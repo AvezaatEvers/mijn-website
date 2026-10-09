@@ -24,7 +24,7 @@ body {
   background: var(--white);
   line-height: 1.6;
 }
-img { max-width: 100%; display: block; }
+img { max-width: 100%; height: auto; display: block; }
 a { color: var(--accent); }
 a:hover { color: var(--accent-dark); }
 h1, h2, h3 { line-height: 1.15; letter-spacing: -0.02em; margin: 0; }
@@ -224,3 +224,5 @@ table.compare tr:last-child td { border-bottom: 0; }
   .plan-single .plan .btn { align-self: stretch; }
   .plan, .plan-single .side { padding: 28px 22px; }
 }
+
+.photo-wide { aspect-ratio: 1200 / 975; max-height: none; }

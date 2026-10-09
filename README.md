@@ -68,3 +68,7 @@ Gratis foto's van Pexels (Pexels-licentie: vrij te gebruiken, ook commercieel, n
 | `branches/hoveniers-2.jpg` | pexels.com/photo/5231138 |
 | `branches/kappers-barbers-1.jpg` | pexels.com/photo/7518731 |
 | `branches/kappers-barbers-2.jpg` | pexels.com/photo/4625648 |
+| `branches/installateurs-1.jpg` | pexels.com/photo/17842832 |
+| `branches/installateurs-2.jpg` | pexels.com/photo/6419128 |
+| `branches/schilders-stukadoors-1.jpg` | pexels.com/photo/6474471 |
+| `branches/schilders-stukadoors-2.jpg` | pexels.com/photo/7218011 |

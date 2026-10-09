@@ -39,8 +39,8 @@ Zoek in alle bestanden op `[` om de placeholders te vinden:
 
 Zet foto's in `assets/img/` en vervang de placeholderblokken (zie het commentaar `<!-- FOTO: ... -->` in `index.html`):
 
-- `koen-daan.jpg` – hero, staand formaat (4:5), ± 1200 px breed
-- `koen.jpg` en `daan.jpg` – vierkant, ± 800 px
+- `koen-daan.webp` – hero (± 1200 px breed, plus `-800`-versie voor mobiel)
+- `koen.webp` en `daan` – vierkant, ± 800 px (lever gerust een jpg aan, Claude zet hem om naar webp)
 
 ## Kennismaking plannen (Cal.com)
 
@@ -60,15 +60,15 @@ Gratis foto's van Pexels (Pexels-licentie: vrij te gebruiken, ook commercieel, n
 
 | Bestand | Pexels-foto |
 |---|---|
-| `branches/bouw-1.jpg` | pexels.com/photo/10202865 |
-| `branches/bouw-2.jpg` | pexels.com/photo/32913797 |
-| `branches/maatwerk-1.jpg` | pexels.com/photo/28513061 |
-| `branches/maatwerk-2.jpg` | pexels.com/photo/6790078 |
-| `branches/hoveniers-1.jpg` | pexels.com/photo/24595771 |
-| `branches/hoveniers-2.jpg` | pexels.com/photo/5231138 |
-| `branches/kappers-barbers-1.jpg` | pexels.com/photo/7518731 |
-| `branches/kappers-barbers-2.jpg` | pexels.com/photo/4625648 |
-| `branches/installateurs-1.jpg` | pexels.com/photo/17842832 |
-| `branches/installateurs-2.jpg` | pexels.com/photo/6419128 |
-| `branches/schilders-stukadoors-1.jpg` | pexels.com/photo/6474471 |
-| `branches/schilders-stukadoors-2.jpg` | pexels.com/photo/7218011 |
+| `branches/bouw-1.webp` | pexels.com/photo/10202865 |
+| `branches/bouw-2.webp` | pexels.com/photo/32913797 |
+| `branches/maatwerk-1.webp` | pexels.com/photo/28513061 |
+| `branches/maatwerk-2.webp` | pexels.com/photo/6790078 |
+| `branches/hoveniers-1.webp` | pexels.com/photo/24595771 |
+| `branches/hoveniers-2.webp` | pexels.com/photo/5231138 |
+| `branches/kappers-barbers-1.webp` | pexels.com/photo/7518731 |
+| `branches/kappers-barbers-2.webp` | pexels.com/photo/4625648 |
+| `branches/installateurs-1.webp` | pexels.com/photo/17842832 |
+| `branches/installateurs-2.webp` | pexels.com/photo/6419128 |
+| `branches/schilders-stukadoors-1.webp` | pexels.com/photo/6474471 |
+| `branches/schilders-stukadoors-2.webp` | pexels.com/photo/7218011 |

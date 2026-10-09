@@ -465,3 +465,24 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 
 /* Nadruk in introteksten: donker en halfvet, niet blauw */
 .lead strong { color: var(--ink); font-weight: 600; }
+
+/* Mobiele optimalisaties (scan okt 2026) */
+@media (max-width: 700px) {
+  /* Knoppen in de hero over de volle breedte: groter tikvlak, rustiger beeld */
+  .hero .btn-row .btn, .branch-hero-grid .btn-row .btn { flex: 1 1 100%; }
+  /* Vergelijkingstabel past zonder zijwaarts scrollen */
+  table.compare { font-size: 14px; }
+  table.compare th, table.compare td { padding: 12px 10px; }
+  table.compare th:first-child, table.compare td:first-child { padding-left: 14px; }
+  /* Grotere tikvlakken voor kleine links */
+  .footer-bottom a, .contact-lines a, .plan a[href="/tarieven.html"] { display: inline-block; padding-block: 10px; margin-block: -10px; }
+  .footer-dd summary { padding-block: 6px; }
+  .footer-grid ul { gap: 4px; }
+  .footer-grid li a { display: inline-block; padding-block: 5px; }
+  .contact-lines { gap: 14px; }
+  /* WhatsApp-knop iets compacter, zodat hij minder tekst afdekt */
+  .wa { width: 50px; height: 50px; right: 14px; bottom: 14px; }
+}
+@media (max-width: 400px) {
+  .pill { font-size: 13px; padding: 7px 12px; }
+}

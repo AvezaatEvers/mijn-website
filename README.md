@@ -29,14 +29,14 @@ Zolang `netlify/edge-functions/toegang.js` bestaat, ziet elke bezoeker `binnenko
 
 Zoek in alle bestanden op `[` om de placeholders te vinden:
 
-- `[EMAIL]`, `[TELEFOON]`, `[WHATSAPP-NUMMER]` (formaat 316xxxxxxxx, zonder + of spaties)
+- `[TELEFOON]`, `[WHATSAPP-NUMMER]` (formaat 316xxxxxxxx, zonder + of spaties)
 - `[NUMMER]` – KvK-nummer en btw-id in de footer
 - `[X]` – aantal resterende founding-plekken in de banner
 - `[LOOPTIJD…]` – contractafspraak (homepage FAQ, tarieven, voorwaarden)
 - `[OPLEIDING/ERVARING DAAN]`
 - `[BETAALWIJZE…]` op de tarievenpagina
 - Privacy en voorwaarden: rechtsvorm, adres, datum, termijnen – en laat ze controleren
-- Domein: overal staat `https://www.avezaat-evers.nl` – aanpassen als het domein anders wordt
+- Domein: overal staat `https://www.avezaatenevers.nl` – aanpassen als het domein anders wordt
 
 ## Foto's
 

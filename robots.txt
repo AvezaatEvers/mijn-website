@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /bedankt.html
 
-Sitemap: https://www.avezaat-evers.nl/sitemap.xml
+Sitemap: https://www.avezaatenevers.nl/sitemap.xml

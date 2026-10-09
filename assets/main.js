@@ -28,3 +28,18 @@
   var y = document.getElementById('year');
   if (y) y.textContent = new Date().getFullYear();
 })();
+
+// Afvinkbare checklists, onthouden op dit apparaat
+(function () {
+  var boxes = document.querySelectorAll('.checklist input[type="checkbox"][data-key]');
+  if (!boxes.length) return;
+  var store = {};
+  try { store = JSON.parse(localStorage.getItem('ae-checklist') || '{}'); } catch (e) { store = {}; }
+  boxes.forEach(function (b) {
+    if (store[b.dataset.key]) b.checked = true;
+    b.addEventListener('change', function () {
+      store[b.dataset.key] = b.checked;
+      try { localStorage.setItem('ae-checklist', JSON.stringify(store)); } catch (e) {}
+    });
+  });
+})();

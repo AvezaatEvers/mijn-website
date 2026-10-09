@@ -288,3 +288,4 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 .faq-head .faq-search { width: 100%; text-align: left; }
 [hidden] { display: none !important; }
 .faq-back { scroll-margin-top: 110px; } #faq-grid { scroll-margin-top: 110px; }
+.cta-alt { font-size: 15px !important; color: #D1D5DB; line-height: 1.6; } .cta-alt a { color: #FFFFFF; font-weight: 600; } .cta-options { flex: 0 1 380px !important; }

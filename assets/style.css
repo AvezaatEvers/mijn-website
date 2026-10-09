@@ -271,3 +271,20 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 .faq-count { color: var(--muted); font-size: 15px; margin-bottom: 8px !important; }
 .faq details { scroll-margin-top: 100px; }
 .faq p a { font-weight: 500; }
+
+/* FAQ: onderwerpen-grid */
+.cat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 1080px) { .cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .cat-grid { grid-template-columns: 1fr; gap: 12px; } }
+.cat-card { display: flex; flex-direction: column; gap: 8px; padding: 26px 24px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--white); color: var(--ink); text-decoration: none; transition: border-color .15s, box-shadow .15s, transform .15s; }
+.cat-card:hover, .cat-card:focus-visible { border-color: var(--accent); box-shadow: 0 12px 28px rgba(30,64,175,0.10); transform: translateY(-2px); color: var(--ink); }
+.cat-card h2 { font-size: 18px; letter-spacing: -0.01em; margin-top: 6px; }
+.cat-count { font-size: 14px; font-weight: 600; color: var(--accent); }
+.cat-ex { font-size: 14px; color: var(--muted); line-height: 1.5; }
+.faq-back { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-decoration: none; margin-bottom: 8px; }
+.js-faq .faq-cat { display: none; }
+.js-faq .faq-cat.active { display: block; }
+.faq-head .stack { align-items: center; text-align: center; margin: 0 auto; }
+.faq-head .faq-search { width: 100%; text-align: left; }
+[hidden] { display: none !important; }
+.faq-back { scroll-margin-top: 110px; } #faq-grid { scroll-margin-top: 110px; }

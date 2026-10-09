@@ -7,6 +7,34 @@
   var resultsBox = document.getElementById('faq-resultaten');
   var cats = document.getElementById('faq-categorieen');
   var items = Array.prototype.slice.call(document.querySelectorAll('.faq-all details[data-q]'));
+  var grid = document.getElementById('faq-grid');
+  var back = document.getElementById('faq-terug');
+  var sections = Array.prototype.slice.call(document.querySelectorAll('.faq-cat'));
+  document.documentElement.classList.add('js-faq');
+
+  // Onderwerpen-grid: toon één categorie tegelijk
+  function route(scroll) {
+    var id = location.hash.slice(1);
+    var target = id && document.getElementById(id);
+    var sec = null, q = null;
+    if (target && target.classList.contains('faq-cat')) sec = target;
+    else if (target && target.tagName === 'DETAILS') { q = target; sec = target.closest('.faq-cat'); }
+    sections.forEach(function (s) { s.classList.toggle('active', s === sec); });
+    if (sec) {
+      grid.hidden = true; back.hidden = false;
+      if (q) q.open = true;
+      if (scroll) (q || back).scrollIntoView({ block: 'start' });
+    } else {
+      grid.hidden = false; back.hidden = true;
+    }
+  }
+  back.addEventListener('click', function (e) {
+    e.preventDefault();
+    history.pushState('', document.title, location.pathname + location.search);
+    route(false);
+    grid.scrollIntoView({ block: 'start' });
+  });
+  window.addEventListener('hashchange', function () { route(true); });
 
   // Woorden met (ongeveer) dezelfde betekenis
   var GROUPS = [
@@ -137,9 +165,10 @@
     if (!q.trim()) {
       resultsBox.hidden = true; resultsBox.innerHTML = '';
       cats.hidden = false;
+      route(false);
       return;
     }
-    cats.hidden = true;
+    cats.hidden = true; grid.hidden = true; back.hidden = true;
     var nq = norm(q);
     var ranked = index.map(function (e) {
       var s = score(e, qtoks);
@@ -178,9 +207,5 @@
   });
   document.getElementById('faq-form').addEventListener('submit', function (e) { e.preventDefault(); render(input.value); });
 
-  // Direct naar een vraag via een link met #id
-  if (location.hash) {
-    var target = document.getElementById(location.hash.slice(1));
-    if (target && target.tagName === 'DETAILS') target.open = true;
-  }
+  route(!!location.hash);
 })();

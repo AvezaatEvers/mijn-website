@@ -76,3 +76,14 @@
     update();
   });
 })();
+
+// Animatie bij in beeld komen (MoneyMonk-badge)
+(function () {
+  var el = document.querySelector('.app-section');
+  if (!el || !('IntersectionObserver' in window)) return;
+  document.documentElement.classList.add('js-anim');
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { if (e.isIntersecting) { el.classList.add('in-view'); io.disconnect(); } });
+  }, { threshold: 0.35 });
+  io.observe(el);
+})();

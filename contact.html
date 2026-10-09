@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plan een gratis kennismaking | Avezaat &amp; Evers</title>
+<meta name="description" content="Plan een gratis en vrijblijvende kennismaking van 20 minuten. Je weet direct welk pakket bij je past en wat het kost.">
+<link rel="canonical" href="https://www.avezaat-evers.nl/contact.html">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<a class="skip" href="#main">Naar de inhoud</a>
+
+<header class="site-header">
+  <div class="container nav">
+    <a class="logo" href="/">Avezaat <span>&amp;</span> Evers</a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menu openen">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <nav id="nav-links" class="nav-links" aria-label="Hoofdmenu">
+      <a href="/#werkwijze">Werkwijze</a>
+      <a href="/tarieven.html">Tarieven</a>
+      <a href="/starters.html">Starters</a>
+      <a href="/overstappen.html">Overstappen</a>
+      <a href="/kennisbank/">Kennisbank</a>
+      <a class="btn btn-primary" href="/contact.html" aria-current="page">Plan een kennismaking</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="section">
+  <div class="container">
+    <div class="cta">
+      <div class="stack" style="gap:16px">
+        <p class="crumbs" style="font-size:14px"><a href="/">Home</a> / Contact</p>
+        <h1 style="font-size:clamp(32px,4vw,48px)">Plan een gratis kennismaking</h1>
+        <p>Vul het formulier in en we nemen binnen één werkdag contact op om een moment te plannen. Het gesprek duurt 20 minuten, is vrijblijvend en je weet direct wat het je kost.</p>
+        <div class="contact-lines">
+          <span><strong style="color:#FFFFFF">Liever direct contact?</strong></span>
+          <a href="mailto:[EMAIL]">[EMAIL]</a>
+          <a href="tel:[TELEFOON]">[TELEFOON]</a>
+          <a href="https://wa.me/[WHATSAPP-NUMMER]">Stuur een WhatsApp</a>
+        </div>
+        <!-- OPTIONEEL: zelf een tijd laten kiezen via Calendly.
+             Vervang [CALENDLY-LINK] en haal het commentaar weg:
+        <a class="btn btn-white" href="[CALENDLY-LINK]" style="align-self:flex-start;margin-top:8px">Kies zelf een tijdstip</a>
+        -->
+      </div>
+      <form class="form" name="kennismaking" method="POST" action="/bedankt.html" data-netlify="true" netlify-honeypot="bot-field">
+        <input type="hidden" name="form-name" value="kennismaking">
+        <p class="hidden"><label>Niet invullen: <input name="bot-field"></label></p>
+        <label>Naam<input type="text" name="naam" autocomplete="name" required></label>
+        <label>E-mail<input type="email" name="email" autocomplete="email" required></label>
+        <label>Telefoon<input type="tel" name="telefoon" autocomplete="tel"></label>
+        <label>Interesse in pakket
+          <select name="pakket" id="pakket">
+            <option value="weet-niet">Weet ik nog niet</option>
+            <option value="starter">Starter – €79 p/m</option>
+            <option value="compleet">Compleet – €99 p/m</option>
+            <option value="plus">Plus – €139 p/m</option>
+          </select>
+        </label>
+        <label>Transacties per maand (ca.)
+          <select name="transacties">
+            <option>Minder dan 20</option>
+            <option>20 – 50</option>
+            <option>Meer dan 50</option>
+            <option>Weet ik niet</option>
+          </select>
+        </label>
+        <label>Situatie
+          <select name="situatie">
+            <option>Ik ben net gestart</option>
+            <option>Ik wil overstappen van boekhouder</option>
+            <option>Ik doe het nu zelf</option>
+            <option>Anders</option>
+          </select>
+        </label>
+        <label class="full">Wat voor onderneming heb je?<textarea name="bericht" rows="4"></textarea></label>
+        <label class="check full"><input type="checkbox" name="privacy" required><span>Ik ga akkoord met de <a href="/privacy.html">privacyverklaring</a>.</span></label>
+        <button class="btn btn-white" type="submit">Verstuur aanvraag</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <a class="logo" href="/">Avezaat <span>&amp;</span> Evers</a>
+      <p style="margin-top:12px">De boekhouder voor zzp'ers en eenmanszaken. Jij onderneemt, wij doen de rest.</p>
+    </div>
+    <div>
+      <h4>Diensten</h4>
+      <ul>
+        <li><a href="/tarieven.html">Tarieven</a></li>
+        <li><a href="/starters.html">Voor starters</a></li>
+        <li><a href="/overstappen.html">Overstappen</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Informatie</h4>
+      <ul>
+        <li><a href="/kennisbank/">Kennisbank</a></li>
+        <li><a href="/#over">Over ons</a></li>
+        <li><a href="/#faq">Veelgestelde vragen</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:[EMAIL]">[EMAIL]</a></li>
+        <li><a href="tel:[TELEFOON]">[TELEFOON]</a></li>
+        <li><a href="/contact.html">Plan een kennismaking</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>© <span id="year">2026</span> Avezaat &amp; Evers · KvK [NUMMER] · Btw-id [NUMMER]</span>
+    <span><a href="/voorwaarden.html">Algemene voorwaarden</a> · <a href="/privacy.html">Privacyverklaring</a></span>
+  </div>
+</footer>
+
+<script src="/assets/main.js" defer></script>
+</body>
+</html>

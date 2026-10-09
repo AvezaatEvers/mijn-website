@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /bedankt.html
+
+Sitemap: https://www.avezaat-evers.nl/sitemap.xml

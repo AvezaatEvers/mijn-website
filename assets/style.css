@@ -548,3 +548,7 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 .nc-eerder { font-size: 14px; }
 .nc-hint { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.5; min-height: 1.5em; }
 @media (max-width: 480px) { .nc-row { grid-template-columns: 1fr; } }
+
+/* Pill op getinte achtergrond: wit, zodat hij niet wegvalt */
+.bg-tint .pill { background: var(--white); border: 1px solid var(--tint-border); }
+.app-section h2 { text-wrap: balance; }

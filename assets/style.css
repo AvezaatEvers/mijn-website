@@ -229,3 +229,12 @@ table.compare tr:last-child td { border-bottom: 0; }
 
 /* Cal.com agenda */
 .cal-box { border: 1px solid var(--line); border-radius: var(--radius); background: var(--white); padding: 8px; box-shadow: 0 12px 32px rgba(17,24,39,0.06); }
+
+/* MoneyMonk-handleiding */
+.mm-head { display: flex; gap: 24px; align-items: flex-start; max-width: 860px; }
+.mm-head img { flex: none; border-radius: 16px; margin-top: 30px; }
+@media (max-width: 600px) { .mm-head { flex-direction: column; gap: 12px; } .mm-head img { width: 56px; height: 56px; margin-top: 0; } }
+.prose ol li::marker { color: var(--accent); font-weight: 600; }
+.prose ul.checklist { list-style: none; padding-left: 0; }
+.prose ul.checklist li { position: relative; padding-left: 34px; }
+.prose ul.checklist li::before { content: ''; position: absolute; left: 0; top: 4px; width: 20px; height: 20px; border: 2px solid var(--accent); border-radius: 6px; }

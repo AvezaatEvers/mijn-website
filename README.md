@@ -30,7 +30,6 @@ Zolang `netlify/edge-functions/toegang.js` bestaat, ziet elke bezoeker `binnenko
 Zoek in alle bestanden op `[` om de placeholders te vinden:
 
 - `[TELEFOON]`, `[WHATSAPP-NUMMER]` (formaat 316xxxxxxxx, zonder + of spaties)
-- `[NUMMER]` – KvK-nummer en btw-id in de footer
 - `[OPLEIDING/ERVARING DAAN]`
 - `[BETAALWIJZE…]` op de tarievenpagina
 - Privacy en voorwaarden: rechtsvorm, adres, datum, termijnen – en laat ze controleren

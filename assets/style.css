@@ -462,3 +462,6 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 @font-face{font-family:'Poppins';font-style:normal;font-weight:500;font-display:swap;src:url(/assets/fonts/poppins-500.woff2) format('woff2')}
 @font-face{font-family:'Poppins';font-style:normal;font-weight:600;font-display:swap;src:url(/assets/fonts/poppins-600.woff2) format('woff2')}
 @font-face{font-family:'Poppins';font-style:normal;font-weight:700;font-display:swap;src:url(/assets/fonts/poppins-700.woff2) format('woff2')}
+
+/* Nadruk in introteksten: donker en halfvet, niet blauw */
+.lead strong { color: var(--ink); font-weight: 600; }

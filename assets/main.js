@@ -87,3 +87,38 @@
   }, { threshold: 0.35 });
   io.observe(el);
 })();
+
+// Vloeiend open- en dichtklappen van FAQ-vragen
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.addEventListener('click', function (e) {
+    var summary = e.target.closest('.faq summary');
+    if (!summary || reduce.matches || !summary.parentElement.animate) return;
+    var d = summary.parentElement;
+    if (d.classList.contains('is-animating')) { e.preventDefault(); return; }
+    e.preventDefault();
+    var content = Array.prototype.slice.call(d.children).filter(function (c) { return c !== summary; });
+    var start = d.offsetHeight, end;
+    d.classList.add('is-animating');
+    if (!d.open) {
+      d.open = true;
+      end = d.offsetHeight;
+      content.forEach(function (c) { c.animate([{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }], { duration: 320, easing: 'ease-out' }); });
+    } else {
+      d.open = false;
+      end = d.offsetHeight;
+      d.open = true;
+      content.forEach(function (c) { c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease-in', fill: 'forwards' }); });
+    }
+    var closing = end < start;
+    var anim = d.animate([{ height: start + 'px' }, { height: end + 'px' }], { duration: 320, easing: 'cubic-bezier(.4,0,.2,1)' });
+    if (closing) d.open = true;
+    anim.onfinish = function () {
+      if (closing) {
+        d.open = false;
+        content.forEach(function (c) { c.getAnimations().forEach(function (a) { a.cancel(); }); });
+      }
+      d.classList.remove('is-animating');
+    };
+  });
+})();

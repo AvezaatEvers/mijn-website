@@ -151,8 +151,20 @@ table.compare tr:last-child td { border-bottom: 0; }
 .faq details { border-bottom: 1px solid var(--line); padding: 18px 0; }
 .faq summary { font-size: 18px; font-weight: 600; min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; list-style: none; }
 .faq summary::-webkit-details-marker { display: none; }
-.faq summary::after { content: '+'; font-size: 24px; font-weight: 400; color: var(--accent); }
-.faq details[open] summary::after { content: '–'; }
+.faq summary::after {
+  content: ''; flex: none; width: 16px; height: 16px;
+  background:
+    linear-gradient(var(--accent), var(--accent)) center / 16px 2px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) center / 2px 16px no-repeat;
+  transition: transform .35s cubic-bezier(.4,0,.2,1), background-size .35s cubic-bezier(.4,0,.2,1);
+}
+.faq details[open] summary::after {
+  transform: rotate(180deg);
+  background-size: 16px 2px, 2px 0;
+}
+.faq details > :not(summary) { transition: opacity .3s ease; }
+.faq details.is-animating { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { .faq summary::after { transition: none; } }
 .faq p { margin-top: 8px; color: var(--muted); }
 
 /* CTA / contact */

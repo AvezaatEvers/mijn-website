@@ -342,3 +342,11 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
   .footer-grid > div:last-child { grid-column: 1 / -1; }
   .footer-bottom { padding-bottom: 96px; }
 }
+
+/* Branches */
+.branch-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 1000px) { .branch-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.branch-card { text-decoration: none; color: var(--ink); transition: border-color .15s, box-shadow .15s, transform .15s; }
+.branch-card:hover { border-color: var(--accent); box-shadow: 0 12px 28px rgba(30,64,175,0.10); transform: translateY(-2px); color: var(--ink); }
+.branch-card .more { color: var(--accent); font-weight: 600; font-size: 15px; margin-top: auto; }
+@media (max-width: 700px) { .m-slider.branch-grid > * { flex-basis: 62%; } }

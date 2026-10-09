@@ -43,3 +43,36 @@
     });
   });
 })();
+
+// Stippen onder mobiele sliders (laat zien dat er meer is en waar je bent)
+(function () {
+  var mq = window.matchMedia('(max-width: 700px)');
+  document.querySelectorAll('.m-slider').forEach(function (slider) {
+    var slides = Array.prototype.slice.call(slider.children);
+    if (slides.length < 2) return;
+    var dots = document.createElement('div');
+    dots.className = 'slider-dots';
+    slides.forEach(function (s, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('aria-label', 'Ga naar ' + (i + 1) + ' van ' + slides.length);
+      b.addEventListener('click', function () {
+        slider.scrollTo({ left: s.offsetLeft - slider.offsetLeft - 24, behavior: 'smooth' });
+      });
+      dots.appendChild(b);
+    });
+    slider.parentNode.insertBefore(dots, slider.nextSibling);
+    function update() {
+      if (!mq.matches) return;
+      var x = slider.scrollLeft, best = 0, bestD = Infinity;
+      slides.forEach(function (s, i) {
+        var d = Math.abs(s.offsetLeft - slider.offsetLeft - 24 - x);
+        if (d < bestD) { bestD = d; best = i; }
+      });
+      if (x + slider.clientWidth >= slider.scrollWidth - 4) best = slides.length - 1;
+      dots.querySelectorAll('button').forEach(function (b, i) { b.classList.toggle('active', i === best); });
+    }
+    slider.addEventListener('scroll', function () { window.requestAnimationFrame(update); }, { passive: true });
+    update();
+  });
+})();

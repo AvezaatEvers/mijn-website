@@ -249,3 +249,10 @@ table.compare tr:last-child td { border-bottom: 0; }
 .prose .faq summary { font-size: 17px; color: var(--ink); }
 .prose .faq p { margin: 8px 0 0; }
 .prose h3.faq-group { margin: 32px 0 4px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); }
+
+/* Tijdwaarde-blok en bronvermelding */
+.worth { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: center; background: var(--tint); border-radius: var(--radius); padding: 40px; }
+.worth .table-wrap { background: var(--white); }
+@media (max-width: 860px) { .worth { grid-template-columns: 1fr; padding: 28px 22px; } }
+.source-note { font-size: 13px !important; color: var(--muted) !important; }
+sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }

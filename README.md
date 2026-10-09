@@ -32,7 +32,7 @@ Zoek in alle bestanden op `[` om de placeholders te vinden:
 - **Testnummer vervangen:** overal staat nu `06 1234 5678` / `+31612345678` / `wa.me/31612345678` als test. Vervangen door het echte nummer.
 - `[OPLEIDING/ERVARING DAAN]`
 - `[BETAALWIJZE…]` op de tarievenpagina
-- Privacy en voorwaarden: rechtsvorm, adres, datum, termijnen – en laat ze controleren
+- Privacy en voorwaarden: datum, termijnen – en laat ze controleren (rechtsvorm VOF en adres zijn ingevuld)
 - Domein: overal staat `https://www.avezaatenevers.nl` – aanpassen als het domein anders wordt
 
 ## Foto's

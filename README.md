@@ -19,6 +19,12 @@ Statische website (HTML + CSS), gehost op Netlify vanuit GitHub. Geen build-stap
 
 Huisstijl: `assets/style.css` (kleuren bovenaan als variabelen). Menu en formulier-hulp: `assets/main.js`.
 
+## Afscherming tot de lancering
+
+Zolang `netlify/edge-functions/toegang.js` bestaat, ziet elke bezoeker `binnenkort.html`. Met het wachtwoord (via "Toegang" rechtsonder) krijg je 30 dagen toegang tot de echte site.
+
+**Lancering:** verwijder `netlify/edge-functions/toegang.js` – dan is de site direct open.
+
 ## Vóór livegang invullen
 
 Zoek in alle bestanden op `[` om de placeholders te vinden:

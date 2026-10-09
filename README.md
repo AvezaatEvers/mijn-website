@@ -31,7 +31,6 @@ Zoek in alle bestanden op `[` om de placeholders te vinden:
 
 - `[TELEFOON]`, `[WHATSAPP-NUMMER]` (formaat 316xxxxxxxx, zonder + of spaties)
 - `[NUMMER]` – KvK-nummer en btw-id in de footer
-- `[LOOPTIJD…]` – contractafspraak (homepage FAQ, tarieven, voorwaarden)
 - `[OPLEIDING/ERVARING DAAN]`
 - `[BETAALWIJZE…]` op de tarievenpagina
 - Privacy en voorwaarden: rechtsvorm, adres, datum, termijnen – en laat ze controleren

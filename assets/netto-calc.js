@@ -71,6 +71,7 @@
 
   var fmt = new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
   function euro(n) { return fmt.format(Math.round(n)).replace(/\s/g, ' '); }
+  function perJaar() { return form.querySelector('input[name="periode"]:checked').value === 'jaar'; }
   function getal(id) {
     var v = document.getElementById(id).value.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.');
     var n = parseFloat(v);
@@ -81,10 +82,24 @@
   function update() {
     var jaar = form.querySelector('input[name="jaar"]:checked').value;
     var uren = document.getElementById('nc-uren').checked;
-    var starterBox = document.getElementById('nc-starter');
-    starterBox.disabled = !uren;
-    if (!uren) starterBox.checked = false;
-    var r = bereken(jaar, getal('nc-omzet'), getal('nc-kosten'), uren, starterBox.checked);
+    var fase = form.querySelector('input[name="fase"]:checked').value;
+    var eerderBox = document.getElementById('nc-eerder');
+    var faseSet = document.getElementById('nc-fase');
+    faseSet.disabled = !uren;
+    faseSet.classList.toggle('is-uit', !uren);
+    eerderBox.closest('label').hidden = fase === '0';
+    var starter = uren && fase !== '0' && !eerderBox.checked;
+    var hint = '';
+    if (!uren) hint = 'Zonder urencriterium krijg je geen zelfstandigen- en startersaftrek.';
+    else if (fase === '0') hint = 'Na je eerste drie jaar heb je geen recht meer op startersaftrek.';
+    else if (eerderBox.checked) hint = 'Dan heb je waarschijnlijk geen recht op startersaftrek: die krijg je alleen als je in de vijf jaar daarvoor maximaal twee keer zelfstandigenaftrek had. We rekenen zonder.';
+    else hint = 'Je krijgt startersaftrek: ' + euro(JAREN[jaar].sa) + ' in ' + jaar + (jaar === '2027' ? '. Vanaf 2028 vervalt die.' : '.');
+    zet('nc-fase-hint', hint);
+    var factor = perJaar() ? 1 : 12;
+    form.querySelectorAll('.nc-per-label').forEach(function (el, i) {
+      el.textContent = (i === 0 ? 'Omzet' : 'Zakelijke kosten') + (perJaar() ? ' per jaar' : ' per maand');
+    });
+    var r = bereken(jaar, getal('nc-omzet') * factor, getal('nc-kosten') * factor, uren, starter);
     zet('nc-netto-maand', euro(r.netto / 12));
     zet('nc-netto-jaar', euro(r.netto));
     zet('nc-winst', euro(r.winst));
@@ -100,6 +115,21 @@
     zet('nc-jaar-label', jaar === '2027' ? '2027 (voorlopige tarieven)' : '2026');
     document.getElementById('nc-negatief').hidden = r.winst >= 0;
   }
+
+  // Wissel per maand / per jaar: rek de ingevulde bedragen om
+  var vorige = perJaar();
+  form.querySelectorAll('input[name="periode"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      var nu = perJaar();
+      if (nu !== vorige) {
+        ['nc-omzet', 'nc-kosten'].forEach(function (id) {
+          var n = getal(id) * (nu ? 12 : 1 / 12);
+          document.getElementById(id).value = n ? new Intl.NumberFormat('nl-NL').format(Math.round(n)) : '';
+        });
+        vorige = nu;
+      }
+    });
+  });
 
   form.addEventListener('input', update);
   form.addEventListener('change', update);

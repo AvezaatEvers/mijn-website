@@ -498,14 +498,14 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 /* Netto-calculator (kennisbank) */
 .nc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 32px; align-items: start; }
 .nc-inputs { display: flex; flex-direction: column; gap: 22px; background: var(--white); border: 1px solid var(--line); border-radius: 20px; padding: 28px; }
-.nc-jaar { border: 0; margin: 0; padding: 0; display: flex; gap: 8px; flex-wrap: wrap; }
-.nc-jaar legend { font-weight: 600; font-size: 15px; margin-bottom: 10px; padding: 0; }
-.nc-jaar label { flex: 1 1 0; cursor: pointer; }
-.nc-jaar input { position: absolute; opacity: 0; pointer-events: none; }
-.nc-jaar span { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 46px; border: 1px solid var(--line); border-radius: 12px; font-weight: 600; color: var(--muted); transition: border-color .15s, background .15s, color .15s; }
-.nc-jaar small { font-weight: 500; font-size: 12px; }
-.nc-jaar input:checked + span { border-color: var(--accent); background: var(--tint); color: var(--accent); }
-.nc-jaar input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.nc-seg { border: 0; margin: 0; padding: 0; display: flex; gap: 8px; flex-wrap: wrap; }
+.nc-seg legend { font-weight: 600; font-size: 15px; margin-bottom: 10px; padding: 0; }
+.nc-seg label { flex: 1 1 0; cursor: pointer; }
+.nc-seg input { position: absolute; opacity: 0; pointer-events: none; }
+.nc-seg > label > span, .nc-seg span { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 46px; border: 1px solid var(--line); border-radius: 12px; font-weight: 600; color: var(--muted); transition: border-color .15s, background .15s, color .15s; }
+.nc-seg small { font-weight: 500; font-size: 12px; }
+.nc-seg input:checked + span { border-color: var(--accent); background: var(--tint); color: var(--accent); }
+.nc-seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
 .nc-field { display: flex; flex-direction: column; gap: 8px; font-weight: 600; font-size: 15px; }
 .nc-field small, .nc-check small { font-weight: 400; color: var(--muted); }
 .nc-money { display: flex; align-items: center; border: 1px solid #D1D5DB; border-radius: 12px; padding: 0 14px; background: var(--white); }
@@ -537,3 +537,14 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
   .nc-table { padding: 4px 14px; }
   .nc-table div { font-size: 14px; }
 }
+
+.nc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.nc-seg { min-width: 0; }
+.nc-seg span { min-height: 44px; font-size: 15px; text-align: center; padding: 0 6px; }
+.nc-fase { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.nc-fase legend { font-weight: 600; font-size: 15px; margin-bottom: 10px; padding: 0; }
+.nc-seg-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.nc-fase.is-uit .nc-seg-4, .nc-fase.is-uit .nc-eerder { opacity: .45; }
+.nc-eerder { font-size: 14px; }
+.nc-hint { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.5; min-height: 1.5em; }
+@media (max-width: 480px) { .nc-row { grid-template-columns: 1fr; } }

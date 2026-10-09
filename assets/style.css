@@ -404,3 +404,4 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
   .mm-badge, .js-anim .app-section.in-view .mm-badge { right: 8px; transform: none; }
   .js-anim .mm-badge { transform: translateY(12px) scale(.9); }
 }
+.banner-value { font-weight: 600; }

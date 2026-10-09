@@ -256,3 +256,18 @@ table.compare tr:last-child td { border-bottom: 0; }
 @media (max-width: 860px) { .worth { grid-template-columns: 1fr; padding: 28px 22px; } }
 .source-note { font-size: 13px !important; color: var(--muted) !important; }
 sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
+
+/* Veelgestelde vragen */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.faq-search { display: flex; align-items: center; gap: 12px; background: var(--white); border: 1.5px solid #D1D5DB; border-radius: 14px; padding: 6px 18px; margin-top: 8px; box-shadow: 0 8px 24px rgba(17,24,39,0.06); }
+.faq-search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px var(--tint); }
+.faq-search input { flex: 1; border: 0; outline: 0; font: inherit; font-size: 17px; padding: 12px 0; background: transparent; color: var(--ink); min-width: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.chip { font-size: 14px; padding: 8px 14px; border-radius: 999px; background: var(--tint); color: var(--accent); text-decoration: none; font-weight: 500; }
+.chip:hover { background: #E3E9F8; }
+.faq-cat { scroll-margin-top: 100px; margin-bottom: 48px; }
+.faq-cat h2 { font-size: 24px; margin-bottom: 8px; }
+.faq-results { margin-bottom: 48px; }
+.faq-count { color: var(--muted); font-size: 15px; margin-bottom: 8px !important; }
+.faq details { scroll-margin-top: 100px; }
+.faq p a { font-weight: 500; }

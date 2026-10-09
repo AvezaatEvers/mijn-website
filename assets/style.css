@@ -418,3 +418,6 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 @media (max-width: 700px) {
   .usp-grid.m-slider .card { border: 1px solid var(--line); padding: 24px; background: var(--white); }
 }
+.app-section.bg-tint .app-visual::before { background: var(--white); }
+#faq.bg-soft + section { padding-top: 96px !important; }
+@media (max-width: 600px) { #faq.bg-soft + section { padding-top: 64px !important; } }

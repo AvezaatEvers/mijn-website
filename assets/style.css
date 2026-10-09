@@ -45,8 +45,15 @@ p { margin: 0; }
 .skip:focus { left: 16px; top: 16px; background: var(--white); padding: 8px 12px; z-index: 100; }
 
 /* Banner */
-.banner { background: var(--ink); color: var(--white); padding: 12px 24px; text-align: center; font-size: 14px; }
-.banner a { color: var(--white); font-weight: 600; }
+.banner { display: block; background: var(--tint); color: var(--accent); padding: 11px 24px; text-align: center; font-size: 14px; text-decoration: none; border-bottom: 1px solid var(--tint-border); }
+.banner:hover { color: var(--accent-dark); background: #E3E9F8; }
+.banner strong { font-weight: 600; }
+.banner-short { display: none; }
+@media (max-width: 600px) {
+  .banner { font-size: 14px; padding: 10px 16px; }
+  .banner-long { display: none; }
+  .banner-short { display: inline; }
+}
 
 /* Header */
 .site-header { border-bottom: 1px solid var(--line); background: var(--white); position: sticky; top: 0; z-index: 50; }

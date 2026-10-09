@@ -289,3 +289,10 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 [hidden] { display: none !important; }
 .faq-back { scroll-margin-top: 110px; } #faq-grid { scroll-margin-top: 110px; }
 .cta-alt { font-size: 15px !important; color: #D1D5DB; line-height: 1.6; } .cta-alt a { color: #FFFFFF; font-weight: 600; } .cta-options { flex: 0 1 380px !important; }
+
+.cta-alt { display: flex; flex-direction: column; gap: 8px; }
+.cta-alt p { font-size: 14px !important; color: #D1D5DB !important; margin: 0; }
+.cta-contact { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.cta-contact li { display: flex; align-items: center; gap: 10px; color: #9CA3AF; font-size: 15px; }
+.cta-contact a { color: #FFFFFF; font-weight: 600; text-decoration: none; }
+.cta-contact a:hover { text-decoration: underline; }

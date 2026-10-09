@@ -29,7 +29,7 @@ Zolang `netlify/edge-functions/toegang.js` bestaat, ziet elke bezoeker `binnenko
 
 Zoek in alle bestanden op `[` om de placeholders te vinden:
 
-- `[TELEFOON]`, `[WHATSAPP-NUMMER]` (formaat 316xxxxxxxx, zonder + of spaties)
+- **Testnummer vervangen:** overal staat nu `06 1234 5678` / `+31612345678` / `wa.me/31612345678` als test. Vervangen door het echte nummer.
 - `[OPLEIDING/ERVARING DAAN]`
 - `[BETAALWIJZE…]` op de tarievenpagina
 - Privacy en voorwaarden: rechtsvorm, adres, datum, termijnen – en laat ze controleren

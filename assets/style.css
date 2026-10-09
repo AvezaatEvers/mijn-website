@@ -350,3 +350,19 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 .branch-card:hover { border-color: var(--accent); box-shadow: 0 12px 28px rgba(30,64,175,0.10); transform: translateY(-2px); color: var(--ink); }
 .branch-card .more { color: var(--accent); font-weight: 600; font-size: 15px; margin-top: auto; }
 @media (max-width: 700px) { .m-slider.branch-grid > * { flex-basis: 62%; } }
+
+/* Branchepagina's met foto's */
+.branch-hero-grid { display: flex; flex-wrap: wrap; gap: 48px; align-items: center; }
+.branch-hero-grid > .stack { flex: 1 1 460px; min-width: 0; }
+.branch-photo { width: 100%; border-radius: 24px; object-fit: cover; aspect-ratio: 3 / 2; }
+.branch-hero-grid > .branch-photo { flex: 1 1 400px; min-width: 0; max-width: 560px; }
+.branch-photo-tall { aspect-ratio: 4 / 3; max-height: 420px; }
+@media (max-width: 700px) { .branch-hero-grid { gap: 24px; } .branch-photo { border-radius: 16px; } }
+
+/* Footer-dropdown */
+.footer-dd summary { cursor: pointer; color: var(--muted); list-style: none; display: inline-flex; align-items: center; gap: 6px; }
+.footer-dd summary::-webkit-details-marker { display: none; }
+.footer-dd summary::after { content: ''; width: 7px; height: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translateY(-2px); transition: transform .15s; }
+.footer-dd[open] summary::after { transform: rotate(-135deg) translateY(-1px); }
+.footer-dd summary:hover { color: var(--accent); }
+.footer-dd ul { margin-top: 8px !important; padding-left: 12px !important; border-left: 2px solid var(--line); gap: 6px !important; }

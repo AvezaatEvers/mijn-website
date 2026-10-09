@@ -53,3 +53,18 @@ Werkt via **Netlify Forms** (`data-netlify="true"`). Aanvragen verschijnen in Ne
 ## Wijzigen
 
 Vraag Claude: "werk aan de Avezaat & Evers-site in GitHub" en beschrijf de wijziging. Header en footer staan op elke pagina; een wijziging daarin moet op alle pagina's.
+
+## Stockfoto's branchepagina's
+
+Gratis foto's van Pexels (Pexels-licentie: vrij te gebruiken, ook commercieel, naamsvermelding niet verplicht). Bron-ID's:
+
+| Bestand | Pexels-foto |
+|---|---|
+| `branches/bouw-1.jpg` | pexels.com/photo/10202865 |
+| `branches/bouw-2.jpg` | pexels.com/photo/32913797 |
+| `branches/maatwerk-1.jpg` | pexels.com/photo/28513061 |
+| `branches/maatwerk-2.jpg` | pexels.com/photo/6790078 |
+| `branches/hoveniers-1.jpg` | pexels.com/photo/24595771 |
+| `branches/hoveniers-2.jpg` | pexels.com/photo/5231138 |
+| `branches/kappers-barbers-1.jpg` | pexels.com/photo/7518731 |
+| `branches/kappers-barbers-2.jpg` | pexels.com/photo/4625648 |

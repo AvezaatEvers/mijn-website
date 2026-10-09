@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=19">
+<link rel="stylesheet" href="/assets/style.css?v=20">
 </head>
 <body>
 <a class="skip" href="#main">Naar de inhoud</a>
@@ -34,8 +34,9 @@
 
 <main id="main">
 
-<section class="page-head">
-  <div class="container stack">
+<section class="page-head branch-hero">
+  <div class="container branch-hero-grid">
+    <div class="stack">
     <p class="crumbs"><a href="/">Home</a> / Branches / Bouw</p>
     <h1>Boekhouder voor zzp'ers in de bouw</h1>
     <p class="lead">Je staat liever op de bouwplaats dan achter een laptop. Wij regelen je administratie, ook de lastige bouwzaken zoals verlegde btw, zodat jij kunt doorwerken.</p>
@@ -43,6 +44,8 @@
       <a class="btn btn-primary" href="/contact.html">Plan een gratis kennismaking</a>
       <a class="btn btn-ghost" href="/tarieven.html">Bekijk tarieven</a>
     </div>
+    </div>
+    <img class="branch-photo" src="/assets/img/branches/bouw-1.jpg" alt="Bouwvakkers aan het werk op een bouwplaats" width="1200" height="800">
   </div>
 </section>
 
@@ -74,16 +77,15 @@
     <div class="stack" style="gap:18px">
       <h2>Alles geregeld voor €80 per maand</h2>
       <p class="lead">Je eigen vaste boekhouder, je btw-aangiftes, je aangifte inkomstenbelasting en elke maand een 1-op-1 gesprek. Tot 100 banktransacties per maand, de software inbegrepen.</p>
-      <div class="btn-row"><a class="btn btn-primary" href="/tarieven.html">Bekijk wat er in het pakket zit</a></div>
-    </div>
-    <div class="card" style="gap:12px">
-      <h3>Zo werkt het</h3>
+      <h3 style="margin-top:6px">Zo werkt het</h3>
       <ol style="margin:0;padding-left:20px;color:#374151;display:flex;flex-direction:column;gap:8px">
         <li>Gratis kennismaking van 20 minuten</li>
         <li>Wij richten je administratie in en koppelen je bank</li>
         <li>Jij maakt een foto van je bonnen, wij doen de rest</li>
       </ol>
+      <div class="btn-row"><a class="btn btn-primary" href="/tarieven.html">Bekijk wat er in het pakket zit</a></div>
     </div>
+    <img class="branch-photo branch-photo-tall" src="/assets/img/branches/bouw-2.jpg" alt="Metselaar legt een baksteen" width="800" height="1200" loading="lazy">
   </div>
 </section>
 
@@ -147,15 +149,17 @@
         <li><a href="/tarieven.html">Tarieven</a></li>
         <li><a href="/starters.html">Voor starters</a></li>
         <li><a href="/overstappen.html">Overstappen</a></li>
-      </ul>
-    </div>
-    <div>
-      <h4>Branches</h4>
-      <ul>
-        <li><a href="/branches/bouw.html">Bouw</a></li>
-        <li><a href="/branches/maatwerk.html">Maatwerk</a></li>
-        <li><a href="/branches/hoveniers.html">Hoveniers</a></li>
-        <li><a href="/branches/kappers-barbers.html">Kappers &amp; barbers</a></li>
+        <li>
+          <details class="footer-dd">
+            <summary>Branches</summary>
+            <ul>
+            <li><a href="/branches/bouw.html">Bouw</a></li>
+            <li><a href="/branches/maatwerk.html">Maatwerk</a></li>
+            <li><a href="/branches/hoveniers.html">Hoveniers</a></li>
+            <li><a href="/branches/kappers-barbers.html">Kappers &amp; barbers</a></li>
+            </ul>
+          </details>
+        </li>
       </ul>
     </div>
     <div>
@@ -185,7 +189,7 @@
   <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFFFFF" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg>
 </a>
 
-<script src="/assets/main.js?v=19" defer></script>
-<script src="/assets/cal.js?v=19" defer></script>
+<script src="/assets/main.js?v=20" defer></script>
+<script src="/assets/cal.js?v=20" defer></script>
 </body>
 </html>

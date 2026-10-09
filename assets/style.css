@@ -226,3 +226,6 @@ table.compare tr:last-child td { border-bottom: 0; }
 }
 
 .photo-wide { aspect-ratio: 1200 / 975; max-height: none; }
+
+/* Cal.com agenda */
+.cal-box { border: 1px solid var(--line); border-radius: var(--radius); background: var(--white); padding: 8px; box-shadow: 0 12px 32px rgba(17,24,39,0.06); }

@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=6">
+<link rel="stylesheet" href="/assets/style.css?v=7">
 </head>
 <body>
 <a class="skip" href="#main">Naar de inhoud</a>
@@ -34,23 +34,35 @@
 
 <main id="main">
 
-<section class="section">
+<section class="page-head">
+  <div class="container stack">
+    <p class="crumbs"><a href="/">Home</a> / Contact</p>
+    <h1>Plan een gratis kennismaking</h1>
+    <p class="lead">Kies hieronder direct een moment dat jou uitkomt. Het gesprek duurt 20 minuten, telefonisch of via video, en is vrijblijvend. Je weet daarna precies wat het je kost.</p>
+  </div>
+</section>
+
+<section id="plannen" class="section" style="padding-top:48px">
+  <div class="container">
+    <div class="cal-box">
+      <div id="cal-inline" style="width:100%;min-height:640px;overflow:auto"></div>
+      <noscript><p style="padding:24px">Zet JavaScript aan om direct een tijd te kiezen, of <a href="https://cal.com/avezaatenevers/kennismaking">open de agenda</a>.</p></noscript>
+    </div>
+    <p class="extras" style="text-align:center">Lukt het plannen niet? <a href="https://cal.com/avezaatenevers/kennismaking" target="_blank" rel="noopener">Open de agenda in een nieuw venster</a>.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
   <div class="container">
     <div class="cta">
       <div class="stack" style="gap:16px">
-        <p class="crumbs" style="font-size:14px"><a href="/">Home</a> / Contact</p>
-        <h1 style="font-size:clamp(32px,4vw,48px)">Plan een gratis kennismaking</h1>
-        <p>Vul het formulier in en we nemen binnen één werkdag contact op om een moment te plannen. Het gesprek duurt 20 minuten, is vrijblijvend en je weet direct wat het je kost.</p>
+        <h2>Liever eerst een vraag stellen?</h2>
+        <p>Laat je gegevens achter, dan nemen we binnen één werkdag contact met je op.</p>
         <div class="contact-lines">
-          <span><strong style="color:#FFFFFF">Liever direct contact?</strong></span>
           <a href="mailto:info@avezaatenevers.nl">info@avezaatenevers.nl</a>
           <a href="tel:[TELEFOON]">[TELEFOON]</a>
           <a href="https://wa.me/[WHATSAPP-NUMMER]">Stuur een WhatsApp</a>
         </div>
-        <!-- OPTIONEEL: zelf een tijd laten kiezen via Calendly.
-             Vervang [CALENDLY-LINK] en haal het commentaar weg:
-        <a class="btn btn-white" href="[CALENDLY-LINK]" style="align-self:flex-start;margin-top:8px">Kies zelf een tijdstip</a>
-        -->
       </div>
       <form class="form" name="kennismaking" method="POST" action="/bedankt.html" data-netlify="true" netlify-honeypot="bot-field">
         <input type="hidden" name="form-name" value="kennismaking">
@@ -76,7 +88,7 @@
         </label>
         <label class="full">Wat voor onderneming heb je?<textarea name="bericht" rows="4"></textarea></label>
         <label class="check full"><input type="checkbox" name="privacy" required><span>Ik ga akkoord met de <a href="/privacy.html">privacyverklaring</a>.</span></label>
-        <button class="btn btn-white" type="submit">Verstuur aanvraag</button>
+        <button class="btn btn-white" type="submit">Verstuur je vraag</button>
       </form>
     </div>
   </div>
@@ -121,6 +133,7 @@
   </div>
 </footer>
 
-<script src="/assets/main.js?v=6" defer></script>
+<script src="/assets/main.js?v=7" defer></script>
+<script src="/assets/cal.js?v=7" defer></script>
 </body>
 </html>

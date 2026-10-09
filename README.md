@@ -43,6 +43,10 @@ Zet foto's in `assets/img/` en vervang de placeholderblokken (zie het commentaar
 - `koen-daan.jpg` – hero, staand formaat (4:5), ± 1200 px breed
 - `koen.jpg` en `daan.jpg` – vierkant, ± 800 px
 
+## Kennismaking plannen (Cal.com)
+
+Alle knoppen "Plan een kennismaking" openen de Cal.com-agenda als pop-up; op `contact.html` staat de agenda in de pagina. De link staat in `assets/cal.js` (`CAL_LINK`). Laadt Cal.com niet, dan gaan de knoppen gewoon naar de contactpagina.
+
 ## Formulier
 
 Werkt via **Netlify Forms** (`data-netlify="true"`). Aanvragen verschijnen in Netlify onder *Forms*. Stel daar een e-mailmelding in (*Forms → Form notifications*).

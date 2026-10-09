@@ -451,9 +451,7 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 .price-badge strong span { color: var(--ink); }
 .price-badge em { color: var(--muted); }
 
-/* Huisstijlaccenten: tekstselectie en focusrand in eigen blauw */
-::selection { background: #C7D2FE; color: var(--ink); }
-.cta ::selection, .banner ::selection { background: #3B5BDB; color: var(--white); }
+/* Huisstijlaccent: focusrand in eigen blauw */
 :focus { outline: none; }
 :focus-visible { outline: 2.5px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
 .cta :focus-visible { outline-color: var(--white); }

@@ -406,3 +406,15 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 }
 .banner-value { font-weight: 600; }
 .section-flush-top { padding-top: 24px !important; }
+
+/* Homepage: USP's luchtig zonder kaders, zodat het prijsblok eruit springt */
+.usp-grid .card { border: 0; padding: 0; background: transparent; }
+.usp-grid .card h3 { margin-top: 6px; }
+#werkwijze .step-num { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: var(--tint); font-size: 0; }
+#werkwijze .stack:nth-child(1) .step-num::after { content: '1'; }
+#werkwijze .stack:nth-child(2) .step-num::after { content: '2'; }
+#werkwijze .stack:nth-child(3) .step-num::after { content: '3'; }
+#werkwijze .step-num::after { font-size: 17px; font-weight: 700; color: var(--accent); }
+@media (max-width: 700px) {
+  .usp-grid.m-slider .card { border: 1px solid var(--line); padding: 24px; background: var(--white); }
+}

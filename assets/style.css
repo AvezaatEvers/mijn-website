@@ -489,3 +489,8 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 
 /* Witruimte onder de header op mobiel gelijkgetrokken */
 @media (max-width: 600px) { .page-head { padding: 32px 0 40px; } }
+
+/* Prijskaart branchepagina's: tekstlink rustiger en los van de knop */
+.branch-plan .plan .btn-row { gap: 12px 32px; }
+.branch-plan .plan .btn-row a:not(.btn) { font-weight: 500 !important; text-decoration: none; color: var(--accent); }
+.branch-plan .plan .btn-row a:not(.btn):hover { text-decoration: underline; text-underline-offset: 3px; }

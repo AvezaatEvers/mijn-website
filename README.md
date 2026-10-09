@@ -72,3 +72,5 @@ Gratis foto's van Pexels (Pexels-licentie: vrij te gebruiken, ook commercieel, n
 | `branches/installateurs-2.webp` | pexels.com/photo/6419128 |
 | `branches/schilders-stukadoors-1.webp` | pexels.com/photo/6474471 |
 | `branches/schilders-stukadoors-2.webp` | pexels.com/photo/7218011 |
+| `branches/e-commerce-1.webp` | pexels.com/photo/7289707 |
+| `branches/e-commerce-2.webp` | pexels.com/photo/7857523 |

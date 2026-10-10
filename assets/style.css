@@ -608,13 +608,16 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 .app-phone { z-index: 1; }
 .mm-badge { z-index: 2; }
 
-/* Contactpagina: snelle keuzes */
-.contact-chips { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
-.contact-chips a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--white); color: var(--ink); font-size: 15px; font-weight: 500; text-decoration: none; transition: border-color .15s, color .15s; }
-.contact-chips a:hover { border-color: var(--accent); color: var(--accent); }
-.contact-chips li:first-child a { background: var(--accent); border-color: var(--accent); color: var(--white); }
+/* Contactpagina: contactkaarten */
+.contact-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
+.contact-card { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--white); color: var(--ink); text-decoration: none; transition: border-color .15s, box-shadow .15s; }
+.contact-card:hover { border-color: var(--tint-border); box-shadow: 0 6px 20px rgba(17,24,39,.06); }
+.contact-card svg { flex: none; width: 40px; height: 40px; padding: 10px; border-radius: 12px; background: var(--tint); color: var(--accent); box-sizing: border-box; }
+.contact-card span { display: flex; flex-direction: column; min-width: 0; font-size: 14px; color: var(--muted); line-height: 1.4; white-space: nowrap; }
+.contact-card strong { font-size: 15px; color: var(--ink); }
+@media (min-width: 701px) { .contact-card { flex-direction: column; align-items: flex-start; gap: 12px; padding: 18px; } }
+@media (max-width: 700px) { .contact-cards { grid-template-columns: 1fr; gap: 10px; } }
 #vraag, #plannen { scroll-margin-top: 90px; }
-@media (max-width: 480px) { .contact-chips { gap: 8px; } .contact-chips a { font-size: 14px; padding: 0 14px; } }
 
 /* Footer: kennismaking subtiel uitgelicht */
 .footer-grid a.footer-cta { color: var(--accent); font-weight: 600; }

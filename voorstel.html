@@ -62,6 +62,7 @@
     <div>
       <div class="vs-acties">
         <button class="btn btn-primary" type="button" id="vs-kopieer">Kopieer mail</button>
+        <button class="btn btn-ghost" type="button" id="vs-download">Download als .htm</button>
         <span class="vs-hint" style="margin:0">Onderwerp: <strong id="vs-onderwerp"></strong></span>
         <p class="vs-ok" id="vs-ok"></p>
       </div>
@@ -187,8 +188,8 @@
 
     // Knop
     '<tr><td align="left" style="padding:24px 40px 8px 40px;">' +
-      '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="' + BLAUW + '" style="background:' + BLAUW + ';border-radius:10px;">' +
-        '<a href="' + akkoordLink + '" style="' + F + 'display:inline-block;padding:15px 28px;font-size:16px;font-weight:bold;color:#FFFFFF;text-decoration:none;border-radius:10px;">Ja, ik wil starten &rarr;</a>' +
+      '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" bgcolor="' + BLAUW + '" style="background:' + BLAUW + ';border-radius:10px;padding:14px 28px;' + F + 'font-size:16px;font-weight:bold;">' +
+        '<a href="' + akkoordLink + '" style="' + F + 'font-size:16px;font-weight:bold;color:#FFFFFF;text-decoration:none;">Ja, ik wil starten</a>' +
       '</td></tr></table>' +
       '<p style="' + F + 'font-size:14px;color:' + GRIJS + ';margin:12px 0 0;">Dit voorstel is geldig tot ' + esc(v.geldig.value.trim()) + '. Nog vragen? Bel of app me op <a href="' + TELLINK + '" style="color:' + BLAUW + ';text-decoration:none;">' + TEL + '</a>.</p>' +
     '</td></tr>' +
@@ -215,6 +216,18 @@
       '<td valign="top" style="padding:3px 0 ' + (laatste ? '0' : '14px') + ' 0;' + F + 'font-size:15px;line-height:1.5;color:' + TEKST + ';"><strong style="color:' + INKT + ';">' + titel + '</strong><br>' + tekst + '</td>' +
     '</tr>';
   }
+
+  document.getElementById('vs-download').addEventListener('click', function () {
+    var html = '<!DOCTYPE html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' +
+      esc(document.getElementById('vs-onderwerp').textContent) + '</title></head><body style="margin:0;padding:24px 0;background:#F3F4F6;">' +
+      document.getElementById('vs-mail').innerHTML + '</body></html>';
+    var naam = (form.elements.bedrijf.value.trim() || 'klant').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+    a.download = 'voorstel-' + naam + '.htm';
+    document.body.appendChild(a); a.click(); a.remove();
+    document.getElementById('vs-ok').textContent = 'Gedownload. In Outlook voor Windows: Invoegen → Bestand bijvoegen → kies het bestand → pijltje naast Invoegen → Invoegen als tekst.';
+  });
 
   form.addEventListener('input', bouw);
   form.addEventListener('change', bouw);

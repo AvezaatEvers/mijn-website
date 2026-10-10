@@ -76,3 +76,4 @@ Gratis foto's van Pexels (Pexels-licentie: vrij te gebruiken, ook commercieel, n
 | `branches/e-commerce-2.webp` | pexels.com/photo/7857523 |
 | `branches/zorgverleners-1.webp` | pexels.com/photo/20860592 |
 | `branches/zorgverleners-2.webp` | pexels.com/photo/15319035 |
+| `aanbevelen.webp` | pexels.com/photo/20541452 |

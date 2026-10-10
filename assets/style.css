@@ -703,13 +703,15 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
 .bd-foto figcaption { font-size: 14px; color: var(--muted); margin-top: 10px; text-align: center; }
 .bd-verder-sectie { padding-top: 56px; padding-bottom: 64px; }
 .bd-kop { font-size: clamp(26px, 3vw, 34px); margin: 0 0 24px; }
-.bd-stappen { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; counter-reset: bd; }
-.bd-stappen li { position: relative; counter-increment: bd; background: var(--soft); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px 18px 64px; }
-.bd-stappen li::before { content: counter(bd); position: absolute; left: 18px; top: 18px; width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: var(--white); font-weight: 600; font-size: 15px; display: grid; place-items: center; }
+.bd-stappen { list-style: none; margin: 0 0 40px; padding: 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 24px; counter-reset: bd; }
+.bd-stappen li { position: relative; counter-increment: bd; padding-top: 52px; }
+.bd-stappen li::before { content: counter(bd); position: absolute; left: 0; top: 0; width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: var(--white); font-weight: 600; font-size: 15px; display: grid; place-items: center; z-index: 1; }
+.bd-stappen li::after { content: ''; position: absolute; left: 36px; right: -24px; top: 17px; height: 2px; background: var(--tint-border); }
+.bd-stappen li:last-child::after { display: none; }
 .bd-wanneer { display: block; font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); }
 .bd-stappen h3 { margin: 2px 0 4px; font-size: 17px; }
 .bd-stappen p { margin: 0; font-size: 15px; color: var(--text); line-height: 1.5; }
-.bd-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.bd-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .bd-blok { border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; }
 .bd-blok h2 { font-size: 18px; margin: 0 0 10px; }
 .bd-blok p { margin: 0; color: var(--text); font-size: 15px; }
@@ -717,7 +719,14 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
 .bd-contact { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px !important; }
 .bd-contact a { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-weight: 600; text-decoration: none; min-height: 36px; }
 .bd-contact a:hover { text-decoration: underline; }
-@media (max-width: 960px) { .bd-stappen { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 960px) {
+  .bd-stappen { grid-template-columns: 1fr; gap: 0; }
+  .bd-stappen li { padding: 0 0 24px 56px; }
+  .bd-stappen li:last-child { padding-bottom: 0; }
+  .bd-stappen li::before { top: 0; }
+  .bd-stappen li::after { left: 17px; right: auto; top: 36px; bottom: 0; width: 2px; height: auto; }
+  .bd-wanneer { padding-top: 8px; }
+}
 @media (max-width: 860px) {
   .bd-hero { padding: 32px 0 40px; }
   .bd-hero-grid { grid-template-columns: 1fr; gap: 24px; }
@@ -726,9 +735,6 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
   .bd-duo { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {
-  .bd-stappen { grid-template-columns: 1fr; gap: 10px; }
-  .bd-stappen li { padding: 14px 16px 14px 58px; }
-  .bd-stappen li::before { left: 14px; top: 16px; }
   .bd-verder-sectie { padding-top: 40px; padding-bottom: 48px; }
   .bd-lijst { grid-template-columns: 1fr; }
 }

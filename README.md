@@ -76,3 +76,7 @@ Gratis foto's van Pexels (Pexels-licentie: vrij te gebruiken, ook commercieel, n
 | `branches/e-commerce-2.webp` | pexels.com/photo/7857523 |
 | `branches/zorgverleners-1.webp` | pexels.com/photo/20860592 |
 | `branches/zorgverleners-2.webp` | pexels.com/photo/15319035 |
+
+## E-mailhandtekening
+
+Open `/handtekening.html` (niet gelinkt, noindex) en klik op "Kopieer handtekening". Afbeeldingen staan in `assets/email/` en zijn ook achter het wachtwoord bereikbaar (alles onder /assets/ is uitgezonderd). Na het koppelen van het domein de handtekening opnieuw kopiëren vanaf www.avezaatenevers.nl.

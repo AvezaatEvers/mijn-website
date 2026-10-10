@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="robots" content="noindex">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/style.css?v=67">
+<link rel="stylesheet" href="/assets/style.css?v=68">
 </head>
 <body>
 <header class="site-header">
@@ -28,97 +28,84 @@
 <main id="main">
   <section class="bd-hero">
     <div class="container bd-hero-grid">
-      <div class="stack" style="gap:18px">
+      <div class="stack" style="gap:16px">
         <span class="pill bd-pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span data-alleen="afspraak" hidden>Je afspraak staat</span><span data-alleen="formulier">Aanvraag ontvangen</span></span>
         <h1 data-alleen="afspraak" hidden>Top, we spreken elkaar snel!</h1>
         <h1 data-alleen="formulier">Bedankt, we hebben je bericht!</h1>
-        <p class="lead" data-alleen="afspraak" hidden>Je kennismaking staat in onze agenda. De bevestiging met de link voor het gesprek zit in je mail. Wij kijken er nu al naar uit.</p>
-        <p class="lead" data-alleen="formulier">We lezen je bericht zelf en nemen binnen één werkdag persoonlijk contact met je op. Geen standaardmail, gewoon één van ons twee.</p>
+        <p class="lead" data-alleen="afspraak" hidden>De bevestiging met de link voor het gesprek zit in je mail.</p>
+        <p class="lead" data-alleen="formulier">We lezen je bericht zelf en nemen binnen één werkdag persoonlijk contact met je op.</p>
+        <div class="bd-brief">
+          <p>Wat leuk dat je kennis wilt maken! Wij zijn Koen en Daan, de twee oprichters van Avezaat &amp; Evers. We vinden dat je als zzp'er een boekhouder verdient die je bedrijf kent, die je gewoon even kunt appen en die je vooraf vertelt waar je aan toe bent.</p>
+          <p class="bd-groet">Tot snel, <strong>Koen &amp; Daan</strong></p>
+        </div>
       </div>
       <figure class="bd-foto">
-        <img src="/assets/img/koen-daan-800.webp" srcset="/assets/img/koen-daan-800.webp 800w, /assets/img/koen-daan.webp 1200w" sizes="(max-width: 860px) calc(100vw - 48px), 480px" alt="Koen Avezaat en Daan Evers" width="800" height="650">
-        <figcaption>Koen (links) en Daan</figcaption>
+        <img src="/assets/img/koen-daan-800.webp" srcset="/assets/img/koen-daan-800.webp 800w, /assets/img/koen-daan.webp 1200w" sizes="(max-width: 860px) calc(100vw - 48px), 460px" alt="Koen Avezaat en Daan Evers" width="800" height="650">
+        <figcaption>Koen en Daan</figcaption>
       </figure>
     </div>
   </section>
 
-  <section class="section">
-    <div class="container bd-brief">
-      <p class="bd-aanhef">Hoi!</p>
-      <p>Wat leuk dat je even de tijd neemt om kennis te maken. Wij zijn Koen en Daan, de twee mensen achter Avezaat &amp; Evers. Er zit geen callcenter of verkoopteam tussen: je praat straks gewoon met ons.</p>
-      <p>We zijn Avezaat &amp; Evers begonnen omdat we vinden dat je als zzp'er een boekhouder verdient die je bedrijf kent, die je gewoon even kunt appen en die je vooraf vertelt waar je aan toe bent. Geen gedoe, geen verrassingen achteraf.</p>
-      <p>Hieronder lees je precies wat je van ons kunt verwachten. Zo weet je wat er gebeurt, nog voordat we elkaar spreken.</p>
-      <p class="bd-groet">Tot snel,<br><strong>Koen &amp; Daan</strong></p>
-    </div>
-  </section>
-
-  <section class="section bg-tint">
-    <div class="container bd-verder">
-      <div class="section-head" style="margin-bottom:32px">
-        <h2>Zo gaat het verder</h2>
-        <p class="lead">Van kennismaking tot je eerste maand bij ons, stap voor stap.</p>
-      </div>
-      <ol class="bd-tijdlijn">
+  <section class="section bd-verder-sectie">
+    <div class="container">
+      <h2 class="bd-kop">Zo gaat het verder</h2>
+      <ol class="bd-stappen">
         <li>
           <span class="bd-wanneer">Nu</span>
-          <h3 data-alleen="afspraak" hidden>Je ontvangt een bevestiging</h3>
-          <h3 data-alleen="formulier">We nemen contact met je op</h3>
-          <p data-alleen="afspraak" hidden>In je mail staat de bevestiging met de datum, de tijd en de link voor het gesprek. Komt het toch niet uit? Via die mail verzet je de afspraak in een paar klikken.</p>
-          <p data-alleen="formulier">Binnen één werkdag hoor je van ons, per mail of telefoon. We beantwoorden je vraag of prikken samen een moment voor een gratis kennismaking.</p>
+          <h3 data-alleen="afspraak" hidden>Bevestiging in je mail</h3>
+          <h3 data-alleen="formulier">We nemen contact op</h3>
+          <p data-alleen="afspraak" hidden>Komt het toch niet uit? Via die mail verzet je de afspraak in een paar klikken.</p>
+          <p data-alleen="formulier">Binnen één werkdag, per mail of telefoon. Samen prikken we een moment.</p>
         </li>
         <li>
           <span class="bd-wanneer">Vóór het gesprek</span>
           <h3>Wij bereiden ons voor</h3>
-          <p>We kijken alvast even naar je bedrijf, zodat we niet bij nul beginnen en de 20 minuten echt over jou gaan. Jij hoeft niets voor te bereiden, maar heb je onderstaande punten paraat, dan kunnen we nog gerichter advies geven.</p>
+          <p>We kijken alvast naar je bedrijf, zodat het gesprek echt over jou gaat.</p>
         </li>
         <li>
-          <span class="bd-wanneer">Het gesprek · 20 minuten</span>
-          <h3>Een eerlijk gesprek, geen verkooppraatje</h3>
-          <p>We willen vooral horen wat je doet en waar je tegenaan loopt. Je vragen beantwoorden we meteen, en we rekenen samen uit of het voor jou loont. Passen we niet bij je? Dan zeggen we dat ook eerlijk.</p>
+          <span class="bd-wanneer">20 minuten</span>
+          <h3>Een eerlijk gesprek</h3>
+          <p>Geen verkooppraatje. We beantwoorden je vragen en rekenen uit of het voor je loont.</p>
         </li>
         <li>
           <span class="bd-wanneer">Binnen 24 uur</span>
           <h3>Je voorstel op maat</h3>
-          <p>Je ontvangt van ons een duidelijk voorstel: wat je betaalt, eventuele extra's en per wanneer we starten. Neem rustig de tijd. Je zit nergens aan vast.</p>
+          <p>Wat je betaalt en per wanneer we starten. Je zit nergens aan vast.</p>
         </li>
         <li>
-          <span class="bd-wanneer">Ja? Dan regelen wij de rest</span>
-          <h3>We zetten alles voor je klaar</h3>
-          <p>We maken je MoneyMonk-account aan, regelen de machtiging voor je aangiftes en stappen je over van je oude boekhouder als dat nodig is. Jij koppelt je bank en downloadt de app. In onze <a href="/kennisbank/starten-met-moneymonk.html">handleiding</a> zie je hoe dat gaat.</p>
+          <span class="bd-wanneer">Ja?</span>
+          <h3>Wij regelen de rest</h3>
+          <p>MoneyMonk, de machtiging voor je aangiftes en je overstap. <a href="/kennisbank/starten-met-moneymonk.html">Zo werkt de start</a>.</p>
         </li>
         <li>
-          <span class="bd-wanneer">Je eerste maand</span>
-          <h3>Ons eerste 1-op-1</h3>
-          <p>We plannen samen je eerste vaste maandgesprek. Vanaf dat moment heb je één vaste boekhouder die je bedrijf kent, en kun je ons altijd even bellen, mailen of appen.</p>
+          <span class="bd-wanneer">Eerste maand</span>
+          <h3>Je eerste 1-op-1</h3>
+          <p>Vanaf dan heb je één vaste boekhouder die je bedrijf kent.</p>
         </li>
       </ol>
-    </div>
-  </section>
 
-  <section class="section">
-    <div class="container bd-duo">
-      <div class="card stack" style="gap:12px">
-        <h2 style="font-size:22px;margin:0">Handig om bij de hand te hebben</h2>
-        <ul class="bd-lijst">
-          <li>Wat je doet en sinds wanneer je onderneemt</li>
-          <li>Ongeveer je omzet per jaar, of wat je verwacht</li>
-          <li>Hoeveel betalingen er per maand op je zakelijke rekening staan</li>
-          <li>Je huidige boekhouder of boekhoudprogramma, als je die hebt</li>
-          <li>Of je klanten in het buitenland hebt</li>
-          <li>Je vragen, hoe klein ook</li>
-        </ul>
-      </div>
-      <div class="card stack" style="gap:12px">
-        <h2 style="font-size:22px;margin:0">Nog iets kwijt?</h2>
-        <p style="margin:0">Schiet je nog iets te binnen, of wil je iets vooraf delen? Laat het ons gerust weten. We lezen alles zelf.</p>
-        <p class="bd-contact">
-          <a href="mailto:info@avezaatenevers.nl"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>Mail</a>
-          <span aria-hidden="true">·</span>
-          <a href="tel:+31612345678"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Bel</a>
-          <span aria-hidden="true">·</span>
-          <a href="https://wa.me/31612345678"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/></svg>WhatsApp</a>
-        </p>
-        <p style="margin:8px 0 0;font-size:15px;color:var(--muted)">Alvast inlezen? Bereken wat je <a href="/kennisbank/netto-inkomen-berekenen.html">netto overhoudt</a>, of lees alles over de <a href="/kennisbank/zelfstandigenaftrek.html">zelfstandigenaftrek</a>. En volg ons op <a href="https://www.instagram.com/avezaat.evers/" target="_blank" rel="noopener">Instagram</a> voor korte tips.</p>
+      <div class="bd-duo">
+        <div class="bd-blok">
+          <h2>Handig om paraat te hebben</h2>
+          <ul class="bd-lijst">
+            <li>Wat je doet en sinds wanneer</li>
+            <li>Ongeveer je omzet per jaar</li>
+            <li>Aantal betalingen per maand</li>
+            <li>Je huidige boekhouder of programma</li>
+            <li>Klanten in het buitenland?</li>
+            <li>Je vragen, hoe klein ook</li>
+          </ul>
+        </div>
+        <div class="bd-blok">
+          <h2>Nog iets kwijt?</h2>
+          <p>Laat het ons gerust weten, we lezen alles zelf.</p>
+          <p class="bd-contact">
+            <a href="mailto:info@avezaatenevers.nl"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>Mail</a>
+            <a href="tel:+31612345678"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Bel</a>
+            <a href="https://wa.me/31612345678"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/></svg>WhatsApp</a>
+            <a href="https://www.instagram.com/avezaat.evers/" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/></svg>Instagram</a>
+          </p>
+        </div>
       </div>
     </div>
   </section>
@@ -129,7 +116,7 @@
     <span><a href="/voorwaarden.html">Algemene voorwaarden</a> · <a href="/privacy.html">Privacyverklaring</a></span>
   </div>
 </footer>
-<script src="/assets/main.js?v=67" defer></script>
+<script src="/assets/main.js?v=68" defer></script>
 <script>
 (function () {
   var afspraak = /[?&]afspraak=1/.test(location.search);
@@ -138,6 +125,6 @@
   });
 })();
 </script>
-<script src="/assets/analytics.js?v=67" defer></script>
+<script src="/assets/analytics.js?v=68" defer></script>
 </body>
 </html>

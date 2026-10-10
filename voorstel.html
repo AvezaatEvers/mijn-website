@@ -18,7 +18,7 @@
   .vs-form .vs-check input { width: 18px; height: 18px; accent-color: var(--accent); }
   .vs-rij { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .vs-hint { font-size: 13px; color: var(--muted); margin: -6px 0 0; }
-  .vs-preview { background: #F3F4F6; border-radius: 20px; padding: 32px 16px; overflow-x: auto; }
+  .vs-preview { background: #F3F4F6; display: flex; justify-content: center; border-radius: 20px; padding: 32px 16px; overflow-x: auto; }
   .vs-acties { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
   .vs-ok { font-size: 14px; color: #15803D; margin: 0; }
   @media (max-width: 960px) { .vs-wrap { grid-template-columns: 1fr; } .vs-form { position: static; max-height: none; } }
@@ -92,13 +92,27 @@
     var heel = Math.round(n * 100) % 100 === 0;
     return '€' + n.toLocaleString('nl-NL', { minimumFractionDigits: heel ? 0 : 2, maximumFractionDigits: 2 });
   }
-  function rij(links, rechts, opties) {
-    opties = opties || {};
-    var stijl = F + 'font-size:15px;color:' + (opties.sterk ? INKT : TEKST) + ';' + (opties.sterk ? 'font-weight:bold;' : '') + 'padding:11px 0;' + (opties.geenLijn ? '' : 'border-bottom:1px solid ' + LIJN + ';');
-    return '<tr><td style="' + stijl + '">' + links + '</td><td align="right" style="' + stijl + 'white-space:nowrap;padding-left:16px;">' + rechts + '</td></tr>';
+  // Ontwerp dat ook goed blijft als Outlook bij plakken kleuren en lettergroottes weghaalt:
+  // opbouw met tabellen en HTML-attributen (bgcolor, width, height), nadruk met vet,
+  // en de kop en de knop als afbeelding.
+  var T = F + 'font-size:15px;line-height:1.6;color:' + INKT + ';';
+  function ruimte(h) { return '<tr><td colspan="3" height="' + h + '" style="height:' + h + 'px;font-size:1px;line-height:1px;"></td></tr>'; }
+  function blok(inhoud) { return '<tr><td width="40" style="width:40px;">&nbsp;</td><td width="520" style="width:520px;' + T + '">' + inhoud + '</td><td width="40" style="width:40px;">&nbsp;</td></tr>'; }
+  function lijn() { return '<tr><td colspan="2" height="1" bgcolor="' + LIJN + '" style="height:1px;background:' + LIJN + ';font-size:1px;line-height:1px;"></td></tr>'; }
+  function kopje(t) { return '<b style="' + F + 'font-size:15px;color:' + INKT + ';">' + t + '</b>'; }
+  function rij(links, rechts, sterk) {
+    var st = T + 'padding:8px 0;' + (sterk ? 'font-weight:bold;' : '');
+    return '<tr><td style="' + st + '">' + (sterk ? '<b>' + links + '</b>' : links) + '</td><td align="right" style="' + st + 'white-space:nowrap;">' + (sterk ? '<b>' + rechts + '</b>' : rechts) + '</td></tr>';
   }
   function vinkje(t) {
-    return '<tr><td width="26" valign="top" style="' + F + 'font-size:15px;color:' + BLAUW + ';font-weight:bold;padding:4px 0;">&#10003;</td><td style="' + F + 'font-size:15px;color:' + TEKST + ';padding:4px 0;line-height:1.5;">' + t + '</td></tr>';
+    return '<tr><td width="24" valign="top" style="' + T + 'padding:3px 0;"><b>&#10003;</b></td><td valign="top" style="' + T + 'padding:3px 0;">' + t + '</td></tr>';
+  }
+  function stap(n, titel, tekst) {
+    return '<tr>' +
+      '<td width="30" valign="top" style="padding:2px 0 12px 0;"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td width="26" height="26" align="center" valign="middle" bgcolor="' + TINT + '" style="width:26px;height:26px;background:' + TINT + ';border-radius:13px;' + F + 'font-size:13px;font-weight:bold;color:' + INKT + ';"><b>' + n + '</b></td></tr></table></td>' +
+      '<td width="12">&nbsp;</td>' +
+      '<td valign="top" style="' + T + 'padding:0 0 12px 0;"><b>' + titel + '</b><br>' + tekst + '</td>' +
+    '</tr>';
   }
 
   function bouw() {
@@ -108,14 +122,14 @@
     var wie = v.boekhouder.value;
     var pakket = Math.max(0, parseFloat(v.pakket.value) || 0);
     var maand = pakket, jaar = 0, eenmalig = 0;
-    var extraRijen = '';
-    if (v.icp.checked) { maand += 15; extraRijen += rij('ICP-aangifte (klanten binnen de EU)', '€15 p/m'); }
-    if (v.uren.checked) { maand += 10; extraRijen += rij('Uren- en rittenregistratie', '€10 p/m'); }
-    if (v.partner.checked) { jaar += 150; extraRijen += rij('IB-aangifte fiscaal partner', '€150 per jaar'); }
-    if (v.overstap.value === 'gratis') extraRijen += rij('Overstappen van je oude boekhouder', '<span style="color:#15803D;font-weight:bold;">gratis</span>');
-    if (v.overstap.value === 'betaald') { eenmalig += 149; extraRijen += rij('Overstappen van je oude boekhouder', '€149 eenmalig'); }
+    var extra = '';
+    if (v.icp.checked) { maand += 15; extra += lijn() + rij('ICP-aangifte (klanten binnen de EU)', '€15 p/m'); }
+    if (v.uren.checked) { maand += 10; extra += lijn() + rij('Uren- en rittenregistratie', '€10 p/m'); }
+    if (v.partner.checked) { jaar += 150; extra += lijn() + rij('IB-aangifte fiscaal partner', '€150 per jaar'); }
+    if (v.overstap.value === 'gratis') extra += lijn() + rij('Overstappen van je oude boekhouder', '<b>gratis</b>');
+    if (v.overstap.value === 'betaald') { eenmalig += 149; extra += lijn() + rij('Overstappen van je oude boekhouder', '€149 eenmalig'); }
     var uren = Math.max(0, parseInt(v.achterstand.value, 10) || 0);
-    if (uren) { eenmalig += uren * 60; extraRijen += rij('Achterstand inhalen (± ' + uren + ' uur à €60)', euro(uren * 60) + ' eenmalig'); }
+    if (uren) { eenmalig += uren * 60; extra += lijn() + rij('Achterstand inhalen (± ' + uren + ' uur à €60)', euro(uren * 60) + ' eenmalig'); }
 
     var situatie = esc(v.situatie.value.trim());
     var noot = esc(v.noot.value.trim()).replace(/\n/g, '<br>');
@@ -125,108 +139,65 @@
     var akkoordLink = 'mailto:' + MAIL + '?subject=' + encodeURIComponent('Akkoord voorstel' + (bedrijf ? ' ' + v.bedrijf.value.trim() : '')) +
       '&body=' + encodeURIComponent('Hoi ' + wie + ',\n\nIk ga akkoord met het voorstel en wil graag starten per ' + v.start.value.trim() + '.\n\nGroet,\n' + v.voornaam.value.trim());
 
-    var p = 'style="' + F + 'font-size:16px;line-height:1.6;color:' + TEKST + ';margin:0 0 16px;"';
-    var h = function (t) { return '<p style="' + F + 'font-size:13px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:' + BLAUW + ';margin:0 0 10px;">' + t + '</p>'; };
-
+    var tabel = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">';
     var html = '' +
-    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F3F4F6;">' +
-    '<tr><td align="center" style="padding:0;">' +
-    '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background:#FFFFFF;border:1px solid ' + LIJN + ';">' +
-
-    // Kop
-    '<tr><td style="padding:28px 40px 24px 40px;border-bottom:1px solid ' + LIJN + ';"><a href="' + BASE + '/" style="text-decoration:none;"><img src="' + BASE + '/assets/email/logo.png" width="177" height="31" alt="Avezaat &amp; Evers" style="display:block;border:0;width:177px;height:31px;"></a></td></tr>' +
-
+    '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFFFFF" style="width:600px;background:#FFFFFF;">' +
+    ruimte(32) +
+    // Kop als afbeelding
+    blok('<a href="' + BASE + '/"><img src="' + BASE + '/assets/email/voorstel-kop.png" width="520" height="150" alt="Je voorstel op maat van Avezaat &amp; Evers" style="display:block;border:0;width:520px;height:150px;"></a>') +
+    ruimte(28) +
     // Intro
-    '<tr><td style="padding:36px 40px 8px 40px;">' +
-      '<p style="' + F + 'font-size:26px;line-height:1.25;font-weight:bold;color:' + INKT + ';margin:0 0 20px;">Je voorstel op maat' + (bedrijf ? '<br><span style="color:' + BLAUW + ';">voor ' + bedrijf + '</span>' : '') + '</p>' +
-      '<p ' + p + '>Hoi ' + naam + ',</p>' +
-      '<p ' + p + '>Leuk je gesproken te hebben!' + (situatie ? ' Je vertelde dat ' + situatie + '.' : '') + ' Zoals beloofd zetten we hieronder op een rij wat we voor je gaan doen en wat het kost. Geen kleine lettertjes, en je zit nergens aan vast.</p>' +
-    '</td></tr>' +
-
-    // Prijsblok
-    '<tr><td style="padding:8px 40px 8px 40px;">' +
-      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:' + TINT + ';border-radius:12px;">' +
-      '<tr><td style="padding:26px 28px;">' +
-        '<p style="' + F + 'font-size:14px;color:' + GRIJS + ';margin:0 0 4px;">Jouw vaste prijs</p>' +
-        '<p style="' + F + 'font-size:40px;line-height:1.1;font-weight:bold;color:' + INKT + ';margin:0;">' + euro(maand) + '<span style="font-size:16px;font-weight:normal;color:' + GRIJS + ';"> per maand excl. btw</span></p>' +
-        '<p style="' + F + 'font-size:14px;color:' + GRIJS + ';margin:6px 0 0;">' + euro(maand * 1.21) + ' incl. btw · maandelijks opzegbaar' +
-          (jaar ? ' · plus ' + euro(jaar) + ' per jaar' : '') + (eenmalig ? ' · eenmalig ' + euro(eenmalig) : '') + '</p>' +
-      '</td></tr></table>' +
-    '</td></tr>' +
-
+    blok('Hoi ' + naam + ',<br><br>Leuk je gesproken te hebben!' + (situatie ? ' Je vertelde dat ' + situatie + '.' : '') +
+      ' Zoals beloofd zetten we hieronder op een rij wat we ' + (bedrijf ? 'voor <b>' + bedrijf + '</b> ' : 'voor je ') + 'gaan doen en wat het kost. Geen kleine lettertjes, en je zit nergens aan vast.') +
+    ruimte(24) +
+    // Prijs
+    blok('<table role="presentation" width="100%" cellpadding="20" cellspacing="0" border="0" bgcolor="' + TINT + '" style="background:' + TINT + ';"><tr><td style="' + T + '">' +
+      'Jouw vaste prijs<br><b style="font-size:28px;line-height:1.3;">' + euro(maand) + ' per maand</b> excl. btw<br>' +
+      euro(maand * 1.21) + ' incl. btw · maandelijks opzegbaar' +
+      (jaar ? '<br>Plus ' + euro(jaar) + ' per jaar' : '') + (eenmalig ? '<br>Eenmalig ' + euro(eenmalig) : '') +
+    '</td></tr></table>') +
+    ruimte(28) +
     // Inbegrepen
-    '<tr><td style="padding:28px 40px 4px 40px;">' + h('Altijd inbegrepen') +
-      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' +
-        vinkje('Eén vaste boekhouder: <strong style="color:' + INKT + ';">' + wie + '</strong>, die jouw bedrijf kent') +
-        vinkje('Je complete boekhouding, tot 100 banktransacties per maand') +
-        vinkje('4× btw-aangifte per jaar, op tijd en vooraf met je besproken') +
-        vinkje('Je aangifte inkomstenbelasting en jaarcijfers') +
-        vinkje('MoneyMonk-software en app om je bonnetjes aan te leveren') +
-        vinkje('Elke maand een 1-op-1 gesprek, en vragen stellen wanneer je wilt') +
-      '</table>' +
-    '</td></tr>' +
-
+    blok(kopje('Altijd inbegrepen') + tabel + '<tr><td colspan="2" height="8" style="font-size:1px;line-height:1px;"></td></tr>' +
+      vinkje('Eén vaste boekhouder: <b>' + wie + '</b>, die jouw bedrijf kent') +
+      vinkje('Je complete boekhouding, tot 100 banktransacties per maand') +
+      vinkje('4× btw-aangifte per jaar, vooraf met je besproken') +
+      vinkje('Je aangifte inkomstenbelasting en jaarcijfers') +
+      vinkje('MoneyMonk-software en app om je bonnetjes aan te leveren') +
+      vinkje('Elke maand een 1-op-1 gesprek, en vragen stellen wanneer je wilt') +
+    '</table>') +
+    ruimte(28) +
     // Overzicht
-    '<tr><td style="padding:24px 40px 4px 40px;">' + h('Overzicht') +
-      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' +
-        rij('Pakket boekhouding volledig uit handen', euro(pakket) + ' p/m') +
-        extraRijen +
-        rij('Totaal per maand', euro(maand) + ' excl. btw', { sterk: true, geenLijn: true }) +
-      '</table>' +
-      '<p style="' + F + 'font-size:13px;line-height:1.5;color:' + GRIJS + ';margin:10px 0 0;">Startdatum: <strong style="color:' + INKT + ';">' + esc(v.start.value.trim()) + '</strong>. Je zegt maandelijks op. Stop je binnen 12 maanden nadat we je aangifte inkomstenbelasting hebben gedaan, dan rekenen we die aangifte apart af (€250).</p>' +
-    '</td></tr>' +
-
-    // Volgende stappen
-    '<tr><td style="padding:28px 40px 4px 40px;">' + h('Zo starten we') +
-      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' +
-        stap(1, 'Jij geeft akkoord', 'Met één klik op de knop hieronder, of gewoon door op deze mail te reageren.') +
-        stap(2, 'Wij sturen de opdrachtbevestiging', 'En we vragen je identiteitsbewijs, dat zijn we wettelijk verplicht.') +
-        stap(3, 'We zetten alles klaar', 'Je MoneyMonk-account, de machtiging voor je aangiftes' + (v.overstap.value !== 'nee' ? ' en de overdracht met je oude boekhouder' : '') + '.') +
-        stap(4, 'Je eerste 1-op-1', 'In je eerste maand lopen we samen alles door.', true) +
-      '</table>' +
-    '</td></tr>' +
-
-    // Knop
-    '<tr><td align="left" style="padding:24px 40px 8px 40px;">' +
-      '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" bgcolor="' + BLAUW + '" style="background:' + BLAUW + ';border-radius:10px;padding:14px 28px;' + F + 'font-size:16px;font-weight:bold;">' +
-        '<a href="' + akkoordLink + '" style="' + F + 'font-size:16px;font-weight:bold;color:#FFFFFF;text-decoration:none;">Ja, ik wil starten</a>' +
-      '</td></tr></table>' +
-      '<p style="' + F + 'font-size:14px;color:' + GRIJS + ';margin:12px 0 0;">Dit voorstel is geldig tot ' + esc(v.geldig.value.trim()) + '. Nog vragen? Bel of app me op <a href="' + TELLINK + '" style="color:' + BLAUW + ';text-decoration:none;">' + TEL + '</a>.</p>' +
-    '</td></tr>' +
-
-    // Persoonlijke noot + groet
-    '<tr><td style="padding:24px 40px 32px 40px;">' +
-      (noot ? '<p ' + p + '>' + noot + '</p>' : '') +
-      '<p style="' + F + 'font-size:16px;line-height:1.6;color:' + TEKST + ';margin:0;">Hartelijke groet,<br><strong style="color:' + INKT + ';">' + wie + (wie === 'Daan' ? ' Evers' : ' Avezaat') + '</strong><br><span style="color:' + GRIJS + ';font-size:14px;">Avezaat &amp; Evers</span></p>' +
-    '</td></tr>' +
-
+    blok(kopje('Overzicht') + '<table role="presentation" width="100%" cellpadding="4" cellspacing="0" border="0">' +
+      rij('Pakket boekhouding volledig uit handen', euro(pakket) + ' p/m') +
+      extra + lijn() +
+      rij('Totaal per maand', euro(maand) + ' excl. btw', true) +
+    '</table>' +
+    'Startdatum: <b>' + esc(v.start.value.trim()) + '</b>. Je zegt maandelijks op. Stop je binnen 12 maanden nadat we je aangifte inkomstenbelasting hebben gedaan, dan rekenen we die aangifte apart af (€250).') +
+    ruimte(28) +
+    // Stappen
+    blok(kopje('Zo starten we') + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td colspan="3" height="10" style="font-size:1px;line-height:1px;"></td></tr>' +
+      stap(1, 'Jij geeft akkoord', 'Met de knop hieronder, of gewoon door op deze mail te reageren.') +
+      stap(2, 'Wij sturen de opdrachtbevestiging', 'En we vragen je identiteitsbewijs, dat zijn we wettelijk verplicht.') +
+      stap(3, 'We zetten alles klaar', 'Je MoneyMonk-account, de machtiging voor je aangiftes' + (v.overstap.value !== 'nee' ? ' en de overdracht met je oude boekhouder' : '') + '.') +
+      stap(4, 'Je eerste 1-op-1', 'In je eerste maand lopen we samen alles door.') +
+    '</table>') +
+    ruimte(12) +
+    // Knop als afbeelding
+    blok('<a href="' + akkoordLink + '"><img src="' + BASE + '/assets/email/voorstel-knop.png" width="240" height="52" alt="Ja, ik wil starten" style="display:block;border:0;width:240px;height:52px;"></a>') +
+    ruimte(16) +
+    blok('Dit voorstel is geldig tot <b>' + esc(v.geldig.value.trim()) + '</b>. Nog vragen? Bel of app me op <a href="' + TELLINK + '">' + TEL + '</a>.' +
+      (noot ? '<br><br>' + noot : '') +
+      '<br><br>Hartelijke groet,<br><b>' + wie + (wie === 'Daan' ? ' Evers' : ' Avezaat') + '</b><br>Avezaat &amp; Evers') +
+    ruimte(28) +
     // Voet
-    '<tr><td style="padding:20px 40px;background:#F9FAFB;border-top:1px solid ' + LIJN + ';">' +
-      '<p style="' + F + 'font-size:12px;line-height:1.6;color:' + GRIJS + ';margin:0;">Avezaat &amp; Evers · <a href="mailto:' + MAIL + '" style="color:' + GRIJS + ';">' + MAIL + '</a> · <a href="' + BASE + '/" style="color:' + GRIJS + ';">avezaatenevers.nl</a><br>Alle bedragen excl. 21% btw, tenzij anders vermeld. Op onze diensten zijn onze <a href="' + BASE + '/voorwaarden.html" style="color:' + GRIJS + ';">algemene voorwaarden</a> van toepassing.</p>' +
-    '</td></tr>' +
+    blok(tabel + lijn() + '</table>') +
+    ruimte(14) +
+    blok('<span style="font-size:12px;">Avezaat &amp; Evers · <a href="mailto:' + MAIL + '">' + MAIL + '</a> · <a href="' + BASE + '/">avezaatenevers.nl</a><br>Alle bedragen excl. 21% btw, tenzij anders vermeld. Op onze diensten zijn onze <a href="' + BASE + '/voorwaarden.html">algemene voorwaarden</a> van toepassing.</span>') +
+    ruimte(28) +
+    '</table>';
 
-    '</table></td></tr></table>';
-
-    var root = document.getElementById('vs-mail');
-    root.innerHTML = html;
-    // Outlook laat bij plakken de tekstkleur van blokken (p, td, a) vaak vallen.
-    // Een <font color> binnenin wordt wel bewaard, dus die zetten we er overal bij.
-    root.querySelectorAll('[style*="color:"]').forEach(function (el) {
-      var m = (el.getAttribute('style') || '').match(/(?:^|;)\s*color:\s*(#[0-9A-Fa-f]{3,6})/);
-      if (!m || el.tagName === 'FONT' || el.querySelector('table')) return;
-      var f = document.createElement('font');
-      f.setAttribute('color', m[1]);
-      f.setAttribute('style', 'color:' + m[1] + ';');
-      while (el.firstChild) f.appendChild(el.firstChild);
-      el.appendChild(f);
-    });
-  }
-
-  function stap(n, titel, tekst, laatste) {
-    return '<tr>' +
-      '<td width="44" valign="top" style="padding:0 0 ' + (laatste ? '0' : '14px') + ' 0;"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td width="28" height="28" align="center" valign="middle" bgcolor="' + BLAUW + '" style="background:' + BLAUW + ';border-radius:14px;' + F + 'font-size:13px;font-weight:bold;color:#FFFFFF;width:28px;height:28px;">' + n + '</td></tr></table></td>' +
-      '<td valign="top" style="padding:3px 0 ' + (laatste ? '0' : '14px') + ' 0;' + F + 'font-size:15px;line-height:1.5;color:' + TEKST + ';"><strong style="color:' + INKT + ';">' + titel + '</strong><br>' + tekst + '</td>' +
-    '</tr>';
+    document.getElementById('vs-mail').innerHTML = html;
   }
 
   document.getElementById('vs-download').addEventListener('click', function () {

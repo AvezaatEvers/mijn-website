@@ -596,3 +596,9 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
 
+
+/* MoneyMonk Erkend Adviseur-badge */
+.mm-badge.mm-erkend { background: none; padding: 0; box-shadow: none; border-radius: 0; filter: drop-shadow(0 12px 24px rgba(17,24,39,0.18)); }
+.mm-badge.mm-erkend img { display: block; width: 220px; height: auto; border-radius: 0; }
+@media (max-width: 700px) { .mm-badge.mm-erkend img { width: 170px; } }
+.footer-badge { display: block; width: 150px; height: auto; margin-top: 18px; }

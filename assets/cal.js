@@ -62,3 +62,15 @@ if (document.getElementById("cal-inline")) {
     a.addEventListener("click", function (e) { if (window.__calReady) e.preventDefault(); });
   });
 })();
+
+// Na een geboekte afspraak: door naar onze persoonlijke bedankpagina
+(function () {
+  var klaar = false;
+  function naarBedankt() {
+    if (klaar) return;
+    klaar = true;
+    setTimeout(function () { location.href = "/bedankt.html?afspraak=1"; }, 1500);
+  }
+  Cal.ns.kennismaking("on", { action: "bookingSuccessful", callback: naarBedankt });
+  Cal.ns.kennismaking("on", { action: "bookingSuccessfulV2", callback: naarBedankt });
+})();

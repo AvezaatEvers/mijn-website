@@ -687,3 +687,40 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 
 /* Kennisbank: tekst gelijk uitlijnen met de kop */
 article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin-right: auto; }
+
+/* Bedankpagina na formulier of afspraak */
+.bd-hero { background: var(--tint); padding: 64px 0; }
+.bd-hero-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center; }
+.bd-hero h1 { font-size: clamp(34px, 4.6vw, 54px); margin: 0; }
+.bd-hero .lead { margin: 0; max-width: 540px; }
+.bd-pill { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; background: var(--white); color: var(--accent); }
+.bd-foto { margin: 0; }
+.bd-foto img { width: 100%; border-radius: var(--radius); box-shadow: 0 24px 48px -24px rgba(17,24,39,.35); }
+.bd-foto figcaption { font-size: 14px; color: var(--muted); margin-top: 10px; text-align: center; }
+.bd-brief, .bd-verder, .bd-duo { max-width: 808px; }
+.bd-brief { font-size: 18px; color: var(--text); }
+.bd-brief p { margin: 0 0 16px; }
+.bd-aanhef { font-size: 22px; font-weight: 600; color: var(--ink); }
+.bd-groet { margin-top: 28px !important; line-height: 1.5; }
+.bd-groet strong { font-size: 22px; color: var(--accent); }
+.bd-tijdlijn { list-style: none; margin: 0; padding: 0; counter-reset: bd; }
+.bd-tijdlijn li { position: relative; padding: 0 0 36px 64px; counter-increment: bd; }
+.bd-tijdlijn li::before { content: counter(bd); position: absolute; left: 0; top: 0; width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: var(--white); font-weight: 600; display: grid; place-items: center; z-index: 1; }
+.bd-tijdlijn li::after { content: ''; position: absolute; left: 19px; top: 40px; bottom: 0; width: 2px; background: var(--tint-border); }
+.bd-tijdlijn li:last-child { padding-bottom: 0; }
+.bd-tijdlijn li:last-child::after { display: none; }
+.bd-wanneer { display: block; font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); margin: 8px 0 4px; }
+.bd-tijdlijn h3 { margin: 0 0 6px; font-size: 20px; }
+.bd-tijdlijn p { margin: 0; color: var(--text); }
+.bd-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.bd-lijst { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; color: var(--text); }
+.bd-contact { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 4px 0 0; color: var(--muted); }
+.bd-contact a { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-weight: 600; text-decoration: none; min-height: 36px; }
+.bd-contact a:hover { text-decoration: underline; }
+@media (max-width: 860px) {
+  .bd-hero { padding: 40px 0 48px; }
+  .bd-hero-grid { grid-template-columns: 1fr; gap: 32px; }
+  .bd-duo { grid-template-columns: 1fr; }
+  .bd-brief { font-size: 17px; }
+  .bd-tijdlijn li { padding-left: 56px; }
+}

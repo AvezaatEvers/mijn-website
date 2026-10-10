@@ -154,3 +154,18 @@
   window.addEventListener('resize', check);
   check();
 })();
+
+// Contactpagina: groen bolletje als we nu bereikbaar zijn (Nederlandse tijd)
+(function () {
+  var els = document.querySelectorAll('.cc-tijd');
+  if (!els.length) return;
+  var nu = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Amsterdam' }));
+  var dag = nu.getDay() || 7, uur = nu.getHours() + nu.getMinutes() / 60;
+  els.forEach(function (el) {
+    var d = (el.getAttribute('data-dagen') || '1-7').split('-').map(Number);
+    var van = +(el.getAttribute('data-van') || 0), tot = +(el.getAttribute('data-tot') || 24);
+    var open = dag >= d[0] && dag <= d[1] && uur >= van && uur < tot;
+    el.classList.toggle('is-open', open);
+    el.setAttribute('title', open ? 'Nu bereikbaar' : 'Op dit moment buiten onze bereikbaarheid');
+  });
+})();

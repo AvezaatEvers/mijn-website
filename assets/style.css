@@ -623,3 +623,8 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 .footer-grid a.footer-cta { color: var(--accent); font-weight: 600; }
 .footer-grid a.footer-cta span { display: inline-block; transition: transform .2s ease; }
 .footer-grid a.footer-cta:hover span { transform: translateX(3px); }
+.contact-card .cc-tijd { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; margin-top: 4px; padding-top: 12px; border-top: 1px solid var(--line); width: 100%; font-style: normal; font-size: 13px; font-weight: 600; color: var(--ink); }
+.contact-card .cc-tijd i { width: 8px; height: 8px; border-radius: 50%; background: #9CA3AF; flex: none; }
+.contact-card .cc-tijd.is-open i { background: #16A34A; box-shadow: 0 0 0 3px rgba(22,163,74,.15); }
+.contact-card .cc-tijd small { flex-basis: 100%; padding-left: 16px; font-weight: 400; font-size: 13px; color: var(--muted); }
+@media (max-width: 700px) { .contact-card { flex-wrap: wrap; } .contact-card .cc-tijd { margin-top: 2px; } }

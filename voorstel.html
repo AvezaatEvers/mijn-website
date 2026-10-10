@@ -198,9 +198,21 @@
     '</table>';
 
     document.getElementById('vs-mail').innerHTML = html;
+    toonAfbeeldingen(false);
+  }
+
+  // In de voorbeeldweergave laden we de afbeeldingen van deze site zelf, zodat je ze ook op de conceptversie ziet.
+  // Bij kopiëren en downloaden zetten we ze terug naar het live domein: alleen dat kan Outlook bereiken.
+  function toonAfbeeldingen(live) {
+    document.querySelectorAll('#vs-mail img').forEach(function (img) {
+      var pad = img.getAttribute('src').replace(/^https?:\/\/[^/]+/, '');
+      img.setAttribute('src', (live ? BASE : location.origin) + pad);
+    });
   }
 
   document.getElementById('vs-download').addEventListener('click', function () {
+    toonAfbeeldingen(true);
+    setTimeout(function () { toonAfbeeldingen(false); }, 500);
     var html = '<!DOCTYPE html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' +
       esc(document.getElementById('vs-onderwerp').textContent) + '</title></head><body style="margin:0;padding:24px 0;background:#F3F4F6;">' +
       document.getElementById('vs-mail').innerHTML + '</body></html>';
@@ -218,6 +230,8 @@
 
   document.getElementById('vs-kopieer').addEventListener('click', function () {
     var el = document.getElementById('vs-mail'), ok = document.getElementById('vs-ok');
+    toonAfbeeldingen(true);
+    setTimeout(function () { toonAfbeeldingen(false); }, 1500);
     function klaar() { ok.textContent = 'Gekopieerd. Plak hem in een nieuwe mail in Outlook (Ctrl+V of Cmd+V).'; }
     function oudeManier() {
       var r = document.createRange(); r.selectNodeContents(el);

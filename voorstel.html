@@ -254,6 +254,14 @@
       try { document.execCommand('copy'); klaar(); } catch (e) { ok.textContent = 'Selecteer de mail en kopieer hem handmatig.'; }
       s.removeAllRanges();
     }
+    // Eerst kopiëren via een selectie: dan neemt de browser (ook Safari) de opmaak mee zoals je hem ziet.
+    // Safari haalt bij de andere methode alle opmaak weg.
+    var r0 = document.createRange(); r0.selectNodeContents(el);
+    var sel0 = window.getSelection(); sel0.removeAllRanges(); sel0.addRange(r0);
+    var gelukt = false;
+    try { gelukt = document.execCommand('copy'); } catch (e) {}
+    sel0.removeAllRanges();
+    if (gelukt) { klaar(); return; }
     if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
       navigator.clipboard.write([new ClipboardItem({
         'text/html': new Blob([el.innerHTML], { type: 'text/html' }),

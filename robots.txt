@@ -3,5 +3,6 @@ Allow: /
 Disallow: /bedankt.html
 Disallow: /voorstel.html
 Disallow: /handtekening.html
+Disallow: /welkom.html
 
 Sitemap: https://avezaatenevers.nl/sitemap.xml

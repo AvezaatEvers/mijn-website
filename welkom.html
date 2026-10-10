@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Welkom bij Avezaat &amp; Evers</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Je persoonlijke startpagina bij Avezaat &amp; Evers.">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css?v=73">
+<style>
+  .wk { --wk-shadow: 0 1px 2px rgba(17,24,39,.04), 0 12px 32px -12px rgba(17,24,39,.14); }
+
+  /* Kop */
+  .wk-hero { position: relative; overflow: hidden; background: var(--tint); padding: 72px 0 80px; }
+  .wk-hero::before, .wk-hero::after { content: ''; position: absolute; border-radius: 50%; filter: blur(0); pointer-events: none; }
+  .wk-hero::before { width: 560px; height: 560px; right: -160px; top: -220px; background: radial-gradient(closest-side, rgba(30,64,175,.12), rgba(30,64,175,0)); }
+  .wk-hero::after { width: 420px; height: 420px; left: -180px; bottom: -240px; background: radial-gradient(closest-side, rgba(99,102,241,.10), rgba(99,102,241,0)); }
+  .wk-amp { position: absolute; right: 4%; bottom: -120px; font-size: 420px; font-weight: 700; line-height: 1; color: rgba(30,64,175,.05); pointer-events: none; user-select: none; }
+  .wk-hero-grid { position: relative; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center; }
+  .wk-pill { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; background: var(--white); color: var(--accent); box-shadow: 0 1px 2px rgba(17,24,39,.06); }
+  .wk-pill i { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; box-shadow: 0 0 0 4px rgba(34,197,94,.18); }
+  .wk-hero h1 { font-size: clamp(38px, 5.4vw, 64px); line-height: 1.04; letter-spacing: -0.03em; margin: 0; }
+  .wk-hero h1 span { color: var(--accent); }
+  .wk-hero .lead { margin: 0; max-width: 520px; }
+  .wk-wie { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
+  .wk-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 600; font-size: 18px; flex: none; box-shadow: 0 0 0 4px var(--white); }
+  .wk-wie p { margin: 0; font-size: 15px; color: var(--text); line-height: 1.45; }
+  .wk-wie strong { color: var(--ink); }
+
+  /* Voortgangskaart */
+  .wk-voortgang { background: var(--white); border-radius: 24px; box-shadow: var(--wk-shadow); padding: 28px; display: flex; flex-direction: column; gap: 22px; }
+  .wk-ring-rij { display: flex; align-items: center; gap: 20px; }
+  .wk-ring { position: relative; width: 96px; height: 96px; flex: none; }
+  .wk-ring svg { width: 96px; height: 96px; transform: rotate(-90deg); }
+  .wk-ring circle { fill: none; stroke-width: 8; }
+  .wk-ring .bg { stroke: var(--tint); }
+  .wk-ring .fg { stroke: var(--accent); stroke-linecap: round; transition: stroke-dashoffset .9s cubic-bezier(.22,1,.36,1); }
+  .wk-ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 22px; letter-spacing: -0.02em; color: var(--ink); }
+  .wk-ring-tekst strong { display: block; font-size: 18px; color: var(--ink); }
+  .wk-ring-tekst span { font-size: 14px; color: var(--muted); }
+  .wk-mini { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .wk-mini li { display: flex; align-items: center; gap: 12px; font-size: 15px; color: var(--text); transition: color .3s; }
+  .wk-mini li::before { content: ''; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--tint-border); flex: none; transition: background .3s, border-color .3s; }
+  .wk-mini li.is-klaar { color: var(--muted); }
+  .wk-mini li.is-klaar::before { background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/11px no-repeat; border-color: var(--accent); }
+  .wk-klaar-melding { display: none; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; background: #F0FDF4; color: #166534; font-size: 14px; font-weight: 500; }
+  .wk-alles-klaar .wk-klaar-melding { display: flex; }
+
+  /* Secties */
+  .wk-sectie { padding: 88px 0; }
+  .wk-kop { max-width: 640px; margin-bottom: 36px; }
+  .wk-label { display: block; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .wk-kop h2 { font-size: clamp(28px, 3.4vw, 40px); letter-spacing: -0.02em; margin: 0 0 10px; }
+  .wk-kop p { margin: 0; color: var(--text); font-size: 17px; }
+
+  /* Checklist */
+  .wk-check-grid { display: grid; grid-template-columns: 0.75fr 1.25fr; gap: 64px; align-items: start; }
+  .wk-check-grid .wk-kop { position: sticky; top: 116px; margin-bottom: 0; }
+  .wk-check-grid .wk-lijst { max-width: none; }
+  .wk-lijst { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; max-width: 860px; }
+  .wk-stap { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start; background: var(--white); border: 1px solid var(--line); border-radius: 20px; padding: 22px 24px; transition: border-color .3s, box-shadow .3s, background .3s; }
+  .wk-stap:hover { border-color: var(--tint-border); box-shadow: var(--wk-shadow); }
+  .wk-vink { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--tint-border); background: var(--white); display: grid; place-items: center; cursor: pointer; padding: 0; transition: background .35s cubic-bezier(.22,1,.36,1), border-color .35s, transform .2s; }
+  .wk-vink:hover { border-color: var(--accent); }
+  .wk-vink:active { transform: scale(.92); }
+  .wk-vink:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .wk-vink svg { width: 20px; height: 20px; }
+  .wk-vink path { fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 24; stroke-dashoffset: 24; transition: stroke-dashoffset .4s .1s cubic-bezier(.22,1,.36,1); }
+  .wk-stap.is-klaar { background: var(--soft); }
+  .wk-stap.is-klaar .wk-vink { background: var(--accent); border-color: var(--accent); }
+  .wk-stap.is-klaar .wk-vink path { stroke-dashoffset: 0; }
+  .wk-stap.is-klaar h3 { color: var(--muted); }
+  .wk-stap-kop { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 6px 0 6px; }
+  .wk-stap h3 { margin: 0; font-size: 19px; transition: color .3s; }
+  .wk-tijd { font-size: 12px; font-weight: 600; color: var(--accent); background: var(--tint); border-radius: 999px; padding: 3px 10px; }
+  .wk-stap p { margin: 0; color: var(--text); font-size: 15.5px; line-height: 1.6; }
+  .wk-actie { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; font-weight: 600; font-size: 15px; color: var(--accent); text-decoration: none; }
+  .wk-actie span { transition: transform .2s; }
+  .wk-actie:hover span { transform: translateX(3px); }
+
+  /* Wat wij doen */
+  .wk-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .wk-kaart { background: var(--white); border-radius: 20px; padding: 24px; box-shadow: 0 1px 2px rgba(17,24,39,.04); border: 1px solid rgba(199,210,254,.6); }
+  .wk-icoon { width: 44px; height: 44px; border-radius: 12px; background: var(--tint); color: var(--accent); display: grid; place-items: center; margin-bottom: 16px; }
+  .wk-kaart h3 { margin: 0 0 6px; font-size: 17px; }
+  .wk-kaart p { margin: 0; font-size: 15px; color: var(--text); line-height: 1.55; }
+
+  /* Ritme */
+  .wk-ritme { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
+  .wk-ritme div { padding: 24px; border-right: 1px solid var(--line); }
+  .wk-ritme div:last-child { border-right: 0; }
+  .wk-ritme b { display: block; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .wk-ritme strong { display: block; font-size: 17px; color: var(--ink); margin-bottom: 4px; }
+  .wk-ritme p { margin: 0; font-size: 15px; color: var(--text); line-height: 1.55; }
+
+  /* Contact */
+  .wk-contact { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; background: var(--ink); color: #fff; border-radius: 28px; padding: 44px 48px; position: relative; overflow: hidden; }
+  .wk-contact::after { content: '&'; position: absolute; right: 28px; bottom: -110px; font-size: 300px; font-weight: 700; line-height: 1; color: rgba(255,255,255,.04); pointer-events: none; }
+  .wk-contact h2 { color: #fff; font-size: clamp(26px, 3vw, 34px); margin: 0 0 8px; letter-spacing: -0.02em; }
+  .wk-contact p { margin: 0; color: #D1D5DB; font-size: 16px; max-width: 520px; }
+  .wk-knoppen { display: flex; gap: 10px; flex-wrap: wrap; position: relative; z-index: 1; }
+  .wk-knop { display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; border-radius: 12px; background: rgba(255,255,255,.08); color: #fff; text-decoration: none; font-weight: 600; font-size: 15px; border: 1px solid rgba(255,255,255,.12); transition: background .2s, border-color .2s; }
+  .wk-knop:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.24); }
+  .wk-knop.is-wit { background: #fff; color: var(--accent); border-color: #fff; }
+  .wk-knop.is-wit:hover { background: #EEF2FB; }
+
+  /* Verschijnen bij scrollen */
+  .js .wk-in { opacity: 0; transform: translateY(18px); transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1); transition-delay: var(--d, 0s); }
+  .js .wk-in.is-zichtbaar { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .js .wk-in { opacity: 1; transform: none; transition: none; }
+    .wk-ring .fg, .wk-vink, .wk-vink path, .wk-stap { transition: none; }
+  }
+
+  #wk-confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+
+  @media (max-width: 960px) {
+    .wk-check-grid { grid-template-columns: 1fr; gap: 0; }
+    .wk-check-grid .wk-kop { position: static; margin-bottom: 28px; }
+    .wk-hero-grid { grid-template-columns: 1fr; gap: 36px; }
+    .wk-grid { grid-template-columns: 1fr 1fr; }
+    .wk-ritme { grid-template-columns: 1fr 1fr; }
+    .wk-ritme div:nth-child(2) { border-right: 0; }
+    .wk-ritme div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+    .wk-contact { grid-template-columns: 1fr; padding: 36px 28px; }
+  }
+  @media (max-width: 600px) {
+    .wk-hero { padding: 40px 0 48px; }
+    .wk-amp { font-size: 260px; bottom: -70px; }
+    .wk-sectie { padding: 56px 0; }
+    .wk-voortgang { padding: 22px; }
+    .wk-stap { padding: 18px; gap: 14px; }
+    .wk-vink { width: 36px; height: 36px; }
+    .wk-grid, .wk-ritme { grid-template-columns: 1fr; }
+    .wk-grid { gap: 10px; }
+    .wk-kaart { display: grid; grid-template-columns: 44px 1fr; gap: 2px 14px; padding: 18px; }
+    .wk-icoon { grid-row: span 2; margin: 0; }
+    .wk-ritme div { border-right: 0; border-bottom: 1px solid var(--line); }
+    .wk-ritme div:last-child { border-bottom: 0; }
+  }
+</style>
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body class="wk">
+<header class="site-header">
+  <div class="container nav">
+    <a class="logo" href="/">Avezaat <span>&amp;</span> Evers</a>
+  </div>
+</header>
+
+<main id="main">
+  <section class="wk-hero">
+    <div class="wk-amp" aria-hidden="true">&amp;</div>
+    <div class="container wk-hero-grid">
+      <div class="stack" style="gap:20px">
+        <span class="pill wk-pill wk-in"><i aria-hidden="true"></i>Welkom aan boord</span>
+        <h1 class="wk-in" style="--d:.08s">Welkom<span id="wk-naam"></span>.</h1>
+        <p class="lead wk-in" style="--d:.16s">Fijn dat je voor ons kiest. Hier zie je precies wat er de komende weken gebeurt, en wat je zelf in een paar minuten regelt. De rest doen wij.</p>
+        <div class="wk-wie wk-in" style="--d:.24s">
+          <div class="wk-avatar" id="wk-initiaal" aria-hidden="true">D</div>
+          <p>Jouw vaste boekhouder is <strong id="wk-boekhouder">Daan</strong>.<br>Vragen? Je kunt altijd even bellen, mailen of appen.</p>
+        </div>
+      </div>
+
+      <aside class="wk-voortgang wk-in" style="--d:.2s" aria-label="Jouw voortgang">
+        <div class="wk-ring-rij">
+          <div class="wk-ring">
+            <svg viewBox="0 0 100 100" aria-hidden="true"><circle class="bg" cx="50" cy="50" r="42"/><circle class="fg" id="wk-ring" cx="50" cy="50" r="42"/></svg>
+            <b id="wk-procent">0%</b>
+          </div>
+          <div class="wk-ring-tekst">
+            <strong>Jouw start</strong>
+            <span id="wk-teller">0 van 5 stappen klaar</span>
+          </div>
+        </div>
+        <ul class="wk-mini" id="wk-mini"></ul>
+        <div class="wk-klaar-melding" role="status"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Alles staat klaar. Wij nemen het vanaf hier over.</div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="wk-sectie">
+    <div class="container">
+      <div class="wk-check-grid">
+      <div class="wk-kop wk-in">
+        <span class="wk-label">Jouw checklist</span>
+        <h2>Vijf stappen, samen een kwartiertje</h2>
+        <p>Vink af wat je gedaan hebt. Je voortgang blijft bewaard op dit apparaat, dus je kunt later verder.</p>
+      </div>
+      <ol class="wk-lijst" id="wk-lijst">
+        <li class="wk-stap wk-in" data-stap="id">
+          <button class="wk-vink" type="button" aria-pressed="false" aria-label="Markeer als klaar: identiteitsbewijs"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+          <div>
+            <div class="wk-stap-kop"><h3>Stuur ons je identiteitsbewijs</h3><span class="wk-tijd">2 min</span></div>
+            <p>Dat zijn we wettelijk verplicht. Maak een veilige kopie met de gratis app <strong>KopieID</strong> van de Rijksoverheid: daarmee streep je je BSN en pasfoto weg en zet je er een watermerk op. Stuur de kopie naar je boekhouder.</p>
+            <a class="wk-actie" id="wk-mail-id" href="mailto:info@avezaatenevers.nl?subject=Identiteitsbewijs">Mail je kopie <span aria-hidden="true">→</span></a>
+          </div>
+        </li>
+        <li class="wk-stap wk-in" data-stap="moneymonk">
+          <button class="wk-vink" type="button" aria-pressed="false" aria-label="Markeer als klaar: MoneyMonk-uitnodiging"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+          <div>
+            <div class="wk-stap-kop"><h3>Accepteer je uitnodiging van MoneyMonk</h3><span class="wk-tijd">3 min</span></div>
+            <p>Wij hebben je administratie al voor je aangemaakt. Je krijgt een mail van MoneyMonk: klik op de link en kies een wachtwoord. Geen mail gezien? Kijk even in je spam.</p>
+            <a class="wk-actie" href="/kennisbank/starten-met-moneymonk.html">Bekijk de handleiding <span aria-hidden="true">→</span></a>
+          </div>
+        </li>
+        <li class="wk-stap wk-in" data-stap="bank">
+          <button class="wk-vink" type="button" aria-pressed="false" aria-label="Markeer als klaar: bank koppelen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+          <div>
+            <div class="wk-stap-kop"><h3>Koppel je zakelijke rekening</h3><span class="wk-tijd">5 min</span></div>
+            <p>Dan komen je transacties vanzelf binnen en hoef je geen afschriften te sturen. Je koppelt via je eigen bank, wij kunnen nooit geld van je rekening halen.</p>
+            <a class="wk-actie" href="/veelgestelde-vragen.html#welke-banken">Welke banken kun je koppelen? <span aria-hidden="true">→</span></a>
+          </div>
+        </li>
+        <li class="wk-stap wk-in" data-stap="app">
+          <button class="wk-vink" type="button" aria-pressed="false" aria-label="Markeer als klaar: app downloaden"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+          <div>
+            <div class="wk-stap-kop"><h3>Download de app en maak je eerste foto</h3><span class="wk-tijd">2 min</span></div>
+            <p>Zoek op "MoneyMonk" in de App Store of Google Play en log in. Maak een foto van een bonnetje en klaar: dat is alles wat je voortaan doet.</p>
+          </div>
+        </li>
+        <li class="wk-stap wk-in" data-stap="post">
+          <button class="wk-vink" type="button" aria-pressed="false" aria-label="Markeer als klaar: brief Belastingdienst"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+          <div>
+            <div class="wk-stap-kop"><h3>Houd je post in de gaten</h3><span class="wk-tijd">1 min</span></div>
+            <p>Om je aangiftes te mogen doen, vragen wij een machtiging aan bij de Belastingdienst. Je krijgt daarover binnen een paar weken een brief met een code. Stuur ons een foto van die brief, dan regelen wij de rest.</p>
+          </div>
+        </li>
+      </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="wk-sectie bg-tint">
+    <div class="container">
+      <div class="wk-kop wk-in">
+        <span class="wk-label">Ondertussen bij ons</span>
+        <h2>Dit regelen wij voor je</h2>
+        <p>Jij hoeft hier niets voor te doen. We laten het weten als alles klaarstaat.</p>
+      </div>
+      <div class="wk-grid">
+        <div class="wk-kaart wk-in">
+          <div class="wk-icoon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/></svg></div>
+          <h3>Administratie inrichten</h3>
+          <p>We zetten je grootboek, btw-instellingen en vaste posten klaar in MoneyMonk.</p>
+        </div>
+        <div class="wk-kaart wk-in" style="--d:.08s">
+          <div class="wk-icoon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg></div>
+          <h3>Machtiging aanvragen</h3>
+          <p>Zodat wij je btw- en inkomstenbelastingaangifte namens jou mogen indienen.</p>
+        </div>
+        <div class="wk-kaart wk-in" style="--d:.16s">
+          <div class="wk-icoon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></div>
+          <h3>Overstap regelen</h3>
+          <p>Stap je over? Dan vragen wij je gegevens op bij je vorige boekhouder.</p>
+        </div>
+        <div class="wk-kaart wk-in" style="--d:.24s">
+          <div class="wk-icoon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <h3>Eerste 1-op-1 plannen</h3>
+          <p>In je eerste maand lopen we samen alles door en beantwoorden we je vragen.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wk-sectie">
+    <div class="container">
+      <div class="wk-kop wk-in">
+        <span class="wk-label">Goed om te weten</span>
+        <h2>Zo ziet een jaar met ons eruit</h2>
+        <p>Een vast ritme, zodat je nooit voor verrassingen staat.</p>
+      </div>
+      <div class="wk-ritme wk-in">
+        <div><b>Doorlopend</b><strong>Bonnetjes in de app</strong><p>Maak een foto zodra je iets koopt. Hoe sneller, hoe minder je kwijtraakt.</p></div>
+        <div><b>Elke maand</b><strong>Je 1-op-1</strong><p>Een kort gesprek over je cijfers en je vragen. Een aanbod, geen verplichting.</p></div>
+        <div><b>Elk kwartaal</b><strong>Btw-aangifte</strong><p>Lever alles aan vóór de 10e. Wij laten je vooraf weten wat je betaalt.</p></div>
+        <div><b>Elk voorjaar</b><strong>Inkomstenbelasting</strong><p>We maken je jaarcijfers en doen je aangifte. Jij leest mee en geeft akkoord.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wk-sectie" style="padding-top:0">
+    <div class="container">
+      <div class="wk-contact wk-in">
+        <div>
+          <h2>Vragen? Gewoon even appen.</h2>
+          <p><span id="wk-boekhouder-2">Daan</span> is je vaste aanspreekpunt. Je krijgt binnen 24 uur antwoord op je mail, binnen 2 uur op WhatsApp, en bellen we je binnen 30 minuten terug.</p>
+        </div>
+        <div class="wk-knoppen">
+          <a class="wk-knop is-wit" href="https://wa.me/31612345678"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/></svg>WhatsApp</a>
+          <a class="wk-knop" href="tel:+31612345678"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Bellen</a>
+          <a class="wk-knop" href="mailto:info@avezaatenevers.nl"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>Mail</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-bottom">
+    <span>© <span id="year">2026</span> Avezaat &amp; Evers · KvK 42133742</span>
+    <span><a href="/voorwaarden.html">Algemene voorwaarden</a> · <a href="/privacy.html">Privacyverklaring</a></span>
+  </div>
+</footer>
+<canvas id="wk-confetti" aria-hidden="true"></canvas>
+
+<script>
+(function () {
+  // Persoonlijk maken via de link: /welkom.html?naam=Sanne&boekhouder=Daan
+  var q = new URLSearchParams(location.search);
+  var naam = (q.get('naam') || '').trim().slice(0, 40);
+  var wie = (q.get('boekhouder') || 'Daan').trim();
+  wie = /^koen$/i.test(wie) ? 'Koen' : 'Daan';
+  if (naam) document.getElementById('wk-naam').textContent = ', ' + naam;
+  document.getElementById('wk-boekhouder').textContent = wie;
+  document.getElementById('wk-boekhouder-2').textContent = wie;
+  document.getElementById('wk-initiaal').textContent = wie.charAt(0);
+  if (naam) document.title = 'Welkom, ' + naam + ' | Avezaat & Evers';
+  document.getElementById('wk-mail-id').href = 'mailto:info@avezaatenevers.nl?subject=' + encodeURIComponent('Identiteitsbewijs' + (naam ? ' ' + naam : '') + ' (t.a.v. ' + wie + ')');
+
+  // Checklist met voortgang, bewaard in deze browser
+  var SLEUTEL = 'ae-welkom-' + (naam || 'klant').toLowerCase();
+  var stappen = [].slice.call(document.querySelectorAll('.wk-stap'));
+  var mini = document.getElementById('wk-mini');
+  var ring = document.getElementById('wk-ring');
+  var omtrek = 2 * Math.PI * 42;
+  ring.style.strokeDasharray = omtrek;
+  ring.style.strokeDashoffset = omtrek;
+  var klaar = {};
+  try { klaar = JSON.parse(localStorage.getItem(SLEUTEL) || '{}') || {}; } catch (e) { klaar = {}; }
+
+  stappen.forEach(function (li) {
+    var item = document.createElement('li');
+    item.textContent = li.querySelector('h3').textContent;
+    item.setAttribute('data-stap', li.getAttribute('data-stap'));
+    mini.appendChild(item);
+    li.querySelector('.wk-vink').addEventListener('click', function () {
+      var id = li.getAttribute('data-stap');
+      klaar[id] = !klaar[id];
+      try { localStorage.setItem(SLEUTEL, JSON.stringify(klaar)); } catch (e) {}
+      werkBij(true);
+    });
+  });
+
+  var wasAllesKlaar = null;
+  function werkBij(doorKlik) {
+    var aantal = 0;
+    stappen.forEach(function (li) {
+      var id = li.getAttribute('data-stap'), aan = !!klaar[id];
+      if (aan) aantal++;
+      li.classList.toggle('is-klaar', aan);
+      li.querySelector('.wk-vink').setAttribute('aria-pressed', aan ? 'true' : 'false');
+      mini.querySelector('[data-stap="' + id + '"]').classList.toggle('is-klaar', aan);
+    });
+    var deel = aantal / stappen.length;
+    ring.style.strokeDashoffset = omtrek * (1 - deel);
+    document.getElementById('wk-procent').textContent = Math.round(deel * 100) + '%';
+    document.getElementById('wk-teller').textContent = aantal === stappen.length ? 'Alle stappen klaar' : aantal + ' van ' + stappen.length + ' stappen klaar';
+    var alles = aantal === stappen.length;
+    document.body.classList.toggle('wk-alles-klaar', alles);
+    if (alles && doorKlik && wasAllesKlaar === false) confetti();
+    wasAllesKlaar = alles;
+  }
+  // Ring pas laten vollopen als de pagina er staat
+  requestAnimationFrame(function () { setTimeout(function () { werkBij(false); }, 350); });
+
+  // Verschijnen bij scrollen
+  var rustig = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var items = document.querySelectorAll('.wk-in');
+  if (rustig || !('IntersectionObserver' in window)) {
+    items.forEach(function (el) { el.classList.add('is-zichtbaar'); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('is-zichtbaar'); io.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    items.forEach(function (el, i) {
+      if (el.classList.contains('wk-stap') && !el.style.getPropertyValue('--d')) el.style.setProperty('--d', (i % 5) * 0.06 + 's');
+      io.observe(el);
+    });
+  }
+
+  // Ingetogen confetti in huisstijlkleuren als alles klaar is
+  function confetti() {
+    if (rustig) return;
+    var c = document.getElementById('wk-confetti'), ctx = c.getContext('2d');
+    var dpr = window.devicePixelRatio || 1;
+    c.width = innerWidth * dpr; c.height = innerHeight * dpr; ctx.scale(dpr, dpr);
+    var kleuren = ['#1E40AF', '#3B5BDB', '#C7D2FE', '#EEF2FB', '#111827'];
+    var deeltjes = [];
+    for (var i = 0; i < 90; i++) {
+      deeltjes.push({
+        x: innerWidth / 2 + (Math.random() - 0.5) * 160, y: innerHeight * 0.35,
+        vx: (Math.random() - 0.5) * 9, vy: -Math.random() * 9 - 4,
+        r: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.3,
+        w: 6 + Math.random() * 6, h: 3 + Math.random() * 4, k: kleuren[i % kleuren.length]
+      });
+    }
+    var start = performance.now();
+    (function teken(nu) {
+      var t = nu - start;
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      deeltjes.forEach(function (d) {
+        d.vy += 0.22; d.vx *= 0.99; d.x += d.vx; d.y += d.vy; d.r += d.vr;
+        ctx.save(); ctx.globalAlpha = Math.max(0, 1 - t / 2200);
+        ctx.translate(d.x, d.y); ctx.rotate(d.r); ctx.fillStyle = d.k;
+        ctx.fillRect(-d.w / 2, -d.h / 2, d.w, d.h); ctx.restore();
+      });
+      if (t < 2200) requestAnimationFrame(teken); else ctx.clearRect(0, 0, innerWidth, innerHeight);
+    })(start);
+  }
+})();
+</script>
+<script src="/assets/main.js?v=73" defer></script>
+<script src="/assets/analytics.js?v=73" defer></script>
+</body>
+</html>

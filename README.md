@@ -84,3 +84,7 @@ Open `/handtekening.html` (niet gelinkt, noindex) en klik op "Kopieer handtekeni
 ## Voorstel-mail
 
 Open `/voorstel.html` (niet gelinkt, noindex). Vul de klantgegevens en extra's in, controleer de mail rechts en klik op "Kopieer mail". Plak in een nieuwe mail in Outlook en zet het onderwerp erboven. Bedragen en extra's staan in het script onderaan de pagina.
+
+## Welkomstpagina
+
+Stuur nieuwe klanten na hun akkoord een persoonlijke link: `https://avezaatenevers.nl/welkom.html?naam=Sanne&boekhouder=Daan` (boekhouder: Daan of Koen). Niet gelinkt, noindex. De checklist bewaart de voortgang in de browser van de klant.

@@ -22,6 +22,8 @@
     sections.forEach(function (s) { s.classList.toggle('active', s === sec); });
     if (sec) {
       grid.hidden = true; back.hidden = false;
+      // Focus/hover van de aangeklikte kaart loslaten (voorkomt een achtergebleven rand in Safari)
+      if (document.activeElement && document.activeElement.classList.contains('cat-card')) document.activeElement.blur();
       if (q) q.open = true;
       if (scroll) (q || back).scrollIntoView({ block: 'start' });
     } else {

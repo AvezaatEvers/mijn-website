@@ -287,8 +287,8 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 .cat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
 @media (max-width: 1080px) { .cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .cat-grid { grid-template-columns: 1fr; gap: 12px; } }
-.cat-card { display: flex; flex-direction: column; gap: 8px; padding: 26px 24px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--white); color: var(--ink); text-decoration: none; transition: border-color .15s, box-shadow .15s, transform .15s; }
-.cat-card:hover, .cat-card:focus-visible { border-color: var(--accent); box-shadow: 0 12px 28px rgba(30,64,175,0.10); transform: translateY(-2px); color: var(--ink); }
+.cat-card { display: flex; flex-direction: column; gap: 8px; padding: 26px 24px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--white); color: var(--ink); text-decoration: none; transition: border-color .15s, box-shadow .15s; }
+.cat-card:hover, .cat-card:focus-visible { border-color: var(--accent); box-shadow: 0 8px 20px rgba(30,64,175,0.08); color: var(--ink); }
 .cat-card h2 { font-size: 18px; letter-spacing: -0.01em; margin-top: 6px; }
 .cat-count { font-size: 14px; font-weight: 600; color: var(--accent); }
 .cat-ex { font-size: 14px; color: var(--muted); line-height: 1.5; }

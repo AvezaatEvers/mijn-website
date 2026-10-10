@@ -615,3 +615,8 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 .contact-chips li:first-child a { background: var(--accent); border-color: var(--accent); color: var(--white); }
 #vraag, #plannen { scroll-margin-top: 90px; }
 @media (max-width: 480px) { .contact-chips { gap: 8px; } .contact-chips a { font-size: 14px; padding: 0 14px; } }
+
+/* Footer: kennismaking subtiel uitgelicht */
+.footer-grid a.footer-cta { color: var(--accent); font-weight: 600; }
+.footer-grid a.footer-cta span { display: inline-block; transition: transform .2s ease; }
+.footer-grid a.footer-cta:hover span { transform: translateX(3px); }

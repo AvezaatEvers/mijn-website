@@ -207,7 +207,19 @@
 
     '</table></td></tr></table>';
 
-    document.getElementById('vs-mail').innerHTML = html;
+    var root = document.getElementById('vs-mail');
+    root.innerHTML = html;
+    // Outlook laat bij plakken de tekstkleur van blokken (p, td, a) vaak vallen.
+    // Een <font color> binnenin wordt wel bewaard, dus die zetten we er overal bij.
+    root.querySelectorAll('[style*="color:"]').forEach(function (el) {
+      var m = (el.getAttribute('style') || '').match(/(?:^|;)\s*color:\s*(#[0-9A-Fa-f]{3,6})/);
+      if (!m || el.tagName === 'FONT' || el.querySelector('table')) return;
+      var f = document.createElement('font');
+      f.setAttribute('color', m[1]);
+      f.setAttribute('style', 'color:' + m[1] + ';');
+      while (el.firstChild) f.appendChild(el.firstChild);
+      el.appendChild(f);
+    });
   }
 
   function stap(n, titel, tekst, laatste) {

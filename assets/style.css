@@ -563,3 +563,35 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
   .trust strong { font-weight: 600; }
 }
 @media (min-width: 1000px) { .trust li > span { white-space: nowrap; } }
+
+/* Zo werkt het: scrollverhaal op desktop (kop blijft staan, stappen lichten op) */
+.werk-btn { display: none; }
+@media (min-width: 901px) {
+  .werk-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 72px; align-items: start; }
+  .werk-intro { position: sticky; top: calc(50vh - 120px); display: flex; flex-direction: column; gap: 28px; }
+  .werk-intro .section-head { margin-bottom: 0; }
+  .werk-btn { display: inline-flex; align-self: flex-start; }
+  .werk-grid .steps { display: flex; flex-direction: column; gap: 0; position: relative; padding: 8vh 0; }
+  .werk-grid .steps::before { content: ''; position: absolute; left: 19px; top: calc(8vh + 20px); bottom: calc(8vh + 20px); width: 2px; background: var(--line); }
+  .werk-grid .steps::after { content: ''; position: absolute; left: 19px; top: calc(8vh + 20px); width: 2px; height: var(--werk-voortgang, 0px); background: var(--accent); transition: height .5s ease; }
+  .werk-grid .steps > .stack { position: relative; padding: 0 0 0 76px; min-height: 34vh; gap: 12px; }
+  .werk-grid .steps > .stack:last-child { min-height: 0; }
+  .werk-grid .step-num { position: absolute; left: 0; top: 0; z-index: 1; box-shadow: 0 0 0 6px var(--white); transition: background .4s, color .4s; }
+  .werk-grid .steps h3 { font-size: 26px; margin-top: 4px; }
+  .werk-grid .steps p { font-size: 17px; max-width: 460px; }
+  .js-werk .werk-grid .steps > .stack { opacity: .32; transform: translateY(10px); transition: opacity .5s ease, transform .5s ease; }
+  .js-werk .werk-grid .steps > .stack.is-actief { opacity: 1; transform: none; }
+  .js-werk #werkwijze .stack.is-actief .step-num, .js-werk #werkwijze .stack.is-gedaan .step-num { background: var(--accent); }
+  .js-werk #werkwijze .stack.is-actief .step-num::after, .js-werk #werkwijze .stack.is-gedaan .step-num::after { color: var(--white); }
+}
+@media (min-width: 901px) and (prefers-reduced-motion: reduce) {
+  .js-werk .werk-grid .steps > .stack { opacity: 1; transform: none; transition: none; }
+}
+
+/* Zachte overgang tussen pagina's (moderne browsers); header blijft staan */
+@view-transition { navigation: auto; }
+.site-header { view-transition-name: site-header; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .28s; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}

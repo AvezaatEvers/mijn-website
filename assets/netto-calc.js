@@ -79,6 +79,28 @@
   }
   function zet(id, tekst) { var el = document.getElementById(id); if (el) el.textContent = tekst; }
 
+  // Getallen kort laten oplopen naar de nieuwe uitkomst
+  var rustig = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function tel(id, doel, opmaak) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var van = typeof el._v === 'number' ? el._v : doel;
+    el._v = doel;
+    if (el._raf) cancelAnimationFrame(el._raf);
+    if (rustig || van === doel || !el._gezien) { el.textContent = opmaak(doel); el._gezien = true; return; }
+    var start = null, duur = 450;
+    function stap(ts) {
+      if (start === null) start = ts;
+      var p = Math.min(1, (ts - start) / duur);
+      var e = 1 - Math.pow(1 - p, 3);
+      el.textContent = opmaak(van + (doel - van) * e);
+      if (p < 1) el._raf = requestAnimationFrame(stap);
+    }
+    el._raf = requestAnimationFrame(stap);
+  }
+  function min(n) { return n > 0.5 ? '− ' + euro(n) : euro(0); }
+  function pct(n) { return Math.round(n) + '%'; }
+
   function update() {
     var jaar = form.querySelector('input[name="jaar"]:checked').value;
     var uren = document.getElementById('nc-uren').checked;
@@ -100,18 +122,18 @@
       el.textContent = (i === 0 ? 'Omzet' : 'Zakelijke kosten') + (perJaar() ? ' per jaar' : ' per maand');
     });
     var r = bereken(jaar, getal('nc-omzet') * factor, getal('nc-kosten') * factor, uren, starter);
-    zet('nc-netto-maand', euro(r.netto / 12));
-    zet('nc-netto-jaar', euro(r.netto));
-    zet('nc-winst', euro(r.winst));
-    zet('nc-za', r.za + r.sa > 0 ? '− ' + euro(r.za + r.sa) : euro(0));
-    zet('nc-mkb', '− ' + euro(r.mkb));
-    zet('nc-belastbaar', euro(r.belastbaar));
-    zet('nc-ib', euro(r.ib));
-    zet('nc-kortingen', '− ' + euro(r.kortingen));
-    zet('nc-tebetalen', euro(r.teBetalen));
-    zet('nc-zvw', euro(r.zvw));
-    zet('nc-reserveer', Math.round(r.reserveer * 100) + '%');
-    zet('nc-reserveer-maand', euro((r.teBetalen + r.zvw) / 12));
+    tel('nc-netto-maand', r.netto / 12, euro);
+    tel('nc-netto-jaar', r.netto, euro);
+    tel('nc-winst', r.winst, euro);
+    tel('nc-za', r.za + r.sa, min);
+    tel('nc-mkb', r.mkb, min);
+    tel('nc-belastbaar', r.belastbaar, euro);
+    tel('nc-ib', r.ib, euro);
+    tel('nc-kortingen', r.kortingen, min);
+    tel('nc-tebetalen', r.teBetalen, euro);
+    tel('nc-zvw', r.zvw, euro);
+    tel('nc-reserveer', r.reserveer * 100, pct);
+    tel('nc-reserveer-maand', (r.teBetalen + r.zvw) / 12, euro);
     zet('nc-jaar-label', jaar === '2027' ? '2027 (voorlopige tarieven)' : '2026');
     document.getElementById('nc-negatief').hidden = r.winst >= 0;
   }

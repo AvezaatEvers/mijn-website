@@ -122,3 +122,29 @@
     };
   });
 })();
+
+// Zo werkt het: actieve stap volgen tijdens scrollen (alleen desktop)
+(function () {
+  var wrap = document.querySelector('.werk-grid .steps');
+  if (!wrap || !('IntersectionObserver' in window)) return;
+  var mq = window.matchMedia('(min-width: 901px)');
+  var stappen = Array.prototype.slice.call(wrap.children);
+  document.documentElement.classList.add('js-werk');
+  function zetActief(i) {
+    stappen.forEach(function (s, k) {
+      s.classList.toggle('is-actief', k === i);
+      s.classList.toggle('is-gedaan', k < i);
+    });
+    var doel = stappen[i];
+    var lijn = doel.offsetTop - stappen[0].offsetTop;
+    wrap.style.setProperty('--werk-voortgang', lijn + 'px');
+  }
+  zetActief(0);
+  var io = new IntersectionObserver(function (entries) {
+    if (!mq.matches) return;
+    entries.forEach(function (e) {
+      if (e.isIntersecting) zetActief(stappen.indexOf(e.target));
+    });
+  }, { rootMargin: '-45% 0px -45% 0px' });
+  stappen.forEach(function (s) { io.observe(s); });
+})();

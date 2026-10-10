@@ -145,6 +145,6 @@
     entries.forEach(function (e) {
       if (e.isIntersecting) zetActief(stappen.indexOf(e.target));
     });
-  }, { rootMargin: '-45% 0px -45% 0px' });
+  }, { rootMargin: '-35% 0px -55% 0px' });
   stappen.forEach(function (s) { io.observe(s); });
 })();

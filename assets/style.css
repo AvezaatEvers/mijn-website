@@ -568,14 +568,14 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 .werk-btn { display: none; }
 @media (min-width: 901px) {
   .werk-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 72px; align-items: start; }
-  .werk-intro { position: sticky; top: calc(50vh - 120px); display: flex; flex-direction: column; gap: 28px; }
+  .werk-intro { position: sticky; top: 140px; display: flex; flex-direction: column; gap: 28px; }
   .werk-intro .section-head { margin-bottom: 0; }
   .werk-btn { display: inline-flex; align-self: flex-start; }
-  .werk-grid .steps { display: flex; flex-direction: column; gap: 0; position: relative; padding: 8vh 0; }
-  .werk-grid .steps::before { content: ''; position: absolute; left: 19px; top: calc(8vh + 20px); bottom: calc(8vh + 20px); width: 2px; background: var(--line); }
-  .werk-grid .steps::after { content: ''; position: absolute; left: 19px; top: calc(8vh + 20px); width: 2px; height: var(--werk-voortgang, 0px); background: var(--accent); transition: height .5s ease; }
-  .werk-grid .steps > .stack { position: relative; padding: 0 0 0 76px; min-height: 34vh; gap: 12px; }
-  .werk-grid .steps > .stack:last-child { min-height: 0; }
+  .werk-grid .steps { display: flex; flex-direction: column; gap: 0; position: relative; padding: 0; }
+  .werk-grid .steps::before { content: ''; position: absolute; left: 19px; top: 20px; bottom: 20px; width: 2px; background: var(--line); }
+  .werk-grid .steps::after { content: ''; position: absolute; left: 19px; top: 20px; width: 2px; height: var(--werk-voortgang, 0px); background: var(--accent); transition: height .5s ease; }
+  .werk-grid .steps > .stack { position: relative; padding: 0 0 0 76px; min-height: 0; margin-bottom: 72px; gap: 10px; }
+  .werk-grid .steps > .stack:last-child { margin-bottom: 0; }
   .werk-grid .step-num { position: absolute; left: 0; top: 0; z-index: 1; box-shadow: 0 0 0 6px var(--white); transition: background .4s, color .4s; }
   .werk-grid .steps h3 { font-size: 26px; margin-top: 4px; }
   .werk-grid .steps p { font-size: 17px; max-width: 460px; }

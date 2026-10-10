@@ -58,7 +58,7 @@
     'kor kleineondernemersregeling vrijstelling vrijgesteld',
     'laat deadline termijn optijd boete vergeten uiterlijk',
     'achterstand achter inhalen achterstallig',
-    'bv vennootschap rechtsvorm',
+    'bv vof vennootschap rechtsvorm maatschap',
     'moneymonk app software programma boekhoudprogramma',
     'aftrek aftrekpost aftrekposten zelfstandigenaftrek startersaftrek aftrekbaar aftrekken',
     'prive persoonlijk',

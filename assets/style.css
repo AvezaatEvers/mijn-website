@@ -714,7 +714,6 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
 .bd-stappen-kort { grid-template-columns: repeat(3, 1fr); }
 .bd-stappen-vier { grid-template-columns: repeat(4, 1fr); }
 .bd-lijst-drie { grid-template-columns: repeat(3, 1fr) !important; }
-.bd-lijst-vier { grid-template-columns: repeat(4, auto) !important; justify-content: start; gap: 4px 40px !important; }
 .bd-contact > span { color: var(--muted); font-weight: 500; margin-right: 4px; }
 .bd-links a { font-weight: 500; }
 .bd-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

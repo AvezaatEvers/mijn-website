@@ -1,7 +1,7 @@
 // Bezoekersstatistieken met Umami Cloud (gratis, geen cookies, geen persoonsgegevens).
 // Instellen: maak een account op umami.is, voeg de website toe en plak het Website ID hieronder.
 // Er wordt alleen gemeten op het echte domein, niet op de conceptversie of lokaal.
-var UMAMI_WEBSITE_ID = "";
+var UMAMI_WEBSITE_ID = "931b51e9-cfd4-41b0-9b54-bc51ab4c0d77";
 
 (function () {
   if (!UMAMI_WEBSITE_ID) return;

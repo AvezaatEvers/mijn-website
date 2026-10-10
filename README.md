@@ -33,7 +33,7 @@ Zoek in alle bestanden op `[` om de placeholders te vinden:
 - `[OPLEIDING/ERVARING DAAN]`
 - `[BETAALWIJZE…]` op de tarievenpagina
 - Privacy en voorwaarden: datum, termijnen – en laat ze controleren (rechtsvorm VOF en adres zijn ingevuld)
-- Domein: overal staat `https://www.avezaatenevers.nl` – aanpassen als het domein anders wordt
+- Domein: overal staat `https://avezaatenevers.nl` – aanpassen als het domein anders wordt
 
 ## Foto's
 
@@ -79,4 +79,4 @@ Gratis foto's van Pexels (Pexels-licentie: vrij te gebruiken, ook commercieel, n
 
 ## E-mailhandtekening
 
-Open `/handtekening.html` (niet gelinkt, noindex) en klik op "Kopieer handtekening". Afbeeldingen staan in `assets/email/` en zijn ook achter het wachtwoord bereikbaar (alles onder /assets/ is uitgezonderd). Na het koppelen van het domein de handtekening opnieuw kopiëren vanaf www.avezaatenevers.nl.
+Open `/handtekening.html` (niet gelinkt, noindex) en klik op "Kopieer handtekening". Afbeeldingen staan in `assets/email/` en zijn ook achter het wachtwoord bereikbaar (alles onder /assets/ is uitgezonderd). Het domein avezaatenevers.nl is gekoppeld; de handtekening gebruikt dat adres.

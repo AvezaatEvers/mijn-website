@@ -7,7 +7,7 @@ Website van Avezaat & Evers (statische HTML, gehost op Netlify).
 - Elke publicatie naar `main` kost op Netlify 15 credits (gratis plan: 300 per maand). Branch deploys kosten 0 credits.
 - **Commit en push wijzigingen daarom altijd naar de branch `concept`**, nooit rechtstreeks naar `main`.
 - Conceptversie: https://concept--preeminent-baklava-40debb.netlify.app
-- Live site: https://preeminent-baklava-40debb.netlify.app
+- Live site: https://avezaatenevers.nl (gekoppeld domein; www.avezaatenevers.nl en preeminent-baklava-40debb.netlify.app verwijzen hiernaar)
 - Pas als de gebruiker expliciet "zet live" (of iets gelijkwaardigs) zegt: `concept` mergen naar `main` en pushen. Bundel wijzigingen; zet niet na elke kleine aanpassing live.
 - Na het live zetten `concept` weer gelijk houden met `main`.
 

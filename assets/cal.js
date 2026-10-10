@@ -63,13 +63,21 @@ if (document.getElementById("cal-inline")) {
   });
 })();
 
-// Na een geboekte afspraak: door naar onze persoonlijke bedankpagina
+// Na een geboekte afspraak: door naar onze persoonlijke bedankpagina, met datum en tijd van de afspraak
 (function () {
-  var klaar = false;
-  function naarBedankt() {
-    if (klaar) return;
-    klaar = true;
-    setTimeout(function () { location.href = "/bedankt.html?afspraak=1"; }, 1500);
+  var gepland = false, start = "", eind = "";
+  function naarBedankt(e) {
+    var d = (e && e.detail && e.detail.data) || {};
+    start = start || d.startTime || d.date || "";
+    eind = eind || d.endTime || "";
+    if (gepland) return;
+    gepland = true;
+    setTimeout(function () {
+      var url = "/bedankt.html?afspraak=1";
+      if (start) url += "&start=" + encodeURIComponent(start);
+      if (eind) url += "&eind=" + encodeURIComponent(eind);
+      location.href = url;
+    }, 1500);
   }
   Cal.ns.kennismaking("on", { action: "bookingSuccessful", callback: naarBedankt });
   Cal.ns.kennismaking("on", { action: "bookingSuccessfulV2", callback: naarBedankt });

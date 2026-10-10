@@ -689,6 +689,16 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin-right: auto; }
 
 /* Bedankpagina na formulier of afspraak */
+.bd-moment { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--white); border-radius: 16px; padding: 14px 18px 14px 14px; box-shadow: 0 1px 2px rgba(17,24,39,.05), 0 10px 24px -14px rgba(17,24,39,.18); align-self: flex-start; }
+.bd-moment[hidden] { display: none; }
+.bd-kal { width: 56px; border-radius: 12px; overflow: hidden; text-align: center; border: 1px solid var(--tint-border); flex: none; }
+.bd-moment .bd-kal span { display: block; background: var(--accent); color: #fff; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; padding: 3px 0; }
+.bd-kal b { display: block; font-size: 22px; line-height: 1; padding: 7px 0 8px; color: var(--ink); }
+.bd-moment strong { display: block; font-size: 17px; color: var(--ink); }
+.bd-moment div span { font-size: 15px; color: var(--muted); }
+.bd-ics { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; padding: 8px 14px; border-radius: 10px; background: var(--tint); color: var(--accent); font-weight: 600; font-size: 14px; text-decoration: none; }
+.bd-ics:hover { background: var(--tint-border); }
+@media (max-width: 600px) { .bd-moment { align-self: stretch; } .bd-ics { margin-left: 72px; } }
 .bd-hero { background: var(--tint); padding: 56px 0; }
 .bd-hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 56px; align-items: center; }
 .bd-hero h1 { font-size: clamp(32px, 4.4vw, 50px); margin: 0; }

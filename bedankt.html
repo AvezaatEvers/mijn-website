@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="robots" content="noindex">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/style.css?v=73">
+<link rel="stylesheet" href="/assets/style.css?v=75">
 </head>
 <body>
 <header class="site-header">
@@ -32,6 +32,11 @@
         <span class="pill bd-pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span data-alleen="afspraak" hidden>Je afspraak staat</span><span data-alleen="formulier">Bericht ontvangen</span></span>
         <h1 data-alleen="afspraak" hidden>Top, we spreken elkaar snel!</h1>
         <h1 data-alleen="formulier">Bedankt, we hebben je bericht!</h1>
+        <div class="bd-moment" id="bd-moment" hidden>
+          <div class="bd-kal" aria-hidden="true"><span id="bd-maand"></span><b id="bd-dag"></b></div>
+          <div><strong id="bd-datum"></strong><span id="bd-tijd"></span></div>
+          <a class="bd-ics" id="bd-ics" href="#" download="kennismaking-avezaat-evers.ics"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>In mijn agenda</a>
+        </div>
         <p class="lead" data-alleen="afspraak" hidden>De bevestiging met de link voor het gesprek zit in je mail.</p>
         <p class="lead" data-alleen="formulier">We lezen je bericht zelf en nemen binnen één werkdag persoonlijk contact met je op.</p>
         <div class="bd-brief">
@@ -128,15 +133,35 @@
     <span><a href="/voorwaarden.html">Algemene voorwaarden</a> · <a href="/privacy.html">Privacyverklaring</a></span>
   </div>
 </footer>
-<script src="/assets/main.js?v=73" defer></script>
+<script src="/assets/main.js?v=75" defer></script>
 <script>
 (function () {
   var afspraak = /[?&]afspraak=1/.test(location.search);
   document.querySelectorAll('[data-alleen]').forEach(function (el) {
     el.hidden = el.getAttribute('data-alleen') !== (afspraak ? 'afspraak' : 'formulier');
   });
+  // Datum en tijd van de afspraak (doorgegeven door Cal.com)
+  var q = new URLSearchParams(location.search);
+  var start = new Date(q.get('start') || '');
+  if (afspraak && !isNaN(start)) {
+    var eind = new Date(q.get('eind') || '');
+    if (isNaN(eind) || eind <= start) eind = new Date(start.getTime() + 20 * 60000);
+    var tz = { timeZone: 'Europe/Amsterdam' };
+    function f(d, o) { return d.toLocaleString('nl-NL', Object.assign({}, tz, o)); }
+    document.getElementById('bd-maand').textContent = f(start, { month: 'short' }).replace('.', '');
+    document.getElementById('bd-dag').textContent = f(start, { day: 'numeric' });
+    var datum = f(start, { weekday: 'long', day: 'numeric', month: 'long' });
+    document.getElementById('bd-datum').textContent = datum.charAt(0).toUpperCase() + datum.slice(1);
+    document.getElementById('bd-tijd').textContent = f(start, { hour: '2-digit', minute: '2-digit' }) + ' – ' + f(eind, { hour: '2-digit', minute: '2-digit' }) + ' uur';
+    function ics(d) { return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); }
+    var cal = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Avezaat & Evers//Kennismaking//NL', 'BEGIN:VEVENT',
+      'UID:' + ics(start) + '-kennismaking@avezaatenevers.nl', 'DTSTAMP:' + ics(new Date()), 'DTSTART:' + ics(start), 'DTEND:' + ics(eind),
+      'SUMMARY:Kennismaking Avezaat & Evers', 'DESCRIPTION:De link voor het gesprek staat in je bevestigingsmail.', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+    document.getElementById('bd-ics').href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(cal);
+    document.getElementById('bd-moment').hidden = false;
+  }
 })();
 </script>
-<script src="/assets/analytics.js?v=73" defer></script>
+<script src="/assets/analytics.js?v=75" defer></script>
 </body>
 </html>

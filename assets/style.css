@@ -607,3 +607,11 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 .app-visual::after { content: ''; position: absolute; left: 50%; bottom: -6px; width: min(70%, 260px); height: 36px; transform: translateX(-50%); background: radial-gradient(ellipse at center, rgba(17,24,39,0.22), rgba(17,24,39,0) 70%); pointer-events: none; }
 .app-phone { z-index: 1; }
 .mm-badge { z-index: 2; }
+
+/* Contactpagina: snelle keuzes */
+.contact-chips { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.contact-chips a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--white); color: var(--ink); font-size: 15px; font-weight: 500; text-decoration: none; transition: border-color .15s, color .15s; }
+.contact-chips a:hover { border-color: var(--accent); color: var(--accent); }
+.contact-chips li:first-child a { background: var(--accent); border-color: var(--accent); color: var(--white); }
+#vraag, #plannen { scroll-margin-top: 90px; }
+@media (max-width: 480px) { .contact-chips { gap: 8px; } .contact-chips a { font-size: 14px; padding: 0 14px; } }

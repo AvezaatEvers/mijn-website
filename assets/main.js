@@ -155,17 +155,32 @@
   check();
 })();
 
-// Contactpagina: groen bolletje als we nu bereikbaar zijn (Nederlandse tijd)
+// Contactpagina: groen bolletje als we nu bereikbaar zijn (Nederlandse tijd),
+// anders een korte melding wanneer we weer bereikbaar zijn
 (function () {
   var els = document.querySelectorAll('.cc-tijd');
   if (!els.length) return;
+  var DAGEN = ['', 'ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'];
   var nu = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Amsterdam' }));
   var dag = nu.getDay() || 7, uur = nu.getHours() + nu.getMinutes() / 60;
+  function tijd(u) { return (u < 10 ? '0' : '') + u + ':00'; }
   els.forEach(function (el) {
     var d = (el.getAttribute('data-dagen') || '1-7').split('-').map(Number);
     var van = +(el.getAttribute('data-van') || 0), tot = +(el.getAttribute('data-tot') || 24);
-    var open = dag >= d[0] && dag <= d[1] && uur >= van && uur < tot;
+    var werkdag = function (x) { return x >= d[0] && x <= d[1]; };
+    var open = werkdag(dag) && uur >= van && uur < tot;
+    var tekst;
+    if (open) tekst = 'Nu bereikbaar';
+    else if (werkdag(dag) && uur < van) tekst = 'Weer bereikbaar: vandaag ' + tijd(van);
+    else {
+      for (var i = 1; i <= 7; i++) {
+        var x = ((dag - 1 + i) % 7) + 1;
+        if (werkdag(x)) { tekst = 'Weer bereikbaar: ' + (i === 1 ? 'morgen' : DAGEN[x]) + ' ' + tijd(van); break; }
+      }
+    }
     el.classList.toggle('is-open', open);
-    el.setAttribute('title', open ? 'Nu bereikbaar' : 'Op dit moment buiten onze bereikbaarheid');
+    var s = el.querySelector('.cc-status') || el.appendChild(document.createElement('span'));
+    s.className = 'cc-status';
+    s.textContent = tekst;
   });
 })();

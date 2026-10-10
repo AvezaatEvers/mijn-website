@@ -579,13 +579,13 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
   .werk-grid .step-num { position: absolute; left: 0; top: 0; z-index: 1; box-shadow: 0 0 0 6px var(--white); transition: background .4s, color .4s; }
   .werk-grid .steps h3 { font-size: 26px; margin-top: 4px; }
   .werk-grid .steps p { font-size: 17px; max-width: 460px; }
-  .js-werk .werk-grid .steps > .stack { opacity: .32; transform: translateY(10px); transition: opacity .5s ease, transform .5s ease; }
-  .js-werk .werk-grid .steps > .stack.is-actief { opacity: 1; transform: none; }
+  .js-werk .werk-grid .steps > .stack > :not(.step-num) { opacity: .32; transform: translateY(8px); transition: opacity .5s ease, transform .5s ease; }
+  .js-werk .werk-grid .steps > .stack.is-actief > :not(.step-num) { opacity: 1; transform: none; }
   .js-werk #werkwijze .stack.is-actief .step-num, .js-werk #werkwijze .stack.is-gedaan .step-num { background: var(--accent); }
   .js-werk #werkwijze .stack.is-actief .step-num::after, .js-werk #werkwijze .stack.is-gedaan .step-num::after { color: var(--white); }
 }
 @media (min-width: 901px) and (prefers-reduced-motion: reduce) {
-  .js-werk .werk-grid .steps > .stack { opacity: 1; transform: none; transition: none; }
+  .js-werk .werk-grid .steps > .stack > :not(.step-num) { opacity: 1; transform: none; transition: none; }
 }
 
 /* Zachte overgang tussen pagina's (moderne browsers); header blijft staan */

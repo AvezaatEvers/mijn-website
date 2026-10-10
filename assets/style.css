@@ -684,3 +684,6 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 /* Instagram in footer */
 .footer-grid a.footer-ig { display: inline-flex; align-items: center; gap: 8px; }
 .footer-grid a.footer-ig svg { flex-shrink: 0; }
+
+/* Kennisbank: tekst gelijk uitlijnen met de kop */
+article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin-right: auto; }

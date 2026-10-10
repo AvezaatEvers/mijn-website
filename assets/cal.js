@@ -77,7 +77,7 @@ if (document.getElementById("cal-inline")) {
       if (start) url += "&start=" + encodeURIComponent(start);
       if (eind) url += "&eind=" + encodeURIComponent(eind);
       location.href = url;
-    }, 1500);
+    }, 250);
   }
   Cal.ns.kennismaking("on", { action: "bookingSuccessful", callback: naarBedankt });
   Cal.ns.kennismaking("on", { action: "bookingSuccessfulV2", callback: naarBedankt });

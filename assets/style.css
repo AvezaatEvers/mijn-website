@@ -389,7 +389,7 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 .app-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 64px; align-items: center; }
 .app-visual { position: relative; display: flex; justify-content: center; }
 .app-visual::before { content: ''; position: absolute; width: 78%; aspect-ratio: 1; border-radius: 50%; background: var(--tint); top: 50%; left: 50%; transform: translate(-50%, -50%); }
-.app-phone { position: relative; width: 100%; max-width: 330px; filter: drop-shadow(0 24px 40px rgba(17,24,39,0.18)); }
+.app-phone { position: relative; width: 100%; max-width: 330px; }
 .mm-badge { position: absolute; top: 14%; right: 4%; display: flex; align-items: center; gap: 10px; background: var(--white); padding: 10px 16px 10px 10px; border-radius: 16px; box-shadow: 0 12px 32px rgba(17,24,39,0.14); }
 .mm-badge img { border-radius: 10px; }
 .mm-badge span { display: flex; flex-direction: column; line-height: 1.2; }
@@ -598,7 +598,12 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 
 
 /* MoneyMonk Erkend Adviseur-badge */
-.mm-badge.mm-erkend { background: none; padding: 0; box-shadow: none; border-radius: 0; filter: drop-shadow(0 12px 24px rgba(17,24,39,0.18)); }
+.mm-badge.mm-erkend { background: none; padding: 0; box-shadow: none; border-radius: 0; }
 .mm-badge.mm-erkend img { display: block; width: 220px; height: auto; border-radius: 0; }
 @media (max-width: 700px) { .mm-badge.mm-erkend img { width: 170px; } }
 .footer-badge { display: block; width: 150px; height: auto; margin-top: 18px; }
+
+/* Schaduw onder de telefoon zonder CSS-filter (filters gaven wazige rechthoeken op iPhone) */
+.app-visual::after { content: ''; position: absolute; left: 50%; bottom: -6px; width: min(70%, 260px); height: 36px; transform: translateX(-50%); background: radial-gradient(ellipse at center, rgba(17,24,39,0.22), rgba(17,24,39,0) 70%); pointer-events: none; }
+.app-phone { z-index: 1; }
+.mm-badge { z-index: 2; }

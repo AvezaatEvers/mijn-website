@@ -183,7 +183,7 @@
     var head = document.createElement('p');
     head.className = 'faq-count';
     if (!ranked.length) {
-      head.innerHTML = 'Geen vraag gevonden die hierop lijkt. Probeer andere woorden, of <a href="/contact.html">plan een kennismaking</a> en stel je vraag direct.';
+      head.innerHTML = 'Geen vraag gevonden die hierop lijkt. Probeer andere woorden, of <a href="/contact.html#plannen">plan een kennismaking</a> en stel je vraag direct.';
       resultsBox.appendChild(head);
       return;
     }

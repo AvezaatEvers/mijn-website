@@ -265,29 +265,17 @@
       <div class="stack" style="gap:16px">
         <h2>Klaar om je administratie uit handen te geven?</h2>
         <p>Plan een gratis kennismaking van 20 minuten. Vrijblijvend, en je weet direct wat het je kost.</p>
-        <div class="contact-lines">
-          <a href="mailto:info@avezaatenevers.nl">info@avezaatenevers.nl</a>
-          <a href="tel:+31612345678">06 1234 5678</a>
-        </div>
       </div>
-      <form class="form" name="kennismaking" method="POST" action="/bedankt.html" data-netlify="true" netlify-honeypot="bot-field">
-        <input type="hidden" name="form-name" value="kennismaking">
-        <p class="hidden"><label>Niet invullen: <input name="bot-field"></label></p>
-        <label>Naam<input type="text" name="naam" autocomplete="name" required></label>
-        <label>E-mail<input type="email" name="email" autocomplete="email" required></label>
-        <label>Telefoon<input type="tel" name="telefoon" autocomplete="tel"></label>
-        <label>Transacties per maand (ca.)
-          <select name="transacties">
-            <option>Minder dan 50</option>
-            <option>50 – 100</option>
-            <option>Meer dan 100</option>
-            <option>Weet ik niet</option>
-          </select>
-        </label>
-        <label class="full">Wat voor onderneming heb je?<textarea name="bericht" rows="3"></textarea></label>
-        <label class="check full"><input type="checkbox" name="privacy" required><span>Ik ga akkoord met de <a href="/privacy.html">privacyverklaring</a>.</span></label>
-        <button class="btn btn-white" type="submit">Plan mijn kennismaking</button>
-      </form>
+      <div class="stack cta-options" style="align-self:center;gap:14px">
+        <a class="btn btn-white" href="/contact.html">Plan een gratis kennismaking</a>
+        <p class="cta-alt"><span class="cta-alt-label">Of neem contact op:</span>
+          <a href="mailto:info@avezaatenevers.nl"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>Mail</a>
+          <span aria-hidden="true">·</span>
+          <a href="tel:+31612345678"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Bel</a>
+          <span aria-hidden="true">·</span>
+          <a href="https://wa.me/31612345678"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/></svg>WhatsApp</a>
+        </p>
+      </div>
     </div>
   </div>
 </section>

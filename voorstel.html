@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voorstel-mail | Avezaat &amp; Evers</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css?v=73">
+<style>
+  .vs-page { padding: 40px 0 80px; }
+  .vs-wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: 380px 1fr; gap: 32px; align-items: start; }
+  .vs-form { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 14px; background: var(--soft); border: 1px solid var(--line); border-radius: 20px; padding: 22px; max-height: calc(100vh - 48px); overflow: auto; }
+  .vs-form h2 { font-size: 18px; margin: 6px 0 0; }
+  .vs-form label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 500; color: var(--ink); }
+  .vs-form input[type=text], .vs-form input[type=number], .vs-form input[type=date], .vs-form select, .vs-form textarea { font: inherit; font-weight: 400; font-size: 15px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  .vs-form .vs-check { flex-direction: row; align-items: center; gap: 10px; font-weight: 400; }
+  .vs-form .vs-check input { width: 18px; height: 18px; accent-color: var(--accent); }
+  .vs-rij { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .vs-hint { font-size: 13px; color: var(--muted); margin: -6px 0 0; }
+  .vs-preview { background: #F3F4F6; border-radius: 20px; padding: 32px 16px; overflow-x: auto; }
+  .vs-acties { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+  .vs-ok { font-size: 14px; color: #15803D; margin: 0; }
+  @media (max-width: 960px) { .vs-wrap { grid-template-columns: 1fr; } .vs-form { position: static; max-height: none; } }
+</style>
+</head>
+<body>
+<main class="vs-page">
+  <div class="vs-wrap">
+    <form class="vs-form" id="vs-form" autocomplete="off">
+      <a class="logo" href="/">Avezaat <span>&amp;</span> Evers</a>
+      <p class="vs-hint" style="margin:0">Interne pagina. Vul in, controleer de mail rechts en klik op Kopieer mail.</p>
+
+      <h2>Klant</h2>
+      <div class="vs-rij">
+        <label>Voornaam<input type="text" name="voornaam" value="Sanne"></label>
+        <label>Bedrijfsnaam<input type="text" name="bedrijf" value="Studio Sanne"></label>
+      </div>
+      <label>Wat hebben we besproken? <textarea name="situatie" rows="3">je net gestart bent als grafisch ontwerper en je je administratie vanaf het begin goed wilt regelen</textarea></label>
+      <p class="vs-hint">Loopt door na "Leuk je gesproken te hebben. Je vertelde dat …"</p>
+
+      <h2>Voorstel</h2>
+      <div class="vs-rij">
+        <label>Startdatum<input type="text" name="start" value="1 januari 2027"></label>
+        <label>Boekhouder<select name="boekhouder"><option>Daan</option><option>Koen</option></select></label>
+      </div>
+      <label>Maandbedrag pakket (excl. btw)<input type="number" name="pakket" value="80" min="0" step="1"></label>
+      <p class="vs-hint">Standaard €80. Alleen aanpassen bij meer dan 100 transacties per maand.</p>
+
+      <h2>Extra's</h2>
+      <label class="vs-check"><input type="checkbox" name="icp">ICP-aangifte (€15 p/m)</label>
+      <label class="vs-check"><input type="checkbox" name="uren">Uren- en rittenregistratie (€10 p/m)</label>
+      <label class="vs-check"><input type="checkbox" name="partner">IB-aangifte fiscaal partner (€150 per jaar)</label>
+      <label>Overstappen<select name="overstap"><option value="nee">Niet van toepassing</option><option value="gratis">Gratis (per 1 januari, aangemeld vóór 15 december)</option><option value="betaald">€149 eenmalig</option></select></label>
+      <label>Achterstand inhalen (geschat aantal uren à €60)<input type="number" name="achterstand" value="0" min="0" step="1"></label>
+
+      <h2>Afsluiting</h2>
+      <label>Persoonlijke noot (optioneel)<textarea name="noot" rows="2" placeholder="Bijv. een tip die je in het gesprek beloofde"></textarea></label>
+      <label>Geldig tot<input type="text" name="geldig" value=""></label>
+    </form>
+
+    <div>
+      <div class="vs-acties">
+        <button class="btn btn-primary" type="button" id="vs-kopieer">Kopieer mail</button>
+        <span class="vs-hint" style="margin:0">Onderwerp: <strong id="vs-onderwerp"></strong></span>
+        <p class="vs-ok" id="vs-ok"></p>
+      </div>
+      <div class="vs-preview"><div id="vs-mail"></div></div>
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  // Afbeeldingen en links moeten openbaar bereikbaar zijn voor Outlook, dus altijd het live domein.
+  var BASE = 'https://avezaatenevers.nl';
+  var MAIL = 'info@avezaatenevers.nl', TEL = '06 1234 5678', TELLINK = 'tel:+31612345678', WA = 'https://wa.me/31612345678';
+  var BLAUW = '#1E40AF', INKT = '#111827', TEKST = '#374151', GRIJS = '#6B7280', LIJN = '#E5E7EB', TINT = '#EEF2FB';
+  var F = 'font-family:Arial,Helvetica,sans-serif;';
+  var form = document.getElementById('vs-form');
+
+  // Standaard geldig tot: over 14 dagen
+  var g = form.elements.geldig;
+  if (!g.value) {
+    var d = new Date(Date.now() + 14 * 864e5);
+    g.value = d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function esc(t) { return String(t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function euro(n) {
+    var heel = Math.round(n * 100) % 100 === 0;
+    return '€' + n.toLocaleString('nl-NL', { minimumFractionDigits: heel ? 0 : 2, maximumFractionDigits: 2 });
+  }
+  function rij(links, rechts, opties) {
+    opties = opties || {};
+    var stijl = F + 'font-size:15px;color:' + (opties.sterk ? INKT : TEKST) + ';' + (opties.sterk ? 'font-weight:bold;' : '') + 'padding:11px 0;' + (opties.geenLijn ? '' : 'border-bottom:1px solid ' + LIJN + ';');
+    return '<tr><td style="' + stijl + '">' + links + '</td><td align="right" style="' + stijl + 'white-space:nowrap;padding-left:16px;">' + rechts + '</td></tr>';
+  }
+  function vinkje(t) {
+    return '<tr><td width="26" valign="top" style="' + F + 'font-size:15px;color:' + BLAUW + ';font-weight:bold;padding:4px 0;">&#10003;</td><td style="' + F + 'font-size:15px;color:' + TEKST + ';padding:4px 0;line-height:1.5;">' + t + '</td></tr>';
+  }
+
+  function bouw() {
+    var v = form.elements;
+    var naam = esc(v.voornaam.value.trim() || 'daar');
+    var bedrijf = esc(v.bedrijf.value.trim());
+    var wie = v.boekhouder.value;
+    var pakket = Math.max(0, parseFloat(v.pakket.value) || 0);
+    var maand = pakket, jaar = 0, eenmalig = 0;
+    var extraRijen = '';
+    if (v.icp.checked) { maand += 15; extraRijen += rij('ICP-aangifte (klanten binnen de EU)', '€15 p/m'); }
+    if (v.uren.checked) { maand += 10; extraRijen += rij('Uren- en rittenregistratie', '€10 p/m'); }
+    if (v.partner.checked) { jaar += 150; extraRijen += rij('IB-aangifte fiscaal partner', '€150 per jaar'); }
+    if (v.overstap.value === 'gratis') extraRijen += rij('Overstappen van je oude boekhouder', '<span style="color:#15803D;font-weight:bold;">gratis</span>');
+    if (v.overstap.value === 'betaald') { eenmalig += 149; extraRijen += rij('Overstappen van je oude boekhouder', '€149 eenmalig'); }
+    var uren = Math.max(0, parseInt(v.achterstand.value, 10) || 0);
+    if (uren) { eenmalig += uren * 60; extraRijen += rij('Achterstand inhalen (± ' + uren + ' uur à €60)', euro(uren * 60) + ' eenmalig'); }
+
+    var situatie = esc(v.situatie.value.trim());
+    var noot = esc(v.noot.value.trim()).replace(/\n/g, '<br>');
+    var onderwerp = 'Je voorstel van Avezaat & Evers' + (bedrijf ? ' voor ' + v.bedrijf.value.trim() : '');
+    document.getElementById('vs-onderwerp').textContent = onderwerp;
+
+    var akkoordLink = 'mailto:' + MAIL + '?subject=' + encodeURIComponent('Akkoord voorstel' + (bedrijf ? ' ' + v.bedrijf.value.trim() : '')) +
+      '&body=' + encodeURIComponent('Hoi ' + wie + ',\n\nIk ga akkoord met het voorstel en wil graag starten per ' + v.start.value.trim() + '.\n\nGroet,\n' + v.voornaam.value.trim());
+
+    var p = 'style="' + F + 'font-size:16px;line-height:1.6;color:' + TEKST + ';margin:0 0 16px;"';
+    var h = function (t) { return '<p style="' + F + 'font-size:13px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:' + BLAUW + ';margin:0 0 10px;">' + t + '</p>'; };
+
+    var html = '' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F3F4F6;">' +
+    '<tr><td align="center" style="padding:0;">' +
+    '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background:#FFFFFF;border:1px solid ' + LIJN + ';">' +
+
+    // Kop
+    '<tr><td style="padding:28px 40px 24px 40px;border-bottom:1px solid ' + LIJN + ';"><a href="' + BASE + '/" style="text-decoration:none;"><img src="' + BASE + '/assets/email/logo.png" width="177" height="31" alt="Avezaat &amp; Evers" style="display:block;border:0;width:177px;height:31px;"></a></td></tr>' +
+
+    // Intro
+    '<tr><td style="padding:36px 40px 8px 40px;">' +
+      '<p style="' + F + 'font-size:26px;line-height:1.25;font-weight:bold;color:' + INKT + ';margin:0 0 20px;">Je voorstel op maat' + (bedrijf ? '<br><span style="color:' + BLAUW + ';">voor ' + bedrijf + '</span>' : '') + '</p>' +
+      '<p ' + p + '>Hoi ' + naam + ',</p>' +
+      '<p ' + p + '>Leuk je gesproken te hebben!' + (situatie ? ' Je vertelde dat ' + situatie + '.' : '') + ' Zoals beloofd zetten we hieronder op een rij wat we voor je gaan doen en wat het kost. Geen kleine lettertjes, en je zit nergens aan vast.</p>' +
+    '</td></tr>' +
+
+    // Prijsblok
+    '<tr><td style="padding:8px 40px 8px 40px;">' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:' + TINT + ';border-radius:12px;">' +
+      '<tr><td style="padding:26px 28px;">' +
+        '<p style="' + F + 'font-size:14px;color:' + GRIJS + ';margin:0 0 4px;">Jouw vaste prijs</p>' +
+        '<p style="' + F + 'font-size:40px;line-height:1.1;font-weight:bold;color:' + INKT + ';margin:0;">' + euro(maand) + '<span style="font-size:16px;font-weight:normal;color:' + GRIJS + ';"> per maand excl. btw</span></p>' +
+        '<p style="' + F + 'font-size:14px;color:' + GRIJS + ';margin:6px 0 0;">' + euro(maand * 1.21) + ' incl. btw · maandelijks opzegbaar' +
+          (jaar ? ' · plus ' + euro(jaar) + ' per jaar' : '') + (eenmalig ? ' · eenmalig ' + euro(eenmalig) : '') + '</p>' +
+      '</td></tr></table>' +
+    '</td></tr>' +
+
+    // Inbegrepen
+    '<tr><td style="padding:28px 40px 4px 40px;">' + h('Altijd inbegrepen') +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' +
+        vinkje('Eén vaste boekhouder: <strong style="color:' + INKT + ';">' + wie + '</strong>, die jouw bedrijf kent') +
+        vinkje('Je complete boekhouding, tot 100 banktransacties per maand') +
+        vinkje('4× btw-aangifte per jaar, op tijd en vooraf met je besproken') +
+        vinkje('Je aangifte inkomstenbelasting en jaarcijfers') +
+        vinkje('MoneyMonk-software en app om je bonnetjes aan te leveren') +
+        vinkje('Elke maand een 1-op-1 gesprek, en vragen stellen wanneer je wilt') +
+      '</table>' +
+    '</td></tr>' +
+
+    // Overzicht
+    '<tr><td style="padding:24px 40px 4px 40px;">' + h('Overzicht') +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' +
+        rij('Pakket boekhouding volledig uit handen', euro(pakket) + ' p/m') +
+        extraRijen +
+        rij('Totaal per maand', euro(maand) + ' excl. btw', { sterk: true, geenLijn: true }) +
+      '</table>' +
+      '<p style="' + F + 'font-size:13px;line-height:1.5;color:' + GRIJS + ';margin:10px 0 0;">Startdatum: <strong style="color:' + INKT + ';">' + esc(v.start.value.trim()) + '</strong>. Je zegt maandelijks op. Stop je binnen 12 maanden nadat we je aangifte inkomstenbelasting hebben gedaan, dan rekenen we die aangifte apart af (€250).</p>' +
+    '</td></tr>' +
+
+    // Volgende stappen
+    '<tr><td style="padding:28px 40px 4px 40px;">' + h('Zo starten we') +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' +
+        stap(1, 'Jij geeft akkoord', 'Met één klik op de knop hieronder, of gewoon door op deze mail te reageren.') +
+        stap(2, 'Wij sturen de opdrachtbevestiging', 'En we vragen je identiteitsbewijs, dat zijn we wettelijk verplicht.') +
+        stap(3, 'We zetten alles klaar', 'Je MoneyMonk-account, de machtiging voor je aangiftes' + (v.overstap.value !== 'nee' ? ' en de overdracht met je oude boekhouder' : '') + '.') +
+        stap(4, 'Je eerste 1-op-1', 'In je eerste maand lopen we samen alles door.', true) +
+      '</table>' +
+    '</td></tr>' +
+
+    // Knop
+    '<tr><td align="left" style="padding:24px 40px 8px 40px;">' +
+      '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="' + BLAUW + '" style="background:' + BLAUW + ';border-radius:10px;">' +
+        '<a href="' + akkoordLink + '" style="' + F + 'display:inline-block;padding:15px 28px;font-size:16px;font-weight:bold;color:#FFFFFF;text-decoration:none;border-radius:10px;">Ja, ik wil starten &rarr;</a>' +
+      '</td></tr></table>' +
+      '<p style="' + F + 'font-size:14px;color:' + GRIJS + ';margin:12px 0 0;">Dit voorstel is geldig tot ' + esc(v.geldig.value.trim()) + '. Nog vragen? Bel of app me op <a href="' + TELLINK + '" style="color:' + BLAUW + ';text-decoration:none;">' + TEL + '</a>.</p>' +
+    '</td></tr>' +
+
+    // Persoonlijke noot + groet
+    '<tr><td style="padding:24px 40px 32px 40px;">' +
+      (noot ? '<p ' + p + '>' + noot + '</p>' : '') +
+      '<p style="' + F + 'font-size:16px;line-height:1.6;color:' + TEKST + ';margin:0;">Hartelijke groet,<br><strong style="color:' + INKT + ';">' + wie + (wie === 'Daan' ? ' Evers' : ' Avezaat') + '</strong><br><span style="color:' + GRIJS + ';font-size:14px;">Avezaat &amp; Evers</span></p>' +
+    '</td></tr>' +
+
+    // Voet
+    '<tr><td style="padding:20px 40px;background:#F9FAFB;border-top:1px solid ' + LIJN + ';">' +
+      '<p style="' + F + 'font-size:12px;line-height:1.6;color:' + GRIJS + ';margin:0;">Avezaat &amp; Evers · <a href="mailto:' + MAIL + '" style="color:' + GRIJS + ';">' + MAIL + '</a> · <a href="' + BASE + '/" style="color:' + GRIJS + ';">avezaatenevers.nl</a><br>Alle bedragen excl. 21% btw, tenzij anders vermeld. Op onze diensten zijn onze <a href="' + BASE + '/voorwaarden.html" style="color:' + GRIJS + ';">algemene voorwaarden</a> van toepassing.</p>' +
+    '</td></tr>' +
+
+    '</table></td></tr></table>';
+
+    document.getElementById('vs-mail').innerHTML = html;
+  }
+
+  function stap(n, titel, tekst, laatste) {
+    return '<tr>' +
+      '<td width="44" valign="top" style="padding:0 0 ' + (laatste ? '0' : '14px') + ' 0;"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td width="28" height="28" align="center" valign="middle" bgcolor="' + BLAUW + '" style="background:' + BLAUW + ';border-radius:14px;' + F + 'font-size:13px;font-weight:bold;color:#FFFFFF;width:28px;height:28px;">' + n + '</td></tr></table></td>' +
+      '<td valign="top" style="padding:3px 0 ' + (laatste ? '0' : '14px') + ' 0;' + F + 'font-size:15px;line-height:1.5;color:' + TEKST + ';"><strong style="color:' + INKT + ';">' + titel + '</strong><br>' + tekst + '</td>' +
+    '</tr>';
+  }
+
+  form.addEventListener('input', bouw);
+  form.addEventListener('change', bouw);
+  bouw();
+
+  document.getElementById('vs-kopieer').addEventListener('click', function () {
+    var el = document.getElementById('vs-mail'), ok = document.getElementById('vs-ok');
+    function klaar() { ok.textContent = 'Gekopieerd. Plak hem in een nieuwe mail in Outlook (Ctrl+V of Cmd+V).'; }
+    function oudeManier() {
+      var r = document.createRange(); r.selectNodeContents(el);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      try { document.execCommand('copy'); klaar(); } catch (e) { ok.textContent = 'Selecteer de mail en kopieer hem handmatig.'; }
+      s.removeAllRanges();
+    }
+    if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+      navigator.clipboard.write([new ClipboardItem({
+        'text/html': new Blob([el.innerHTML], { type: 'text/html' }),
+        'text/plain': new Blob([el.innerText], { type: 'text/plain' })
+      })]).then(klaar, oudeManier);
+    } else oudeManier();
+  });
+})();
+</script>
+</body>
+</html>

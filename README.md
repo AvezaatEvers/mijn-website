@@ -80,3 +80,7 @@ Gratis foto's van Pexels (Pexels-licentie: vrij te gebruiken, ook commercieel, n
 ## E-mailhandtekening
 
 Open `/handtekening.html` (niet gelinkt, noindex) en klik op "Kopieer handtekening". Afbeeldingen staan in `assets/email/` en zijn ook achter het wachtwoord bereikbaar (alles onder /assets/ is uitgezonderd). Het domein avezaatenevers.nl is gekoppeld; de handtekening gebruikt dat adres.
+
+## Voorstel-mail
+
+Open `/voorstel.html` (niet gelinkt, noindex). Vul de klantgegevens en extra's in, controleer de mail rechts en klik op "Kopieer mail". Plak in een nieuwe mail in Outlook en zet het onderwerp erboven. Bedragen en extra's staan in het script onderaan de pagina.

@@ -171,11 +171,11 @@
     var open = werkdag(dag) && uur >= van && uur < tot;
     var tekst;
     if (open) tekst = 'Nu bereikbaar';
-    else if (werkdag(dag) && uur < van) tekst = 'Weer bereikbaar: vandaag ' + tijd(van);
+    else if (werkdag(dag) && uur < van) tekst = 'Weer bereikbaar: ' + tijd(van);
     else {
       for (var i = 1; i <= 7; i++) {
         var x = ((dag - 1 + i) % 7) + 1;
-        if (werkdag(x)) { tekst = 'Weer bereikbaar: ' + (i === 1 ? 'morgen' : DAGEN[x]) + ' ' + tijd(van); break; }
+        if (werkdag(x)) { tekst = 'Weer bereikbaar: ' + DAGEN[x] + ' ' + tijd(van); break; }
       }
     }
     el.classList.toggle('is-open', open);

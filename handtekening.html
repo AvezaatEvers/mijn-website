@@ -40,6 +40,23 @@
       <p class="sig-ok" data-ok="sig-daan" style="padding:0 24px 16px"></p>
     </div>
 
+    <div class="stack" style="gap:6px;margin-top:12px">
+      <h2 style="font-size:24px;margin:0">Voor bestaande klanten</h2>
+      <p class="sig-note" style="margin:0">Dezelfde handtekening, maar met een banner voor de aanbeveelactie. Gebruik deze bij mails aan klanten, zodat nieuwe klanten de kennismakingsbanner zien en bestaande klanten de aanbeveelactie.</p>
+    </div>
+
+    <div class="sig-card">
+      <div class="sig-card-head"><strong>Koen Avezaat · klanten</strong><button class="btn btn-primary" type="button" data-copy="sig-koen-klant">Kopieer handtekening</button></div>
+      <div class="sig-preview" id="sig-koen-klant"></div>
+      <p class="sig-ok" data-ok="sig-koen-klant" style="padding:0 24px 16px"></p>
+    </div>
+
+    <div class="sig-card">
+      <div class="sig-card-head"><strong>Daan Evers · klanten</strong><button class="btn btn-primary" type="button" data-copy="sig-daan-klant">Kopieer handtekening</button></div>
+      <div class="sig-preview" id="sig-daan-klant"></div>
+      <p class="sig-ok" data-ok="sig-daan-klant" style="padding:0 24px 16px"></p>
+    </div>
+
     <div class="card stack" style="gap:12px">
       <h2 style="font-size:20px;margin:0">Zo zet je hem in Outlook (Microsoft 365)</h2>
       <ol class="sig-steps">
@@ -62,7 +79,9 @@
   var BASE = 'https://avezaatenevers.nl';
   var mensen = {
     'sig-koen': { naam: 'Koen Avezaat', rol: 'Mede-oprichter' },
-    'sig-daan': { naam: 'Daan Evers', rol: 'Mede-oprichter &amp; boekhouder' }
+    'sig-daan': { naam: 'Daan Evers', rol: 'Mede-oprichter &amp; boekhouder' },
+    'sig-koen-klant': { naam: 'Koen Avezaat', rol: 'Mede-oprichter', klant: true },
+    'sig-daan-klant': { naam: 'Daan Evers', rol: 'Mede-oprichter &amp; boekhouder', klant: true }
   };
   var tel = '06 1234 5678', telLink = 'tel:+31612345678', wa = 'https://wa.me/31612345678', mail = 'info@avezaatenevers.nl';
   var f = 'font-family:Arial,Helvetica,sans-serif;';
@@ -76,16 +95,25 @@
       '<tr><td style="' + f + 'font-size:13px;color:#111827;padding:0;"><span style="color:#1E40AF;font-weight:bold;">E</span>&nbsp; <a href="mailto:' + mail + '" style="color:#111827;text-decoration:none;">' + mail + '</a></td></tr>' +
       '<tr><td style="' + f + 'font-size:13px;color:#111827;padding:0 0 12px 0;"><span style="color:#1E40AF;font-weight:bold;">W</span>&nbsp; <a href="' + BASE + '/" style="color:#1E40AF;text-decoration:none;font-weight:bold;">avezaatenevers.nl</a> &nbsp;·&nbsp; <a href="https://www.instagram.com/avezaat.evers/" style="color:#111827;text-decoration:none;">Instagram</a></td></tr>' +
       '<tr><td style="padding:0 0 14px 0;"><img src="' + BASE + '/assets/img/moneymonk-erkend-adviseur-klein.png" width="120" height="36" alt="Erkend Adviseur MoneyMonk" style="display:block;border:0;width:120px;height:36px;"></td></tr>' +
-      '<tr><td style="padding:0 0 10px 0;"><a href="' + BASE + '/contact.html#plannen" style="text-decoration:none;"><img src="' + BASE + '/assets/email/handtekening-banner.png" width="480" height="120" alt="Je boekhouding volledig uit handen. Plan een gratis kennismaking" style="display:block;border:0;width:480px;max-width:100%;height:auto;border-radius:10px;"></a></td></tr>' +
+      '<tr><td style="padding:0 0 10px 0;"><a href="' + BASE + (p.klant ? '/aanbevelen.html' : '/contact.html#plannen') + '" style="text-decoration:none;"><img src="' + BASE + (p.klant ? '/assets/email/handtekening-banner-klant.png' : '/assets/email/handtekening-banner.png') + '" width="480" height="120" alt="' + (p.klant ? 'Ken je een collega-zzp&#39;er? Jullie krijgen allebei een maand gratis' : 'Je boekhouding volledig uit handen. Plan een gratis kennismaking') + '" style="display:block;border:0;width:480px;max-width:100%;height:auto;border-radius:10px;"></a></td></tr>' +
       '<tr><td style="' + f + 'font-size:11px;color:#9CA3AF;padding:0;">Avezaat &amp; Evers · KvK 42133742</td></tr>' +
       '</table>';
   }
   Object.keys(mensen).forEach(function (id) { document.getElementById(id).innerHTML = handtekening(mensen[id]); });
+  // Voorbeeld: afbeeldingen van deze site laden; bij kopiëren terug naar het live domein (alleen dat bereikt Outlook).
+  function toonAfbeeldingen(live) {
+    document.querySelectorAll('.sig-preview img').forEach(function (img) {
+      img.setAttribute('src', (live ? BASE : location.origin) + img.getAttribute('src').replace(/^https?:\/\/[^/]+/, ''));
+    });
+  }
+  toonAfbeeldingen(false);
 
   document.querySelectorAll('[data-copy]').forEach(function (knop) {
     knop.addEventListener('click', function () {
       var id = knop.getAttribute('data-copy'), el = document.getElementById(id);
       var ok = document.querySelector('[data-ok="' + id + '"]');
+      toonAfbeeldingen(true);
+      setTimeout(function () { toonAfbeeldingen(false); }, 1500);
       var html = el.innerHTML;
       function klaar() { ok.textContent = 'Gekopieerd. Plak hem nu in Outlook (Ctrl+V of Cmd+V).'; }
       function oudeManier() {

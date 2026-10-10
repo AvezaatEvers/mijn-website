@@ -126,7 +126,7 @@
 // Zo werkt het: actieve stap volgen tijdens scrollen (alleen desktop)
 (function () {
   var wrap = document.querySelector('.werk-grid .steps');
-  if (!wrap || !('IntersectionObserver' in window)) return;
+  if (!wrap) return;
   var mq = window.matchMedia('(min-width: 901px)');
   var stappen = Array.prototype.slice.call(wrap.children);
   document.documentElement.classList.add('js-werk');
@@ -138,13 +138,19 @@
     var doel = stappen[i];
     var lijn = doel.offsetTop - stappen[0].offsetTop;
     wrap.style.setProperty('--werk-voortgang', lijn + 'px');
+    wrap.style.setProperty('--werk-totaal', (stappen[stappen.length - 1].offsetTop - stappen[0].offsetTop) + 'px');
   }
   zetActief(0);
-  var io = new IntersectionObserver(function (entries) {
+  // Een stap wordt actief zodra de bovenkant ervan op ~60% van het scherm komt
+  var huidig = 0, gepland = false;
+  function check() {
+    gepland = false;
     if (!mq.matches) return;
-    entries.forEach(function (e) {
-      if (e.isIntersecting) zetActief(stappen.indexOf(e.target));
-    });
-  }, { rootMargin: '-35% 0px -55% 0px' });
-  stappen.forEach(function (s) { io.observe(s); });
+    var lijn = window.innerHeight * 0.6, actief = 0;
+    stappen.forEach(function (s, i) { if (s.getBoundingClientRect().top < lijn) actief = i; });
+    if (actief !== huidig) { huidig = actief; zetActief(actief); }
+  }
+  window.addEventListener('scroll', function () { if (!gepland) { gepland = true; requestAnimationFrame(check); } }, { passive: true });
+  window.addEventListener('resize', check);
+  check();
 })();

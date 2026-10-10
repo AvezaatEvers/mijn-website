@@ -711,6 +711,8 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
 .bd-wanneer { display: block; font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); }
 .bd-stappen h3 { margin: 2px 0 4px; font-size: 17px; }
 .bd-stappen p { margin: 0; font-size: 15px; color: var(--text); line-height: 1.5; }
+.bd-stappen-kort { grid-template-columns: repeat(3, 1fr); max-width: 900px; }
+.bd-links a { font-weight: 500; }
 .bd-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .bd-blok { border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; }
 .bd-blok h2 { font-size: 18px; margin: 0 0 10px; }

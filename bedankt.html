@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="robots" content="noindex">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/style.css?v=69">
+<link rel="stylesheet" href="/assets/style.css?v=70">
 </head>
 <body>
 <header class="site-header">
@@ -29,13 +29,14 @@
   <section class="bd-hero">
     <div class="container bd-hero-grid">
       <div class="stack" style="gap:16px">
-        <span class="pill bd-pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span data-alleen="afspraak" hidden>Je afspraak staat</span><span data-alleen="formulier">Aanvraag ontvangen</span></span>
+        <span class="pill bd-pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span data-alleen="afspraak" hidden>Je afspraak staat</span><span data-alleen="formulier">Bericht ontvangen</span></span>
         <h1 data-alleen="afspraak" hidden>Top, we spreken elkaar snel!</h1>
         <h1 data-alleen="formulier">Bedankt, we hebben je bericht!</h1>
         <p class="lead" data-alleen="afspraak" hidden>De bevestiging met de link voor het gesprek zit in je mail.</p>
         <p class="lead" data-alleen="formulier">We lezen je bericht zelf en nemen binnen één werkdag persoonlijk contact met je op.</p>
         <div class="bd-brief">
-          <p>Wat leuk dat je kennis wilt maken! Wij zijn Koen en Daan, de twee oprichters van Avezaat &amp; Evers. We vinden dat je als zzp'er een boekhouder verdient die je bedrijf kent, die je gewoon even kunt appen en die je vooraf vertelt waar je aan toe bent.</p>
+          <p data-alleen="formulier">Leuk dat je contact opneemt! Wij zijn Koen en Daan, de twee oprichters van Avezaat &amp; Evers. We lezen elk bericht zelf en geven je een eerlijk antwoord, ook als je (nog) geen klant wordt.</p>
+          <p data-alleen="afspraak" hidden>Wat leuk dat je kennis wilt maken! Wij zijn Koen en Daan, de twee oprichters van Avezaat &amp; Evers. We vinden dat je als zzp'er een boekhouder verdient die je bedrijf kent, die je gewoon even kunt appen en die je vooraf vertelt waar je aan toe bent.</p>
           <p class="bd-groet">Tot snel, <strong>Koen &amp; Daan</strong></p>
         </div>
       </div>
@@ -49,13 +50,11 @@
   <section class="section bd-verder-sectie">
     <div class="container">
       <h2 class="bd-kop">Zo gaat het verder</h2>
-      <ol class="bd-stappen">
+      <ol class="bd-stappen" data-alleen="afspraak" hidden>
         <li>
           <span class="bd-wanneer">Nu</span>
-          <h3 data-alleen="afspraak" hidden>Bevestiging in je mail</h3>
-          <h3 data-alleen="formulier">We nemen contact op</h3>
-          <p data-alleen="afspraak" hidden>Komt het toch niet uit? Via die mail verzet je de afspraak in een paar klikken.</p>
-          <p data-alleen="formulier">Binnen één werkdag, per mail of telefoon. Samen prikken we een moment.</p>
+          <h3>Bevestiging in je mail</h3>
+          <p>Komt het toch niet uit? Via die mail verzet je de afspraak in een paar klikken.</p>
         </li>
         <li>
           <span class="bd-wanneer">Vóór het gesprek</span>
@@ -84,8 +83,26 @@
         </li>
       </ol>
 
+      <ol class="bd-stappen bd-stappen-kort" data-alleen="formulier">
+        <li>
+          <span class="bd-wanneer">Nu</span>
+          <h3>Wij lezen je bericht</h3>
+          <p>Je bericht komt direct bij ons binnen, niet bij een helpdesk.</p>
+        </li>
+        <li>
+          <span class="bd-wanneer">Binnen één werkdag</span>
+          <h3>Persoonlijk antwoord</h3>
+          <p>Per mail of telefoon, net wat het handigst is voor jouw vraag.</p>
+        </li>
+        <li>
+          <span class="bd-wanneer">Wil je verder?</span>
+          <h3>Gratis kennismaking</h3>
+          <p>Past het? Dan plannen we een gesprek van 20 minuten. <a href="/contact.html#plannen" data-no-cal>Plan direct</a>.</p>
+        </li>
+      </ol>
+
       <div class="bd-duo">
-        <div class="bd-blok">
+        <div class="bd-blok" data-alleen="afspraak" hidden>
           <h2>Handig om paraat te hebben</h2>
           <ul class="bd-lijst">
             <li>Wat je doet en sinds wanneer</li>
@@ -94,6 +111,15 @@
             <li>Je huidige boekhouder of programma</li>
             <li>Klanten in het buitenland?</li>
             <li>Je vragen, hoe klein ook</li>
+          </ul>
+        </div>
+        <div class="bd-blok" data-alleen="formulier">
+          <h2>Alvast verder lezen?</h2>
+          <ul class="bd-lijst bd-links">
+            <li><a href="/veelgestelde-vragen.html">Veelgestelde vragen</a></li>
+            <li><a href="/tarieven.html">Tarieven</a></li>
+            <li><a href="/kennisbank/netto-inkomen-berekenen.html">Netto-inkomen berekenen</a></li>
+            <li><a href="/kennisbank/zelfstandigenaftrek.html">Zelfstandigenaftrek</a></li>
           </ul>
         </div>
         <div class="bd-blok">
@@ -116,7 +142,7 @@
     <span><a href="/voorwaarden.html">Algemene voorwaarden</a> · <a href="/privacy.html">Privacyverklaring</a></span>
   </div>
 </footer>
-<script src="/assets/main.js?v=69" defer></script>
+<script src="/assets/main.js?v=70" defer></script>
 <script>
 (function () {
   var afspraak = /[?&]afspraak=1/.test(location.search);
@@ -125,6 +151,6 @@
   });
 })();
 </script>
-<script src="/assets/analytics.js?v=69" defer></script>
+<script src="/assets/analytics.js?v=70" defer></script>
 </body>
 </html>

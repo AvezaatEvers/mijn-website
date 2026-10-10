@@ -680,3 +680,7 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
   .ref-ticket-b { transform: translate(40px, 54px) rotate(4deg); }
 }
 @media (max-width: 700px) { .ref-hero .btn-row .btn { flex: 1 1 100%; } }
+
+/* Instagram in footer */
+.footer-grid a.footer-ig { display: inline-flex; align-items: center; gap: 8px; }
+.footer-grid a.footer-ig svg { flex-shrink: 0; }

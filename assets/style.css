@@ -711,14 +711,18 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
 .bd-wanneer { display: block; font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); }
 .bd-stappen h3 { margin: 2px 0 4px; font-size: 17px; }
 .bd-stappen p { margin: 0; font-size: 15px; color: var(--text); line-height: 1.5; }
-.bd-stappen-kort { grid-template-columns: repeat(3, 1fr); max-width: 900px; }
+.bd-stappen-kort { grid-template-columns: repeat(3, 1fr); }
+.bd-stappen-vier { grid-template-columns: repeat(4, 1fr); }
+.bd-lijst-drie { grid-template-columns: repeat(3, 1fr) !important; }
+.bd-lijst-vier { grid-template-columns: repeat(4, auto) !important; justify-content: start; gap: 4px 40px !important; }
+.bd-contact > span { color: var(--muted); font-weight: 500; margin-right: 4px; }
 .bd-links a { font-weight: 500; }
 .bd-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .bd-blok { border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; }
 .bd-blok h2 { font-size: 18px; margin: 0 0 10px; }
 .bd-blok p { margin: 0; color: var(--text); font-size: 15px; }
 .bd-lijst { margin: 0; padding-left: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px; font-size: 15px; color: var(--text); }
-.bd-contact { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px !important; }
+.bd-contact { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; margin: 20px 0 0; font-size: 15px; }
 .bd-contact a { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-weight: 600; text-decoration: none; min-height: 36px; }
 .bd-contact a:hover { text-decoration: underline; }
 @media (max-width: 960px) {
@@ -730,6 +734,7 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
   .bd-wanneer { padding-top: 8px; }
 }
 @media (max-width: 860px) {
+  .bd-lijst-drie { grid-template-columns: 1fr 1fr !important; }
   .bd-hero { padding: 32px 0 40px; }
   .bd-hero-grid { grid-template-columns: 1fr; gap: 24px; }
   .bd-foto { order: -1; max-width: 420px; }
@@ -738,5 +743,5 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
 }
 @media (max-width: 600px) {
   .bd-verder-sectie { padding-top: 40px; padding-bottom: 48px; }
-  .bd-lijst { grid-template-columns: 1fr; }
+  .bd-lijst, .bd-lijst-drie { grid-template-columns: 1fr !important; }
 }

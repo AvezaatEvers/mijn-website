@@ -107,7 +107,6 @@ p { margin: 0; }
 /* Trust strip */
 .trust { background: var(--soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .trust ul { list-style: none; margin: 0 auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 24px; padding: 28px 24px; font-size: 15px; color: var(--text); text-align: center; }
-@media (max-width: 760px) { .trust ul { grid-template-columns: 1fr; text-align: left; } }
 .trust strong { color: var(--ink); }
 
 /* Cards */
@@ -552,3 +551,15 @@ sup a { text-decoration: none; font-weight: 600; padding: 0 2px; }
 /* Pill op getinte achtergrond: wit, zodat hij niet wegvalt */
 .bg-tint .pill { background: var(--white); border: 1px solid var(--tint-border); }
 .app-section h2 { text-wrap: balance; }
+
+/* Trust-strip met iconen; op mobiel drie compacte kolommen */
+.trust li { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.trust-ic { flex: none; color: var(--accent); }
+@media (max-width: 760px) {
+  .trust ul { gap: 8px; padding: 22px 16px; }
+  .trust li { flex-direction: column; gap: 8px; text-align: center; font-size: 13px; line-height: 1.35; }
+  .trust-ic { width: 40px; height: 40px; padding: 10px; border-radius: 12px; background: var(--white); border: 1px solid var(--line); box-sizing: border-box; }
+  .trust-rest { display: none; }
+  .trust strong { font-weight: 600; }
+}
+@media (min-width: 1000px) { .trust li > span { white-space: nowrap; } }

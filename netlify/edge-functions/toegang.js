@@ -58,5 +58,5 @@ export default async (request, context) => {
 
 export const config = {
   path: "/*",
-  excludedPath: ["/assets/*", "/binnenkort.html", "/robots.txt"],
+  excludedPath: ["/assets/*", "/binnenkort.html", "/robots.txt", "/agenda.ics"],
 };

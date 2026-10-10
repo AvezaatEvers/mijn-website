@@ -35,7 +35,7 @@
         <div class="bd-moment" id="bd-moment" hidden>
           <div class="bd-kal" aria-hidden="true"><span id="bd-maand"></span><b id="bd-dag"></b></div>
           <div><strong id="bd-datum"></strong><span id="bd-tijd"></span></div>
-          <a class="bd-ics" id="bd-ics" href="#" download="kennismaking-avezaat-evers.ics"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>In mijn agenda</a>
+          <a class="bd-ics" id="bd-ics" href="#"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>In mijn agenda</a>
         </div>
         <p class="lead" data-alleen="afspraak" hidden>De bevestiging met de link voor het gesprek zit in je mail.</p>
         <p class="lead" data-alleen="formulier">We lezen je bericht zelf en nemen binnen één werkdag persoonlijk contact met je op.</p>
@@ -153,11 +153,7 @@
     var datum = f(start, { weekday: 'long', day: 'numeric', month: 'long' });
     document.getElementById('bd-datum').textContent = datum.charAt(0).toUpperCase() + datum.slice(1);
     document.getElementById('bd-tijd').textContent = f(start, { hour: '2-digit', minute: '2-digit' }) + ' – ' + f(eind, { hour: '2-digit', minute: '2-digit' }) + ' uur';
-    function ics(d) { return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); }
-    var cal = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Avezaat & Evers//Kennismaking//NL', 'BEGIN:VEVENT',
-      'UID:' + ics(start) + '-kennismaking@avezaatenevers.nl', 'DTSTAMP:' + ics(new Date()), 'DTSTART:' + ics(start), 'DTEND:' + ics(eind),
-      'SUMMARY:Kennismaking Avezaat & Evers', 'DESCRIPTION:De link voor het gesprek staat in je bevestigingsmail.', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
-    document.getElementById('bd-ics').href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(cal);
+    document.getElementById('bd-ics').href = '/agenda.ics?start=' + encodeURIComponent(start.toISOString()) + '&eind=' + encodeURIComponent(eind.toISOString());
     document.getElementById('bd-moment').hidden = false;
   }
 })();

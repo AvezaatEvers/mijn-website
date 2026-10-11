@@ -200,7 +200,7 @@
 
   <!-- Hero -->
   <section class="hm-hero">
-    <span class="hm-pill"><i aria-hidden="true"></i>Boekhouder voor zzp'ers en eenmanszaken</span>
+    <span class="hm-pill">Boekhouder voor zzp'ers en eenmanszaken</span>
     <h1>Jouw vaste boekhouder voor <span>€80</span> per maand.</h1>
     <p class="hm-lead">Jij levert je bonnetjes aan. Wij doen je boekhouding, btw en inkomstenbelasting.</p>
     <a class="hm-btn" href="/contact.html#plannen">Plan een gratis kennismaking</a>
@@ -270,18 +270,18 @@
     <span class="hm-label">Voor wie</span>
     <h2>Voor elke zzp'er en eenmanszaak</h2>
     <div class="hm-chips" role="tablist" aria-label="Kies je branche">
-      <button type="button" role="tab" aria-selected="true" data-b="bouw">Bouw</button>
+      <button type="button" role="tab" aria-selected="true" data-b="maatwerk">Maatwerk</button>
       <button type="button" role="tab" aria-selected="false" data-b="kappers-barbers">Kappers</button>
       <button type="button" role="tab" aria-selected="false" data-b="zorgverleners">Zorg</button>
       <button type="button" role="tab" aria-selected="false" data-b="e-commerce">E-commerce</button>
       <button type="button" role="tab" aria-selected="false" data-b="installateurs">Installateurs</button>
       <button type="button" role="tab" aria-selected="false" data-b="hoveniers">Hoveniers</button>
       <button type="button" role="tab" aria-selected="false" data-b="schilders-stukadoors">Schilders</button>
-      <button type="button" role="tab" aria-selected="false" data-b="maatwerk">Maatwerk</button>
+      <button type="button" role="tab" aria-selected="false" data-b="bouw">Bouw</button>
     </div>
-    <a class="hm-branche" id="hm-branche" href="/branches/bouw.html">
-      <img id="hm-branche-img" src="/assets/img/branches/bouw-1-800.webp" alt="" width="800" height="533" loading="lazy">
-      <span class="hm-branche-tekst"><strong id="hm-branche-titel">Bouw</strong><span id="hm-branche-zin">Verlegde btw, materiaal en je bus: wij weten hoe het zit.</span><em>Bekijk wat we voor jou doen →</em></span>
+    <a class="hm-branche" id="hm-branche" href="/branches/maatwerk.html">
+      <img id="hm-branche-img" src="/assets/img/branches/maatwerk-1-800.webp" alt="" width="800" height="533" loading="lazy">
+      <span class="hm-branche-tekst"><strong id="hm-branche-titel">Maatwerk</strong><span id="hm-branche-zin">Meubelmaker of interieurbouwer: je administratie net zo strak.</span><em>Bekijk wat we voor jou doen →</em></span>
     </a>
   </section>
 
@@ -420,14 +420,15 @@
     });
   });
 
-  // Sticky knop: zichtbaar na de hero, weg bij het slotblok
+  // Sticky knop: verschijnt zodra je voorbij de knop in de hero bent en blijft daarna rustig staan
   var sticky = document.getElementById('hm-sticky');
-  var hero = document.querySelector('.hm-hero .hm-btn'), slot = document.querySelector('.hm-slot');
-  var heroWeg = false, slotZicht = false;
-  function zet() { var aan = heroWeg && !slotZicht; sticky.classList.toggle('is-zichtbaar', aan); sticky.setAttribute('aria-hidden', aan ? 'false' : 'true'); sticky.querySelector('a').tabIndex = aan ? 0 : -1; }
+  var hero = document.querySelector('.hm-hero .hm-btn');
+  function toon() { sticky.classList.add('is-zichtbaar'); sticky.setAttribute('aria-hidden', 'false'); sticky.querySelector('a').tabIndex = 0; }
   if ('IntersectionObserver' in window) {
-    new IntersectionObserver(function (e) { heroWeg = !e[0].isIntersecting && e[0].boundingClientRect.top < 0; zet(); }).observe(hero);
-    new IntersectionObserver(function (e) { slotZicht = e[0].isIntersecting; zet(); }).observe(slot);
+    var ioHero = new IntersectionObserver(function (e) {
+      if (!e[0].isIntersecting && e[0].boundingClientRect.top < 0) { toon(); ioHero.disconnect(); }
+    });
+    ioHero.observe(hero);
     // Zacht verschijnen van secties
     var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('is-zichtbaar'); io.unobserve(x.target); } }); }, { rootMargin: '0px 0px -10% 0px' });
     document.querySelectorAll('.hm-sectie > *, .hm-slot').forEach(function (el) { el.classList.add('hm-in'); io.observe(el); });

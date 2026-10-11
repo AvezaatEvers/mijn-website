@@ -928,3 +928,78 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
   .ph-route div b { font-size: 14px; }
   .ph-voet { font-size: 13px; padding: 12px 14px; }
 }
+
+/* Werken bij */
+.wb-hero .pill { background: var(--white); border: 1px solid var(--tint-border); }
+.wb-foto { margin: 0; position: relative; border-radius: 24px; overflow: hidden; box-shadow: 0 24px 60px rgba(30, 64, 175, .14); }
+.wb-foto img { width: 100%; height: auto; display: block; }
+.wb-foto figcaption { position: absolute; left: 16px; right: 16px; bottom: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+.wb-chip { display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, .94); color: var(--ink); font-size: 14px; font-weight: 600; padding: 8px 14px; border-radius: 999px; box-shadow: 0 4px 14px rgba(17, 24, 39, .12); }
+.wb-chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.wb-waarden { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 32px; }
+.wb-waarden > div { display: flex; flex-direction: column; gap: 8px; }
+.wb-waarden h3 { margin-top: 8px; }
+.wb-waarden p { color: var(--muted); }
+.wb-ico { width: 48px; height: 48px; border-radius: 14px; background: var(--tint); color: var(--accent); display: grid; place-items: center; }
+.wb-ico svg { width: 22px; height: 22px; }
+.wb-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.wb-tags span { font-size: 14px; font-weight: 500; color: var(--text); background: var(--white); border: 1px solid var(--tint-border); padding: 6px 12px; border-radius: 999px; }
+.wb-vac { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.wb-blok { background: var(--white); border: 1px solid var(--line); border-radius: 20px; padding: 26px; }
+.wb-blok h3 { margin-bottom: 10px; }
+.wb-blok .ph-lijst li { align-items: flex-start; }
+.wb-blok .ph-v { margin-top: 1px; }
+.wb-model { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 16px; align-items: stretch; }
+.wb-stap { border: 1px solid var(--line); border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 6px; }
+.wb-stap b { font-size: 44px; font-weight: 700; letter-spacing: -.03em; color: var(--ink); line-height: 1.1; }
+.wb-stap b small { font-size: 18px; font-weight: 600; color: var(--muted); letter-spacing: 0; }
+.wb-stap strong { font-size: 17px; }
+.wb-stap p { color: var(--muted); font-size: 15px; }
+.wb-stap.is-blauw { background: var(--accent); border-color: var(--accent); }
+.wb-stap.is-blauw b, .wb-stap.is-blauw strong { color: var(--white); }
+.wb-stap.is-blauw p { color: #C7D2FE; }
+.wb-plus { align-self: center; font-size: 28px; font-weight: 600; color: var(--muted); }
+.wb-calc { margin-top: 32px; display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 40px; background: var(--soft); border: 1px solid var(--line); border-radius: 24px; padding: 32px; }
+.wb-calc-in label { font-weight: 600; color: var(--ink); }
+.wb-n-rij { display: flex; align-items: center; gap: 14px; margin: 10px 0 6px; }
+.wb-n-rij input { flex: 1; accent-color: var(--accent); }
+.wb-n-rij output { min-width: 48px; text-align: center; font-size: 22px; font-weight: 700; color: var(--accent); background: var(--white); border: 1px solid var(--tint-border); border-radius: 10px; padding: 4px 8px; }
+.wb-klein { font-size: 13px; color: var(--muted); }
+.wb-uit { margin: 18px 0 10px; display: grid; gap: 8px; }
+.wb-uit div { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.wb-uit dt { color: var(--text); }
+.wb-uit dd { margin: 0; font-weight: 700; font-size: 20px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.wb-uit .is-hoofd dd { font-size: 28px; color: var(--accent); }
+.wb-calc-grafiek { display: flex; flex-direction: column; min-width: 0; }
+.wb-leg { display: flex; gap: 18px; font-size: 13px; color: var(--text); margin-bottom: 12px; }
+.wb-leg span { display: inline-flex; align-items: center; gap: 6px; }
+.wb-leg i, .wb-bars i { display: block; }
+.wb-leg i { width: 10px; height: 10px; border-radius: 3px; }
+.wb-leg i.b, .wb-bars i.b { background: #93C5FD; }
+.wb-leg i.t, .wb-bars i.t { background: var(--accent); }
+.wb-bars { flex: 1; min-height: 240px; display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); gap: 4px; align-items: end; border-bottom: 1px solid var(--line); }
+.wb-bars span { height: 100%; display: flex; flex-direction: column-reverse; }
+.wb-bars i { width: 100%; transition: height .35s ease; }
+.wb-bars i.b { border-radius: 4px 4px 0 0; }
+.wb-as { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-top: 6px; }
+.wb-stappen { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; counter-reset: none; }
+.wb-stappen li { display: flex; flex-direction: column; gap: 8px; }
+.wb-stappen b { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: var(--white); display: grid; place-items: center; font-weight: 600; }
+.wb-stappen strong { font-size: 18px; margin-top: 6px; }
+.wb-stappen p { color: var(--muted); }
+.wb-ok { background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .25); border-radius: 14px; padding: 14px 16px; color: var(--white); font-weight: 500; }
+@media (max-width: 900px) {
+  .wb-waarden, .wb-vac { grid-template-columns: minmax(0, 1fr); }
+  .wb-waarden { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; }
+  .wb-model { grid-template-columns: minmax(0, 1fr); }
+  .wb-plus { justify-self: center; line-height: 1; }
+  .wb-calc { grid-template-columns: minmax(0, 1fr); padding: 24px; gap: 24px; }
+  .wb-stappen { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .wb-waarden, .wb-stappen { grid-template-columns: minmax(0, 1fr); }
+  .wb-stap b { font-size: 36px; }
+  .wb-bars { min-height: 180px; gap: 2px; }
+  .wb-foto figcaption { left: 10px; right: 10px; bottom: 10px; }
+  .wb-chip { font-size: 12.5px; padding: 6px 11px; }
+}

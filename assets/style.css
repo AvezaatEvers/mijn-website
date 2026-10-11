@@ -1275,3 +1275,6 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
   .wh-hero::after { background: linear-gradient(90deg, #0F1A46 0%, #0F1A46 50%, rgba(15, 26, 70, .4) 60%, rgba(15, 26, 70, 0) 75%); }
   .wh-hero-tekst > * { max-width: 340px; }
 }
+.wh-hero-foto { object-position: center 40%; }
+@media (min-width: 601px) { .wh-hero-foto { object-position: 55% 40%; } }
+@media (max-width: 600px) { .wh-hero-foto { object-position: 55% 30%; } }

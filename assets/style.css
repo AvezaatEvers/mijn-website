@@ -866,3 +866,10 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
   .dl-lijst li { grid-template-columns: 1fr; gap: 4px; padding: 16px 18px; }
   .dl-lijst time { font-size: 14px; }
 }
+
+/* App Store / Google Play */
+.store-badges { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0 4px; }
+.store-badges a { display: inline-block; line-height: 0; border-radius: 8px; transition: opacity .2s; }
+.store-badges a:hover { opacity: .85; }
+.store-badges img { height: 40px; width: auto; }
+@media (max-width:480px) { .store-badges { gap:8px; flex-wrap:nowrap; } .store-badges img { height:36px; } }

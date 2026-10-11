@@ -77,6 +77,7 @@
   .wk-stap p { margin: 0; color: var(--text); font-size: 15.5px; line-height: 1.6; }
   .wk-actie { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; font-weight: 600; font-size: 15px; color: var(--accent); text-decoration: none; }
   .wk-actie span { transition: transform .2s; }
+  .wk-actie-hint { font-size: 12.5px; font-weight: 500; color: var(--muted); margin-left: 6px; }
   .wk-actie:hover span { transform: translateX(3px); }
 
   /* Wat wij doen */
@@ -210,7 +211,7 @@
           <div>
             <div class="wk-stap-kop"><h3>Stuur ons je identiteitsbewijs</h3><span class="wk-tijd">2 min</span></div>
             <p>Dat zijn we wettelijk verplicht. Maak een veilige kopie met de gratis app <strong>KopieID</strong> van de Rijksoverheid: daarmee streep je je BSN en pasfoto weg en zet je er een watermerk op. Stuur de kopie naar je boekhouder.</p>
-            <a class="wk-actie" id="wk-mail-id" href="mailto:info@avezaatenevers.nl?subject=Identiteitsbewijs">Mail je kopie <span aria-hidden="true">→</span></a>
+            <a class="wk-actie" id="wk-mail-id" href="mailto:info@avezaatenevers.nl?subject=Identiteitsbewijs&amp;body=In%20de%20bijlage%20stuur%20ik%20de%20kopie%20van%20mijn%20identiteitsbewijs%2C%20gemaakt%20met%20de%20KopieID-app.">Mail je kopie <span aria-hidden="true">→</span><small class="wk-actie-hint">Vergeet de bijlage niet</small></a>
           </div>
         </li>
         <li class="wk-stap wk-in" data-stap="moneymonk">
@@ -350,7 +351,8 @@
   document.getElementById('wk-boekhouder-2').textContent = wie;
   document.getElementById('wk-foto').src = '/assets/img/' + wie.toLowerCase() + '-160.webp';
   if (naam) document.title = 'Welkom, ' + naam + ' | Avezaat & Evers';
-  document.getElementById('wk-mail-id').href = 'mailto:info@avezaatenevers.nl?subject=' + encodeURIComponent('Identiteitsbewijs' + (naam ? ' ' + naam : '') + ' (t.a.v. ' + wie + ')');
+  var idTekst = 'Hoi ' + wie + ',\n\nIn de bijlage stuur ik de kopie van mijn identiteitsbewijs, gemaakt met de KopieID-app.\n\nGroet,\n' + (naam || '');
+  document.getElementById('wk-mail-id').href = 'mailto:info@avezaatenevers.nl?subject=' + encodeURIComponent('Identiteitsbewijs' + (naam ? ' ' + naam : '') + ' (t.a.v. ' + wie + ')') + '&body=' + encodeURIComponent(idTekst);
 
   // Checklist met voortgang, bewaard in deze browser
   var SLEUTEL = 'ae-welkom-' + (naam || 'klant').toLowerCase();

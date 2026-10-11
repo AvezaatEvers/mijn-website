@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Je persoonlijke startpagina bij Avezaat &amp; Evers.">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/style.css?v=81">
+<link rel="stylesheet" href="/assets/style.css?v=82">
 <style>
   .wk { --wk-shadow: 0 1px 2px rgba(17,24,39,.04), 0 12px 32px -12px rgba(17,24,39,.14); }
 
@@ -24,7 +24,7 @@
   .wk-hero h1 span { color: var(--accent); }
   .wk-hero .lead { margin: 0; max-width: 520px; }
   .wk-wie { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
-  .wk-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 600; font-size: 18px; flex: none; box-shadow: 0 0 0 4px var(--white); }
+  .wk-avatar { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; flex: none; box-shadow: 0 0 0 4px var(--white); }
   .wk-wie p { margin: 0; font-size: 15px; color: var(--text); line-height: 1.45; }
   .wk-wie strong { color: var(--ink); }
 
@@ -174,7 +174,7 @@
         <h1 class="wk-in" style="--d:.08s">Welkom<span id="wk-naam"></span>.</h1>
         <p class="lead wk-in" style="--d:.16s">Fijn dat je voor ons kiest. Hier zie je precies wat er de komende weken gebeurt, en wat je zelf in een paar minuten regelt. De rest doen wij.</p>
         <div class="wk-wie wk-in" style="--d:.24s">
-          <div class="wk-avatar" id="wk-initiaal" aria-hidden="true">D</div>
+          <img class="wk-avatar" id="wk-foto" src="/assets/img/daan-160.webp" alt="" width="160" height="160">
           <p>Jouw vaste boekhouder is <strong id="wk-boekhouder">Daan</strong>.<br>Vragen? Je kunt altijd even bellen, mailen of appen.</p>
         </div>
       </div>
@@ -348,7 +348,7 @@
   if (naam) document.getElementById('wk-naam').textContent = ', ' + naam;
   document.getElementById('wk-boekhouder').textContent = wie;
   document.getElementById('wk-boekhouder-2').textContent = wie;
-  document.getElementById('wk-initiaal').textContent = wie.charAt(0);
+  document.getElementById('wk-foto').src = '/assets/img/' + wie.toLowerCase() + '-160.webp';
   if (naam) document.title = 'Welkom, ' + naam + ' | Avezaat & Evers';
   document.getElementById('wk-mail-id').href = 'mailto:info@avezaatenevers.nl?subject=' + encodeURIComponent('Identiteitsbewijs' + (naam ? ' ' + naam : '') + ' (t.a.v. ' + wie + ')');
 
@@ -444,7 +444,7 @@
   }
 })();
 </script>
-<script src="/assets/main.js?v=81" defer></script>
-<script src="/assets/analytics.js?v=81" defer></script>
+<script src="/assets/main.js?v=82" defer></script>
+<script src="/assets/analytics.js?v=82" defer></script>
 </body>
 </html>

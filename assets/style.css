@@ -754,3 +754,95 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
   .bd-verder-sectie { padding-top: 40px; padding-bottom: 48px; }
   .bd-lijst, .bd-lijst-drie { grid-template-columns: 1fr !important; }
 }
+
+/* ===== Homepage: nieuwe mobiele opbouw (desktop blijft gelijk) ===== */
+.home h1 .accent { color: var(--accent); }
+.mob-only { display: none; }
+.avatar-initiaal { font-size: 40px; font-weight: 700; color: var(--accent); background: var(--tint); border: 0; }
+
+/* Branche-kaart (mobiel) */
+.hm-branche { display: block; position: relative; border-radius: var(--radius); overflow: hidden; text-decoration: none; box-shadow: 0 1px 2px rgba(17,24,39,.05), 0 14px 30px -16px rgba(17,24,39,.22); background: #111827; }
+.hm-branche img { width: 100%; height: 230px; object-fit: cover; display: block; transition: opacity .25s; }
+.hm-branche::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(17,24,39,0) 30%, rgba(17,24,39,.85) 100%); }
+.hm-branche-tekst { position: absolute; left: 18px; right: 18px; bottom: 16px; z-index: 1; color: #fff; display: flex; flex-direction: column; gap: 4px; }
+.hm-branche-tekst strong { font-size: 20px; }
+.hm-branche-tekst span { font-size: 14px; line-height: 1.45; color: #E5E7EB; }
+.hm-branche-tekst em { font-style: normal; font-weight: 600; font-size: 14px; margin-top: 4px; }
+.hm-bediening { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
+.hm-pijl { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--tint-border); background: #fff; color: var(--ink); display: grid; place-items: center; cursor: pointer; transition: border-color .2s, transform .15s; }
+.hm-pijl:hover { border-color: var(--accent); }
+.hm-pijl:active { transform: scale(.94); }
+.hm-stippen { display: flex; justify-content: center; gap: 6px; }
+.hm-stippen i { width: 6px; height: 6px; border-radius: 3px; background: var(--tint-border); transition: width .25s, background .25s; }
+.hm-stippen i.is-actief { width: 18px; background: var(--accent); }
+
+@media (max-width: 700px) {
+  .mob-only { display: block; }
+  .home .desk-only-inline, .home .desk-only { display: none; }
+  .home .section { padding: 56px 0; }
+  .home .section-head { margin-bottom: 22px; }
+  .home h2 { font-size: 27px; line-height: 1.15; }
+
+  /* Hero */
+  .home .hero { padding: 28px 0 36px; background: linear-gradient(180deg, var(--tint) 0%, var(--tint) 58%, #fff 58%); }
+  .home .hero-grid { gap: 24px; }
+  .home .hero-text { gap: 16px; }
+  .home .hero .pill { align-self: flex-start; background: #fff; box-shadow: 0 1px 2px rgba(17,24,39,.06); }
+  .home .hero h1 { font-size: clamp(34px, 9.6vw, 44px); line-height: 1.06; }
+  .home .hero-text .lead { font-size: 17px; line-height: 1.55; }
+  .home .hero .btn-ghost, .home .hero .checks, .home .price-badge { display: none; }
+  .home .hero .btn-primary { min-height: 54px; border-radius: 14px; font-size: 16px; }
+  .home .hero-micro { text-align: center; font-size: 13px; color: var(--muted); margin: -6px 0 0; }
+  .home .hero-media .photo { width: 100%; height: 300px; object-fit: cover; object-position: 50% 35%; border-radius: var(--radius); }
+  .home .hero-status { position: absolute; left: 12px; right: 12px; bottom: -22px; display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 16px; padding: 12px 14px; box-shadow: 0 10px 24px -14px rgba(17,24,39,.35); }
+  .home .hero-status-duo { display: flex; flex: none; }
+  .home .hero-status-duo span { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; display: grid; place-items: center; box-shadow: 0 0 0 3px #fff; }
+  .home .hero-status-duo span + span { margin-left: -12px; background: #3B5BDB; }
+  .home .hero-status strong { display: block; font-size: 15px; color: var(--ink); }
+  .home .hero-status em { font-style: normal; font-size: 13px; color: var(--muted); }
+  .home .hero + .trust { display: none; }
+  .home .hero + .trust + .section { padding-top: 64px; }
+
+  /* Waarom: lijst met iconen */
+  .home .usp-grid { display: flex; flex-direction: column; gap: 22px; }
+  .home .usp-grid .card { display: grid; grid-template-columns: 44px 1fr; gap: 4px 14px; border: 0; padding: 0; background: none; }
+  .home .usp-grid .icon { grid-row: span 2; width: 44px; height: 44px; border-radius: 12px; margin: 0; }
+  .home .usp-grid .card h3 { font-size: 17px; margin: 2px 0 0; }
+  .home .usp-grid .card p { font-size: 15px; line-height: 1.5; margin: 0; }
+
+  /* Prijs */
+  .home #tarieven .card.side { display: none; }
+  .home #tarieven .plan ul.two-col { grid-template-columns: 1fr; list-style: none; padding: 0; gap: 10px; }
+  .home #tarieven .plan ul.two-col li { display: flex; gap: 10px; font-size: 15px; line-height: 1.45; margin: 0; padding: 0; }
+  .home #tarieven .plan ul.two-col li::before { content: ''; position: static; width: 20px; height: 20px; flex: none; margin-top: 1px; border-radius: 50%; background: var(--tint) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231E40AF' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/11px no-repeat; }
+  .home #tarieven .plan { gap: 18px; }
+  .home #tarieven .plan ul.two-col li.desk-only, .home .app-list li.desk-only, .home #over .person span.desk-only { display: none; }
+  .home .home-link { display: block; text-align: center; margin-top: 16px; font-weight: 600; font-size: 15px; color: var(--accent); text-decoration: none; }
+
+  /* Zo werkt het: verticale tijdlijn */
+  .home #werkwijze .steps { display: block; }
+  .home #werkwijze .steps > .stack { position: relative; padding: 0 0 22px 52px; gap: 4px; background: none; border: 0; }
+  .home #werkwijze .steps > .stack:last-child { padding-bottom: 0; }
+  .home #werkwijze .steps > .stack::after { content: ''; position: absolute; left: 17px; top: 36px; bottom: 0; width: 2px; background: var(--tint-border); }
+  .home #werkwijze .steps > .stack:last-child::after { display: none; }
+  .home #werkwijze .step-num { position: absolute; left: 0; top: 0; width: 36px; height: 36px; background: var(--accent); z-index: 1; }
+  .home #werkwijze .step-num::after { color: #fff; font-size: 15px; }
+  .home #werkwijze .steps h3 { font-size: 17px; margin-top: 6px; }
+  .home #werkwijze .steps p { font-size: 15px; line-height: 1.5; margin: 0; }
+
+  /* App: Erkend Adviseur boven de telefoon */
+  .home .home-app { background: #fff; }
+  .home .app-grid { gap: 24px; }
+  .home .app-visual { order: 2; flex-direction: column; align-items: flex-start; }
+  .home .app-visual::before { display: none; }
+  .home .app-phone { max-width: 200px; margin: 0 auto; }
+  .home .mm-badge, .js-anim .home .mm-badge, .js-anim .home .app-section.in-view .mm-badge { position: static; order: -1; transform: none; opacity: 1; box-shadow: none; background: none; padding: 0; margin: 0 0 18px; }
+  .home .mm-badge img { width: 170px; height: auto; border-radius: 0; }
+  .home .app-list li { font-size: 15px; }
+
+  /* Wie wij zijn */
+  .home #over .team { gap: 14px; }
+  .home #over .person { align-items: center; text-align: center; padding: 20px 12px; border-radius: 18px; background: var(--soft); }
+  .home #over .avatar { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; }
+  .home #over .avatar-initiaal { font-size: 30px; padding: 0; }
+}

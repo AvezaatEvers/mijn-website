@@ -5,6 +5,15 @@ var UMAMI_WEBSITE_ID = "931b51e9-cfd4-41b0-9b54-bc51ab4c0d77";
 
 (function () {
   if (!UMAMI_WEBSITE_ID) return;
+
+  // Eigen bezoeken niet meten: ?umami=uit zet het uit op dit apparaat, ?umami=aan weer aan.
+  // Het interne dashboard zet het automatisch uit.
+  try {
+    var schakel = new URLSearchParams(location.search).get("umami");
+    if (schakel === "uit" || location.pathname.indexOf("/intern") === 0) localStorage.setItem("umami.disabled", "1");
+    if (schakel === "aan") localStorage.removeItem("umami.disabled");
+    if (localStorage.getItem("umami.disabled")) return;
+  } catch (e) {}
   var host = location.hostname.replace(/^www\./, "");
   if (host !== "avezaatenevers.nl") return;
 

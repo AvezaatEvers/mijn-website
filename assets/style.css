@@ -1148,3 +1148,37 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
   .wb-hero-deco span, .wb-float, .wb-kaartje i, .wb-pill-live i { animation: none !important; }
 }
 .wb-cijfers b span { font-size: inherit; color: inherit; }
+
+/* Werken bij: wereldkaart en lege vacaturestaat */
+.wb-hero-deco { display: none; }
+.wb-kaartblok { background: var(--white); border: 1px solid var(--line); border-radius: 24px; padding: 22px 22px 18px; box-shadow: 0 24px 60px rgba(30, 64, 175, .10), 0 2px 6px rgba(17, 24, 39, .04); }
+.wb-kaartblok-kop { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.wb-kaartblok-kop strong { font-size: 16px; }
+.wb-kaartblok-kop span { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); background: var(--tint); padding: 5px 10px; border-radius: 999px; }
+.wb-kaartblok-voet { font-size: 14px; color: var(--muted); margin-top: 10px; padding-top: 12px; border-top: 1px solid var(--line); }
+.wb-kaart { display: block; width: 100%; height: auto; overflow: visible; }
+.wb-kaart .land { fill: none; stroke: #BCCAF0; stroke-width: 5.4; stroke-linecap: round; }
+.wb-kaart .boog { fill: none; stroke: var(--accent); stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 4 6; opacity: .55; animation: wb-stroom 1.6s linear infinite; }
+@keyframes wb-stroom { to { stroke-dashoffset: -20; } }
+.wb-kaart .pin .kern { fill: var(--accent); stroke: #fff; stroke-width: 3.5; }
+.wb-kaart .pin .ring { fill: var(--accent); opacity: 0; transform-box: fill-box; transform-origin: center; animation: wb-ring 2.6s ease-out infinite; animation-delay: var(--v, 0s); }
+.wb-kaart .pin.hoofd .kern { fill: var(--accent); stroke-width: 4; }
+@keyframes wb-ring { 0% { transform: scale(1); opacity: .45; } 100% { transform: scale(3.4); opacity: 0; } }
+.wb-kaart .lbl { font-family: 'Poppins', system-ui, sans-serif; font-size: 22px; font-weight: 500; fill: var(--muted); }
+.wb-kaart .nl-lbl rect { fill: var(--accent); }
+.wb-kaart .nl-lbl text { font-family: 'Poppins', system-ui, sans-serif; font-size: 22px; font-weight: 600; fill: #fff; }
+.wb-voordeel.is-groot { min-height: 0; }
+.wb-geen { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 28px; align-items: center; background: var(--white); border: 1px solid var(--tint-border); border-radius: 24px; padding: 32px 36px; }
+.wb-geen .wb-ico { width: 64px; height: 64px; border-radius: 18px; }
+.wb-geen .wb-ico svg { width: 28px; height: 28px; }
+.wb-geen h2 { font-size: clamp(22px, 2.4vw, 28px); margin: 6px 0 8px; }
+.wb-geen p { color: var(--muted); max-width: 620px; }
+@media (max-width: 900px) {
+  .wb-geen { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 26px; }
+  .wb-geen .btn { justify-self: start; }
+}
+.wb-hero .ph-grid:has(.wb-kaartblok) { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 48px; }
+@media (max-width: 900px) { .wb-hero .ph-grid:has(.wb-kaartblok) { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .wb-kaartblok { padding: 16px; } }
+@media (prefers-reduced-motion: reduce) { .wb-kaart .boog, .wb-kaart .pin .ring { animation: none !important; } }
+.wb-kaart .lbl { paint-order: stroke; stroke: #fff; stroke-width: 6px; stroke-linejoin: round; }

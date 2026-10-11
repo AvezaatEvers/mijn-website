@@ -190,3 +190,24 @@
     s.textContent = tekst;
   });
 })();
+
+// Elementen zacht laten verschijnen bij scrollen (class "rv"); tellers in [data-tel] laten oplopen
+(function () {
+  var els = document.querySelectorAll('.rv');
+  if (!els.length || !('IntersectionObserver' in window)) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.documentElement.classList.add('js-rv');
+  function tel(el) {
+    el.querySelectorAll('[data-tel]').forEach(function (n) {
+      var doel = +n.getAttribute('data-tel'); if (!doel) return;
+      var start = performance.now();
+      (function stap(t) { var p = Math.min(1, (t - start) / 1200); n.textContent = Math.round(doel * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(stap); })(start);
+    });
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('is-in'); tel(e.target); io.unobserve(e.target); } });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+  els.forEach(function (el) { io.observe(el); });
+  // Vangnet: na 4 seconden alles tonen wat nog verborgen is
+  setTimeout(function () { els.forEach(function (el) { el.classList.add('is-in'); }); }, 4000);
+})();

@@ -873,3 +873,58 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
 .store-badges a:hover { opacity: .85; }
 .store-badges img { height: 40px; width: auto; }
 @media (max-width:480px) { .store-badges { gap:8px; flex-wrap:nowrap; } .store-badges img { height:36px; } }
+
+/* Hero met kaart (starters, overstappen, tarieven) */
+.page-head.ph { padding: 64px 0 72px; background: linear-gradient(180deg, var(--tint) 0%, #F6F8FD 55%, #fff 100%); }
+.ph-grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); gap: 64px; align-items: center; }
+.page-head.ph .ph-grid > .stack { max-width: none; }
+.ph .lead { max-width: 560px; }
+.ph-trust { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--muted); margin-top: 6px; }
+.ph-av { display: flex; flex: none; }
+.ph-av img { width: 34px; height: 34px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; }
+.ph-av img + img { margin-left: -10px; }
+.ph-kaart { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 30px; box-shadow: 0 24px 60px rgba(30, 64, 175, .10), 0 2px 6px rgba(17, 24, 39, .04); }
+.ph-kop { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.ph-kop strong { font-size: 18px; letter-spacing: -.01em; }
+.ph-kop span { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); background: var(--tint); padding: 5px 10px; border-radius: 999px; white-space: nowrap; }
+.ph-lijst { list-style: none; margin: 0; padding: 0; }
+.ph-lijst li { display: flex; align-items: center; gap: 14px; padding: 13px 0; border-top: 1px solid var(--line); font-size: 15px; color: var(--ink); }
+.ph-lijst li > div { flex: 1; min-width: 0; }
+.ph-lijst small { display: block; font-size: 13px; color: var(--muted); }
+.ph-lijst em { font-style: normal; font-size: 12px; font-weight: 600; color: var(--muted); background: var(--soft); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+.ph-lijst em.wij { color: var(--accent); background: var(--tint); border-color: var(--tint-border); }
+.ph-v { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); flex: none; display: grid; place-items: center; }
+.ph-v svg { width: 14px; height: 14px; }
+.ph-voet { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 14px 16px; border-radius: 14px; background: var(--tint); color: var(--ink); font-size: 14px; text-decoration: none; }
+.ph-voet:hover { color: var(--ink); background: #E3E9F8; }
+.ph-voet b { color: var(--accent); }
+.ph-voet .ph-nr { margin-left: auto; font-weight: 600; color: var(--accent); white-space: nowrap; }
+.ph-voet.groen { background: #ECFDF5; color: #065F46; }
+.ph-voet.groen b, .ph-voet.groen .ph-nr { color: #047857; }
+.ph-route { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.ph-route div { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; font-size: 13px; color: var(--muted); }
+.ph-route div b { display: block; font-size: 15px; color: var(--ink); font-weight: 600; }
+.ph-route div.wij { border-color: var(--tint-border); background: var(--tint); }
+.ph-route div.wij b { color: var(--accent); }
+.ph-route > svg { width: 22px; height: 22px; color: var(--accent); flex: none; }
+.ph-staaf { display: grid; grid-template-columns: 96px minmax(0, 1fr) 54px; align-items: center; gap: 12px; font-size: 14px; color: var(--text); padding: 7px 0; }
+.ph-staaf i { display: block; height: 22px; border-radius: 7px; background: #DCE3F3; }
+.ph-staaf b { text-align: right; font-weight: 600; }
+.ph-staaf.wij { color: var(--accent); font-weight: 600; }
+.ph-staaf.wij i { background: var(--accent); }
+.ph-klein { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+@media (max-width: 900px) {
+  .ph-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .ph-kaart { max-width: 560px; }
+}
+@media (max-width: 600px) {
+  .page-head.ph { padding: 32px 0 40px; }
+  .ph-kaart { padding: 22px; border-radius: 20px; }
+  .ph-kaart.ph-mob-weg { display: none; }
+  .ph-kop span, .ph-lijst small { display: none; }
+  .ph-kop { margin-bottom: 12px; }
+  .ph-lijst li { padding: 11px 0; font-size: 15px; }
+  .ph-route div { padding: 10px 12px; }
+  .ph-route div b { font-size: 14px; }
+  .ph-voet { font-size: 13px; padding: 12px 14px; }
+}

@@ -18,7 +18,7 @@
 <meta name="description" content="Overstappen naar een andere boekhouder is makkelijker dan je denkt. Wij regelen de overdracht met je vorige boekhouder. Per 1 januari overstappen? Geen overstapkosten bij aanmelding t/m 15 december.">
 <link rel="canonical" href="https://avezaatenevers.nl/overstappen.html">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/style.css?v=84">
+<link rel="stylesheet" href="/assets/style.css?v=85">
 </head>
 <body>
 <a class="skip" href="#main">Naar de inhoud</a>
@@ -44,15 +44,33 @@
 
 <main id="main">
 
-<section class="page-head">
-  <div class="container stack">
-    <p class="crumbs"><a href="/">Home</a> / Overstappen</p>
-    <h1>Overstappen van boekhouder? Wij regelen het.</h1>
-    <p class="lead">Ben je klaar met wisselende contactpersonen, onverwachte rekeningen of zelf boeken in een programma? Overstappen is minder werk dan je denkt. De overdracht met je vorige boekhouder nemen wij voor onze rekening.</p>
-    <div class="btn-row" style="margin-top:8px">
-      <a class="btn btn-primary" href="/contact.html#plannen">Plan een gratis kennismaking</a>
-      <a class="btn btn-ghost" href="/tarieven.html">Bekijk tarieven</a>
+<section class="page-head ph">
+  <div class="container ph-grid">
+    <div class="stack">
+      <p class="crumbs"><a href="/">Home</a> / Overstappen</p>
+      <h1>Overstappen van boekhouder? Wij regelen het.</h1>
+      <p class="lead">Ben je klaar met wisselende contactpersonen, onverwachte rekeningen of zelf boeken in een programma? Overstappen is minder werk dan je denkt. De overdracht met je vorige boekhouder nemen wij voor onze rekening.</p>
+      <div class="btn-row" style="margin-top:8px">
+        <a class="btn btn-primary" href="/contact.html#plannen">Plan een gratis kennismaking</a>
+        <a class="btn btn-ghost" href="/tarieven.html">Bekijk tarieven</a>
+      </div>
+    <p class="ph-trust"><span class="ph-av"><img src="/assets/img/koen-160.webp" alt="" width="34" height="34"><img src="/assets/img/daan-160.webp" alt="" width="34" height="34"></span>Vrijblijvend · 20 minuten · gewoon online</p>
     </div>
+    <aside class="ph-kaart" aria-label="Zo gaat je overstap">
+      <div class="ph-kop"><strong>Zo gaat je overstap</strong><span>Wij doen het werk</span></div>
+      <div class="ph-route">
+        <div>Van<b>Huidige boekhouder</b></div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        <div class="wij">Naar<b>Avezaat &amp; Evers</b></div>
+      </div>
+      <ul class="ph-lijst" style="margin-top:12px">
+        <li><span class="ph-v"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><div>Opzeggen<small>Eén mailtje, wij helpen met het moment</small></div><em>Jij</em></li>
+        <li><span class="ph-v"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><div>Gegevens opvragen<small>Laatste aangiftes en eindbalans</small></div><em class="wij">Wij</em></li>
+        <li><span class="ph-v"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><div>Inrichten en bank koppelen<small>Klaar voor het nieuwe boekjaar</small></div><em class="wij">Wij</em></li>
+        <li><span class="ph-v"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><div>Aanleveren via de app<small>Vanaf nu doen wij de rest</small></div><em>Jij</em></li>
+      </ul>
+      <a class="ph-voet groen" href="#kosten" id="ph-gratis"><span><b>Gratis overstappen</b> per 1 januari bij aanmelding t/m 15 december</span><span class="ph-nr" id="ph-gratis-nog"></span></a>
+    </aside>
   </div>
 </section>
 
@@ -111,7 +129,7 @@
   <div class="container narrow">
     <div class="section-head"><h2>Vragen over overstappen</h2></div>
     <div class="faq">
-      <details open>
+      <details open id="kosten">
         <summary>Wat kost overstappen?</summary>
         <p>Eenmalig €149 voor het inrichten en de overdracht. Stap je over per 1 januari en meld je je aan uiterlijk 15 december? Dan is overstappen gratis.</p>
       </details>
@@ -213,8 +231,20 @@
   <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFFFFF" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg>
 </a>
 
-<script src="/assets/main.js?v=84" defer></script>
-<script src="/assets/cal.js?v=84" defer></script>
-<script src="/assets/analytics.js?v=84" defer></script>
+<script src="/assets/main.js?v=85" defer></script>
+<script src="/assets/cal.js?v=85" defer></script>
+<script src="/assets/analytics.js?v=85" defer></script>
+<script>
+// Hero: aftellen tot 15 december (gratis overstappen per 1 januari)
+(function () {
+  var el = document.getElementById('ph-gratis'), nog = document.getElementById('ph-gratis-nog');
+  if (!el) return;
+  var nu = new Date(), vandaag = new Date(nu.getFullYear(), nu.getMonth(), nu.getDate());
+  var tot = new Date(nu.getFullYear(), 11, 15);
+  var d = Math.round((tot - vandaag) / 864e5);
+  if (d < 0) { el.classList.remove('groen'); el.firstElementChild.innerHTML = 'Overstappen kost eenmalig <b>€149</b>, inclusief de volledige overdracht'; nog.textContent = ''; return; }
+  nog.textContent = d === 0 ? 'Laatste dag' : 'Nog ' + d + (d === 1 ? ' dag' : ' dagen');
+})();
+</script>
 </body>
 </html>

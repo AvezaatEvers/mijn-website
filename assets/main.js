@@ -64,15 +64,21 @@
     slider.parentNode.insertBefore(dots, slider.nextSibling);
     function update() {
       if (!mq.matches) return;
-      var x = slider.scrollLeft, best = 0, bestD = Infinity;
+      // Welke kaart staat het dichtst bij de linkerrand van de slider (waar hij op uitlijnt)?
+      var basis = slider.getBoundingClientRect().left + (parseFloat(getComputedStyle(slider).paddingLeft) || 0);
+      var best = 0, bestD = Infinity;
       slides.forEach(function (s, i) {
-        var d = Math.abs(s.offsetLeft - slider.offsetLeft - 24 - x);
+        var d = Math.abs(s.getBoundingClientRect().left - basis);
         if (d < bestD) { bestD = d; best = i; }
       });
-      if (x + slider.clientWidth >= slider.scrollWidth - 4) best = slides.length - 1;
+      // Helemaal naar rechts gescrold (en er valt echt iets te scrollen)? Dan is de laatste actief.
+      var max = slider.scrollWidth - slider.clientWidth;
+      if (max > 8 && slider.scrollLeft >= max - 4) best = slides.length - 1;
       dots.querySelectorAll('button').forEach(function (b, i) { b.classList.toggle('active', i === best); });
     }
     slider.addEventListener('scroll', function () { window.requestAnimationFrame(update); }, { passive: true });
+    window.addEventListener('resize', update);
+    window.addEventListener('load', update);
     update();
   });
 })();

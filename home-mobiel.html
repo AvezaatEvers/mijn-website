@@ -45,11 +45,13 @@
   .hm-foto { position: relative; }
   .hm-foto > img:first-child { width: 100%; height: 300px; object-fit: cover; object-position: 50% 35%; border-radius: var(--r); box-shadow: var(--sh); }
   .hm-status { position: absolute; left: 12px; right: 12px; bottom: -22px; display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 16px; padding: 12px 14px; box-shadow: var(--sh); }
-  .hm-status-av { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; display: grid; place-items: center; flex: none; }
+  .hm-status-duo { display: flex; flex: none; }
+  .hm-status-duo .hm-status-av + .hm-status-av { margin-left: -12px; background: #3B5BDB; }
+  .hm-status-av { box-shadow: 0 0 0 3px #fff; width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; display: grid; place-items: center; flex: none; }
   .hm-status strong { display: block; font-size: 15px; color: var(--ink); }
   .hm-status em { display: flex; align-items: center; gap: 6px; font-style: normal; font-size: 13px; color: var(--muted); }
   .hm-status em i { width: 7px; height: 7px; border-radius: 50%; background: #22C55E; }
-  .hm-erkend { position: absolute; top: 12px; right: 12px; width: 120px; height: auto; border-radius: 8px; box-shadow: 0 6px 14px -6px rgba(0,0,0,.35); }
+  .hm-erkend { position: absolute; top: 12px; left: 12px; width: 120px; height: auto; border-radius: 8px; box-shadow: 0 6px 14px -6px rgba(0,0,0,.35); }
 
   /* Ticker */
   .hm-ticker { margin-top: 44px; overflow: hidden; border-block: 1px solid var(--line); background: #fff; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
@@ -183,7 +185,6 @@
   </div>
 </header>
 
-<div class="hm-testbalk">Testversie van de homepage voor mobiel. Bekijk hem op je telefoon of maak dit venster smal.</div>
 <main id="main" class="hm">
 
   <!-- Hero -->
@@ -197,8 +198,8 @@
     <div class="hm-foto">
       <img src="/assets/img/koen-daan-800.webp" srcset="/assets/img/koen-daan-800.webp 800w, /assets/img/koen-daan.webp 1200w" sizes="(max-width: 520px) calc(100vw - 40px), 440px" alt="Koen Avezaat en Daan Evers aan tafel" width="800" height="650" fetchpriority="high">
       <div class="hm-status">
-        <span class="hm-status-av" aria-hidden="true">D</span>
-        <span><strong>Daan, je boekhouder</strong><em><i aria-hidden="true"></i>Reactie binnen 2 uur via WhatsApp</em></span>
+        <span class="hm-status-duo" aria-hidden="true"><span class="hm-status-av">K</span><span class="hm-status-av">D</span></span>
+        <span><strong>Koen &amp; Daan</strong><em>Jouw vaste boekhouders, ook via WhatsApp</em></span>
       </div>
       <img class="hm-erkend" src="/assets/img/moneymonk-erkend-adviseur-klein.png" alt="Erkend Adviseur MoneyMonk" width="534" height="160">
     </div>
@@ -219,7 +220,7 @@
     <div class="hm-kaarten">
       <div class="hm-kaart">
         <span class="hm-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg></span>
-        <div><h3>Eén vaste boekhouder</h3><p>Geen wisselende medewerkers. Bellen, mailen of appen, je spreekt altijd dezelfde.</p></div>
+        <div><h3>Eén vaste boekhouder</h3><p>Koen of Daan, en dat blijft zo. Bellen, mailen of appen, je spreekt altijd dezelfde.</p></div>
       </div>
       <div class="hm-kaart">
         <span class="hm-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg></span>

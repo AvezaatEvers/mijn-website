@@ -677,11 +677,46 @@
     </div>
     <aside class="notes">
       <ul>
-        <li>Wordt automatisch overgeslagen als je "Net gestart" hebt aangeklikt.</li>
+        <li>Alleen zichtbaar bij "Heb nu een boekhouder" (of als je niets hebt aangeklikt). Bij "Doe het nu zelf" krijg je een eigen dia.</li>
         <li>Mooiste moment: per 1 januari. Oude boekhouder rondt het oude jaar af, wij starten met het nieuwe.</li>
         <li>Begin van een kwartaal kan ook: dan spreken we af wie welke aangifte doet.</li>
-        <li>Zelf boeken in een programma? Ook "overstappen": we nemen de gegevens over.</li>
         <li>Check de opzegtermijn bij de huidige boekhouder.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 12b Van zelf doen naar uit handen -->
+  <section class="slide" data-titel="Stoppen met zelf boeken" data-min="1.5" data-alleen="zelf">
+    <div class="kicker a">Van zelf doen naar uit handen</div>
+    <h2 class="a a2">Stoppen met zelf boeken<br>is zo geregeld</h2>
+    <div class="over">
+      <ol class="over-stappen">
+        <li class="a a3"><b>1</b><div><strong>Wij nemen je cijfers over</strong><p>Uit je huidige programma of Excel: je cijfers tot nu toe en wat er nog openstaat.</p></div></li>
+        <li class="a a4"><b>2</b><div><strong>Jij stopt met boeken</strong><p>Je oude abonnement kun je opzeggen. MoneyMonk zit in je pakket.</p></div></li>
+        <li class="a a5"><b>3</b><div><strong>Je levert alleen nog aan</strong><p>Foto van je bonnetje in de app. Wij boeken, controleren en dienen in.</p></div></li>
+      </ol>
+      <div class="a a5">
+        <div class="nodig">
+          <h3>Dit hebben we van je nodig</h3>
+          <ul>
+            <li>Toegang tot of een export uit je huidige programma of Excel</li>
+            <li>KvK-nummer en btw-id</li>
+            <li>De laatste btw-aangifte</li>
+            <li>De IB-aangifte van vorig jaar</li>
+          </ul>
+          <p>Loopt er iets achter? Dan maken we vooraf een prijsafspraak.</p>
+        </div>
+        <div class="gratis-band">Start per 1 januari en meld je aan t/m 15 december? Dan is overstappen gratis (t.w.v. €149).</div>
+      </div>
+    </div>
+    <aside class="notes">
+      <ul>
+        <li>Alleen zichtbaar bij "Doe het nu zelf".</li>
+        <li>Vraag: in welk programma boek je nu, en hoeveel tijd kost het je per maand? Koppel dat aan "Wat is je tijd waard" op de prijsdia.</li>
+        <li>Benoem de winst: geen avonden meer kwijt, en de zekerheid dat de aangiftes kloppen.</li>
+        <li>Mooiste moment: per 1 januari, dan begint een schoon boekjaar. Halverwege kan ook, dan nemen we de cijfers tot dat moment over.</li>
+        <li>Achterstand of rommelige boekhouding? Vooraf prijsafspraak, €60 per uur.</li>
+        <li>Check of het huidige programma-abonnement jaarlijks of maandelijks opzegbaar is.</li>
       </ul>
     </aside>
   </section>
@@ -768,7 +803,9 @@
   // Welke dia's doen mee (overstappen alleen als de klant niet net gestart is)
   function zichtbaar() {
     return alle.filter(function (s) {
-      var skip = s.getAttribute('data-alleen') === 'overstap' && keuze.start === 'nieuw';
+      var alleen = s.getAttribute('data-alleen');
+      var skip = (alleen === 'overstap' && keuze.start !== 'boekhouder' && keuze.start !== null) ||
+                 (alleen === 'zelf' && keuze.start !== 'zelf');
       s.classList.toggle('is-overgeslagen', skip);
       return !skip;
     });
@@ -838,9 +875,11 @@
   var gratisTot = new Date(nu.getFullYear(), 11, 15, 23, 59, 59);
   var gratisOverstap = nu <= gratisTot;
   var startJaar = nu.getFullYear() + 1;
-  document.getElementById('gratis-band').textContent = gratisOverstap
-    ? 'Start per 1 januari ' + startJaar + ' en meld je aan t/m 15 december? Dan is overstappen gratis (t.w.v. €149).'
-    : 'Overstappen kost eenmalig €149, voor het inrichten en de volledige overdracht.';
+  document.querySelectorAll('.gratis-band').forEach(function (el) {
+    el.textContent = gratisOverstap
+      ? 'Start per 1 januari ' + startJaar + ' en meld je aan t/m 15 december? Dan is overstappen gratis (t.w.v. €149).'
+      : 'Overstappen kost eenmalig €149, voor het inrichten en de volledige overdracht.';
+  });
 
   // Schalen naar het scherm
   function schaal() {

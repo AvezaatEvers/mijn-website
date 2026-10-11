@@ -88,3 +88,7 @@ Open `/voorstel.html` (niet gelinkt, noindex). Vul de klantgegevens en extra's i
 ## Welkomstpagina
 
 Stuur nieuwe klanten na hun akkoord een persoonlijke link: `https://avezaatenevers.nl/welkom.html?naam=Sanne&boekhouder=Daan` (boekhouder: Daan of Koen). Niet gelinkt, noindex. De checklist bewaart de voortgang in de browser van de klant.
+
+## Intern dashboard
+
+`/intern/` is het dashboard voor Koen en Daan (snelkoppelingen, welkomstlink maken, open punten, alle pagina's). Afgeschermd met een eigen wachtwoord via `netlify/edge-functions/intern.js`, samen met `/voorstel.html` en `/handtekening.html`. Dit blijft ook na de lancering actief. Het wachtwoord staat niet in de code (alleen een hash); bewaar het in een wachtwoordmanager.

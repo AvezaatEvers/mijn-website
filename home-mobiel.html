@@ -143,6 +143,17 @@
   body:has(.hm-sticky.is-zichtbaar) .wa { opacity: 0; pointer-events: none; }
   .wa { transition: opacity .3s; }
 
+
+  /* Rustiger */
+  .hm-sectie { padding: 56px 20px; }
+  .hm-hero { padding-bottom: 36px; }
+  .hm-kaarten { gap: 22px; }
+  .hm-kaart { border: 0; padding: 0; background: none; }
+  .hm-intro { margin: -8px 0 20px; font-size: 16px; line-height: 1.55; color: var(--text); }
+  .hm-app-erkend { display: block; width: 170px; height: auto; margin: 0 0 22px; }
+  .hm-prijs { box-shadow: 0 1px 2px rgba(17,24,39,.05); }
+  .hm-status { box-shadow: 0 10px 24px -14px rgba(17,24,39,.35); }
+
   /* Verschijnen */
   .js .hm-in { opacity: 0; transform: translateY(16px); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
   .js .hm-in.is-zichtbaar { opacity: 1; transform: none; }
@@ -201,17 +212,8 @@
         <span class="hm-status-duo" aria-hidden="true"><span class="hm-status-av">K</span><span class="hm-status-av">D</span></span>
         <span><strong>Koen &amp; Daan</strong><em>Jouw vaste boekhouders, ook via WhatsApp</em></span>
       </div>
-      <img class="hm-erkend" src="/assets/img/moneymonk-erkend-adviseur-klein.png" alt="Erkend Adviseur MoneyMonk" width="534" height="160">
     </div>
   </section>
-
-  <!-- Lopende balk met voordelen -->
-  <div class="hm-ticker" aria-label="Wat je krijgt">
-    <div class="hm-ticker-rij">
-      <span>Eén vaste boekhouder</span><span>Btw-aangifte inbegrepen</span><span>Inkomstenbelasting inbegrepen</span><span>Software en app inbegrepen</span><span>Maandelijks opzegbaar</span><span>Elke maand een 1-op-1</span>
-      <span aria-hidden="true">Eén vaste boekhouder</span><span aria-hidden="true">Btw-aangifte inbegrepen</span><span aria-hidden="true">Inkomstenbelasting inbegrepen</span><span aria-hidden="true">Software en app inbegrepen</span><span aria-hidden="true">Maandelijks opzegbaar</span><span aria-hidden="true">Elke maand een 1-op-1</span>
-    </div>
-  </div>
 
   <!-- Waarom -->
   <section class="hm-sectie">
@@ -252,17 +254,6 @@
     </div>
   </section>
 
-  <!-- Btw-deadline -->
-  <section class="hm-sectie">
-    <div class="hm-deadline">
-      <div class="hm-dl-kal" aria-hidden="true"><span id="hm-dl-maand">okt</span><b id="hm-dl-dag">31</b></div>
-      <div>
-        <strong>Volgende btw-deadline: <span id="hm-dl-datum">31 oktober</span></strong>
-        <p>Nog <b id="hm-dl-dagen">20 dagen</b>. Bij ons hoef je daar niet aan te denken: wij dienen hem op tijd in.</p>
-      </div>
-    </div>
-  </section>
-
   <!-- Zo werkt het -->
   <section class="hm-sectie">
     <span class="hm-label">Zo werkt het</span>
@@ -298,6 +289,8 @@
   <section class="hm-sectie">
     <span class="hm-label">Software inbegrepen</span>
     <h2>Al je administratie in één app</h2>
+    <p class="hm-intro">MoneyMonk zit in je pakket. Als Erkend Adviseur kennen we het programma door en door.</p>
+    <img class="hm-app-erkend" src="/assets/img/moneymonk-erkend-adviseur.png" alt="Erkend Adviseur MoneyMonk" width="801" height="240" loading="lazy">
     <div class="hm-app">
       <img src="/assets/img/moneymonk-app.webp" alt="Het dashboard van de MoneyMonk-app" width="640" height="1134" loading="lazy">
       <ul>
@@ -400,17 +393,6 @@
 <script src="/assets/analytics.js?v=77" defer></script>
 <script>
 (function () {
-  // Volgende btw-deadline: 30 apr, 31 jul, 31 okt, 31 jan
-  var nu = new Date(), j = nu.getFullYear();
-  var kandidaten = [new Date(j, 0, 31), new Date(j, 3, 30), new Date(j, 6, 31), new Date(j, 9, 31), new Date(j + 1, 0, 31)];
-  var vandaag = new Date(j, nu.getMonth(), nu.getDate());
-  var dl = kandidaten.filter(function (d) { return d >= vandaag; })[0];
-  var dagen = Math.round((dl - vandaag) / 864e5);
-  document.getElementById('hm-dl-maand').textContent = dl.toLocaleDateString('nl-NL', { month: 'short' }).replace('.', '');
-  document.getElementById('hm-dl-dag').textContent = dl.getDate();
-  document.getElementById('hm-dl-datum').textContent = dl.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' });
-  document.getElementById('hm-dl-dagen').textContent = dagen === 0 ? 'vandaag de laatste dag' : dagen === 1 ? '1 dag' : dagen + ' dagen';
-
   // Branche-keuze
   var B = {
     'bouw': ['Bouw', 'Verlegde btw, materiaal en je bus: wij weten hoe het zit.'],

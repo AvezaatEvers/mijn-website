@@ -91,4 +91,4 @@ Stuur nieuwe klanten na hun akkoord een persoonlijke link: `https://avezaateneve
 
 ## Intern dashboard
 
-`/intern/` is het dashboard voor Koen en Daan (snelkoppelingen, welkomstlink maken, open punten, alle pagina's). Afgeschermd met een eigen wachtwoord via `netlify/edge-functions/intern.js`, samen met `/voorstel.html` en `/handtekening.html`. Dit blijft ook na de lancering actief. Het wachtwoord staat niet in de code (alleen een hash); bewaar het in een wachtwoordmanager.
+`/intern/` is het dashboard voor Koen en Daan: gedeelde takenlijst met deadlines (wie heeft afgevinkt), kalender met vaste deadlines en taken, snelkoppelingen, welkomstlink maken en alle pagina's. Ieder logt in met een eigen wachtwoord. Afgeschermd via `netlify/edge-functions/intern.js` (logica in `netlify/intern-logica.js`), samen met `/voorstel.html` en `/handtekening.html`. Taken staan in Netlify Blobs (store `intern`), daarvoor is `package.json` met `@netlify/blobs` nodig. Wachtwoorden staan niet in de code (alleen hashes); bewaar ze in een wachtwoordmanager.

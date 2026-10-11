@@ -69,16 +69,75 @@
   .db-paginas em { font-style: normal; font-size: 11px; color: var(--muted); margin-left: 6px; }
 
   /* Tools */
-  .db-tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .db-tools { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
   .db-tool { padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); text-decoration: none; color: var(--ink); transition: border-color .2s; }
   .db-tool:hover { border-color: var(--accent); }
   .db-tool strong { display: block; font-size: 15px; overflow-wrap: anywhere; }
   .db-tool span { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.35; margin-top: 2px; }
   .db-noot { font-size: 13px; color: var(--muted); margin: 12px 0 0; }
 
+
+  .db-wie { display: flex; align-items: center; gap: 16px; font-size: 14px; color: var(--muted); }
+  .db-wie a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .db-kop { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .db-kop h2 { margin: 0; }
+
+  /* Taken */
+  .tk-nieuw { display: grid; grid-template-columns: 1fr 150px 100px auto; gap: 8px; margin-bottom: 12px; }
+  .tk-nieuw input, .tk-nieuw select { font: inherit; font-size: 14px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff; min-width: 0; }
+  .tk-filters { display: flex; gap: 6px; margin-bottom: 6px; }
+  .tk-filters button { font: inherit; font-size: 13px; font-weight: 500; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--text); cursor: pointer; }
+  .tk-filters button.is-aan { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .tk-lijst { list-style: none; margin: 0; padding: 0; max-height: 520px; overflow-y: auto; }
+  .tk-lijst li { display: grid; grid-template-columns: 22px 1fr auto; gap: 12px; align-items: start; padding: 11px 2px; border-bottom: 1px solid var(--line); }
+  .tk-lijst li:last-child { border-bottom: 0; }
+  .tk-lijst input[type=checkbox] { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--accent); cursor: pointer; }
+  .tk-titel { font-size: 15px; color: var(--ink); line-height: 1.4; }
+  .tk-meta { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 3px; font-size: 12.5px; color: var(--muted); }
+  .tk-meta .tk-voor { font-weight: 600; color: var(--accent); }
+  .tk-meta .is-laat { color: #B91C1C; font-weight: 600; }
+  .tk-meta .is-binnenkort { color: #B45309; font-weight: 600; }
+  .tk-meta .tk-afgevinkt { color: #15803D; }
+  li.is-klaar .tk-titel { color: var(--muted); text-decoration: line-through; }
+  .tk-weg { font: inherit; font-size: 12px; border: 0; background: none; color: #9CA3AF; cursor: pointer; padding: 2px 4px; border-radius: 6px; }
+  .tk-weg:hover { color: #B91C1C; background: #FEF2F2; }
+  .tk-weg.is-zeker { color: #fff; background: #B91C1C; }
+  .tk-leeg { display: block !important; color: var(--muted); font-size: 14px; padding: 14px 2px !important; }
+
+  /* Kalender */
+  .kal-nav { display: flex; gap: 6px; }
+  .kal-nav button { font: inherit; font-size: 14px; min-width: 34px; height: 34px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line); background: #fff; cursor: pointer; color: var(--ink); }
+  .kal-nav button:hover { border-color: var(--accent); }
+  .kal-raster { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+  .kal-raster .kal-wd { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); text-align: center; padding-bottom: 4px; }
+  .kal-raster button { font: inherit; position: relative; aspect-ratio: 1 / .9; min-height: 44px; border: 1px solid transparent; border-radius: 10px; background: var(--soft); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 6px 2px; color: var(--ink); font-size: 13px; }
+  .kal-raster button.is-anders { background: transparent; color: #C4C9D4; }
+  .kal-raster button.is-vandaag { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .kal-raster button.is-gekozen { background: var(--accent); color: #fff; }
+  .kal-raster button:hover { border-color: var(--tint-border); }
+  .kal-stip { display: flex; gap: 3px; margin-top: auto; }
+  .kal-stip i, .kal-legenda i { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .k-vast { background: #B45309; } .k-taak { background: var(--accent); } .k-klaar { background: #9CA3AF; }
+  .kal-raster button.is-gekozen .k-taak { background: #fff; }
+  .kal-legenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin: 12px 0 0; }
+  .kal-legenda span { display: inline-flex; align-items: center; gap: 6px; }
+  .kal-dag { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px; }
+  .kal-dag h3 { font-size: 14px; margin: 0 0 8px; }
+  .kal-dag ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .kal-dag li { font-size: 14px; color: var(--text); display: flex; gap: 8px; align-items: baseline; }
+  .kal-dag li i { flex: none; transform: translateY(-1px); }
+  .kal-dag p { margin: 0; font-size: 14px; color: var(--muted); }
+  @media (max-width: 600px) {
+    .tk-nieuw { grid-template-columns: 1fr 1fr; }
+    .tk-nieuw #tk-titel { grid-column: 1 / -1; }
+    .tk-nieuw button { grid-column: 1 / -1; justify-content: center; }
+    .db-wie { gap: 12px; }
+  }
+
   @media (max-width: 1000px) {
     .s3, .s4, .s5 { grid-column: span 6; } .s6, .s7, .s8 { grid-column: span 12; }
     .db-paginas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .db-tools { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
   @media (max-width: 600px) {
     .s3, .s4, .s5, .s6 { grid-column: span 12; }
@@ -92,7 +151,7 @@
 <main class="db">
   <div class="db-top">
     <div><a class="logo" href="/">Avezaat <span>&amp;</span> Evers</a><span class="db-tag">Intern</span></div>
-    <a class="db-site" href="/" target="_blank" rel="noopener">Bekijk de website →</a>
+    <div class="db-wie"><span id="db-ik">Ingelogd</span><a href="/intern/logout">Uitloggen</a><a class="db-site" href="/" target="_blank" rel="noopener">Website →</a></div>
   </div>
 
   <h1 id="db-groet">Goedemorgen</h1>
@@ -103,6 +162,35 @@
     <div class="db-kaart db-teller is-blauw s4"><small>Start boekjaar 2027</small><b id="t-start">–</b><span>tot 1 januari</span></div>
     <div class="db-kaart db-teller s4"><small>Overstapactie loopt af</small><b id="t-overstap">–</b><span id="t-overstap-tekst">gratis overstappen bij aanmelding t/m 15 december</span></div>
     <div class="db-kaart db-teller s4"><small>Volgende btw-deadline</small><b id="t-btw">–</b><span id="t-btw-tekst"></span></div>
+
+    <!-- Taken -->
+    <div class="db-kaart s6" id="taken-kaart">
+      <div class="db-kop"><h2>Taken</h2><span class="db-teller-todo" id="todo-teller"></span></div>
+      <form class="tk-nieuw" id="tk-form" autocomplete="off">
+        <input id="tk-titel" type="text" placeholder="Nieuwe taak…" maxlength="200" required>
+        <input id="tk-datum" type="date" aria-label="Deadline">
+        <select id="tk-voor" aria-label="Voor wie"><option value="samen">Samen</option><option value="koen">Koen</option><option value="daan">Daan</option></select>
+        <button class="db-knop" type="submit">Toevoegen</button>
+      </form>
+      <div class="tk-filters" role="tablist">
+        <button type="button" data-f="open" class="is-aan">Open</button>
+        <button type="button" data-f="mijn">Voor mij</button>
+        <button type="button" data-f="klaar">Afgerond</button>
+      </div>
+      <ul class="tk-lijst" id="tk-lijst"><li class="tk-leeg">Laden…</li></ul>
+      <p class="db-noot" id="tk-status">Gedeeld met Koen en Daan. Wordt elke minuut bijgewerkt.</p>
+    </div>
+
+    <!-- Kalender -->
+    <div class="db-kaart s6">
+      <div class="db-kop">
+        <h2 id="kal-titel">Kalender</h2>
+        <div class="kal-nav"><button type="button" id="kal-vorige" aria-label="Vorige maand">‹</button><button type="button" id="kal-vandaag">Vandaag</button><button type="button" id="kal-volgende" aria-label="Volgende maand">›</button></div>
+      </div>
+      <div class="kal-raster" id="kal-raster"></div>
+      <div class="kal-legenda"><span><i class="k-vast"></i>Vaste deadline</span><span><i class="k-taak"></i>Taak</span><span><i class="k-klaar"></i>Afgerond</span></div>
+      <div class="kal-dag" id="kal-dag"></div>
+    </div>
 
     <!-- Snel naar -->
     <div class="db-kaart s7">
@@ -133,31 +221,8 @@
       <p class="db-noot" style="margin-top:4px">Stuur deze link mee met de opdrachtbevestiging.</p>
     </div>
 
-    <!-- Open punten -->
-    <div class="db-kaart s6">
-      <h2>Open punten tot de lancering <span class="db-teller-todo" id="todo-teller"></span></h2>
-      <div class="db-voortgang"><div id="todo-balk"></div></div>
-      <ul class="db-todo" id="todo">
-        <li><label><input type="checkbox" data-id="telefoon"><span>Echt telefoonnummer op de site<small>Nu staat overal het testnummer 06 1234 5678</small></span></label></li>
-        <li><label><input type="checkbox" data-id="daan"><span>Foto en achtergrond van Daan<small>Homepage, Wie wij zijn</small></span></label></li>
-        <li><label><input type="checkbox" data-id="betaal"><span>Betaalwijze invullen<small>FAQ "Hoe betaal ik?"</small></span></label></li>
-        <li><label><input type="checkbox" data-id="forms"><span>Netlify: formulierdetectie en e-mailmeldingen</span></label></li>
-        <li><label><input type="checkbox" data-id="cal"><span>Cal.com instellen<small>Nederlands, 24-uurs, maandag eerst, "Voor- en achternaam", herinnering</small></span></label></li>
-        <li><label><input type="checkbox" data-id="verzekering"><span>Beroepsaansprakelijkheidsverzekering</span></label></li>
-        <li><label><input type="checkbox" data-id="salaris"><span>Salarispartner voor klanten met personeel</span></label></li>
-        <li><label><input type="checkbox" data-id="nalezen"><span>Daan leest fiscale teksten na<small>Zelfstandigenaftrek, calculator, welkomstpagina</small></span></label></li>
-        <li><label><input type="checkbox" data-id="search"><span>Google Search Console koppelen en sitemap indienen</span></label></li>
-        <li><label><input type="checkbox" data-id="profiel"><span>Google Bedrijfsprofiel aanmaken</span></label></li>
-        <li><label><input type="checkbox" data-id="moneymonk"><span>Vermelding in de lijst Erkend Adviseurs van MoneyMonk</span></label></li>
-        <li><label><input type="checkbox" data-id="umami"><span>Umami: eigen bezoeken uitsluiten</span></label></li>
-        <li><label><input type="checkbox" data-id="belastingplan"><span>Bedragen 2027 bijwerken na de stemming over het Belastingplan</span></label></li>
-        <li><label><input type="checkbox" data-id="lancering"><span>Wachtwoordpagina weghalen: lancering</span></label></li>
-      </ul>
-      <p class="db-noot">Afvinken wordt bewaard in deze browser. Koen en Daan zien elk hun eigen vinkjes.</p>
-    </div>
-
     <!-- Tools -->
-    <div class="db-kaart s6">
+    <div class="db-kaart s12">
       <h2>Tools</h2>
       <div class="db-tools">
         <a class="db-tool" href="https://outlook.office.com" target="_blank" rel="noopener"><strong>Outlook</strong><span>Mail info@</span></a>
@@ -256,24 +321,145 @@
     else { link.select(); document.execCommand('copy'); klaar(); }
   });
 
-  // Open punten
-  var SLEUTEL = 'ae-intern-todo', staat = {};
-  try { staat = JSON.parse(localStorage.getItem(SLEUTEL) || '{}') || {}; } catch (e) {}
-  var vakjes = [].slice.call(document.querySelectorAll('#todo input'));
-  function werkBij() {
-    var klaarAantal = vakjes.filter(function (v) { return v.checked; }).length;
-    document.getElementById('todo-teller').textContent = klaarAantal + ' van ' + vakjes.length + ' klaar';
-    document.getElementById('todo-balk').style.width = (klaarAantal / vakjes.length * 100) + '%';
+  // ===== Ingelogde gebruiker =====
+  var IK = null, NAAM = { koen: 'Koen', daan: 'Daan', samen: 'Samen' };
+  fetch('/intern/api/ik', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+    if (!d) return;
+    IK = d.wie;
+    document.getElementById('db-ik').textContent = 'Ingelogd als ' + d.naam;
+    document.getElementById('db-groet').textContent = (uur < 12 ? 'Goedemorgen' : uur < 18 ? 'Goedemiddag' : 'Goedenavond') + ', ' + d.naam;
+    document.getElementById('tk-voor').value = d.wie;
+    tekenTaken();
+  }).catch(function () {});
+
+  // ===== Taken (gedeeld, opgeslagen op de server) =====
+  var TAKEN = [], filter = 'open';
+  var lijst = document.getElementById('tk-lijst'), status = document.getElementById('tk-status');
+  function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function vanIso(s) { var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function kort(d) { return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }).replace('.', ''); }
+  function api(methode, body, query) {
+    return fetch('/intern/api/taken' + (query || ''), {
+      method: methode, credentials: 'same-origin',
+      headers: body ? { 'Content-Type': 'application/json' } : {},
+      body: body ? JSON.stringify(body) : undefined
+    }).then(function (r) {
+      if (r.status === 401) { location.reload(); throw new Error('uitgelogd'); }
+      if (!r.ok) throw new Error('fout');
+      return r.json();
+    }).then(function (t) { TAKEN = t; status.textContent = 'Gedeeld met Koen en Daan. Bijgewerkt om ' + new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }) + '.'; tekenTaken(); tekenKalender(); return t; })
+      .catch(function (e) { if (e.message !== 'uitgelogd') status.textContent = 'Opslaan of ophalen lukte niet. Probeer het opnieuw.'; throw e; });
   }
-  vakjes.forEach(function (v) {
-    v.checked = !!staat[v.getAttribute('data-id')];
-    v.addEventListener('change', function () {
-      staat[v.getAttribute('data-id')] = v.checked;
-      try { localStorage.setItem(SLEUTEL, JSON.stringify(staat)); } catch (e) {}
-      werkBij();
+  function tekenTaken() {
+    var open = TAKEN.filter(function (t) { return !t.klaar; }).length;
+    document.getElementById('todo-teller').textContent = open + ' open · ' + (TAKEN.length - open) + ' afgerond';
+    var lijstje = TAKEN.filter(function (t) {
+      if (filter === 'klaar') return t.klaar;
+      if (filter === 'mijn') return !t.klaar && (t.voor === IK || t.voor === 'samen');
+      return !t.klaar;
+    }).sort(function (a, b) {
+      if (filter === 'klaar') return (b.klaarOp || '').localeCompare(a.klaarOp || '');
+      return (a.deadline || '9999').localeCompare(b.deadline || '9999');
+    });
+    lijst.innerHTML = '';
+    if (!lijstje.length) { var leeg = document.createElement('li'); leeg.className = 'tk-leeg'; leeg.textContent = filter === 'klaar' ? 'Nog niets afgerond.' : 'Niets meer open. Lekker bezig!'; lijst.appendChild(leeg); return; }
+    lijstje.forEach(function (t) {
+      var li = document.createElement('li'); if (t.klaar) li.className = 'is-klaar';
+      var vak = document.createElement('input'); vak.type = 'checkbox'; vak.checked = t.klaar; vak.setAttribute('aria-label', 'Afvinken: ' + t.titel);
+      vak.addEventListener('change', function () { api('PATCH', { id: t.id, klaar: vak.checked }); });
+      var tekst = document.createElement('div');
+      var titel = document.createElement('div'); titel.className = 'tk-titel'; titel.textContent = t.titel; tekst.appendChild(titel);
+      var meta = document.createElement('div'); meta.className = 'tk-meta';
+      function m(txt, cls) { var s = document.createElement('span'); s.textContent = txt; if (cls) s.className = cls; meta.appendChild(s); }
+      m(t.voor === 'samen' ? 'Samen' : 'Voor ' + NAAM[t.voor], 'tk-voor');
+      if (t.deadline && !t.klaar) {
+        var n = Math.round((vanIso(t.deadline) - vandaag) / 864e5);
+        m(n < 0 ? 'Verlopen: ' + kort(vanIso(t.deadline)) : n === 0 ? 'Vandaag' : kort(vanIso(t.deadline)) + ' · nog ' + n + (n === 1 ? ' dag' : ' dagen'), n < 0 ? 'is-laat' : n <= 7 ? 'is-binnenkort' : '');
+      }
+      if (t.klaar) m('✓ Afgevinkt door ' + NAAM[t.klaarDoor] + ' op ' + kort(new Date(t.klaarOp)), 'tk-afgevinkt');
+      if (t.notitie) m(t.notitie);
+      tekst.appendChild(meta);
+      var weg = document.createElement('button'); weg.type = 'button'; weg.className = 'tk-weg'; weg.textContent = '✕'; weg.setAttribute('aria-label', 'Verwijder taak');
+      weg.addEventListener('click', function () {
+        if (!weg.classList.contains('is-zeker')) { weg.classList.add('is-zeker'); weg.textContent = 'Verwijderen?'; setTimeout(function () { weg.classList.remove('is-zeker'); weg.textContent = '✕'; }, 3000); return; }
+        api('DELETE', null, '?id=' + encodeURIComponent(t.id));
+      });
+      li.appendChild(vak); li.appendChild(tekst); li.appendChild(weg); lijst.appendChild(li);
+    });
+  }
+  document.querySelectorAll('.tk-filters button').forEach(function (k) {
+    k.addEventListener('click', function () {
+      filter = k.getAttribute('data-f');
+      document.querySelectorAll('.tk-filters button').forEach(function (x) { x.classList.toggle('is-aan', x === k); });
+      tekenTaken();
     });
   });
-  werkBij();
+  document.getElementById('tk-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var titel = document.getElementById('tk-titel');
+    if (!titel.value.trim()) return;
+    api('POST', { titel: titel.value, deadline: document.getElementById('tk-datum').value, voor: document.getElementById('tk-voor').value })
+      .then(function () { titel.value = ''; document.getElementById('tk-datum').value = ''; });
+  });
+  api('GET');
+  setInterval(function () { if (!document.hidden) api('GET'); }, 60000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) api('GET'); });
+
+  // ===== Kalender =====
+  function vasteDeadlines(jaar) {
+    var v = [];
+    [[0, 31, 'Btw-aangifte 4e kwartaal'], [3, 30, 'Btw-aangifte 1e kwartaal'], [6, 31, 'Btw-aangifte 2e kwartaal'], [9, 31, 'Btw-aangifte 3e kwartaal'],
+     [4, 1, 'Aangifte inkomstenbelasting'], [11, 15, 'Laatste dag aanmelden gratis overstap'],
+     [0, 10, 'Klanten leveren Q4 aan'], [3, 10, 'Klanten leveren Q1 aan'], [6, 10, 'Klanten leveren Q2 aan'], [9, 10, 'Klanten leveren Q3 aan']]
+      .forEach(function (x) { v.push({ datum: iso(new Date(jaar, x[0], x[1])), titel: x[2] }); });
+    if (jaar === 2027) v.push({ datum: '2027-01-01', titel: 'Start boekjaar 2027' });
+    return v;
+  }
+  var kalMaand = new Date(vandaag.getFullYear(), vandaag.getMonth(), 1), gekozen = iso(vandaag);
+  function itemsOp(dag) {
+    var j = +dag.slice(0, 4), uit = [];
+    vasteDeadlines(j).forEach(function (v) { if (v.datum === dag) uit.push({ soort: 'vast', titel: v.titel }); });
+    TAKEN.forEach(function (t) { if (t.deadline === dag) uit.push({ soort: t.klaar ? 'klaar' : 'taak', titel: t.titel + (t.voor !== 'samen' ? ' (' + NAAM[t.voor] + ')' : '') }); });
+    return uit;
+  }
+  function tekenKalender() {
+    var raster = document.getElementById('kal-raster'); raster.innerHTML = '';
+    var t = kalMaand.toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' });
+    document.getElementById('kal-titel').textContent = t.charAt(0).toUpperCase() + t.slice(1);
+    ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'].forEach(function (d) { var e = document.createElement('div'); e.className = 'kal-wd'; e.textContent = d; raster.appendChild(e); });
+    var start = new Date(kalMaand); start.setDate(1 - ((kalMaand.getDay() + 6) % 7));
+    for (var i = 0; i < 42; i++) {
+      var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+      if (i >= 35 && d.getMonth() !== kalMaand.getMonth()) break;
+      var dag = iso(d), b = document.createElement('button'); b.type = 'button';
+      b.textContent = d.getDate();
+      if (d.getMonth() !== kalMaand.getMonth()) b.classList.add('is-anders');
+      if (dag === iso(vandaag)) b.classList.add('is-vandaag');
+      if (dag === gekozen) b.classList.add('is-gekozen');
+      var items = itemsOp(dag);
+      if (items.length) {
+        var st = document.createElement('span'); st.className = 'kal-stip';
+        var soorten = {}; items.forEach(function (x) { soorten[x.soort] = 1; });
+        Object.keys(soorten).forEach(function (k) { var ii = document.createElement('i'); ii.className = 'k-' + k; st.appendChild(ii); });
+        b.appendChild(st);
+        b.setAttribute('aria-label', d.getDate() + ' ' + kalMaand.toLocaleDateString('nl-NL', { month: 'long' }) + ': ' + items.map(function (x) { return x.titel; }).join(', '));
+      }
+      (function (dag) { b.addEventListener('click', function () { gekozen = dag; tekenKalender(); }); })(dag);
+      raster.appendChild(b);
+    }
+    var vak = document.getElementById('kal-dag'), items2 = itemsOp(gekozen), gd = vanIso(gekozen);
+    var kop = gd.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+    vak.innerHTML = '<h3></h3>';
+    vak.querySelector('h3').textContent = kop.charAt(0).toUpperCase() + kop.slice(1);
+    if (!items2.length) { var p = document.createElement('p'); p.textContent = 'Niets gepland.'; vak.appendChild(p); return; }
+    var ul = document.createElement('ul');
+    items2.forEach(function (x) { var li = document.createElement('li'); var ii = document.createElement('i'); ii.className = 'k-' + x.soort; li.appendChild(ii); li.appendChild(document.createTextNode(x.titel)); ul.appendChild(li); });
+    vak.appendChild(ul);
+  }
+  document.getElementById('kal-vorige').addEventListener('click', function () { kalMaand = new Date(kalMaand.getFullYear(), kalMaand.getMonth() - 1, 1); tekenKalender(); });
+  document.getElementById('kal-volgende').addEventListener('click', function () { kalMaand = new Date(kalMaand.getFullYear(), kalMaand.getMonth() + 1, 1); tekenKalender(); });
+  document.getElementById('kal-vandaag').addEventListener('click', function () { kalMaand = new Date(vandaag.getFullYear(), vandaag.getMonth(), 1); gekozen = iso(vandaag); tekenKalender(); });
+  tekenKalender();
 })();
 </script>
 </body>

@@ -846,3 +846,23 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
   .home #over .avatar { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; }
   .home #over .avatar-initiaal { font-size: 30px; padding: 0; }
 }
+
+/* Starters: deadlines */
+.dl-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 56px; align-items: start; }
+.dl-intro .lead { margin: 0; }
+.dl-noot { margin: 0; font-size: 15px; color: var(--text); padding: 14px 16px; background: var(--white); border-radius: 14px; border: 1px solid var(--tint-border); }
+.dl-lijst { list-style: none; margin: 0; padding: 0; background: var(--white); border-radius: var(--radius); border: 1px solid var(--line); overflow: hidden; }
+.dl-lijst li { display: grid; grid-template-columns: 150px 1fr; gap: 16px; padding: 18px 22px; border-bottom: 1px solid var(--line); }
+.dl-lijst li:last-child { border-bottom: 0; }
+.dl-lijst time { font-weight: 600; color: var(--ink); font-size: 15px; }
+.dl-lijst strong { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px; color: var(--ink); }
+.dl-lijst strong em { font-style: normal; font-size: 12px; font-weight: 600; color: var(--accent); background: var(--tint); border-radius: 999px; padding: 3px 10px; }
+.dl-lijst span { display: block; font-size: 15px; color: var(--text); line-height: 1.5; margin-top: 2px; }
+.dl-lijst li.is-eerst { background: #F8FAFF; box-shadow: inset 3px 0 0 var(--accent); }
+.dl-lijst li.is-eerst time { color: var(--accent); }
+.dl-meer { margin: 24px 0 0; }
+@media (max-width: 860px) {
+  .dl-grid { grid-template-columns: 1fr; gap: 24px; }
+  .dl-lijst li { grid-template-columns: 1fr; gap: 4px; padding: 16px 18px; }
+  .dl-lijst time { font-size: 14px; }
+}

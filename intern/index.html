@@ -60,6 +60,15 @@
   .db-voortgang div { height: 100%; width: 0; background: var(--accent); transition: width .5s cubic-bezier(.22,1,.36,1); }
   .db-teller-todo { font-size: 13px; color: var(--muted); font-weight: 500; float: right; }
 
+  /* Kennismaking presenteren */
+  .db-pres { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; background: var(--accent); border-color: var(--accent); color: #fff; }
+  .db-pres h2 { color: #fff; margin: 0 0 4px; }
+  .db-pres p { font-size: 14px; color: #C7D2FE; margin: 0; }
+  .db-pres form { display: flex; gap: 8px; flex: 1; max-width: 460px; min-width: 0; }
+  .db-pres input { flex: 1; min-width: 0; font: inherit; font-size: 15px; padding: 10px 12px; border-radius: 10px; border: 0; }
+  .db-pres .db-knop { background: #fff; color: var(--accent); }
+  @media (max-width: 600px) { .db-pres form { max-width: none; flex-basis: 100%; } }
+
   /* Pagina's */
   .db-paginas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
   .db-paginas h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); margin: 0 0 8px; }
@@ -190,6 +199,18 @@
       <div class="kal-raster" id="kal-raster"></div>
       <div class="kal-legenda"><span><i class="k-vast"></i>Vaste deadline</span><span><i class="k-taak"></i>Taak</span><span><i class="k-klaar"></i>Afgerond</span></div>
       <div class="kal-dag" id="kal-dag"></div>
+    </div>
+
+    <!-- Kennismaking presenteren -->
+    <div class="db-kaart s12 db-pres">
+      <div>
+        <h2>Kennismaking presenteren</h2>
+        <p>Presentatie voor het gesprek van 20 minuten, met live prijsberekening. Druk op N voor je notities en timer.</p>
+      </div>
+      <form id="p-form" action="/intern/kennismaking.html" target="_blank">
+        <input name="naam" type="text" placeholder="Voornaam klant" autocomplete="off" aria-label="Voornaam van de klant">
+        <button class="db-knop" type="submit">Start presentatie</button>
+      </form>
     </div>
 
     <!-- Snel naar -->

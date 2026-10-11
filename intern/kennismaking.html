@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Kennismaking | Avezaat &amp; Evers</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css?v=84">
+<style>
+  html, body { height: 100%; }
+  body { margin: 0; overflow: hidden; background: #E6EBF5; }
+  body.is-notities { overflow: auto; background: var(--soft); }
+
+  /* Podium: alles is ontworpen op 1600 x 900 en wordt geschaald */
+  .deck { position: fixed; inset: 0; overflow: hidden; }
+  .stage { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; background: #fff; overflow: hidden; transform-origin: center center; box-shadow: 0 30px 80px rgba(17,24,39,.12); flex: none; }
+
+  .slide { position: absolute; inset: 0; padding: 88px 112px 110px; display: flex; flex-direction: column; opacity: 0; visibility: hidden; transition: opacity .45s ease, visibility 0s linear .45s; }
+  .slide.is-actief { opacity: 1; visibility: visible; transition: opacity .45s ease, visibility 0s; }
+  .slide .a { opacity: 0; transform: translateY(14px); transition: opacity .55s ease, transform .55s cubic-bezier(.2,.7,.2,1); }
+  .slide.is-actief .a { opacity: 1; transform: none; }
+  .slide.is-actief .a2 { transition-delay: .08s; } .slide.is-actief .a3 { transition-delay: .16s; } .slide.is-actief .a4 { transition-delay: .24s; } .slide.is-actief .a5 { transition-delay: .32s; } .slide.is-actief .a6 { transition-delay: .4s; }
+  .notes { display: none; }
+
+  .kicker { font-size: 18px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 18px; }
+  .slide h1 { font-size: 84px; line-height: 1.04; letter-spacing: -.035em; }
+  .slide h2 { font-size: 60px; line-height: 1.08; letter-spacing: -.03em; max-width: 1200px; }
+  .slide .sub { font-size: 26px; line-height: 1.5; color: var(--muted); max-width: 900px; margin-top: 24px; }
+  .accent { color: var(--accent); }
+  .body { flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
+
+  /* Voettekst */
+  .voet { position: absolute; left: 112px; right: 112px; bottom: 40px; display: flex; align-items: center; justify-content: space-between; font-size: 16px; color: var(--muted); z-index: 5; transition: opacity .3s; }
+  .voet .logo { font-size: 18px; }
+  .voet-r { display: flex; align-items: center; gap: 20px; }
+  .voet-balk { width: 180px; height: 4px; background: var(--line); border-radius: 4px; overflow: hidden; }
+  .voet-balk i { display: block; height: 100%; background: var(--accent); border-radius: 4px; transition: width .45s ease; }
+  .stage.is-titel .voet, .stage.is-slot .voet { opacity: 0; }
+
+  /* 1 Titel */
+  .s-titel { padding: 0; flex-direction: row; }
+  .s-titel .links { flex: 1; padding: 88px 40px 88px 112px; display: flex; flex-direction: column; }
+  .s-titel .links .logo { font-size: 26px; }
+  .s-titel .rechts { width: 680px; position: relative; background: var(--tint); }
+  .s-titel .rechts img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .s-titel .label { position: absolute; left: 40px; bottom: 40px; background: #fff; border-radius: 16px; padding: 16px 22px; display: flex; flex-direction: column; box-shadow: 0 12px 30px rgba(17,24,39,.14); }
+  .s-titel .label strong { font-size: 20px; } .s-titel .label span { font-size: 16px; color: var(--muted); }
+  .s-titel h1 { margin-top: 0; }
+  .meta { display: flex; gap: 14px; margin-top: 40px; flex-wrap: wrap; }
+  .pil { display: inline-flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 500; color: var(--accent); background: var(--tint); border: 1px solid var(--tint-border); border-radius: 999px; padding: 10px 20px; }
+  .pil svg { width: 20px; height: 20px; }
+
+  /* 2 Agenda */
+  .agenda { list-style: none; margin: 40px 0 0; padding: 0; display: grid; gap: 0; max-width: 1100px; }
+  .agenda li { display: grid; grid-template-columns: 90px 1fr auto; align-items: center; padding: 17px 0; border-top: 1px solid var(--line); }
+  .agenda li:last-child { border-bottom: 1px solid var(--line); }
+  .agenda b { font-size: 22px; color: var(--accent); font-weight: 600; }
+  .agenda strong { font-size: 29px; font-weight: 600; letter-spacing: -.02em; }
+  .agenda span { display: block; font-size: 19px; color: var(--muted); font-weight: 400; letter-spacing: 0; margin-top: 2px; }
+  .agenda em { font-style: normal; font-size: 18px; font-weight: 600; color: var(--muted); background: var(--soft); border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; }
+
+  /* 3 Wie */
+  .wie { display: grid; grid-template-columns: 1fr 1fr 1.15fr; gap: 32px; margin-top: 56px; align-items: stretch; }
+  .persoon { background: var(--soft); border: 1px solid var(--line); border-radius: 24px; padding: 32px; display: flex; flex-direction: column; }
+  .persoon img { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin-bottom: 24px; }
+  .persoon strong { font-size: 28px; letter-spacing: -.02em; }
+  .persoon span { font-size: 19px; color: var(--muted); margin-top: 4px; }
+  .persoon em { font-style: normal; font-size: 17px; font-weight: 500; color: var(--accent); margin-top: 16px; }
+  .wie-tekst { display: flex; flex-direction: column; gap: 24px; justify-content: center; padding-left: 16px; }
+  .wie-tekst p { font-size: 24px; line-height: 1.55; color: var(--text); }
+  .wie-tekst img { width: 300px; }
+
+  /* 4 Situatie */
+  .situatie { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; margin-top: 48px; }
+  .vragen { list-style: none; margin: 0; padding: 0; display: grid; gap: 34px; align-content: center; counter-reset: v; }
+  .vragen li { counter-increment: v; display: grid; grid-template-columns: 54px 1fr; align-items: start; font-size: 26px; line-height: 1.4; font-weight: 500; color: var(--ink); }
+  .vragen li::before { content: counter(v); width: 40px; height: 40px; border-radius: 50%; background: var(--tint); color: var(--accent); font-size: 18px; font-weight: 600; display: grid; place-items: center; margin-top: 1px; }
+  .paneel { background: var(--soft); border: 1px solid var(--line); border-radius: 24px; padding: 36px; }
+  .paneel h3 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+  .paneel p { font-size: 17px; color: var(--muted); margin-bottom: 18px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 26px; }
+  .chips:last-child { margin-bottom: 0; }
+  .chip { font: inherit; font-size: 19px; font-weight: 500; color: var(--text); background: #fff; border: 1.5px solid var(--line); border-radius: 999px; padding: 11px 20px 11px 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: background .2s, border-color .2s, color .2s; }
+  .chip::before { content: ""; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #C5CBD6; background: #fff center/12px no-repeat; transition: inherit; flex: none; }
+  .chip[data-groep]::before { border-radius: 50%; }
+  .chip:not([data-groep])::before { border-radius: 6px; }
+  .chip[aria-pressed="true"] { background: var(--tint); border-color: var(--accent); color: var(--accent); }
+  .chip[aria-pressed="true"]::before { background-color: var(--accent); border-color: var(--accent); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E"); }
+
+  /* 5 Wat wij doen */
+  .kaarten { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 56px; }
+  .kaart { border: 1px solid var(--line); border-radius: 24px; padding: 32px 28px; background: #fff; }
+  .ico { width: 60px; height: 60px; border-radius: 16px; background: var(--tint); color: var(--accent); display: grid; place-items: center; margin-bottom: 26px; }
+  .ico svg { width: 28px; height: 28px; }
+  .kaart strong { display: block; font-size: 24px; letter-spacing: -.015em; line-height: 1.25; margin-bottom: 12px; }
+  .kaart p { font-size: 18px; line-height: 1.55; color: var(--muted); }
+
+  /* 6 Zo werkt het */
+  .stappen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-top: 64px; position: relative; }
+  .stap { padding-right: 48px; position: relative; }
+  .stap-nr { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 26px; font-weight: 600; display: grid; place-items: center; position: relative; z-index: 1; box-shadow: 0 0 0 10px #fff; }
+  .stap::after { content: ""; position: absolute; left: 64px; right: 0; top: 31px; height: 2px; background: var(--tint-border); }
+  .stap:last-child::after { display: none; }
+  .stap strong { display: block; font-size: 30px; letter-spacing: -.02em; margin: 30px 0 12px; }
+  .stap p { font-size: 20px; line-height: 1.55; color: var(--muted); max-width: 380px; }
+  .stap ul { margin: 18px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+  .stap li { font-size: 18px; color: var(--text); display: flex; gap: 10px; align-items: center; }
+  .stap li::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+  .balk-tip { margin-top: 64px; display: inline-flex; align-self: flex-start; align-items: center; gap: 16px; background: var(--tint); border-radius: 18px; padding: 20px 28px; font-size: 22px; color: var(--ink); font-weight: 500; }
+  .balk-tip svg { width: 26px; height: 26px; color: var(--accent); flex: none; }
+
+  /* 7 MoneyMonk */
+  .mm { display: grid; grid-template-columns: 1fr 520px; gap: 40px; flex: 1; min-height: 0; }
+  .mm-tekst { display: flex; flex-direction: column; justify-content: center; }
+  .mm-lijst { list-style: none; margin: 40px 0 0; padding: 0; display: grid; gap: 22px; }
+  .mm-lijst li { display: grid; grid-template-columns: 48px 1fr; gap: 6px; align-items: start; font-size: 21px; line-height: 1.45; color: var(--muted); }
+  .mm-lijst li strong { color: var(--ink); font-weight: 600; }
+  .mm-lijst .ico { width: 38px; height: 38px; border-radius: 11px; margin: 0; }
+  .mm-lijst .ico svg { width: 19px; height: 19px; }
+  .mm-onder { display: flex; align-items: center; gap: 28px; margin-top: 44px; }
+  .mm-onder .stores { display: flex; gap: 12px; }
+  .mm-onder .stores img { height: 48px; width: auto; }
+  .mm-onder .erkend { height: 56px; width: auto; }
+  .mm-beeld { position: relative; background: var(--tint); border-radius: 32px; margin: -24px 0 -40px; display: grid; place-items: center; overflow: hidden; }
+  .mm-beeld img { height: 92%; width: auto; filter: none; }
+
+  /* 8 Jaar */
+  .jaar { margin-top: 80px; position: relative; }
+  .maanden { display: grid; grid-template-columns: repeat(12, 1fr); }
+  .maand { position: relative; height: 280px; border-left: 1px dashed var(--line); }
+  .maand:last-child { border-right: 1px dashed var(--line); }
+  .maand > b { position: absolute; left: 0; right: 0; top: 128px; text-align: center; font-size: 17px; font-weight: 600; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+  .spoor { position: absolute; left: 0; right: 0; top: 112px; height: 6px; border-radius: 6px; background: var(--tint); }
+  .mark { position: absolute; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; text-align: center; width: 170px; }
+  .mark i { width: 18px; height: 18px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 0 0 2px currentColor; background: currentColor; display: block; }
+  .mark.btw { color: var(--accent); bottom: 156px; }
+  .mark.btw i { order: 3; margin-top: 12px; }
+  .mark.ib { color: #0F766E; bottom: 156px; }
+  .mark.ib i { order: 3; margin-top: 12px; }
+  .mark.lev { color: #9CA3AF; top: 166px; }
+  .mark strong { font-size: 17px; line-height: 1.25; color: var(--ink); font-weight: 600; }
+  .mark span { font-size: 15px; color: var(--muted); }
+  .mark.lev strong { font-weight: 500; font-size: 15px; color: var(--muted); }
+  .mark.lev i { width: 12px; height: 12px; border-width: 3px; margin-bottom: 8px; }
+  .elke-maand { position: absolute; left: 0; right: 0; top: 232px; height: 44px; border-radius: 12px; background: var(--soft); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 17px; font-weight: 500; color: var(--text); }
+  .elke-maand svg { width: 20px; height: 20px; color: var(--accent); }
+  .jaar-noot { margin-top: 44px; font-size: 22px; color: var(--text); display: flex; gap: 40px; }
+  .jaar-noot span { display: inline-flex; align-items: center; gap: 10px; }
+  .jaar-noot i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+
+  /* 9 Verschil */
+  .tabel { margin-top: 48px; display: grid; grid-template-columns: 300px 1fr 1fr 1.1fr; font-size: 20px; border-radius: 24px; position: relative; }
+  .tabel > div { padding: 19px 24px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; color: var(--muted); }
+  .tabel .kop { font-size: 18px; font-weight: 600; color: var(--ink); border-bottom: 2px solid var(--line); padding-top: 24px; }
+  .tabel .rij { color: var(--ink); font-weight: 500; }
+  .tabel .wij { background: var(--tint); color: var(--ink); font-weight: 500; border-bottom-color: var(--tint-border); }
+  .tabel .wij.kop { color: var(--accent); border-radius: 20px 20px 0 0; border-bottom-color: var(--tint-border); }
+  .tabel .wij.laatst { border-radius: 0 0 20px 20px; border-bottom: 0; }
+  .tabel .laatst-r { border-bottom: 0; }
+  .v { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; display: inline-grid; place-items: center; flex: none; }
+  .v svg { width: 15px; height: 15px; }
+  .x { width: 26px; height: 26px; border-radius: 50%; background: var(--line); color: var(--muted); display: inline-grid; place-items: center; flex: none; }
+  .x svg { width: 13px; height: 13px; }
+
+  /* 10 Pakket */
+  .pakket { display: grid; grid-template-columns: 1.55fr 1fr; gap: 32px; margin-top: 48px; }
+  .pk { border: 2px solid var(--accent); border-radius: 28px; padding: 40px 44px; position: relative; }
+  .pk-tag { position: absolute; top: -16px; left: 40px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 6px 14px; border-radius: 999px; }
+  .pk-prijs { display: flex; align-items: baseline; gap: 14px; }
+  .pk-prijs b { font-size: 88px; letter-spacing: -.04em; line-height: 1; }
+  .pk-prijs span { font-size: 22px; color: var(--muted); }
+  .pk-sub { font-size: 19px; color: var(--muted); margin-top: 10px; }
+  .pk ul { list-style: none; padding: 0; margin: 32px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 28px; border-top: 1px solid var(--line); padding-top: 30px; }
+  .pk li { display: flex; gap: 12px; align-items: flex-start; font-size: 18px; line-height: 1.4; color: var(--text); }
+  .pk li .v { width: 24px; height: 24px; margin-top: 1px; }
+  .extras { background: var(--soft); border: 1px solid var(--line); border-radius: 28px; padding: 36px 36px; }
+  .extras h3 { font-size: 22px; margin-bottom: 6px; }
+  .extras > p { font-size: 17px; color: var(--muted); margin-bottom: 14px; }
+  .extras dl { margin: 0; }
+  .extras dl div { display: flex; justify-content: space-between; gap: 16px; padding: 13px 0; border-bottom: 1px solid var(--line); font-size: 18px; }
+  .extras dl div:last-child { border-bottom: 0; }
+  .extras dt { color: var(--text); } .extras dd { margin: 0; font-weight: 600; white-space: nowrap; }
+
+  /* 11 Jouw prijs */
+  .prijs { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; margin-top: 44px; }
+  .bon { border: 1px solid var(--line); border-radius: 28px; padding: 36px 40px; background: #fff; box-shadow: 0 20px 50px rgba(30,64,175,.08); }
+  .bon h3 { font-size: 16px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .bon-r { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 1px dashed var(--line); font-size: 20px; color: var(--text); }
+  .bon-r b { font-weight: 600; color: var(--ink); white-space: nowrap; }
+  .bon-r s { color: #9CA3AF; font-weight: 400; margin-right: 8px; }
+  .bon-r .gratis { color: #0F766E; }
+  .bon-r small { display: block; font-size: 15px; color: var(--muted); }
+  .bon-totaal { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 22px; }
+  .bon-totaal span { font-size: 20px; font-weight: 600; }
+  .bon-totaal span small { display: block; font-size: 16px; font-weight: 400; color: var(--muted); }
+  .bon-totaal b { font-size: 64px; letter-spacing: -.04em; line-height: 1; color: var(--accent); }
+  .bon-groep { margin-top: 26px; }
+  .tijd { display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+  .tijd h3 { font-size: 30px; letter-spacing: -.02em; }
+  .tijd > p { font-size: 20px; color: var(--muted); line-height: 1.5; }
+  .staaf { display: grid; grid-template-columns: 160px 1fr 70px; align-items: center; gap: 16px; font-size: 18px; color: var(--text); }
+  .staaf i { display: block; height: 30px; border-radius: 8px; background: #DCE3F3; }
+  .staaf.wij i { background: var(--accent); }
+  .staaf b { font-weight: 600; text-align: right; }
+  .staaf.wij { font-weight: 600; color: var(--accent); }
+  .klein { font-size: 15px; color: var(--muted); line-height: 1.5; }
+
+  /* 12 Overstappen */
+  .over { display: grid; grid-template-columns: 1.5fr 1fr; gap: 56px; margin-top: 48px; }
+  .over-stappen { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+  .over-stappen li { display: grid; grid-template-columns: 72px 1fr; padding-bottom: 28px; position: relative; }
+  .over-stappen li::before { content: ""; position: absolute; left: 23px; top: 48px; bottom: 0; width: 2px; background: var(--tint-border); }
+  .over-stappen li:last-child::before { display: none; }
+  .over-stappen b { width: 48px; height: 48px; border-radius: 50%; background: var(--tint); color: var(--accent); display: grid; place-items: center; font-size: 20px; font-weight: 600; }
+  .over-stappen strong { font-size: 25px; letter-spacing: -.015em; display: block; margin-top: 8px; }
+  .over-stappen p { font-size: 19px; color: var(--muted); line-height: 1.5; margin-top: 4px; }
+  .nodig { background: var(--soft); border: 1px solid var(--line); border-radius: 24px; padding: 34px; align-self: start; }
+  .nodig h3 { font-size: 22px; margin-bottom: 18px; }
+  .nodig ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .nodig li { display: flex; gap: 12px; font-size: 18px; color: var(--text); line-height: 1.4; }
+  .nodig li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; margin-top: 9px; }
+  .nodig p { font-size: 16px; color: var(--muted); margin-top: 18px; }
+  .gratis-band { margin-top: 18px; background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; border-radius: 16px; padding: 16px 20px; font-size: 18px; font-weight: 500; }
+
+  /* 13 Na vandaag */
+  .tijdlijn { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 72px; }
+  .tl { position: relative; padding-right: 36px; }
+  .tl::before { content: ""; position: absolute; left: 0; right: 0; top: 13px; height: 2px; background: var(--tint-border); }
+  .tl:last-child::before { right: 50%; }
+  .tl i { position: relative; display: block; width: 28px; height: 28px; border-radius: 50%; background: #fff; border: 3px solid var(--accent); }
+  .tl.klaar i { background: var(--accent); }
+  .tl.klaar i::after { content: ""; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/14px no-repeat; }
+  .tl small { display: block; font-size: 16px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-top: 28px; }
+  .tl strong { display: block; font-size: 27px; letter-spacing: -.02em; line-height: 1.25; margin: 8px 0 12px; }
+  .tl p { font-size: 19px; color: var(--muted); line-height: 1.55; }
+  .geruststelling { margin-top: 72px; display: flex; gap: 16px; flex-wrap: wrap; }
+
+  /* 14 Slot */
+  .s-slot { background: var(--accent); color: #fff; padding: 0; flex-direction: row; }
+  .s-slot .links { flex: 1; padding: 96px 64px 96px 112px; display: flex; flex-direction: column; }
+  .s-slot .logo { color: #fff; font-size: 26px; } .s-slot .logo span { color: #A5B4FC; }
+  .s-slot h2 { color: #fff; font-size: 96px; letter-spacing: -.04em; }
+  .s-slot .sub { color: #C7D2FE; }
+  .contact { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 56px; max-width: 760px; }
+  .contact div { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); border-radius: 18px; padding: 20px 24px; }
+  .contact small { display: block; font-size: 15px; color: #A5B4FC; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; }
+  .contact b { display: block; font-size: 23px; font-weight: 600; margin-top: 4px; }
+  .s-slot .rechts { width: 560px; position: relative; }
+  .s-slot .rechts img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+  /* Bediening (alleen zichtbaar bij muisbeweging, buiten het podium) */
+  .bed { position: fixed; right: 20px; bottom: 20px; display: flex; gap: 8px; z-index: 20; opacity: 0; transition: opacity .3s; }
+  body.muis .bed { opacity: 1; }
+  .bed button, .bed a { font: inherit; font-size: 14px; font-weight: 500; color: var(--ink); background: rgba(255,255,255,.95); border: 1px solid var(--line); border-radius: 12px; height: 42px; min-width: 42px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; text-decoration: none; box-shadow: 0 6px 20px rgba(17,24,39,.08); }
+  .bed button:hover, .bed a:hover { border-color: var(--tint-border); color: var(--accent); }
+  .bed svg { width: 18px; height: 18px; }
+  .melding { position: fixed; left: 50%; top: 20px; transform: translate(-50%, -10px); background: var(--ink); color: #fff; font-size: 14px; padding: 10px 16px; border-radius: 10px; opacity: 0; transition: opacity .25s, transform .25s; z-index: 30; pointer-events: none; }
+  .melding.zicht { opacity: 1; transform: translate(-50%, 0); }
+  .hulp { position: fixed; left: 20px; bottom: 20px; font-size: 13px; color: var(--muted); background: rgba(255,255,255,.95); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; z-index: 20; opacity: 0; transition: opacity .3s; line-height: 1.7; }
+  body.muis .hulp { opacity: 1; }
+  .hulp kbd { font: inherit; font-weight: 600; color: var(--ink); background: var(--soft); border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; }
+
+  /* Sprekersnotities (apart venster) */
+  .nt { max-width: 980px; margin: 0 auto; padding: 28px 24px 60px; }
+  .nt-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+  .nt-klok { display: flex; gap: 10px; align-items: center; }
+  .nt-tijd { font-size: 34px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .nt-tijd.achter { color: #B91C1C; }
+  .nt-schema { font-size: 14px; color: var(--muted); }
+  .nt-knop { font: inherit; font-size: 14px; font-weight: 600; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 9px 14px; cursor: pointer; }
+  .nt-knop.prim { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .nt-kaart { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 28px 32px; }
+  .nt-kaart small { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .nt-kaart h1 { font-size: 30px; margin: 4px 0 16px; letter-spacing: -.02em; }
+  .nt-inhoud { font-size: 19px; line-height: 1.6; color: var(--text); }
+  .nt-inhoud ul { padding-left: 22px; margin: 0 0 12px; } .nt-inhoud li { margin-bottom: 6px; }
+  .nt-inhoud p { margin-bottom: 12px; }
+  .nt-inhoud b { color: var(--ink); }
+  .nt-volgende { margin-top: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 15px; color: var(--muted); }
+  .nt-nav { display: flex; gap: 8px; }
+
+  @media print {
+    @page { size: 1600px 900px; margin: 0; }
+    html, body { height: auto; overflow: visible; background: #fff; }
+    .deck { position: static; display: block; }
+    .stage { position: static; transform: none !important; width: auto; height: auto; box-shadow: none; overflow: visible; }
+    .slide { position: relative; width: 1600px; height: 900px; opacity: 1; visibility: visible; page-break-after: always; break-after: page; }
+    .slide.is-overgeslagen { display: none; }
+    .slide .a { opacity: 1; transform: none; }
+    .voet, .bed, .hulp, .melding { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+<div class="stage" id="stage">
+
+  <!-- 1 Titel -->
+  <section class="slide s-titel" data-titel="Welkom" data-min="0.5">
+    <div class="links">
+      <div class="logo a">Avezaat <span>&amp;</span> Evers</div>
+      <div class="body">
+        <div class="kicker a a2">Kennismaking</div>
+        <h1 class="a a3" id="titel-kop">Fijn dat je er bent.</h1>
+        <p class="sub a a4">Vandaag kijken we samen wat je nodig hebt. Aan het eind weet je precies wat het je kost en hoe het werkt.</p>
+        <div class="meta a a5">
+          <span class="pil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>20 minuten</span>
+          <span class="pil" id="titel-datum"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span></span></span>
+          <span class="pil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Vrijblijvend</span>
+        </div>
+      </div>
+    </div>
+    <div class="rechts">
+      <img src="/assets/img/koen-daan.webp" alt="Koen Avezaat en Daan Evers" width="1200" height="975">
+      <div class="label a a6"><strong>Koen &amp; Daan</strong><span>Jouw vaste boekhouders</span></div>
+    </div>
+    <aside class="notes">
+      <p><b>Openen (30 sec)</b></p>
+      <ul>
+        <li>Bedanken voor de tijd. Check: beeld en geluid goed?</li>
+        <li>"We nemen 20 minuten. Eerst wil ik vooral jóu horen, daarna laat ik zien hoe we werken en wat het kost."</li>
+        <li>Benoem: vrijblijvend, je hoeft vandaag niets te beslissen.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 2 Agenda -->
+  <section class="slide" data-titel="Agenda" data-min="0.5">
+    <div class="kicker a">De komende 20 minuten</div>
+    <h2 class="a a2">Wat we vandaag doen</h2>
+    <ol class="agenda">
+      <li class="a a2"><b>01</b><strong>Even voorstellen<span>Wie zijn wij en waarom doen we dit</span></strong><em>2 min</em></li>
+      <li class="a a3"><b>02</b><strong>Jouw situatie<span>Wat doe je, en wat heb je nodig</span></strong><em>6 min</em></li>
+      <li class="a a4"><b>03</b><strong>Hoe wij werken<span>Van bonnetje tot aangifte</span></strong><em>6 min</em></li>
+      <li class="a a5"><b>04</b><strong>Wat het kost<span>Jouw prijs, direct uitgerekend</span></strong><em>3 min</em></li>
+      <li class="a a6"><b>05</b><strong>Vragen en vervolg<span>Wat er na vandaag gebeurt</span></strong><em>3 min</em></li>
+    </ol>
+    <aside class="notes">
+      <ul>
+        <li>Kort doorlopen, niet voorlezen.</li>
+        <li>Vraag: "Is er iets wat je in ieder geval besproken wilt hebben?" Noteer het en kom er aan het eind op terug.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 3 Wie zijn wij -->
+  <section class="slide" data-titel="Wie zijn wij" data-min="2">
+    <div class="kicker a">01 · Even voorstellen</div>
+    <h2 class="a a2">Twee boekhouders.<br><span class="accent">Eén vast aanspreekpunt.</span></h2>
+    <div class="wie">
+      <div class="persoon a a3">
+        <img src="/assets/img/koen.webp" alt="Koen Avezaat" width="800" height="800">
+        <strong>Koen Avezaat</strong>
+        <span>Mede-oprichter &amp; boekhouder</span>
+      </div>
+      <div class="persoon a a4">
+        <img src="/assets/img/daan.webp" alt="Daan Evers" width="800" height="800">
+        <strong>Daan Evers</strong>
+        <span>Mede-oprichter &amp; boekhouder</span>
+        <em>Achtergrond in Finance &amp; Control</em>
+      </div>
+      <div class="wie-tekst a a5">
+        <p>We zagen hoeveel tijd zzp'ers kwijt zijn aan administratie. Tijd die ze liever aan hun vak besteden. Daarom nemen we het <strong>volledig</strong> over, voor een eerlijke, vaste prijs.</p>
+        <p style="font-size:20px;color:var(--muted)">100% online, voor ondernemers in heel Nederland.</p>
+        <img src="/assets/img/moneymonk-erkend-adviseur.png" alt="Erkend Adviseur MoneyMonk" width="801" height="240">
+      </div>
+    </div>
+    <aside class="notes">
+      <ul>
+        <li>Persoonlijk en kort: wie ben jij, waarom zijn jullie hiermee begonnen.</li>
+        <li>Kern: <b>je hebt altijd dezelfde boekhouder</b>, die je bedrijf kent. Geen callcenter, geen wisselende gezichten.</li>
+        <li>Erkend Adviseur van MoneyMonk: we kennen het programma door en door.</li>
+        <li>Afsluiten met de overgang: "Maar genoeg over ons. Vertel eens over jou."</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 4 Jouw situatie -->
+  <section class="slide" data-titel="Jouw situatie" data-min="6">
+    <div class="kicker a">02 · Jouw situatie</div>
+    <h2 class="a a2">Vertel eens.</h2>
+    <div class="situatie">
+      <ol class="vragen a a3">
+        <li>Wat doe je, en sinds wanneer?</li>
+        <li>Hoe regel je je administratie nu?</li>
+        <li>Waar loop je tegenaan?</li>
+        <li>Wat verwacht je van een boekhouder?</li>
+      </ol>
+      <div class="paneel a a4">
+        <h3>Wat past bij jou?</h3>
+        <p>Hiermee rekenen we straks jouw prijs uit.</p>
+        <div class="chips" role="group" aria-label="Startpunt">
+          <button class="chip" type="button" data-groep="start" data-k="nieuw" aria-pressed="false">Net gestart</button>
+          <button class="chip" type="button" data-groep="start" data-k="zelf" aria-pressed="false">Doe het nu zelf</button>
+          <button class="chip" type="button" data-groep="start" data-k="boekhouder" aria-pressed="false">Heb nu een boekhouder</button>
+        </div>
+        <div class="chips" role="group" aria-label="Extra's">
+          <button class="chip" type="button" data-k="icp" aria-pressed="false">Klanten in de EU</button>
+          <button class="chip" type="button" data-k="uren" aria-pressed="false">Uren of ritten bijhouden</button>
+          <button class="chip" type="button" data-k="partner" aria-pressed="false">Fiscaal partner</button>
+          <button class="chip" type="button" data-k="achterstand" aria-pressed="false">Achterstand</button>
+          <button class="chip" type="button" data-k="veel" aria-pressed="false">Meer dan 100 transacties p/m</button>
+          <button class="chip" type="button" data-k="personeel" aria-pressed="false">Personeel</button>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">
+      <p><b>Het belangrijkste deel: laat de ander praten (6 min).</b> Klik tijdens het gesprek de bolletjes aan, dan staat de prijs straks klaar.</p>
+      <ul>
+        <li><b>Wat doe je?</b> Branche, sinds wanneer, eenmanszaak? (Geen vof/bv.)</li>
+        <li><b>Nu:</b> zelf in een programma, Excel/schoenendoos, of een boekhouder? Zo ja: wat kost die en waarom overstappen?</li>
+        <li><b>Volume:</b> ongeveer hoeveel bonnetjes en facturen per maand? (Grens 100 banktransacties.)</li>
+        <li><b>Klanten in de EU?</b> Dan ICP-aangifte (€15 p/m).</li>
+        <li><b>Uren- of kilometerregistratie</b> nodig (urencriterium, zakelijke ritten)? €10 p/m.</li>
+        <li><b>Fiscaal partner?</b> Diens IB-aangifte erbij voor €150 per jaar.</li>
+        <li><b>Achterstand?</b> Vooraf prijsafspraak, €60 per uur.</li>
+        <li><b>Personeel?</b> Loonadministratie via onze salarisspecialist, op aanvraag.</li>
+        <li><b>Pijnpunt</b> opschrijven en straks bij de oplossing letterlijk terug laten komen.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 5 Wat wij doen -->
+  <section class="slide" data-titel="Wat wij voor je doen" data-min="1.5">
+    <div class="kicker a">03 · Hoe wij werken</div>
+    <h2 class="a a2">Jij doet je vak.<br><span class="accent">Wij de rest.</span></h2>
+    <div class="kaarten">
+      <div class="kaart a a3">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+        <strong>Eén vaste boekhouder</strong>
+        <p>Iemand die jouw bedrijf kent. Je hoeft nooit opnieuw je verhaal te doen.</p>
+      </div>
+      <div class="kaart a a4">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <strong>Echt alles uit handen</strong>
+        <p>Jij maakt een foto van je bonnetje. Wij boeken, controleren en dienen in.</p>
+      </div>
+      <div class="kaart a a5">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div>
+        <strong>Nooit meer een deadline missen</strong>
+        <p>Wij bewaken je btw en inkomstenbelasting, en seinen je op tijd in.</p>
+      </div>
+      <div class="kaart a a6">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <strong>Elke maand een 1&#8209;op&#8209;1</strong>
+        <p>Maximaal 30 minuten over je cijfers en vragen. Als je wilt, elke maand.</p>
+      </div>
+    </div>
+    <aside class="notes">
+      <ul>
+        <li>Koppel elke kaart aan wat de klant net vertelde. Bijv. "Je zei dat je boekhouder steeds wisselt: bij ons is dat altijd [Koen/Daan]."</li>
+        <li>1&#8209;op&#8209;1: zelf in te plannen via de online agenda, telefonisch of video, max 30 min. Hoeft niet, kán elke maand.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 6 Zo werkt het -->
+  <section class="slide" data-titel="Zo werkt het" data-min="1.5">
+    <div class="kicker a">03 · Hoe wij werken</div>
+    <h2 class="a a2">Van bonnetje tot aangifte</h2>
+    <div class="stappen">
+      <div class="stap a a3">
+        <div class="stap-nr">1</div>
+        <strong>Jij levert aan</strong>
+        <p>Op het moment dat het jou uitkomt.</p>
+        <ul><li>Foto van je bonnetje in de app</li><li>Factuur doorsturen per mail</li><li>Of je facturen direct in de app maken</li></ul>
+      </div>
+      <div class="stap a a4">
+        <div class="stap-nr">2</div>
+        <strong>Wij verwerken</strong>
+        <p>Je bank is gekoppeld, transacties komen vanzelf binnen.</p>
+        <ul><li>Wij boeken en controleren</li><li>We vragen het als er iets mist</li><li>Jij ziet altijd je actuele cijfers</li></ul>
+      </div>
+      <div class="stap a a5">
+        <div class="stap-nr">3</div>
+        <strong>Wij dienen in</strong>
+        <p>Op tijd, en je weet vooraf wat je betaalt.</p>
+        <ul><li>Btw-aangifte elk kwartaal</li><li>Inkomstenbelasting elk jaar</li><li>Jaarcijfers: winst en verlies, balans</li></ul>
+      </div>
+    </div>
+    <div class="balk-tip a a6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Jouw rol: een foto van je bonnetje. Dat is het.</div>
+    <aside class="notes">
+      <ul>
+        <li>Benadruk hoe weinig de klant zelf doet.</li>
+        <li>Aanleveren vóór de 10e na elk kwartaal, dan hebben wij tijd voor de btw-aangifte.</li>
+        <li>Vóór elke aangifte laten we weten wat er betaald moet worden: geen verrassingen.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 7 MoneyMonk -->
+  <section class="slide" data-titel="MoneyMonk" data-min="1.5">
+    <div class="mm">
+      <div class="mm-tekst">
+        <div class="kicker a">Software inbegrepen</div>
+        <h2 class="a a2">Al je administratie<br>in één app</h2>
+        <ul class="mm-lijst">
+          <li class="a a3"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span><span><strong>Foto van je bonnetje</strong> en klaar. Wij verwerken de rest.</span></li>
+          <li class="a a4"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-6 9 6M5 10v9M19 10v9M9 10v9M15 10v9M3 21h18"/></svg></span><span><strong>Bank automatisch gekoppeld.</strong> Transacties komen vanzelf binnen.</span></li>
+          <li class="a a5"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span><span><strong>Altijd inzicht</strong> in je omzet en hoeveel btw je opzij zet.</span></li>
+          <li class="a a6"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></span><span><strong>Facturen maken</strong> als je wilt, netjes in je eigen stijl.</span></li>
+        </ul>
+        <div class="mm-onder a a6">
+          <div class="stores"><img src="/assets/img/stores/app-store.svg" alt="App Store" width="120" height="40"><img src="/assets/img/stores/google-play.png" alt="Google Play" width="134" height="40"></div>
+          <img class="erkend" src="/assets/img/moneymonk-erkend-adviseur.png" alt="Erkend Adviseur MoneyMonk" width="801" height="240">
+        </div>
+      </div>
+      <div class="mm-beeld a a3"><img src="/assets/img/moneymonk-app.webp" alt="De MoneyMonk-app" width="640" height="1134"></div>
+    </div>
+    <aside class="notes">
+      <ul>
+        <li>MoneyMonk zit in het pakket: <b>geen los abonnement</b>.</li>
+        <li>Werkt met alle grote banken (bankkoppeling via PSD2, alleen lezen).</li>
+        <li>Tip: deel je scherm met de app als de klant wil zien hoe het eruitziet.</li>
+        <li>Gebruikt de klant nu een ander programma? Wij zetten de gegevens over.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 8 Een jaar met ons -->
+  <section class="slide" data-titel="Een jaar met ons" data-min="1">
+    <div class="kicker a">03 · Hoe wij werken</div>
+    <h2 class="a a2">Een jaar met ons. <span class="accent">Wij houden de data bij.</span></h2>
+    <div class="jaar a a3">
+      <div class="maanden">
+        <div class="maand"><b>jan</b></div><div class="maand"><b>feb</b></div><div class="maand"><b>mrt</b></div><div class="maand"><b>apr</b></div><div class="maand"><b>mei</b></div><div class="maand"><b>jun</b></div><div class="maand"><b>jul</b></div><div class="maand"><b>aug</b></div><div class="maand"><b>sep</b></div><div class="maand"><b>okt</b></div><div class="maand"><b>nov</b></div><div class="maand"><b>dec</b></div>
+      </div>
+      <div class="spoor"></div>
+      <!-- posities: (maand-1 + dag/31) / 12 -->
+      <div class="mark btw" style="left:8.1%"><strong>Btw Q4</strong><span>31 jan</span><i></i></div>
+      <div class="mark btw" style="left:32.5%"><strong>Btw Q1</strong><span>30 apr</span><i></i></div>
+      <div class="mark ib" style="left:40%"><strong>IB-aangifte</strong><span>1 mei</span><i></i></div>
+      <div class="mark btw" style="left:58.2%"><strong>Btw Q2</strong><span>31 jul</span><i></i></div>
+      <div class="mark btw" style="left:83.2%"><strong>Btw Q3</strong><span>31 okt</span><i></i></div>
+      <div class="mark lev" style="left:2.7%"><i></i><strong>jij levert aan</strong></div>
+      <div class="mark lev" style="left:27.7%"><i></i><strong>jij levert aan</strong></div>
+      <div class="mark lev" style="left:52.7%"><i></i><strong>jij levert aan</strong></div>
+      <div class="mark lev" style="left:77.7%"><i></i><strong>jij levert aan</strong></div>
+      <div class="elke-maand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Elke maand: 1&#8209;op&#8209;1 met je eigen boekhouder, als je wilt</div>
+    </div>
+    <div class="jaar-noot a a4">
+      <span><i style="background:var(--accent)"></i>Btw-aangifte</span>
+      <span><i style="background:#0F766E"></i>Aangifte inkomstenbelasting</span>
+      <span><i style="background:#9CA3AF"></i>Vóór de 10e: bonnetjes en facturen compleet</span>
+    </div>
+    <aside class="notes">
+      <ul>
+        <li>"Jij hoeft geen enkele datum te onthouden."</li>
+        <li>Vóór de 10e na elk kwartaal alles aanleveren, wij dienen op tijd in en laten vooraf weten wat er betaald moet worden.</li>
+        <li>IB-aangifte: deadline 1 mei, via ons is vaak uitstel mogelijk.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 9 Het verschil -->
+  <section class="slide" data-titel="Het verschil" data-min="1">
+    <div class="kicker a">03 · Hoe wij werken</div>
+    <h2 class="a a2">Waarom ondernemers voor ons kiezen</h2>
+    <div class="tabel a a3">
+      <div class="kop"></div><div class="kop">Zelf doen</div><div class="kop">Groot online kantoor</div><div class="kop wij">Avezaat &amp; Evers</div>
+      <div class="rij">Wie doet het werk</div><div>Jij, 's avonds</div><div>Een team</div><div class="wij"><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Wij, volledig</div>
+      <div class="rij">Vast aanspreekpunt</div><div><span class="x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>Geen</div><div>Vaak wisselend</div><div class="wij"><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Altijd dezelfde boekhouder</div>
+      <div class="rij">Aangiftes</div><div>Zelf uitzoeken</div><div>Geregeld</div><div class="wij"><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Btw én IB geregeld</div>
+      <div class="rij">Software</div><div>Los abonnement</div><div>Verschilt</div><div class="wij"><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Inbegrepen</div>
+      <div class="rij">Persoonlijk gesprek</div><div><span class="x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>Geen</div><div>Op verzoek</div><div class="wij"><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Elke maand een 1&#8209;op&#8209;1</div>
+      <div class="rij laatst-r">Prijs</div><div class="laatst-r">Je eigen uren</div><div class="laatst-r">Vaak pakketten en tiers</div><div class="wij laatst"><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>€80 vast per maand</div>
+    </div>
+    <aside class="notes">
+      <ul>
+        <li>Niet afgeven op concurrenten, gewoon het verschil laten zien.</li>
+        <li>Zelf doen: kost uren per maand én het risico op fouten of boetes.</li>
+        <li>Grote kantoren: prima, maar je spreekt vaak steeds iemand anders.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 10 Pakket -->
+  <section class="slide" data-titel="Wat zit erin" data-min="1">
+    <div class="kicker a">04 · Wat het kost</div>
+    <h2 class="a a2">Eén pakket. Eén vaste prijs.</h2>
+    <div class="pakket">
+      <div class="pk a a3">
+        <span class="pk-tag">Alles inbegrepen</span>
+        <div class="pk-prijs"><b>€80</b><span>per maand, excl. btw</span></div>
+        <p class="pk-sub">€96,80 incl. btw · maandelijks opzegbaar</p>
+        <ul>
+          <li><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Boekhouding volledig verzorgd</li>
+          <li><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Tot 100 transacties per maand</li>
+          <li><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>4× btw-aangifte per jaar</li>
+          <li><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Aangifte inkomstenbelasting</li>
+          <li><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Jaarcijfers: winst en verlies, balans</li>
+          <li><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Eén vaste boekhouder</li>
+          <li><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Elke maand een 1&#8209;op&#8209;1 gesprek</li>
+          <li><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Boekhoudsoftware en app</li>
+        </ul>
+      </div>
+      <div class="extras a a4">
+        <h3>Alleen als je het nodig hebt</h3>
+        <p>Vooraf duidelijk, nooit achteraf.</p>
+        <dl>
+          <div><dt>ICP-aangifte (klanten in de EU)</dt><dd>€15 p/m</dd></div>
+          <div><dt>Uren- en rittenregistratie</dt><dd>€10 p/m</dd></div>
+          <div><dt>IB-aangifte fiscaal partner</dt><dd>€150 p/jaar</dd></div>
+          <div><dt>Overstappen (eenmalig)</dt><dd>€149</dd></div>
+          <div><dt>Achterstallige administratie</dt><dd>€60 p/uur</dd></div>
+          <div><dt>Meer dan 100 transacties p/m</dt><dd>op maat</dd></div>
+        </dl>
+      </div>
+    </div>
+    <aside class="notes">
+      <ul>
+        <li>"Geen ingewikkelde pakketten: vrijwel iedereen betaalt hetzelfde."</li>
+        <li>Waarom 100 transacties? Vrijwel elke dienstverlenende zzp'er blijft daar ruim onder.</li>
+        <li>KOR? Dan is de btw niet terug te vragen: €96,80 per maand.</li>
+        <li>Door naar de volgende dia: daar staat wat het <b>voor hen</b> kost.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 11 Jouw prijs -->
+  <section class="slide" data-titel="Jouw prijs" data-min="2">
+    <div class="kicker a">04 · Wat het kost</div>
+    <h2 class="a a2" id="prijs-kop">Wat het jou kost</h2>
+    <div class="prijs">
+      <div class="bon a a3">
+        <h3>Per maand</h3>
+        <div id="bon-maand"></div>
+        <div class="bon-totaal"><span>Totaal per maand<small id="bon-incl"></small></span><b id="bon-totaal">€80</b></div>
+        <div class="bon-groep" id="bon-overig"></div>
+      </div>
+      <div class="tijd a a4">
+        <h3>Wat is je tijd waard?</h3>
+        <p>Een zzp'er rekent gemiddeld €83 per uur. Ben je meer dan een uur per maand met je administratie bezig, dan ben je bij ons al goedkoper uit.</p>
+        <div style="display:grid;gap:14px">
+          <div class="staaf"><span>1 uur zelf</span><i style="width:25%"></i><b>€83</b></div>
+          <div class="staaf"><span>2 uur zelf</span><i style="width:50%"></i><b>€166</b></div>
+          <div class="staaf"><span>4 uur zelf</span><i style="width:100%"></i><b>€332</b></div>
+          <div class="staaf wij"><span>Bij ons</span><i style="width:24%"></i><b>€80</b></div>
+        </div>
+        <p class="klein">Bron: Knab, onderzoek onder ruim 20.000 zelfstandigen (2026). Bedragen excl. btw. Boekhoudkosten zijn bovendien aftrekbaar.</p>
+      </div>
+    </div>
+    <aside class="notes">
+      <ul>
+        <li>De prijs is berekend op wat je bij "Jouw situatie" hebt aangeklikt. Klopt iets niet? Ga terug (←), pas aan en kom terug.</li>
+        <li>Benoem het eerlijk: maandelijks opzegbaar, maar stop je binnen 12 maanden na de IB-aangifte, dan rekenen we die aangifte apart af (€250).</li>
+        <li>Stilte laten vallen na de prijs. Vraag: "Hoe klinkt dat?"</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 12 Overstappen -->
+  <section class="slide" data-titel="Overstappen" data-min="1.5" data-alleen="overstap">
+    <div class="kicker a">Overstappen</div>
+    <h2 class="a a2">Overstappen is minder werk<br>dan je denkt</h2>
+    <div class="over">
+      <ol class="over-stappen">
+        <li class="a a3"><b>1</b><div><strong>Opzeggen</strong><p>Jij zegt op bij je huidige boekhouder. Wij helpen je met het juiste moment.</p></div></li>
+        <li class="a a4"><b>2</b><div><strong>Overdracht</strong><p>Wij vragen je laatste aangiftes en eindbalans op en richten alles in.</p></div></li>
+        <li class="a a5"><b>3</b><div><strong>Klaar</strong><p>Je bank is gekoppeld en je levert voortaan aan via de app. Vanaf nu doen wij de rest.</p></div></li>
+      </ol>
+      <div class="a a5">
+        <div class="nodig">
+          <h3>Dit hebben we van je nodig</h3>
+          <ul>
+            <li>KvK-nummer en btw-id</li>
+            <li>De laatste btw-aangifte</li>
+            <li>De IB-aangifte van vorig jaar</li>
+            <li>De eindbalans van je vorige boekhouder</li>
+          </ul>
+          <p>Niet alles paraat? Dan vragen wij het op.</p>
+        </div>
+        <div class="gratis-band" id="gratis-band">Start per 1 januari en meld je aan t/m 15 december? Dan is overstappen gratis (t.w.v. €149).</div>
+      </div>
+    </div>
+    <aside class="notes">
+      <ul>
+        <li>Wordt automatisch overgeslagen als je "Net gestart" hebt aangeklikt.</li>
+        <li>Mooiste moment: per 1 januari. Oude boekhouder rondt het oude jaar af, wij starten met het nieuwe.</li>
+        <li>Begin van een kwartaal kan ook: dan spreken we af wie welke aangifte doet.</li>
+        <li>Zelf boeken in een programma? Ook "overstappen": we nemen de gegevens over.</li>
+        <li>Check de opzegtermijn bij de huidige boekhouder.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 13 Na vandaag -->
+  <section class="slide" data-titel="Na vandaag" data-min="1">
+    <div class="kicker a">05 · Vervolg</div>
+    <h2 class="a a2">Wat er na vandaag gebeurt</h2>
+    <div class="tijdlijn">
+      <div class="tl klaar a a3"><i></i><small>Vandaag</small><strong>Kennismaking</strong><p>We weten wat je nodig hebt. Jij weet wat het kost.</p></div>
+      <div class="tl a a4"><i></i><small>Binnen 24 uur</small><strong>Voorstel op maat</strong><p>In je mail: je prijs, eventuele extra's en per wanneer we starten.</p></div>
+      <div class="tl a a5"><i></i><small>Jij zegt ja</small><strong>Wij regelen de rest</strong><p>Je MoneyMonk-account, de machtiging voor je aangiftes en, als je overstapt, de overdracht.</p></div>
+      <div class="tl a a6"><i></i><small>Eerste maand</small><strong>Je eerste 1&#8209;op&#8209;1</strong><p>We lopen samen alles door, zodat je met een gerust gevoel start.</p></div>
+    </div>
+    <div class="geruststelling a a6">
+      <span class="pil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Je zit nergens aan vast</span>
+      <span class="pil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Maandelijks opzegbaar</span>
+      <span class="pil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Vaste boekhouder vanaf dag één</span>
+    </div>
+    <aside class="notes">
+      <ul>
+        <li>Spreek concreet af: "Ik stuur je morgen vóór [tijd] het voorstel."</li>
+        <li>Na het gesprek: voorstel maken via <b>Voorstel-mail</b> op het dashboard.</li>
+        <li>Bij ja: opdrachtbevestiging + welkomstlink (dashboard) sturen.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 14 Slot -->
+  <section class="slide s-slot" data-titel="Vragen" data-min="1.5">
+    <div class="links">
+      <div class="logo a">Avezaat <span>&amp;</span> Evers</div>
+      <div class="body">
+        <h2 class="a a2">Vragen?</h2>
+        <p class="sub a a3" id="slot-sub">Wat wil je nog weten? Vraag gerust, ook later.</p>
+        <div class="contact a a4">
+          <div><small>Mail</small><b>info@avezaatenevers.nl</b></div>
+          <div><small>Bel of WhatsApp</small><b>06 1234 5678</b></div>
+          <div><small>Website</small><b>avezaatenevers.nl</b></div>
+          <div><small>Instagram</small><b>@avezaat.evers</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="rechts"><img src="/assets/img/koen-daan.webp" alt="" width="1200" height="975"></div>
+    <aside class="notes">
+      <ul>
+        <li>Terugkomen op wat ze bij de agenda in ieder geval besproken wilden hebben.</li>
+        <li>Afsluiten: "Dank je wel. Je hoort binnen 24 uur van me."</li>
+        <li>Vraag eventueel: "Hoe heb je ons gevonden?"</li>
+      </ul>
+    </aside>
+  </section>
+
+  <div class="voet" id="voet">
+    <span class="logo">Avezaat <span>&amp;</span> Evers</span>
+    <span class="voet-r"><span id="voet-titel"></span><span class="voet-balk"><i id="voet-balk"></i></span><span id="voet-nr"></span></span>
+  </div>
+</div>
+</div>
+
+<div class="hulp" id="hulp"><kbd>←</kbd> <kbd>→</kbd> bladeren · <kbd>F</kbd> volledig scherm · <kbd>N</kbd> notities</div>
+<div class="bed" id="bed">
+  <a href="/intern/" title="Terug naar dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Dashboard</a>
+  <button type="button" id="b-notities" title="Sprekersnotities in apart venster (N)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>Notities</button>
+  <button type="button" id="b-vol" title="Volledig scherm (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+  <button type="button" id="b-terug" aria-label="Vorige dia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+  <button type="button" id="b-verder" aria-label="Volgende dia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+</div>
+<div class="melding" id="melding"></div>
+
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var naam = (params.get('naam') || '').trim().slice(0, 40);
+  var isNotities = params.has('notities');
+  var stage = document.getElementById('stage');
+  var alle = [].slice.call(document.querySelectorAll('.slide'));
+  var kanaal = 'BroadcastChannel' in window ? new BroadcastChannel('ae-kennismaking') : null;
+  var keuze = { start: null, icp: false, uren: false, partner: false, achterstand: false, veel: false, personeel: false };
+
+  function esc(s) { return s.replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
+  function euro(n) { return '€' + (Math.round(n * 100) / 100).toFixed(2).replace('.', ',').replace(',00', ''); }
+
+  // Welke dia's doen mee (overstappen alleen als de klant niet net gestart is)
+  function zichtbaar() {
+    return alle.filter(function (s) {
+      var skip = s.getAttribute('data-alleen') === 'overstap' && keuze.start === 'nieuw';
+      s.classList.toggle('is-overgeslagen', skip);
+      return !skip;
+    });
+  }
+
+  // ---------- Notitievenster ----------
+  if (isNotities) {
+    document.body.classList.add('is-notities');
+    document.getElementById('deck').remove();
+    ['hulp', 'bed'].forEach(function (id) { document.getElementById(id).remove(); });
+    var w = document.createElement('div');
+    w.className = 'nt';
+    w.innerHTML = '<div class="nt-top"><div class="nt-klok"><span class="nt-tijd" id="nt-tijd">0:00</span><span class="nt-schema" id="nt-schema"></span></div>' +
+      '<div class="nt-nav"><button class="nt-knop" id="nt-reset" type="button">Timer opnieuw</button><button class="nt-knop" id="nt-terug" type="button">← Vorige</button><button class="nt-knop prim" id="nt-verder" type="button">Volgende →</button></div></div>' +
+      '<div class="nt-kaart"><small id="nt-nr"></small><h1 id="nt-titel"></h1><div class="nt-inhoud" id="nt-inhoud"></div></div>' +
+      '<div class="nt-volgende"><span id="nt-volgende"></span><span>Tip: zet dit venster naast je gedeelde scherm.</span></div>';
+    document.body.appendChild(w);
+    var start = null, huidigNt = 0, lijstNt = alle;
+    function toon(i, overgeslagen) {
+      lijstNt = alle.filter(function (s, k) { return overgeslagen.indexOf(k) === -1; });
+      var s = alle[i]; huidigNt = lijstNt.indexOf(s);
+      document.getElementById('nt-nr').textContent = 'Dia ' + (huidigNt + 1) + ' van ' + lijstNt.length;
+      document.getElementById('nt-titel').textContent = s.getAttribute('data-titel');
+      document.getElementById('nt-inhoud').innerHTML = s.querySelector('.notes').innerHTML;
+      var volg = lijstNt[huidigNt + 1];
+      document.getElementById('nt-volgende').textContent = volg ? 'Hierna: ' + volg.getAttribute('data-titel') : 'Laatste dia';
+      if (!start && i > 0) start = Date.now();
+      klok();
+    }
+    function klok() {
+      var sec = start ? Math.floor((Date.now() - start) / 1000) : 0;
+      var plan = 0; for (var k = 0; k < huidigNt; k++) plan += +lijstNt[k].getAttribute('data-min');
+      var el = document.getElementById('nt-tijd');
+      el.textContent = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+      el.classList.toggle('achter', sec > (plan + 2) * 60 || sec > 20 * 60);
+      var p = Math.round(plan * 60);
+      document.getElementById('nt-schema').textContent = 'schema: ' + Math.floor(p / 60) + ':' + String(p % 60).padStart(2, '0') + ' · totaal 20:00';
+    }
+    setInterval(klok, 1000);
+    document.getElementById('nt-reset').onclick = function () { start = Date.now(); klok(); };
+    document.getElementById('nt-terug').onclick = function () { kanaal && kanaal.postMessage({ stap: -1 }); };
+    document.getElementById('nt-verder').onclick = function () { kanaal && kanaal.postMessage({ stap: 1 }); };
+    document.addEventListener('keydown', function (e) {
+      if (['ArrowRight', 'PageDown', ' '].indexOf(e.key) > -1) { e.preventDefault(); kanaal && kanaal.postMessage({ stap: 1 }); }
+      if (['ArrowLeft', 'PageUp'].indexOf(e.key) > -1) { e.preventDefault(); kanaal && kanaal.postMessage({ stap: -1 }); }
+    });
+    if (kanaal) {
+      kanaal.onmessage = function (e) { if (e.data && typeof e.data.dia === 'number') toon(e.data.dia, e.data.overgeslagen || []); };
+      kanaal.postMessage({ vraag: 1 });
+    }
+    toon(0, []);
+    document.title = 'Notities | Kennismaking';
+    return;
+  }
+
+  // ---------- Presentatie ----------
+  // Personaliseren
+  if (naam) {
+    document.getElementById('titel-kop').innerHTML = 'Fijn dat je er bent, <span class="accent">' + esc(naam) + '</span>.';
+    document.getElementById('prijs-kop').innerHTML = 'Wat het jou kost, ' + esc(naam);
+    document.title = 'Kennismaking met ' + naam + ' | Avezaat & Evers';
+  }
+  document.querySelector('#titel-datum span').textContent = new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  // Gratis overstappen: aanmelden t/m 15 december, start per 1 januari
+  var nu = new Date();
+  var gratisTot = new Date(nu.getFullYear(), 11, 15, 23, 59, 59);
+  var gratisOverstap = nu <= gratisTot;
+  var startJaar = nu.getFullYear() + 1;
+  document.getElementById('gratis-band').textContent = gratisOverstap
+    ? 'Start per 1 januari ' + startJaar + ' en meld je aan t/m 15 december? Dan is overstappen gratis (t.w.v. €149).'
+    : 'Overstappen kost eenmalig €149, voor het inrichten en de volledige overdracht.';
+
+  // Schalen naar het scherm
+  function schaal() {
+    var s = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+    stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+  }
+  window.addEventListener('resize', schaal);
+  schaal();
+
+  var huidig = 0;
+  function ga(n, stil) {
+    var lijst = zichtbaar();
+    n = Math.max(0, Math.min(lijst.length - 1, n));
+    huidig = n;
+    alle.forEach(function (s) { s.classList.remove('is-actief'); });
+    var dia = lijst[n];
+    dia.classList.add('is-actief');
+    stage.classList.toggle('is-titel', dia.classList.contains('s-titel'));
+    stage.classList.toggle('is-slot', dia.classList.contains('s-slot'));
+    document.getElementById('voet-nr').textContent = (n + 1) + ' / ' + lijst.length;
+    document.getElementById('voet-titel').textContent = dia.getAttribute('data-titel');
+    document.getElementById('voet-balk').style.width = ((n + 1) / lijst.length * 100) + '%';
+    if (!stil) history.replaceState(null, '', location.pathname + location.search + '#' + (n + 1));
+    meld();
+  }
+  function meld() {
+    if (!kanaal) return;
+    var lijst = zichtbaar();
+    kanaal.postMessage({ dia: alle.indexOf(lijst[huidig]), overgeslagen: alle.map(function (s, k) { return lijst.indexOf(s) === -1 ? k : -1; }).filter(function (k) { return k > -1; }) });
+  }
+  function stap(d) { ga(huidig + d); }
+
+  if (kanaal) kanaal.onmessage = function (e) {
+    if (!e.data) return;
+    if (e.data.stap) stap(e.data.stap);
+    if (e.data.vraag) meld();
+  };
+
+  // Keuzes en prijs
+  function rekenPrijs() {
+    var maand = [['Boekhouding volledig uit handen', 80]];
+    if (keuze.icp) maand.push(['ICP-aangifte', 15]);
+    if (keuze.uren) maand.push(['Uren- en rittenregistratie', 10]);
+    var totaal = maand.reduce(function (a, r) { return a + r[1]; }, 0);
+    document.getElementById('bon-maand').innerHTML = maand.map(function (r) {
+      return '<div class="bon-r"><span>' + r[0] + '</span><b>' + euro(r[1]) + '</b></div>';
+    }).join('') + (keuze.veel ? '<div class="bon-r"><span>Meer dan 100 transacties<small>We maken vooraf een prijs op maat</small></span><b>op maat</b></div>' : '');
+    document.getElementById('bon-totaal').textContent = euro(totaal) + (keuze.veel ? '+' : '');
+    document.getElementById('bon-incl').textContent = 'excl. btw · ' + euro(totaal * 1.21) + ' incl. btw';
+
+    var overig = [];
+    if (keuze.partner) overig.push('<div class="bon-r"><span>IB-aangifte fiscaal partner<small>Eén keer per jaar</small></span><b>€150 p/jaar</b></div>');
+    if (keuze.start === 'zelf' || keuze.start === 'boekhouder') {
+      overig.push(gratisOverstap
+        ? '<div class="bon-r"><span>Overstappen, eenmalig<small>Bij start per 1 januari ' + startJaar + ', aanmelden t/m 15 december</small></span><b><s>€149</s><span class="gratis">gratis</span></b></div>'
+        : '<div class="bon-r"><span>Overstappen, eenmalig<small>Inrichten en volledige overdracht</small></span><b>€149</b></div>');
+    }
+    if (keuze.achterstand) overig.push('<div class="bon-r"><span>Achterstand inhalen<small>Vooraf een prijsafspraak</small></span><b>€60 p/uur</b></div>');
+    if (keuze.personeel) overig.push('<div class="bon-r"><span>Loonadministratie<small>Via onze salarisspecialist</small></span><b>op aanvraag</b></div>');
+    document.getElementById('bon-overig').innerHTML = overig.length ? '<h3>Daarnaast</h3>' + overig.join('') : '<p class="klein">Software, app, btw- en IB-aangifte zitten er allemaal in. Verder niets.</p>';
+  }
+  document.querySelectorAll('.chip').forEach(function (c) {
+    c.addEventListener('click', function () {
+      var k = c.getAttribute('data-k'), g = c.getAttribute('data-groep');
+      if (g) {
+        var aan = keuze[g] !== k;
+        keuze[g] = aan ? k : null;
+        document.querySelectorAll('.chip[data-groep="' + g + '"]').forEach(function (o) { o.setAttribute('aria-pressed', o === c && aan ? 'true' : 'false'); });
+      } else {
+        keuze[k] = !keuze[k];
+        c.setAttribute('aria-pressed', keuze[k] ? 'true' : 'false');
+      }
+      rekenPrijs();
+      ga(huidig, true);
+    });
+  });
+  rekenPrijs();
+
+  // Bediening
+  document.addEventListener('keydown', function (e) {
+    if (e.target.closest && e.target.closest('input, textarea')) return;
+    if (['ArrowRight', 'PageDown', ' '].indexOf(e.key) > -1) { e.preventDefault(); stap(1); }
+    else if (['ArrowLeft', 'PageUp'].indexOf(e.key) > -1) { e.preventDefault(); stap(-1); }
+    else if (e.key === 'Home') ga(0);
+    else if (e.key === 'End') ga(zichtbaar().length - 1);
+    else if (e.key === 'f' || e.key === 'F') volScherm();
+    else if (e.key === 'n' || e.key === 'N') notities();
+  });
+  document.getElementById('b-terug').onclick = function () { stap(-1); };
+  document.getElementById('b-verder').onclick = function () { stap(1); };
+  document.getElementById('b-vol').onclick = volScherm;
+  document.getElementById('b-notities').onclick = notities;
+  // Klik op een lege plek van de dia = volgende
+  stage.addEventListener('click', function (e) {
+    if (e.target.closest('button, a, .chip')) return;
+    stap(e.clientX < window.innerWidth * 0.25 ? -1 : 1);
+  });
+
+  function volScherm() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+  }
+  function notities() {
+    var w = window.open(location.pathname + '?notities=1', 'ae-notities', 'width=900,height=760');
+    if (!w) melding('Pop-up geblokkeerd. Sta pop-ups toe voor deze pagina.');
+    else setTimeout(meld, 600);
+  }
+  var mt;
+  function melding(t) {
+    var m = document.getElementById('melding');
+    m.textContent = t; m.classList.add('zicht');
+    clearTimeout(mt); mt = setTimeout(function () { m.classList.remove('zicht'); }, 3200);
+  }
+
+  // Bediening tonen bij muisbeweging
+  var mtimer;
+  document.addEventListener('mousemove', function () {
+    document.body.classList.add('muis');
+    clearTimeout(mtimer);
+    mtimer = setTimeout(function () { document.body.classList.remove('muis'); }, 2200);
+  });
+
+  var start = parseInt((location.hash || '').slice(1), 10);
+  ga(isNaN(start) ? 0 : start - 1, true);
+})();
+</script>
+</body>
+</html>

@@ -178,7 +178,7 @@
         <button type="button" data-f="klaar">Afgerond</button>
       </div>
       <ul class="tk-lijst" id="tk-lijst"><li class="tk-leeg">Laden…</li></ul>
-      <p class="db-noot" id="tk-status">Gedeeld met Koen en Daan. Wordt elke minuut bijgewerkt.</p>
+      <p class="db-noot" id="tk-status">Gedeeld met Koen en Daan. Wordt elke 5 minuten bijgewerkt.</p>
     </div>
 
     <!-- Kalender -->
@@ -402,7 +402,7 @@
       .then(function () { titel.value = ''; document.getElementById('tk-datum').value = ''; });
   });
   api('GET');
-  setInterval(function () { if (!document.hidden) api('GET'); }, 60000);
+  setInterval(function () { if (!document.hidden) api('GET'); }, 300000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) api('GET'); });
 
   // ===== Kalender =====

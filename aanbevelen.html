@@ -180,7 +180,16 @@
 (function () {
   var url = 'https://avezaatenevers.nl/';
   var tekst = 'Ik heb mijn boekhouding bij Avezaat & Evers: een vaste boekhouder die alles regelt, inclusief btw- en IB-aangifte, voor €80 per maand. Noem mijn naam bij de kennismaking, dan krijgen we allebei een maand gratis. ' + url;
-  document.getElementById('ref-wa').href = 'https://wa.me/?text=' + encodeURIComponent(tekst);
+  // Op telefoons direct de WhatsApp-app openen (wa.me zonder nummer werkt daar niet altijd),
+  // op de computer WhatsApp Desktop of WhatsApp Web.
+  var wa = document.getElementById('ref-wa');
+  var mobiel = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (mobiel) {
+    wa.href = 'whatsapp://send?text=' + encodeURIComponent(tekst);
+    wa.removeAttribute('target');
+  } else {
+    wa.href = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(tekst);
+  }
   document.getElementById('ref-mail').href = 'mailto:?subject=' + encodeURIComponent('Tip: mijn boekhouder') + '&body=' + encodeURIComponent(tekst);
   var knop = document.getElementById('ref-copy'), msg = document.getElementById('ref-msg');
   knop.addEventListener('click', function () {

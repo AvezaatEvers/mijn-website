@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Testversie mobiele homepage | Avezaat &amp; Evers</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Avezaat &amp; Evers">
+<meta property="og:locale" content="nl_NL">
+<meta property="og:title" content="Boekhouder voor zzp'ers en eenmanszaken | €80 p/m | Avezaat &amp; Evers">
+<meta property="og:description" content="Jij levert je bonnetjes aan, wij doen de rest. Boekhouding, btw- en IB-aangifte voor zzp'ers en eenmanszaken voor €80 per maand. Software inbegrepen en altijd contact met je eigen boekhouder.">
+<meta property="og:url" content="https://avezaatenevers.nl/">
+<meta property="og:image" content="https://avezaatenevers.nl/assets/img/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Avezaat &amp; Evers – jouw vaste boekhouder als zzp'er of eenmanszaak, €80 per maand">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="description" content="Jij levert je bonnetjes aan, wij doen de rest. Boekhouding, btw- en IB-aangifte voor zzp'ers en eenmanszaken voor €80 per maand. Software inbegrepen en altijd contact met je eigen boekhouder.">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css?v=77">
+<style>
+  /* ===== Testversie homepage, mobiel-eerst ===== */
+  .hm { --r: 20px; --sh: 0 1px 2px rgba(17,24,39,.05), 0 14px 30px -16px rgba(17,24,39,.22); overflow-x: clip; }
+  .hm-testbalk { background: #111827; color: #E5E7EB; font-size: 13px; text-align: center; padding: 8px 16px; }
+  .hm h1, .hm h2, .hm h3 { letter-spacing: -0.02em; }
+  .hm-sectie { padding: 44px 20px; }
+  .hm-tint { background: var(--tint); }
+  .hm-soft { background: var(--soft); }
+  .hm-label { display: block; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .hm h2 { font-size: 27px; line-height: 1.15; margin: 0 0 20px; }
+  .hm-btn { display: flex; align-items: center; justify-content: center; min-height: 54px; padding: 0 20px; border-radius: 14px; background: var(--accent); color: #fff; font-weight: 600; font-size: 16px; text-decoration: none; box-shadow: 0 8px 18px -10px rgba(30,64,175,.7); transition: background .2s, transform .15s; }
+  .hm-btn:active { transform: scale(.98); }
+  .hm-btn:hover { background: var(--accent-dark); }
+  .hm-link { display: block; text-align: center; margin-top: 14px; font-weight: 600; font-size: 15px; color: var(--accent); text-decoration: none; }
+
+  /* Hero */
+  .hm-hero { padding: 28px 20px 8px; background: linear-gradient(180deg, var(--tint) 0%, var(--tint) 62%, #fff 62%); }
+  .hm-pill { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--accent); background: #fff; border-radius: 999px; padding: 6px 12px; box-shadow: 0 1px 2px rgba(17,24,39,.06); }
+  .hm-pill i { width: 7px; height: 7px; border-radius: 50%; background: #22C55E; box-shadow: 0 0 0 3px rgba(34,197,94,.2); }
+  .hm-hero h1 { font-size: clamp(34px, 9.6vw, 44px); line-height: 1.06; margin: 16px 0 12px; }
+  .hm-hero h1 span { color: var(--accent); }
+  .hm-lead { font-size: 17px; line-height: 1.55; color: var(--text); margin: 0 0 22px; }
+  .hm-micro { text-align: center; font-size: 13px; color: var(--muted); margin: 10px 0 24px; }
+  .hm-foto { position: relative; }
+  .hm-foto > img:first-child { width: 100%; height: 300px; object-fit: cover; object-position: 50% 35%; border-radius: var(--r); box-shadow: var(--sh); }
+  .hm-status { position: absolute; left: 12px; right: 12px; bottom: -22px; display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 16px; padding: 12px 14px; box-shadow: var(--sh); }
+  .hm-status-av { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; display: grid; place-items: center; flex: none; }
+  .hm-status strong { display: block; font-size: 15px; color: var(--ink); }
+  .hm-status em { display: flex; align-items: center; gap: 6px; font-style: normal; font-size: 13px; color: var(--muted); }
+  .hm-status em i { width: 7px; height: 7px; border-radius: 50%; background: #22C55E; }
+  .hm-erkend { position: absolute; top: 12px; right: 12px; width: 120px; height: auto; border-radius: 8px; box-shadow: 0 6px 14px -6px rgba(0,0,0,.35); }
+
+  /* Ticker */
+  .hm-ticker { margin-top: 44px; overflow: hidden; border-block: 1px solid var(--line); background: #fff; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+  .hm-ticker-rij { display: flex; width: max-content; animation: hm-loop 32s linear infinite; }
+  .hm-ticker span { display: inline-flex; align-items: center; gap: 10px; padding: 14px 18px; font-size: 14px; font-weight: 500; color: var(--ink); white-space: nowrap; }
+  .hm-ticker span::before { content: ''; width: 16px; height: 16px; flex: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231E40AF' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/contain no-repeat; }
+  @keyframes hm-loop { to { transform: translateX(-50%); } }
+
+  /* Kaarten */
+  .hm-kaarten { display: flex; flex-direction: column; gap: 12px; }
+  .hm-kaart { display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: start; padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: #fff; }
+  .hm-ic { width: 44px; height: 44px; border-radius: 12px; background: var(--tint); color: var(--accent); display: grid; place-items: center; }
+  .hm-kaart h3 { font-size: 17px; margin: 2px 0 4px; }
+  .hm-kaart p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--text); }
+
+  /* Prijs */
+  .hm-prijs { position: relative; background: #fff; border-radius: 22px; padding: 28px 22px 22px; box-shadow: var(--sh); border: 2px solid var(--accent); }
+  .hm-prijs-tag { position: absolute; top: -13px; left: 22px; background: var(--accent); color: #fff; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 999px; }
+  .hm-bedrag { margin: 0 0 18px; font-size: 16px; color: var(--muted); }
+  .hm-bedrag b { font-size: 52px; line-height: 1; color: var(--ink); letter-spacing: -0.03em; margin-right: 4px; }
+  .hm-bedrag small { display: block; font-size: 13px; margin-top: 6px; }
+  .hm-prijs ul { list-style: none; margin: 0 0 22px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .hm-prijs li { display: flex; gap: 10px; font-size: 15px; color: var(--text); line-height: 1.45; }
+  .hm-prijs li::before, .hm-app li::before { content: ''; width: 20px; height: 20px; flex: none; margin-top: 1px; border-radius: 50%; background: var(--tint) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231E40AF' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/11px no-repeat; }
+
+  /* Deadline */
+  .hm-sectie:has(.hm-deadline) { padding-block: 28px 0; }
+  .hm-deadline { display: flex; gap: 14px; align-items: center; padding: 16px; border-radius: 18px; background: #FFFBEB; border: 1px solid #FDE68A; }
+  .hm-dl-kal { width: 54px; flex: none; border-radius: 12px; overflow: hidden; text-align: center; background: #fff; border: 1px solid #FDE68A; }
+  .hm-dl-kal span { display: block; background: #B45309; color: #fff; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; padding: 3px 0; }
+  .hm-dl-kal b { display: block; font-size: 21px; padding: 6px 0 7px; color: var(--ink); }
+  .hm-deadline strong { display: block; font-size: 15px; color: var(--ink); }
+  .hm-deadline p { margin: 2px 0 0; font-size: 14px; line-height: 1.45; color: var(--text); }
+
+  /* Stappen */
+  .hm-stappen { list-style: none; margin: 0; padding: 0; counter-reset: s; }
+  .hm-stappen li { position: relative; counter-increment: s; padding: 0 0 22px 52px; }
+  .hm-stappen li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; display: grid; place-items: center; z-index: 1; }
+  .hm-stappen li::after { content: ''; position: absolute; left: 17px; top: 36px; bottom: 0; width: 2px; background: var(--tint-border); }
+  .hm-stappen li:last-child { padding-bottom: 0; }
+  .hm-stappen li:last-child::after { display: none; }
+  .hm-stappen h3 { font-size: 17px; margin: 6px 0 4px; }
+  .hm-stappen p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--text); }
+
+  /* Voor wie */
+  .hm-chips { display: flex; gap: 8px; overflow-x: auto; margin: 0 -20px 16px; padding: 2px 20px 6px; scrollbar-width: none; scroll-snap-type: x proximity; }
+  .hm-chips::-webkit-scrollbar { display: none; }
+  .hm-chips button { flex: none; scroll-snap-align: start; font: inherit; font-size: 14px; font-weight: 500; padding: 9px 16px; border-radius: 999px; border: 1px solid var(--tint-border); background: #fff; color: var(--ink); cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+  .hm-chips button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .hm-branche { display: block; position: relative; border-radius: var(--r); overflow: hidden; text-decoration: none; box-shadow: var(--sh); background: #111827; }
+  .hm-branche img { width: 100%; height: 230px; object-fit: cover; display: block; transition: opacity .25s; }
+  .hm-branche::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(17,24,39,0) 30%, rgba(17,24,39,.85) 100%); }
+  .hm-branche-tekst { position: absolute; left: 18px; right: 18px; bottom: 16px; z-index: 1; color: #fff; display: flex; flex-direction: column; gap: 4px; }
+  .hm-branche-tekst strong { font-size: 20px; }
+  .hm-branche-tekst span { font-size: 14px; line-height: 1.45; color: #E5E7EB; }
+  .hm-branche-tekst em { font-style: normal; font-weight: 600; font-size: 14px; margin-top: 4px; }
+
+  /* App */
+  .hm-app { display: grid; grid-template-columns: 120px 1fr; gap: 18px; align-items: center; }
+  .hm-app img { width: 120px; height: auto; }
+  .hm-app ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .hm-app li { display: flex; gap: 10px; font-size: 15px; line-height: 1.45; color: var(--text); }
+  .hm-app strong { color: var(--ink); }
+
+  /* FAQ */
+  .hm-faq details { background: #fff; border: 1px solid var(--line); border-radius: 16px; margin-bottom: 10px; }
+  .hm-faq summary { list-style: none; cursor: pointer; padding: 16px 48px 16px 18px; font-weight: 600; font-size: 16px; color: var(--ink); position: relative; }
+  .hm-faq summary::-webkit-details-marker { display: none; }
+  .hm-faq summary::after { content: ''; position: absolute; right: 18px; top: 50%; width: 10px; height: 10px; border-right: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: translateY(-70%) rotate(45deg); transition: transform .25s; }
+  .hm-faq details[open] summary::after { transform: translateY(-30%) rotate(-135deg); }
+  .hm-faq p { margin: 0; padding: 0 18px 16px; font-size: 15px; line-height: 1.55; color: var(--text); }
+
+  /* Slot */
+  .hm-slot { margin: 0 20px 40px; padding: 32px 22px; border-radius: 24px; background: var(--accent); color: #fff; text-align: center; position: relative; overflow: hidden; }
+  .hm-slot::after { content: '&'; position: absolute; right: -10px; bottom: -70px; font-size: 220px; font-weight: 700; line-height: 1; color: rgba(255,255,255,.07); pointer-events: none; }
+  .hm-slot h2 { color: #fff; margin-bottom: 10px; }
+  .hm-slot p { color: #C7D2FE; font-size: 16px; margin: 0 0 20px; position: relative; z-index: 1; }
+  .hm-btn-wit { background: #fff; color: var(--accent); position: relative; z-index: 1; }
+  .hm-btn-wit:hover { background: var(--tint); }
+  .hm-slot .hm-slot-alt { margin: 16px 0 0; font-size: 14px; }
+  .hm-slot-alt a { color: #fff; font-weight: 600; text-decoration: none; }
+
+  /* Sticky knop onderin */
+  .hm-sticky { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 10px 10px 18px; background: rgba(255,255,255,.92); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 12px 30px -10px rgba(17,24,39,.3); transform: translateY(140%); transition: transform .4s cubic-bezier(.22,1,.36,1); font-size: 14px; color: var(--text); line-height: 1.25; }
+  .hm-sticky strong { font-size: 18px; color: var(--ink); }
+  .hm-sticky small { color: var(--muted); }
+  .hm-sticky .hm-btn { min-height: 46px; padding: 0 18px; font-size: 15px; box-shadow: none; }
+  .hm-sticky.is-zichtbaar { transform: none; }
+  body:has(.hm-sticky.is-zichtbaar) .wa { opacity: 0; pointer-events: none; }
+  .wa { transition: opacity .3s; }
+
+  /* Verschijnen */
+  .js .hm-in { opacity: 0; transform: translateY(16px); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); }
+  .js .hm-in.is-zichtbaar { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .hm-ticker-rij { animation: none; flex-wrap: wrap; width: auto; }
+    .hm-ticker-rij span[aria-hidden] { display: none; }
+    .js .hm-in { opacity: 1; transform: none; transition: none; }
+    .hm-sticky { transition: none; }
+  }
+
+  /* Op een groot scherm: telefoonbreedte in het midden, om te beoordelen */
+  @media (min-width: 640px) {
+    .hm { max-width: 440px; margin: 24px auto 40px; border: 1px solid var(--line); border-radius: 28px; box-shadow: 0 30px 60px -30px rgba(17,24,39,.35); overflow: hidden; }
+    .hm-sticky { max-width: 416px; left: 50%; right: auto; transform: translate(-50%, 140%); width: calc(100% - 24px); }
+    .hm-sticky.is-zichtbaar { transform: translate(-50%, 0); }
+  }
+</style>
+
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+<a class="skip" href="#main">Naar de inhoud</a>
+
+<a class="banner" href="/overstappen.html"><span class="banner-long"><strong>Overstappen per 1 januari?</strong> Gratis overstapservice <span class="banner-value">t.w.v. €149</span> t/m 15 december</span><span class="banner-short"><strong>Gratis overstappen</strong> per 1 januari</span> <span aria-hidden="true">→</span></a>
+
+<header class="site-header">
+  <div class="container nav">
+    <a class="logo" href="/">Avezaat <span>&amp;</span> Evers</a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menu openen">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <nav id="nav-links" class="nav-links" aria-label="Hoofdmenu">
+      <a href="/#werkwijze">Werkwijze</a>
+      <a href="/tarieven.html">Tarieven</a>
+      <a href="/starters.html">Starters</a>
+      <a href="/overstappen.html">Overstappen</a>
+      <a href="/contact.html" data-no-cal>Contact</a>
+      <a class="btn btn-primary" href="/contact.html#plannen">Plan een kennismaking</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hm-testbalk">Testversie van de homepage voor mobiel. Bekijk hem op je telefoon of maak dit venster smal.</div>
+<main id="main" class="hm">
+
+  <!-- Hero -->
+  <section class="hm-hero">
+    <span class="hm-pill"><i aria-hidden="true"></i>Boekhouder voor zzp'ers en eenmanszaken</span>
+    <h1>Jouw vaste boekhouder voor <span>€80</span> per maand.</h1>
+    <p class="hm-lead">Jij levert je bonnetjes aan. Wij doen je boekhouding, btw en inkomstenbelasting.</p>
+    <a class="hm-btn" href="/contact.html#plannen">Plan een gratis kennismaking</a>
+    <p class="hm-micro">Vrijblijvend · 20 minuten · gewoon online</p>
+
+    <div class="hm-foto">
+      <img src="/assets/img/koen-daan-800.webp" srcset="/assets/img/koen-daan-800.webp 800w, /assets/img/koen-daan.webp 1200w" sizes="(max-width: 520px) calc(100vw - 40px), 440px" alt="Koen Avezaat en Daan Evers aan tafel" width="800" height="650" fetchpriority="high">
+      <div class="hm-status">
+        <span class="hm-status-av" aria-hidden="true">D</span>
+        <span><strong>Daan, je boekhouder</strong><em><i aria-hidden="true"></i>Reactie binnen 2 uur via WhatsApp</em></span>
+      </div>
+      <img class="hm-erkend" src="/assets/img/moneymonk-erkend-adviseur-klein.png" alt="Erkend Adviseur MoneyMonk" width="534" height="160">
+    </div>
+  </section>
+
+  <!-- Lopende balk met voordelen -->
+  <div class="hm-ticker" aria-label="Wat je krijgt">
+    <div class="hm-ticker-rij">
+      <span>Eén vaste boekhouder</span><span>Btw-aangifte inbegrepen</span><span>Inkomstenbelasting inbegrepen</span><span>Software en app inbegrepen</span><span>Maandelijks opzegbaar</span><span>Elke maand een 1-op-1</span>
+      <span aria-hidden="true">Eén vaste boekhouder</span><span aria-hidden="true">Btw-aangifte inbegrepen</span><span aria-hidden="true">Inkomstenbelasting inbegrepen</span><span aria-hidden="true">Software en app inbegrepen</span><span aria-hidden="true">Maandelijks opzegbaar</span><span aria-hidden="true">Elke maand een 1-op-1</span>
+    </div>
+  </div>
+
+  <!-- Waarom -->
+  <section class="hm-sectie">
+    <span class="hm-label">Waarom Avezaat &amp; Evers</span>
+    <h2>Alles uit handen, met één vast gezicht</h2>
+    <div class="hm-kaarten">
+      <div class="hm-kaart">
+        <span class="hm-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg></span>
+        <div><h3>Eén vaste boekhouder</h3><p>Geen wisselende medewerkers. Bellen, mailen of appen, je spreekt altijd dezelfde.</p></div>
+      </div>
+      <div class="hm-kaart">
+        <span class="hm-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg></span>
+        <div><h3>Foto van je bonnetje, klaar</h3><p>Jij levert aan via de app. Het boeken en controleren doen wij.</p></div>
+      </div>
+      <div class="hm-kaart">
+        <span class="hm-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg></span>
+        <div><h3>Nooit meer een deadline missen</h3><p>Btw en inkomstenbelasting op tijd, en je weet vooraf wat je betaalt.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Prijs -->
+  <section class="hm-sectie hm-tint">
+    <span class="hm-label">Eén vaste prijs</span>
+    <h2>Geen pakketten. Geen verrassingen.</h2>
+    <div class="hm-prijs">
+      <span class="hm-prijs-tag">Alles inbegrepen</span>
+      <p class="hm-bedrag"><b>€80</b> per maand<small>excl. btw · maandelijks opzegbaar</small></p>
+      <ul>
+        <li>Je complete boekhouding, tot 100 transacties p/m</li>
+        <li>4× btw-aangifte per jaar</li>
+        <li>Aangifte inkomstenbelasting en jaarcijfers</li>
+        <li>MoneyMonk-software en app</li>
+        <li>Elke maand een 1-op-1 met je boekhouder</li>
+      </ul>
+      <a class="hm-btn" href="/contact.html#plannen">Plan een gratis kennismaking</a>
+      <a class="hm-link" href="/tarieven.html">Bekijk alle tarieven en extra's</a>
+    </div>
+  </section>
+
+  <!-- Btw-deadline -->
+  <section class="hm-sectie">
+    <div class="hm-deadline">
+      <div class="hm-dl-kal" aria-hidden="true"><span id="hm-dl-maand">okt</span><b id="hm-dl-dag">31</b></div>
+      <div>
+        <strong>Volgende btw-deadline: <span id="hm-dl-datum">31 oktober</span></strong>
+        <p>Nog <b id="hm-dl-dagen">20 dagen</b>. Bij ons hoef je daar niet aan te denken: wij dienen hem op tijd in.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Zo werkt het -->
+  <section class="hm-sectie">
+    <span class="hm-label">Zo werkt het</span>
+    <h2>In drie stappen geregeld</h2>
+    <ol class="hm-stappen">
+      <li><h3>Kennismaken</h3><p>Een gratis gesprek van 20 minuten. We kijken wat je nodig hebt.</p></li>
+      <li><h3>Wij richten alles in</h3><p>MoneyMonk, je bankkoppeling en, als je overstapt, de overdracht.</p></li>
+      <li><h3>Jij levert aan, wij doen de rest</h3><p>Boekhouding, btw en inkomstenbelasting. Elke maand een 1-op-1.</p></li>
+    </ol>
+  </section>
+
+  <!-- Voor wie -->
+  <section class="hm-sectie hm-tint">
+    <span class="hm-label">Voor wie</span>
+    <h2>Voor elke zzp'er en eenmanszaak</h2>
+    <div class="hm-chips" role="tablist" aria-label="Kies je branche">
+      <button type="button" role="tab" aria-selected="true" data-b="bouw">Bouw</button>
+      <button type="button" role="tab" aria-selected="false" data-b="kappers-barbers">Kappers</button>
+      <button type="button" role="tab" aria-selected="false" data-b="zorgverleners">Zorg</button>
+      <button type="button" role="tab" aria-selected="false" data-b="e-commerce">E-commerce</button>
+      <button type="button" role="tab" aria-selected="false" data-b="installateurs">Installateurs</button>
+      <button type="button" role="tab" aria-selected="false" data-b="hoveniers">Hoveniers</button>
+      <button type="button" role="tab" aria-selected="false" data-b="schilders-stukadoors">Schilders</button>
+      <button type="button" role="tab" aria-selected="false" data-b="maatwerk">Maatwerk</button>
+    </div>
+    <a class="hm-branche" id="hm-branche" href="/branches/bouw.html">
+      <img id="hm-branche-img" src="/assets/img/branches/bouw-1-800.webp" alt="" width="800" height="533" loading="lazy">
+      <span class="hm-branche-tekst"><strong id="hm-branche-titel">Bouw</strong><span id="hm-branche-zin">Verlegde btw, materiaal en je bus: wij weten hoe het zit.</span><em>Bekijk wat we voor jou doen →</em></span>
+    </a>
+  </section>
+
+  <!-- App -->
+  <section class="hm-sectie">
+    <span class="hm-label">Software inbegrepen</span>
+    <h2>Al je administratie in één app</h2>
+    <div class="hm-app">
+      <img src="/assets/img/moneymonk-app.webp" alt="Het dashboard van de MoneyMonk-app" width="640" height="1134" loading="lazy">
+      <ul>
+        <li><span><strong>Foto van je bonnetje.</strong> Wij verwerken de rest.</span></li>
+        <li><span><strong>Bank gekoppeld.</strong> Transacties komen vanzelf binnen.</span></li>
+        <li><span><strong>Altijd inzicht.</strong> Zie wat je opzij moet zetten.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="hm-sectie hm-soft">
+    <span class="hm-label">Veelgestelde vragen</span>
+    <h2>Nog vragen?</h2>
+    <div class="hm-faq">
+      <details><summary>Wat moet ik zelf nog doen?</summary><p>Alleen je bonnetjes en facturen aanleveren via de app of per mail. De rest doen wij.</p></details>
+      <details><summary>Zit de aangifte inkomstenbelasting erbij?</summary><p>Ja, voor jou als ondernemer. De aangifte van je fiscaal partner voegen we toe voor €150 per jaar.</p></details>
+      <details><summary>Kan ik halverwege het jaar overstappen?</summary><p>Ja. We regelen de overdracht met je vorige boekhouder. Overstappen kost eenmalig €149, of is gratis per 1 januari bij aanmelding vóór 15 december.</p></details>
+      <details><summary>Zit ik ergens aan vast?</summary><p>Nee, je zegt maandelijks op. Stop je binnen 12 maanden na je aangifte inkomstenbelasting, dan rekenen we die apart af (€250).</p></details>
+    </div>
+    <a class="hm-link" href="/veelgestelde-vragen.html">Alle 55 vragen bekijken</a>
+  </section>
+
+  <!-- Slot -->
+  <section class="hm-slot">
+    <h2>Klaar met zelf boekhouden?</h2>
+    <p>Plan een gratis kennismaking van 20 minuten. Je zit nergens aan vast.</p>
+    <a class="hm-btn hm-btn-wit" href="/contact.html#plannen">Plan een gratis kennismaking</a>
+    <p class="hm-slot-alt"><a href="https://wa.me/31612345678">WhatsApp</a> · <a href="tel:+31612345678">Bellen</a> · <a href="mailto:info@avezaatenevers.nl">Mail</a></p>
+  </section>
+</main>
+
+<div class="hm-sticky" id="hm-sticky" aria-hidden="true">
+  <span><strong>€80</strong> per maand<br><small>alles inbegrepen</small></span>
+  <a class="hm-btn" href="/contact.html#plannen" tabindex="-1">Kennismaken</a>
+</div>
+
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <a class="logo" href="/">Avezaat <span>&amp;</span> Evers</a>
+      <p style="margin-top:12px">Jouw vaste boekhouder als zzp'er of eenmanszaak. Jij onderneemt, wij doen de rest.</p>
+      <img class="footer-badge" src="/assets/img/moneymonk-erkend-adviseur-klein.png" alt="Erkend Adviseur MoneyMonk" width="534" height="160">
+    </div>
+    <div>
+      <h4>Diensten</h4>
+      <ul>
+        <li><a href="/tarieven.html">Tarieven</a></li>
+        <li><a href="/starters.html">Voor starters</a></li>
+        <li><a href="/overstappen.html">Overstappen</a></li>
+        <li>
+          <details class="footer-dd">
+            <summary>Branches</summary>
+            <ul>
+            <li><a href="/branches/bouw.html">Bouw</a></li>
+            <li><a href="/branches/maatwerk.html">Maatwerk</a></li>
+            <li><a href="/branches/hoveniers.html">Hoveniers</a></li>
+            <li><a href="/branches/kappers-barbers.html">Kappers &amp; barbers</a></li>
+            <li><a href="/branches/installateurs.html">Installateurs</a></li>
+            <li><a href="/branches/schilders-stukadoors.html">Schilders &amp; stukadoors</a></li>
+            <li><a href="/branches/e-commerce.html">E-commerce</a></li>
+            <li><a href="/branches/zorgverleners.html">Zorgverleners</a></li>
+            </ul>
+          </details>
+        </li>
+      </ul>
+    </div>
+    <div>
+      <h4>Informatie</h4>
+      <ul>
+        <li><a href="/kennisbank/">Kennisbank</a></li>
+        <li><a href="/#over">Over ons</a></li>
+        <li><a href="/veelgestelde-vragen.html">Veelgestelde vragen</a></li>
+        <li><a href="/contact.html" data-no-cal>Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:info@avezaatenevers.nl">info@avezaatenevers.nl</a></li>
+        <li><a href="tel:+31612345678">06 1234 5678</a></li>
+        <li><a class="footer-ig" href="https://www.instagram.com/avezaat.evers/" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>Instagram</a></li>
+        <li><a class="footer-cta" href="/contact.html#plannen">Plan een kennismaking <span aria-hidden="true">→</span></a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>© <span id="year">2026</span> Avezaat &amp; Evers · Rotterdamseweg&nbsp;26, 2921&nbsp;AP Krimpen&nbsp;aan&nbsp;den&nbsp;IJssel · KvK&nbsp;42133742 · Btw&#8209;id&nbsp;NL869872862B01</span>
+    <span><a href="/voorwaarden.html">Algemene voorwaarden</a> · <a href="/privacy.html">Privacyverklaring</a></span>
+  </div>
+</footer>
+
+<a class="wa" href="https://wa.me/31612345678" aria-label="Stuur ons een WhatsApp-bericht">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFFFFF" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3z"/></svg>
+</a>
+
+<script src="/assets/main.js?v=77" defer></script>
+<script src="/assets/cal.js?v=77" defer></script>
+<script src="/assets/analytics.js?v=77" defer></script>
+<script>
+(function () {
+  // Volgende btw-deadline: 30 apr, 31 jul, 31 okt, 31 jan
+  var nu = new Date(), j = nu.getFullYear();
+  var kandidaten = [new Date(j, 0, 31), new Date(j, 3, 30), new Date(j, 6, 31), new Date(j, 9, 31), new Date(j + 1, 0, 31)];
+  var vandaag = new Date(j, nu.getMonth(), nu.getDate());
+  var dl = kandidaten.filter(function (d) { return d >= vandaag; })[0];
+  var dagen = Math.round((dl - vandaag) / 864e5);
+  document.getElementById('hm-dl-maand').textContent = dl.toLocaleDateString('nl-NL', { month: 'short' }).replace('.', '');
+  document.getElementById('hm-dl-dag').textContent = dl.getDate();
+  document.getElementById('hm-dl-datum').textContent = dl.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' });
+  document.getElementById('hm-dl-dagen').textContent = dagen === 0 ? 'vandaag de laatste dag' : dagen === 1 ? '1 dag' : dagen + ' dagen';
+
+  // Branche-keuze
+  var B = {
+    'bouw': ['Bouw', 'Verlegde btw, materiaal en je bus: wij weten hoe het zit.'],
+    'kappers-barbers': ['Kappers & barbers', 'Pin- en contante omzet, stoelhuur en productverkoop netjes geregeld.'],
+    'zorgverleners': ['Zorgverleners', 'Van btw-vrijstelling tot declaraties bij de zorgverzekeraar.'],
+    'e-commerce': ['E-commerce', 'Bol.com, Etsy of eigen webshop: alle uitbetalingen en btw op orde.'],
+    'installateurs': ['Installateurs', 'Verlegde btw en de inkoop bij de groothandel, zonder gedoe.'],
+    'hoveniers': ['Hoveniers', 'Ook in het drukke voorjaar je administratie binnen op orde.'],
+    'schilders-stukadoors': ['Schilders & stukadoors', 'Altijd het juiste btw-tarief, voor klant en Belastingdienst.'],
+    'maatwerk': ['Maatwerk', 'Meubelmaker of interieurbouwer: je administratie net zo strak.']
+  };
+  var img = document.getElementById('hm-branche-img'), link = document.getElementById('hm-branche');
+  document.querySelectorAll('.hm-chips button').forEach(function (knop) {
+    knop.addEventListener('click', function () {
+      var id = knop.getAttribute('data-b');
+      document.querySelectorAll('.hm-chips button').forEach(function (k) { k.setAttribute('aria-selected', k === knop ? 'true' : 'false'); });
+      img.style.opacity = '0';
+      setTimeout(function () {
+        img.src = '/assets/img/branches/' + id + '-1-800.webp';
+        img.onload = function () { img.style.opacity = '1'; };
+      }, 180);
+      document.getElementById('hm-branche-titel').textContent = B[id][0];
+      document.getElementById('hm-branche-zin').textContent = B[id][1];
+      link.href = '/branches/' + id + '.html';
+    });
+  });
+
+  // Sticky knop: zichtbaar na de hero, weg bij het slotblok
+  var sticky = document.getElementById('hm-sticky');
+  var hero = document.querySelector('.hm-hero .hm-btn'), slot = document.querySelector('.hm-slot');
+  var heroWeg = false, slotZicht = false;
+  function zet() { var aan = heroWeg && !slotZicht; sticky.classList.toggle('is-zichtbaar', aan); sticky.setAttribute('aria-hidden', aan ? 'false' : 'true'); sticky.querySelector('a').tabIndex = aan ? 0 : -1; }
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (e) { heroWeg = !e[0].isIntersecting && e[0].boundingClientRect.top < 0; zet(); }).observe(hero);
+    new IntersectionObserver(function (e) { slotZicht = e[0].isIntersecting; zet(); }).observe(slot);
+    // Zacht verschijnen van secties
+    var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('is-zichtbaar'); io.unobserve(x.target); } }); }, { rootMargin: '0px 0px -10% 0px' });
+    document.querySelectorAll('.hm-sectie > *, .hm-slot').forEach(function (el) { el.classList.add('hm-in'); io.observe(el); });
+  }
+})();
+</script>
+</body>
+</html>

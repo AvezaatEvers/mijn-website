@@ -16,9 +16,7 @@ export async function sha256(text) {
 
 // Startlijst, alleen gebruikt als er nog niets is opgeslagen
 const START = [
-  ["Echt telefoonnummer op de site", "Nu staat overal het testnummer 06 1234 5678", "2026-11-15", "samen"],
   ["Foto en achtergrond van Daan", "Homepage, Wie wij zijn", "2026-11-15", "daan"],
-  ["Betaalwijze invullen", "FAQ: Hoe betaal ik?", "2026-11-15", "samen"],
   ["Netlify: formulierdetectie en e-mailmeldingen", "", "2026-10-31", "koen"],
   ["Cal.com instellen", "Nederlands, 24-uurs, maandag eerst, Voor- en achternaam, herinnering", "2026-10-31", "koen"],
   ["Beroepsaansprakelijkheidsverzekering", "", "2026-12-01", "samen"],

@@ -29,8 +29,6 @@ Zolang `netlify/edge-functions/toegang.js` bestaat, ziet elke bezoeker `binnenko
 
 Zoek in alle bestanden op `[` om de placeholders te vinden:
 
-- **Testnummer vervangen:** overal staat nu `06 1234 5678` / `+31612345678` / `wa.me/31612345678` als test. Vervangen door het echte nummer.
-- `[BETAALWIJZE…]` op de tarievenpagina
 - Privacy en voorwaarden: datum, termijnen – en laat ze controleren (rechtsvorm VOF en adres zijn ingevuld)
 - Domein: overal staat `https://avezaatenevers.nl` – aanpassen als het domein anders wordt
 

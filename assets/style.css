@@ -837,7 +837,7 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
   .home .app-visual::before { display: none; }
   .home .app-phone { max-width: 200px; margin: 0 auto; }
   .home .mm-badge, .js-anim .home .mm-badge, .js-anim .home .app-section.in-view .mm-badge { position: static; order: -1; transform: none; opacity: 1; box-shadow: none; background: none; padding: 0; margin: 0 0 18px; }
-  .home .mm-badge img { width: 170px; height: auto; border-radius: 0; }
+  .home .mm-badge.mm-erkend img { width: 170px; height: auto; border-radius: 0; }
   .home .app-list li { font-size: 15px; }
 
   /* Wie wij zijn */

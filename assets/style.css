@@ -1302,3 +1302,9 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
 .art-cta-gar { font-size: 13px; font-weight: 600; color: #047857; }
 .art-cta .btn { flex: none; }
 @media (max-width: 600px) { .art-cta { flex-direction: column; align-items: stretch; padding: 20px; } }
+.garantie-strip { display: flex; align-items: center; gap: 12px; margin-top: 20px; padding: 14px 18px; border-radius: 14px; background: var(--white); border: 1px solid var(--tint-border); color: var(--text); text-decoration: none; font-size: 15px; }
+.garantie-strip svg { color: #047857; flex: none; }
+.garantie-strip strong { color: var(--ink); }
+.garantie-strip em { margin-left: auto; font-style: normal; font-weight: 600; color: var(--accent); white-space: nowrap; }
+.garantie-strip:hover { border-color: var(--accent); color: var(--text); }
+@media (max-width: 600px) { .garantie-strip { flex-wrap: wrap; font-size: 14px; } .garantie-strip em { margin-left: 34px; } }

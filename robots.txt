@@ -7,5 +7,6 @@ Disallow: /welkom.html
 Disallow: /agenda.ics
 Disallow: /intern/
 Disallow: /homepage-warm.html
+Disallow: /prijscheck.html
 
 Sitemap: https://avezaatenevers.nl/sitemap.xml

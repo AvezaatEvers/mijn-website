@@ -1367,3 +1367,57 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
 .wij-duo figcaption strong { display: block; color: var(--ink); font-size: 16px; }
 @media (max-width: 1000px) { .br-lijst { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 900px) { .wij-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
+
+/* Prijscheck (test) */
+.pc-wrap { max-width: 720px; }
+.pc-kop { text-align: center; display: grid; gap: 12px; justify-items: center; margin-bottom: 28px; }
+.pc-kaart { background: var(--white); border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 18px 44px rgba(30, 64, 175, .08); padding: 28px; }
+.pc-voortgang { height: 6px; background: var(--tint); border-radius: 99px; overflow: hidden; }
+.pc-voortgang span { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width .35s ease; }
+.pc-nav { display: flex; justify-content: space-between; align-items: center; margin: 12px 0 18px; font-size: 13.5px; color: var(--muted); min-height: 28px; }
+.pc-nav span { margin-left: auto; }
+.pc-terug { background: none; border: 0; color: var(--accent); font: inherit; font-weight: 600; cursor: pointer; padding: 4px 0; }
+.pc-stap { border: 0; margin: 0; padding: 0; min-width: 0; }
+.pc-stap legend { font-size: 22px; font-weight: 700; color: var(--ink); line-height: 1.3; padding: 0; }
+.pc-hint { color: var(--muted); font-size: 15px; margin: 6px 0 0; }
+.pc-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+.pc-opts.pc-klein { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.pc-opts.pc-rij { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.pc-opt { text-align: left; background: var(--white); border: 1.5px solid var(--line); border-radius: 14px; padding: 16px 18px; font: inherit; color: var(--ink); cursor: pointer; display: grid; gap: 3px; transition: border-color .15s, background .15s, transform .15s; }
+@media (hover: hover) { .pc-opt:hover { border-color: var(--accent); background: var(--tint); } }
+.pc-opt:active { transform: scale(.98); }
+.pc-opt.gekozen { border-color: var(--accent); background: var(--tint); }
+.pc-opt strong { font-size: 16px; font-weight: 600; }
+.pc-opt small { font-size: 13.5px; color: var(--muted); }
+.pc-klein .pc-opt { padding: 14px; }
+.pc-label { font-size: 14px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; margin: 0; }
+.pc-prijs { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+.pc-prijs #pc-bedrag { font-size: 52px; font-weight: 800; color: var(--ink); letter-spacing: -.02em; line-height: 1.1; }
+.pc-per { color: var(--muted); font-size: 16px; }
+.pc-incl { color: var(--muted); font-size: 14.5px; margin: 4px 0 0; }
+.pc-regels { list-style: none; padding: 0; margin: 20px 0 0; border-top: 1px solid var(--line); }
+.pc-regels li { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+.pc-regels strong { white-space: nowrap; color: var(--ink); }
+.pc-regels .pc-tip { color: var(--accent); font-size: 14px; border-bottom: 0; }
+.pc-garantie { display: flex; gap: 8px; align-items: center; color: var(--accent); font-weight: 600; font-size: 14.5px; margin: 14px 0 0; }
+.pc-form { margin-top: 26px; padding: 24px; background: var(--tint); border-radius: 18px; display: grid; gap: 14px; }
+.pc-form h2 { font-size: 20px; margin: 0; }
+.pc-form > p { margin: 0; color: var(--text); font-size: 15px; }
+.pc-form label { display: grid; gap: 6px; font-size: 14px; font-weight: 600; color: var(--ink); }
+.pc-form input[type=text], .pc-form input[type=email], .pc-form input[type=tel] { font: inherit; font-weight: 400; padding: 12px 14px; border: 1.5px solid var(--tint-border); border-radius: 12px; background: var(--white); }
+.pc-form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.pc-opt-label { font-weight: 400; color: var(--muted); }
+.pc-form .pc-check { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; }
+.pc-check input { margin-top: 4px; }
+.pc-form .btn { justify-self: start; }
+.pc-of { font-size: 14px !important; color: var(--muted) !important; }
+.pc-noot { text-align: center; font-size: 13.5px; color: var(--muted); margin-top: 16px; }
+@media (max-width: 640px) {
+  .pc-kaart { padding: 20px 16px; border-radius: 20px; }
+  .pc-opts, .pc-opts.pc-klein { grid-template-columns: minmax(0, 1fr); }
+  .pc-opts.pc-klein { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pc-stap legend { font-size: 19px; }
+  .pc-prijs #pc-bedrag { font-size: 42px; }
+  .pc-form { padding: 18px; }
+  .pc-form .btn { justify-self: stretch; }
+}

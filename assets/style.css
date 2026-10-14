@@ -1347,26 +1347,12 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
   .warm-persoon blockquote { font-size: 16px; }
 }
 
-/* Testhomepage: WhatsApp-gesprek, branchelijst, wie wij zijn */
-.wa-chat { max-width: 400px; background: var(--tint, #EEF2FB); border-radius: 20px; overflow: hidden; border: 1px solid var(--tint-border, #C7D2FE); box-shadow: 0 14px 36px rgba(30, 64, 175, .10); margin-top: 6px; }
-.wa-kop { display: flex; align-items: center; gap: 10px; background: #fff; color: var(--ink); padding: 10px 14px; border-bottom: 1px solid var(--tint-border, #C7D2FE); }
-.wa-kop img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
-.wa-kop strong { display: block; font-size: 14px; }
-.wa-kop small { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
-.wa-online { width: 7px; height: 7px; border-radius: 50%; background: #22C55E; display: inline-block; }
-.wa-berichten { padding: 14px; display: flex; flex-direction: column; gap: 7px; min-height: 250px; }
-.wa-b { max-width: 80%; padding: 7px 11px 17px; border-radius: 14px; font-size: 14px; line-height: 1.45; color: var(--ink); position: relative; }
-.wa-b span { position: absolute; right: 10px; bottom: 3px; font-size: 10.5px; color: var(--muted); }
-.wa-b.uit { align-self: flex-end; background: var(--accent, #1E40AF); color: #fff; border-bottom-right-radius: 4px; }
-.wa-b.uit span { color: rgba(255, 255, 255, .75); }
-.wa-b.in { align-self: flex-start; background: #fff; border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(17, 24, 39, .06); }
-.wa-typen { display: none; }
-.wa-js .wa-b { opacity: 0; transform: translateY(10px) scale(.98); transition: opacity .35s ease, transform .35s ease; }
-.wa-js .wa-b.zicht { opacity: 1; transform: none; }
-.wa-js .wa-typen.zicht { display: inline-flex; align-self: flex-start; gap: 4px; background: #fff; padding: 11px 13px; border-radius: 14px; border-bottom-left-radius: 4px; }
-.wa-typen i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent, #1E40AF); animation: wa-stip 1s infinite; }
-.wa-typen i:nth-child(2) { animation-delay: .15s; } .wa-typen i:nth-child(3) { animation-delay: .3s; }
-@keyframes wa-stip { 0%, 60%, 100% { transform: translateY(0); opacity: .5; } 30% { transform: translateY(-4px); opacity: 1; } }
+/* Testhomepage: klantbeleving, branchelijst, wie wij zijn */
+.kl-lijst { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 22px; }
+.kl-lijst li { display: flex; gap: 16px; align-items: flex-start; }
+.kl-ic { flex: none; width: 46px; height: 46px; border-radius: 14px; background: var(--tint); color: var(--accent); display: grid; place-items: center; }
+.kl-lijst strong { display: block; font-size: 17px; color: var(--ink); margin-bottom: 2px; }
+.kl-lijst p { margin: 0; color: var(--text); font-size: 15.5px; line-height: 1.55; }
 .br-lijst { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .br-lijst a { display: flex; align-items: center; gap: 12px; padding: 10px 14px 10px 10px; border: 1px solid var(--line); border-radius: 16px; background: var(--white); text-decoration: none; color: var(--ink); font-weight: 600; font-size: 15px; transition: border-color .2s, box-shadow .2s; }
 .br-lijst a:hover { border-color: var(--accent); box-shadow: 0 8px 22px rgba(30, 64, 175, .10); color: var(--ink); }
@@ -1381,4 +1367,3 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
 .wij-duo figcaption strong { display: block; color: var(--ink); font-size: 16px; }
 @media (max-width: 1000px) { .br-lijst { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 900px) { .wij-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
-@media (prefers-reduced-motion: reduce) { .wa-js .wa-b { opacity: 1; transform: none; } }

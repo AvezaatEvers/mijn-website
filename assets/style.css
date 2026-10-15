@@ -1483,3 +1483,23 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
 .wissel strong { color: var(--ink); font-size: 16px; line-height: 1.4; padding-left: 26px; position: relative; }
 .wissel strong::before { content: ""; position: absolute; left: 0; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 12px no-repeat; }
 @media (max-width: 900px) { .wissel { grid-template-columns: minmax(0, 1fr); } }
+
+/* Branchepagina's: verdieping */
+.branche-diep { padding-top: 0; }
+.branche-diep h2 { margin-bottom: 14px; }
+.branche-diep h3 { font-size: 19px; margin: 30px 0 8px; }
+.branche-diep p, .branche-diep li { font-size: 16.5px; line-height: 1.7; color: var(--text); }
+.branche-diep ul { padding-left: 20px; display: grid; gap: 8px; }
+.rekenvb { background: var(--tint); border: 1px solid var(--tint-border); border-radius: 16px; padding: 20px 22px; margin: 22px 0 8px; }
+.rekenvb-kop { font-weight: 700; color: var(--accent) !important; font-size: 15px !important; margin: 0 0 10px; }
+.rekenvb table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.rekenvb td { padding: 8px 0; border-bottom: 1px solid var(--tint-border); vertical-align: top; }
+.rekenvb td:last-child { text-align: right; font-weight: 600; color: var(--ink); padding-left: 16px; }
+.rekenvb tr:last-child td { border-bottom: 0; }
+.rekenvb > p:last-child { font-size: 14.5px !important; margin: 10px 0 0; }
+.valkuil { list-style: none; padding: 0 !important; }
+.valkuil li { padding-left: 28px; position: relative; }
+.valkuil li::before { content: "!"; position: absolute; left: 0; top: 4px; width: 18px; height: 18px; border-radius: 50%; background: #FEF3C7; color: #B45309; font-size: 12px; font-weight: 700; display: grid; place-items: center; }
+.valkuil strong { color: var(--ink); }
+.branche-diep .meta { font-size: 13.5px; color: var(--muted); margin-top: 28px; }
+@media (max-width: 640px) { .rekenvb { padding: 16px; } .rekenvb table, .rekenvb td { font-size: 14px; } }

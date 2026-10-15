@@ -1505,7 +1505,7 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
 @media (max-width: 640px) { .rekenvb { padding: 16px; } .rekenvb table, .rekenvb td { font-size: 14px; } }
 
 /* Lange woorden in koppen (bijv. kleineondernemersregeling) */
-h1, h2, h3 { overflow-wrap: break-word; hyphens: auto; }
+h1, h2, h3 { overflow-wrap: break-word; }
 
 /* Rustiger: geen decoratieve schaduwen op vaste blokken en geen zwevende kaarten bij hover */
 .plan.featured, .cal-box, .ph-kaart, .wb-foto, .wb-kaartblok, .wb-team figure, .warm-moment, .pc-kaart, .bd-foto img, .hm-branche, .wb-chat { box-shadow: none; }

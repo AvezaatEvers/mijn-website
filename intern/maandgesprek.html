@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Maandelijkse 1-op-1 | Avezaat &amp; Evers</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css?v=118">
+<style>
+  html, body { height: 100%; }
+  body { margin: 0; overflow: hidden; background: #E6EBF5; }
+  body.is-notities { overflow: auto; background: var(--soft); }
+
+  /* Podium: alles is ontworpen op 1600 x 900 en wordt geschaald */
+  .deck { position: fixed; inset: 0; overflow: hidden; }
+  .stage { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; background: #fff; overflow: hidden; transform-origin: center center; box-shadow: 0 30px 80px rgba(17,24,39,.12); flex: none; }
+
+  .slide { position: absolute; inset: 0; padding: 88px 112px 110px; display: flex; flex-direction: column; opacity: 0; visibility: hidden; transition: opacity .45s ease, visibility 0s linear .45s; }
+  .slide.is-actief { opacity: 1; visibility: visible; transition: opacity .45s ease, visibility 0s; }
+  .slide .a { opacity: 0; transform: translateY(14px); transition: opacity .55s ease, transform .55s cubic-bezier(.2,.7,.2,1); }
+  .slide.is-actief .a { opacity: 1; transform: none; }
+  .slide.is-actief .a2 { transition-delay: .08s; } .slide.is-actief .a3 { transition-delay: .16s; } .slide.is-actief .a4 { transition-delay: .24s; } .slide.is-actief .a5 { transition-delay: .32s; } .slide.is-actief .a6 { transition-delay: .4s; }
+  .notes { display: none; }
+
+  .kicker { font-size: 18px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 18px; }
+  .slide h1 { font-size: 84px; line-height: 1.04; letter-spacing: -.035em; }
+  .slide h2 { font-size: 60px; line-height: 1.08; letter-spacing: -.03em; max-width: 1200px; }
+  .slide .sub { font-size: 26px; line-height: 1.5; color: var(--muted); max-width: 900px; margin-top: 24px; }
+  .accent { color: var(--accent); }
+  .body { flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
+
+  /* Voettekst */
+  .voet { position: absolute; left: 112px; right: 112px; bottom: 40px; display: flex; align-items: center; justify-content: space-between; font-size: 16px; color: var(--muted); z-index: 5; transition: opacity .3s; }
+  .voet .logo { font-size: 18px; }
+  .voet-r { display: flex; align-items: center; gap: 20px; }
+  .voet-balk { width: 180px; height: 4px; background: var(--line); border-radius: 4px; overflow: hidden; }
+  .voet-balk i { display: block; height: 100%; background: var(--accent); border-radius: 4px; transition: width .45s ease; }
+  .stage.is-titel .voet, .stage.is-slot .voet { opacity: 0; }
+
+  /* 1 Titel */
+  .s-titel { padding: 0; flex-direction: row; }
+  .s-titel .links { flex: 1; padding: 88px 40px 88px 112px; display: flex; flex-direction: column; }
+  .s-titel .links .logo { font-size: 26px; }
+  .s-titel .rechts { width: 680px; position: relative; background: var(--tint); }
+  .s-titel .rechts img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .s-titel .label { position: absolute; left: 40px; bottom: 40px; background: #fff; border-radius: 16px; padding: 16px 22px; display: flex; flex-direction: column; box-shadow: 0 12px 30px rgba(17,24,39,.14); }
+  .s-titel .label strong { font-size: 20px; } .s-titel .label span { font-size: 16px; color: var(--muted); }
+  .s-titel h1 { margin-top: 0; }
+  .meta { display: flex; gap: 14px; margin-top: 40px; flex-wrap: wrap; }
+  .pil { display: inline-flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 500; color: var(--accent); background: var(--tint); border: 1px solid var(--tint-border); border-radius: 999px; padding: 10px 20px; }
+  .pil svg { width: 20px; height: 20px; }
+
+  /* 2 Agenda */
+  .agenda { list-style: none; margin: 40px 0 0; padding: 0; display: grid; gap: 0; max-width: 1100px; }
+  .agenda li { display: grid; grid-template-columns: 90px 1fr auto; align-items: center; padding: 17px 0; border-top: 1px solid var(--line); }
+  .agenda li:last-child { border-bottom: 1px solid var(--line); }
+  .agenda b { font-size: 22px; color: var(--accent); font-weight: 600; }
+  .agenda strong { font-size: 29px; font-weight: 600; letter-spacing: -.02em; }
+  .agenda span { display: block; font-size: 19px; color: var(--muted); font-weight: 400; letter-spacing: 0; margin-top: 2px; }
+  .agenda em { font-style: normal; font-size: 18px; font-weight: 600; color: var(--muted); background: var(--soft); border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; }
+
+  /* 3 Wie */
+  .wie { display: grid; grid-template-columns: 1fr 1fr 1.15fr; gap: 32px; margin-top: 56px; align-items: stretch; }
+  .persoon { background: var(--soft); border: 1px solid var(--line); border-radius: 24px; padding: 32px; display: flex; flex-direction: column; }
+  .persoon img { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin-bottom: 24px; }
+  .persoon strong { font-size: 28px; letter-spacing: -.02em; }
+  .persoon span { font-size: 19px; color: var(--muted); margin-top: 4px; }
+  .persoon em { font-style: normal; font-size: 17px; font-weight: 500; color: var(--accent); margin-top: 16px; }
+  .wie-tekst { display: flex; flex-direction: column; gap: 24px; justify-content: center; padding-left: 16px; }
+  .wie-tekst p { font-size: 24px; line-height: 1.55; color: var(--text); }
+  .wie-tekst img { width: 300px; }
+
+  /* 4 Situatie */
+  .situatie { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; margin-top: 48px; }
+  .vragen { list-style: none; margin: 0; padding: 0; display: grid; gap: 34px; align-content: center; counter-reset: v; }
+  .vragen li { counter-increment: v; display: grid; grid-template-columns: 54px 1fr; align-items: start; font-size: 26px; line-height: 1.4; font-weight: 500; color: var(--ink); }
+  .vragen li::before { content: counter(v); width: 40px; height: 40px; border-radius: 50%; background: var(--tint); color: var(--accent); font-size: 18px; font-weight: 600; display: grid; place-items: center; margin-top: 1px; }
+  .paneel { background: var(--soft); border: 1px solid var(--line); border-radius: 24px; padding: 36px; }
+  .paneel h3 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+  .paneel p { font-size: 17px; color: var(--muted); margin-bottom: 18px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 26px; }
+  .chips:last-child { margin-bottom: 0; }
+  .chip { font: inherit; font-size: 19px; font-weight: 500; color: var(--text); background: #fff; border: 1.5px solid var(--line); border-radius: 999px; padding: 11px 20px 11px 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: background .2s, border-color .2s, color .2s; }
+  .chip::before { content: ""; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #C5CBD6; background: #fff center/12px no-repeat; transition: inherit; flex: none; }
+  .chip[data-groep]::before { border-radius: 50%; }
+  .chip:not([data-groep])::before { border-radius: 6px; }
+  .chip[aria-pressed="true"] { background: var(--tint); border-color: var(--accent); color: var(--accent); }
+  .chip[aria-pressed="true"]::before { background-color: var(--accent); border-color: var(--accent); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E"); }
+
+  /* 5 Wat wij doen */
+  .kaarten { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 56px; }
+  .kaart { border: 1px solid var(--line); border-radius: 24px; padding: 32px 28px; background: #fff; }
+  .ico { width: 60px; height: 60px; border-radius: 16px; background: var(--tint); color: var(--accent); display: grid; place-items: center; margin-bottom: 26px; }
+  .ico svg { width: 28px; height: 28px; }
+  .kaart strong { display: block; font-size: 24px; letter-spacing: -.015em; line-height: 1.25; margin-bottom: 12px; }
+  .kaart p { font-size: 18px; line-height: 1.55; color: var(--muted); }
+
+  /* 6 Zo werkt het */
+  .stappen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-top: 64px; position: relative; }
+  .stap { padding-right: 48px; position: relative; }
+  .stap-nr { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 26px; font-weight: 600; display: grid; place-items: center; position: relative; z-index: 1; box-shadow: 0 0 0 10px #fff; }
+  .stap::after { content: ""; position: absolute; left: 64px; right: 0; top: 31px; height: 2px; background: var(--tint-border); }
+  .stap:last-child::after { display: none; }
+  .stap strong { display: block; font-size: 30px; letter-spacing: -.02em; margin: 30px 0 12px; }
+  .stap p { font-size: 20px; line-height: 1.55; color: var(--muted); max-width: 380px; }
+  .stap ul { margin: 18px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+  .stap li { font-size: 18px; color: var(--text); display: flex; gap: 10px; align-items: center; }
+  .stap li::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+  .balk-tip { margin-top: 64px; display: inline-flex; align-self: flex-start; align-items: center; gap: 16px; background: var(--tint); border-radius: 18px; padding: 20px 28px; font-size: 22px; color: var(--ink); font-weight: 500; }
+  .balk-tip svg { width: 26px; height: 26px; color: var(--accent); flex: none; }
+
+  /* 7 MoneyMonk */
+  .mm { display: grid; grid-template-columns: 1fr 520px; gap: 40px; flex: 1; min-height: 0; }
+  .mm-tekst { display: flex; flex-direction: column; justify-content: center; }
+  .mm-lijst { list-style: none; margin: 40px 0 0; padding: 0; display: grid; gap: 22px; }
+  .mm-lijst li { display: grid; grid-template-columns: 48px 1fr; gap: 6px; align-items: start; font-size: 21px; line-height: 1.45; color: var(--muted); }
+  .mm-lijst li strong { color: var(--ink); font-weight: 600; }
+  .mm-lijst .ico { width: 38px; height: 38px; border-radius: 11px; margin: 0; }
+  .mm-lijst .ico svg { width: 19px; height: 19px; }
+  .mm-onder { display: flex; align-items: center; gap: 28px; margin-top: 44px; }
+  .mm-onder .stores { display: flex; gap: 12px; }
+  .mm-onder .stores img { height: 48px; width: auto; }
+  .mm-onder .erkend { height: 56px; width: auto; }
+  .mm-beeld { position: relative; background: var(--tint); border-radius: 32px; margin: -24px 0 -40px; display: grid; place-items: center; overflow: hidden; }
+  .mm-beeld img { height: 92%; width: auto; filter: none; }
+
+  /* 8 Jaar */
+  .jaar { margin-top: 80px; position: relative; }
+  .maanden { display: grid; grid-template-columns: repeat(12, 1fr); }
+  .maand { position: relative; height: 280px; border-left: 1px dashed var(--line); }
+  .maand:last-child { border-right: 1px dashed var(--line); }
+  .maand > b { position: absolute; left: 0; right: 0; top: 128px; text-align: center; font-size: 17px; font-weight: 600; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+  .spoor { position: absolute; left: 0; right: 0; top: 112px; height: 6px; border-radius: 6px; background: var(--tint); }
+  .mark { position: absolute; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; text-align: center; width: 170px; }
+  .mark i { width: 18px; height: 18px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 0 0 2px currentColor; background: currentColor; display: block; }
+  .mark.btw { color: var(--accent); bottom: 156px; }
+  .mark.btw i { order: 3; margin-top: 12px; }
+  .mark.ib { color: #0F766E; bottom: 156px; }
+  .mark.ib i { order: 3; margin-top: 12px; }
+  .mark.lev { color: #9CA3AF; top: 166px; }
+  .mark strong { font-size: 17px; line-height: 1.25; color: var(--ink); font-weight: 600; }
+  .mark span { font-size: 15px; color: var(--muted); }
+  .mark.lev strong { font-weight: 500; font-size: 15px; color: var(--muted); }
+  .mark.lev i { width: 12px; height: 12px; border-width: 3px; margin-bottom: 8px; }
+  .elke-maand { position: absolute; left: 0; right: 0; top: 232px; height: 44px; border-radius: 12px; background: var(--soft); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 17px; font-weight: 500; color: var(--text); }
+  .elke-maand svg { width: 20px; height: 20px; color: var(--accent); }
+  .jaar-noot { margin-top: 44px; font-size: 22px; color: var(--text); display: flex; gap: 40px; }
+  .jaar-noot span { display: inline-flex; align-items: center; gap: 10px; }
+  .jaar-noot i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+
+  /* 9 Verschil */
+  .tabel { margin-top: 48px; display: grid; grid-template-columns: 300px 1fr 1fr 1.1fr; font-size: 20px; border-radius: 24px; position: relative; }
+  .tabel > div { padding: 19px 24px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; color: var(--muted); }
+  .tabel .kop { font-size: 18px; font-weight: 600; color: var(--ink); border-bottom: 2px solid var(--line); padding-top: 24px; }
+  .tabel .rij { color: var(--ink); font-weight: 500; }
+  .tabel .wij { background: var(--tint); color: var(--ink); font-weight: 500; border-bottom-color: var(--tint-border); }
+  .tabel .wij.kop { color: var(--accent); border-radius: 20px 20px 0 0; border-bottom-color: var(--tint-border); }
+  .tabel .wij.laatst { border-radius: 0 0 20px 20px; border-bottom: 0; }
+  .tabel .laatst-r { border-bottom: 0; }
+  .v { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; display: inline-grid; place-items: center; flex: none; }
+  .v svg { width: 15px; height: 15px; }
+  .x { width: 26px; height: 26px; border-radius: 50%; background: var(--line); color: var(--muted); display: inline-grid; place-items: center; flex: none; }
+  .x svg { width: 13px; height: 13px; }
+
+  /* 10 Pakket */
+  .pakket { display: grid; grid-template-columns: 1.55fr 1fr; gap: 32px; margin-top: 48px; }
+  .pk { border: 2px solid var(--accent); border-radius: 28px; padding: 40px 44px; position: relative; }
+  .pk-tag { position: absolute; top: -16px; left: 40px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 6px 14px; border-radius: 999px; }
+  .pk-prijs { display: flex; align-items: baseline; gap: 14px; }
+  .pk-prijs b { font-size: 88px; letter-spacing: -.04em; line-height: 1; }
+  .pk-prijs span { font-size: 22px; color: var(--muted); }
+  .pk-sub { font-size: 19px; color: var(--muted); margin-top: 10px; }
+  .pk ul { list-style: none; padding: 0; margin: 32px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 28px; border-top: 1px solid var(--line); padding-top: 30px; }
+  .pk li { display: flex; gap: 12px; align-items: flex-start; font-size: 18px; line-height: 1.4; color: var(--text); }
+  .pk li .v { width: 24px; height: 24px; margin-top: 1px; }
+  .extras { background: var(--soft); border: 1px solid var(--line); border-radius: 28px; padding: 36px 36px; }
+  .extras h3 { font-size: 22px; margin-bottom: 6px; }
+  .extras > p { font-size: 17px; color: var(--muted); margin-bottom: 14px; }
+  .extras dl { margin: 0; }
+  .extras dl div { display: flex; justify-content: space-between; gap: 16px; padding: 13px 0; border-bottom: 1px solid var(--line); font-size: 18px; }
+  .extras dl div:last-child { border-bottom: 0; }
+  .extras dt { color: var(--text); } .extras dd { margin: 0; font-weight: 600; white-space: nowrap; }
+
+  /* 11 Jouw prijs */
+  .prijs { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; margin-top: 44px; }
+  .bon { border: 1px solid var(--line); border-radius: 28px; padding: 36px 40px; background: #fff; box-shadow: 0 20px 50px rgba(38,69,143,.08); }
+  .bon h3 { font-size: 16px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .bon-r { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 1px dashed var(--line); font-size: 20px; color: var(--text); }
+  .bon-r b { font-weight: 600; color: var(--ink); white-space: nowrap; }
+  .bon-r s { color: #9CA3AF; font-weight: 400; margin-right: 8px; }
+  .bon-r .gratis { color: #0F766E; }
+  .bon-r small { display: block; font-size: 15px; color: var(--muted); }
+  .bon-totaal { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 22px; }
+  .bon-totaal span { font-size: 20px; font-weight: 600; }
+  .bon-totaal span small { display: block; font-size: 16px; font-weight: 400; color: var(--muted); }
+  .bon-totaal b { font-size: 64px; letter-spacing: -.04em; line-height: 1; color: var(--accent); }
+  .bon-groep { margin-top: 26px; }
+  .tijd { display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+  .tijd h3 { font-size: 30px; letter-spacing: -.02em; }
+  .tijd > p { font-size: 20px; color: var(--muted); line-height: 1.5; }
+  .staaf { display: grid; grid-template-columns: 160px 1fr 70px; align-items: center; gap: 16px; font-size: 18px; color: var(--text); }
+  .staaf i { display: block; height: 30px; border-radius: 8px; background: #DCE3F3; }
+  .staaf.wij i { background: var(--accent); }
+  .staaf b { font-weight: 600; text-align: right; }
+  .staaf.wij { font-weight: 600; color: var(--accent); }
+  .klein { font-size: 15px; color: var(--muted); line-height: 1.5; }
+
+  /* 12 Overstappen */
+  .over { display: grid; grid-template-columns: 1.5fr 1fr; gap: 56px; margin-top: 48px; }
+  .over-stappen { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+  .over-stappen li { display: grid; grid-template-columns: 72px 1fr; padding-bottom: 28px; position: relative; }
+  .over-stappen li::before { content: ""; position: absolute; left: 23px; top: 48px; bottom: 0; width: 2px; background: var(--tint-border); }
+  .over-stappen li:last-child::before { display: none; }
+  .over-stappen b { width: 48px; height: 48px; border-radius: 50%; background: var(--tint); color: var(--accent); display: grid; place-items: center; font-size: 20px; font-weight: 600; }
+  .over-stappen strong { font-size: 25px; letter-spacing: -.015em; display: block; margin-top: 8px; }
+  .over-stappen p { font-size: 19px; color: var(--muted); line-height: 1.5; margin-top: 4px; }
+  .nodig { background: var(--soft); border: 1px solid var(--line); border-radius: 24px; padding: 34px; align-self: start; }
+  .nodig h3 { font-size: 22px; margin-bottom: 18px; }
+  .nodig ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .nodig li { display: flex; gap: 12px; font-size: 18px; color: var(--text); line-height: 1.4; }
+  .nodig li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; margin-top: 9px; }
+  .nodig p { font-size: 16px; color: var(--muted); margin-top: 18px; }
+  .gratis-band { margin-top: 18px; background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; border-radius: 16px; padding: 16px 20px; font-size: 18px; font-weight: 500; }
+
+  /* 13 Na vandaag */
+  .tijdlijn { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 72px; }
+  .tl { position: relative; padding-right: 36px; }
+  .tl::before { content: ""; position: absolute; left: 0; right: 0; top: 13px; height: 2px; background: var(--tint-border); }
+  .tl:last-child::before { right: 50%; }
+  .tl i { position: relative; display: block; width: 28px; height: 28px; border-radius: 50%; background: #fff; border: 3px solid var(--accent); }
+  .tl.klaar i { background: var(--accent); }
+  .tl.klaar i::after { content: ""; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/14px no-repeat; }
+  .tl small { display: block; font-size: 16px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-top: 28px; }
+  .tl strong { display: block; font-size: 27px; letter-spacing: -.02em; line-height: 1.25; margin: 8px 0 12px; }
+  .tl p { font-size: 19px; color: var(--muted); line-height: 1.55; }
+  .geruststelling { margin-top: 72px; display: flex; gap: 16px; flex-wrap: wrap; }
+
+  /* 14 Slot */
+  .s-slot { background: var(--accent); color: #fff; padding: 0; flex-direction: row; }
+  .s-slot .links { flex: 1; padding: 96px 64px 96px 112px; display: flex; flex-direction: column; }
+  .s-slot .logo { color: #fff; font-size: 26px; } .s-slot .logo span { color: #A5B4FC; }
+  .s-slot h2 { color: #fff; font-size: 96px; letter-spacing: -.04em; }
+  .s-slot .sub { color: #CAD4E8; }
+  .contact { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 56px; max-width: 760px; }
+  .contact div { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); border-radius: 18px; padding: 20px 24px; }
+  .contact small { display: block; font-size: 15px; color: #A5B4FC; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; }
+  .contact b { display: block; font-size: 23px; font-weight: 600; margin-top: 4px; }
+  .s-slot .rechts { width: 560px; position: relative; }
+  .s-slot .rechts img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+  /* Bediening (alleen zichtbaar bij muisbeweging, buiten het podium) */
+  .bed { position: fixed; right: 20px; bottom: 20px; display: flex; gap: 8px; z-index: 20; opacity: 0; transition: opacity .3s; }
+  body.muis .bed { opacity: 1; }
+  .bed button, .bed a { font: inherit; font-size: 14px; font-weight: 500; color: var(--ink); background: rgba(255,255,255,.95); border: 1px solid var(--line); border-radius: 12px; height: 42px; min-width: 42px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; text-decoration: none; box-shadow: 0 6px 20px rgba(17,24,39,.08); }
+  .bed button:hover, .bed a:hover { border-color: var(--tint-border); color: var(--accent); }
+  .bed svg { width: 18px; height: 18px; }
+  .melding { position: fixed; left: 50%; top: 20px; transform: translate(-50%, -10px); background: var(--ink); color: #fff; font-size: 14px; padding: 10px 16px; border-radius: 10px; opacity: 0; transition: opacity .25s, transform .25s; z-index: 30; pointer-events: none; }
+  .melding.zicht { opacity: 1; transform: translate(-50%, 0); }
+  .hulp { position: fixed; left: 20px; bottom: 20px; font-size: 13px; color: var(--muted); background: rgba(255,255,255,.95); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; z-index: 20; opacity: 0; transition: opacity .3s; line-height: 1.7; }
+  body.muis .hulp { opacity: 1; }
+  .hulp kbd { font: inherit; font-weight: 600; color: var(--ink); background: var(--soft); border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; }
+
+  /* Sprekersnotities (apart venster) */
+  .nt { max-width: 980px; margin: 0 auto; padding: 28px 24px 60px; }
+  .nt-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+  .nt-klok { display: flex; gap: 10px; align-items: center; }
+  .nt-tijd { font-size: 34px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .nt-tijd.achter { color: #B91C1C; }
+  .nt-schema { font-size: 14px; color: var(--muted); }
+  .nt-knop { font: inherit; font-size: 14px; font-weight: 600; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 9px 14px; cursor: pointer; }
+  .nt-knop.prim { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .nt-kaart { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 28px 32px; }
+  .nt-kaart small { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .nt-kaart h1 { font-size: 30px; margin: 4px 0 16px; letter-spacing: -.02em; }
+  .nt-inhoud { font-size: 19px; line-height: 1.6; color: var(--text); }
+  .nt-inhoud ul { padding-left: 22px; margin: 0 0 12px; } .nt-inhoud li { margin-bottom: 6px; }
+  .nt-inhoud p { margin-bottom: 12px; }
+  .nt-inhoud b { color: var(--ink); }
+  .nt-volgende { margin-top: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 15px; color: var(--muted); }
+  .nt-nav { display: flex; gap: 8px; }
+
+  @media print {
+    @page { size: 1600px 900px; margin: 0; }
+    html, body { height: auto; overflow: visible; background: #fff; }
+    .deck { position: static; display: block; }
+    .stage { position: static; transform: none !important; width: auto; height: auto; box-shadow: none; overflow: visible; }
+    .slide { position: relative; width: 1600px; height: 900px; opacity: 1; visibility: visible; page-break-after: always; break-after: page; }
+    .slide.is-overgeslagen { display: none; }
+    .slide .a { opacity: 1; transform: none; }
+    .voet, .bed, .hulp, .melding { display: none !important; }
+  }
+
+  /* ===== Maandgesprek (aanvullend op de basisstijl van de kennismaking) ===== */
+  .kicker { text-transform: none; letter-spacing: 0; font-size: 20px; }
+  .leeg { color: #9AA3B5; font-style: italic; }
+
+  /* Titel */
+  .s-titel .wie-chip { display: inline-flex; align-items: center; gap: 14px; margin-top: 40px; font-size: 20px; color: var(--text); }
+  .s-titel .wie-chip img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
+  .s-titel .wie-chip strong { display: block; color: var(--ink); font-size: 21px; }
+
+  /* Check-in */
+  .checkin { display: grid; grid-template-columns: 1.1fr 1fr; gap: 64px; margin-top: 48px; }
+  .checkin-vragen { list-style: none; margin: 0; padding: 0; display: grid; gap: 26px; }
+  .checkin-vragen li { font-size: 28px; line-height: 1.35; font-weight: 500; color: var(--ink); padding-left: 32px; position: relative; }
+  .checkin-vragen li::before { content: ""; position: absolute; left: 0; top: 16px; width: 14px; height: 3px; background: var(--accent); border-radius: 2px; }
+  .checkin-rel { background: var(--soft); border: 1px solid var(--line); border-radius: 20px; padding: 32px 36px; align-self: start; }
+  .checkin-rel h3 { font-size: 22px; margin-bottom: 6px; }
+  .checkin-rel > p { font-size: 18px; color: var(--muted); margin-bottom: 18px; }
+  .checkin-rel ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .checkin-rel li { font-size: 19px; color: var(--text); display: flex; gap: 12px; }
+  .checkin-rel li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; margin-top: 10px; }
+
+  /* Actiepunten vorige keer */
+  .ap-lijst { list-style: none; margin: 44px 0 0; padding: 0; max-width: 1200px; }
+  .ap-lijst li { display: grid; grid-template-columns: 52px 1fr auto; align-items: center; gap: 8px; padding: 18px 0; border-bottom: 1px solid var(--line); font-size: 25px; color: var(--ink); cursor: pointer; }
+  .ap-lijst li:first-child { border-top: 1px solid var(--line); }
+  .ap-st { width: 34px; height: 34px; border-radius: 50%; border: 2px solid #C5CBD6; display: grid; place-items: center; }
+  .ap-tag { font-size: 16px; font-weight: 600; border-radius: 8px; padding: 5px 12px; background: var(--soft); color: var(--muted); }
+  li[data-s="1"] .ap-st { border-color: #D97706; background: #FEF3C7; }
+  li[data-s="1"] .ap-tag { background: #FEF3C7; color: #92400E; }
+  li[data-s="2"] .ap-st { border-color: var(--accent); background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/18px no-repeat; }
+  li[data-s="2"] .ap-tag { background: var(--tint); color: var(--accent); }
+  li[data-s="2"] .ap-t { color: var(--muted); }
+  .ap-hint { margin-top: 18px; font-size: 16px; color: var(--muted); }
+
+  /* Cijfers */
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 40px; }
+  .kpi { border: 1px solid var(--line); border-radius: 20px; padding: 26px 30px; }
+  .kpi small { display: block; font-size: 18px; color: var(--muted); font-weight: 500; }
+  .kpi b { display: block; font-size: 52px; letter-spacing: -.03em; color: var(--ink); line-height: 1.1; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .kpi em { font-style: normal; font-size: 17px; font-weight: 600; margin-top: 6px; display: inline-block; }
+  .kpi em.op { color: #0F766E; } .kpi em.neer { color: #B91C1C; } .kpi em.gelijk { color: var(--muted); }
+  .kpi.hoofd { background: var(--tint); border-color: var(--tint-border); }
+  .grafiek { margin-top: 30px; }
+  .grafiek svg { width: 100%; height: 300px; display: block; }
+  .legenda { display: flex; gap: 28px; font-size: 17px; color: var(--muted); margin-top: 8px; }
+  .legenda span { display: inline-flex; align-items: center; gap: 8px; }
+  .legenda i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+
+  /* Jaar tot nu toe */
+  .jaar2 { display: grid; grid-template-columns: 1.15fr 1fr; gap: 56px; margin-top: 44px; }
+  .ytd { display: grid; gap: 0; }
+  .ytd div { display: flex; justify-content: space-between; align-items: baseline; padding: 18px 0; border-bottom: 1px solid var(--line); font-size: 22px; color: var(--text); }
+  .ytd div:first-child { border-top: 1px solid var(--line); }
+  .ytd b { font-size: 30px; color: var(--ink); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .ytd .groot b { font-size: 40px; color: var(--accent); }
+  .ytd small { display: block; font-size: 16px; color: var(--muted); }
+  .uren { background: var(--soft); border: 1px solid var(--line); border-radius: 20px; padding: 32px 36px; align-self: start; }
+  .uren h3 { font-size: 24px; margin-bottom: 4px; }
+  .uren > p { font-size: 18px; color: var(--muted); }
+  .uren-balk { height: 22px; border-radius: 11px; background: #E2E7F0; margin: 26px 0 12px; position: relative; overflow: hidden; }
+  .uren-balk i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); border-radius: 11px; }
+  .uren-balk u { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(45deg, #9DB0DA 0 6px, #B9C7E6 6px 12px); text-decoration: none; }
+  .uren-cijfers { display: flex; justify-content: space-between; font-size: 18px; color: var(--text); }
+  .uren-oordeel { margin-top: 22px; font-size: 20px; font-weight: 500; padding: 14px 18px; border-radius: 12px; }
+  .uren-oordeel.goed { background: #ECFDF5; color: #065F46; } .uren-oordeel.let { background: #FEF3C7; color: #92400E; }
+
+  /* Belasting */
+  .bel { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; }
+  .bel-kaart { border: 1px solid var(--line); border-radius: 20px; padding: 30px 34px; }
+  .bel-kaart h3 { font-size: 23px; margin-bottom: 4px; }
+  .bel-kaart > p { font-size: 17px; color: var(--muted); margin-bottom: 14px; }
+  .bel-r { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px dashed var(--line); font-size: 20px; color: var(--text); }
+  .bel-r b { color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .bel-r:last-of-type { border-bottom: 0; }
+  .bel-groot { display: flex; justify-content: space-between; align-items: baseline; margin-top: 14px; padding-top: 16px; border-top: 2px solid var(--line); }
+  .bel-groot span { font-size: 20px; font-weight: 600; color: var(--ink); }
+  .bel-groot b { font-size: 46px; letter-spacing: -.03em; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .advies { margin-top: 30px; display: flex; gap: 16px; align-items: flex-start; background: var(--tint); border-radius: 16px; padding: 20px 26px; font-size: 21px; color: var(--ink); line-height: 1.5; }
+  .advies svg { width: 28px; height: 28px; color: var(--accent); flex: none; margin-top: 2px; }
+  .klein-noot { font-size: 14px; color: var(--muted); margin-top: 14px; }
+
+  /* Administratie */
+  .adm { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 44px; }
+  .adm-kaart { border: 1px solid var(--line); border-radius: 20px; padding: 30px; }
+  .adm-kaart small { font-size: 18px; color: var(--muted); font-weight: 500; }
+  .adm-kaart b { display: block; font-size: 50px; letter-spacing: -.03em; color: var(--ink); margin: 8px 0 6px; font-variant-numeric: tabular-nums; }
+  .adm-kaart p { font-size: 18px; color: var(--text); line-height: 1.5; }
+  .adm-kaart.ok { background: #F0FDF4; border-color: #BBF7D0; }
+  .adm-kaart.let { background: #FFFBEB; border-color: #FDE68A; }
+
+  /* Deadlines */
+  .dl { list-style: none; margin: 44px 0 0; padding: 0; max-width: 1250px; }
+  .dl li { display: grid; grid-template-columns: 170px 1fr auto; gap: 24px; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--line); }
+  .dl li:first-child { border-top: 1px solid var(--line); }
+  .dl-datum { font-size: 22px; font-weight: 600; color: var(--accent); }
+  .dl strong { font-size: 25px; color: var(--ink); display: block; letter-spacing: -.01em; }
+  .dl span { font-size: 18px; color: var(--muted); }
+  .dl-wie { font-size: 16px; font-weight: 600; padding: 6px 14px; border-radius: 8px; background: var(--soft); color: var(--muted); white-space: nowrap; }
+  .dl-wie.jij { background: #FEF3C7; color: #92400E; }
+
+  /* Thema */
+  .thema { display: grid; grid-template-columns: 1.2fr 1fr; gap: 56px; margin-top: 40px; }
+  .thema-punten { list-style: none; margin: 0; padding: 0; display: grid; gap: 24px; }
+  .thema-punten li { display: grid; grid-template-columns: 56px 1fr; font-size: 22px; line-height: 1.5; color: var(--text); }
+  .thema-punten li b { width: 40px; height: 40px; border-radius: 50%; background: var(--tint); color: var(--accent); display: grid; place-items: center; font-size: 18px; }
+  .thema-punten strong { color: var(--ink); display: block; font-size: 24px; margin-bottom: 2px; }
+  .thema-eigen { background: var(--soft); border: 1px solid var(--line); border-radius: 20px; padding: 32px 36px; align-self: start; font-size: 21px; line-height: 1.55; color: var(--text); white-space: pre-line; }
+  .thema-eigen h3 { font-size: 22px; margin-bottom: 10px; color: var(--ink); }
+
+  /* Vragen */
+  .vr-lijst { list-style: none; margin: 44px 0 0; padding: 0; display: grid; gap: 0; max-width: 1250px; counter-reset: vr; }
+  .vr-lijst li { counter-increment: vr; display: grid; grid-template-columns: 60px 1fr; padding: 20px 0; border-bottom: 1px solid var(--line); font-size: 26px; color: var(--ink); line-height: 1.35; }
+  .vr-lijst li:first-child { border-top: 1px solid var(--line); }
+  .vr-lijst li::before { content: counter(vr); width: 40px; height: 40px; border-radius: 50%; background: var(--tint); color: var(--accent); font-size: 18px; font-weight: 600; display: grid; place-items: center; }
+  .vr-open { margin-top: 30px; font-size: 22px; color: var(--muted); }
+
+  /* Afspraken (live bewerkbaar) */
+  .afspr { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; }
+  .afspr-kol { border: 1px solid var(--line); border-radius: 20px; padding: 26px 30px; min-height: 420px; }
+  .afspr-kol h3 { font-size: 24px; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .afspr-kol h3 img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+  .afspr-kol ul { list-style: none; margin: 0; padding: 0; }
+  .afspr-kol li { font-size: 21px; color: var(--ink); padding: 12px 0 12px 30px; border-bottom: 1px solid var(--line); position: relative; outline: none; }
+  .afspr-kol li::before { content: ""; position: absolute; left: 4px; top: 22px; width: 12px; height: 12px; border: 2px solid var(--accent); border-radius: 4px; }
+  .afspr-kol li:focus { background: var(--soft); }
+  .afspr-kol li:empty::after { content: "Typ een afspraak"; color: #A3ABBB; }
+  .afspr-plus { font: inherit; font-size: 17px; font-weight: 600; color: var(--accent); background: none; border: 1.5px dashed var(--tint-border); border-radius: 10px; padding: 10px 16px; margin-top: 14px; cursor: pointer; }
+  .afspr-plus:hover { background: var(--tint); }
+
+  /* Slot */
+  .s-slot .volgende { margin-top: 48px; display: inline-flex; flex-direction: column; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); border-radius: 18px; padding: 22px 28px; }
+  .s-slot .volgende small { font-size: 17px; color: #CAD4E8; }
+  .s-slot .volgende b { font-size: 34px; font-weight: 600; letter-spacing: -.02em; margin-top: 4px; }
+
+  /* Voorbereiden: lade buiten het podium */
+  .lade { position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 100vw); background: #fff; border-left: 1px solid var(--line); box-shadow: -20px 0 60px rgba(17,24,39,.12); z-index: 40; transform: translateX(105%); transition: transform .3s ease; display: flex; flex-direction: column; }
+  .lade.open { transform: none; }
+  .lade-kop { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid var(--line); }
+  .lade-kop h2 { font-size: 20px; letter-spacing: -.01em; }
+  .lade-inhoud { overflow: auto; padding: 8px 22px 28px; flex: 1; }
+  .lade fieldset { border: 0; padding: 0; margin: 18px 0 0; }
+  .lade legend { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 10px; padding: 0; }
+  .lade label { display: grid; gap: 4px; font-size: 13.5px; color: var(--muted); margin-bottom: 10px; }
+  .lade input, .lade select, .lade textarea { font: inherit; font-size: 15px; color: var(--ink); border: 1px solid #D1D6E0; border-radius: 8px; padding: 8px 10px; background: #fff; width: 100%; }
+  .lade textarea { min-height: 84px; resize: vertical; }
+  .lade input:focus, .lade select:focus, .lade textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+  .lade .rij2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .lade .rij3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .maanden-in { display: grid; grid-template-columns: 54px 1fr 1fr; gap: 6px 10px; align-items: center; font-size: 13.5px; color: var(--muted); }
+  .maanden-in input { padding: 6px 8px; font-size: 14px; }
+  .maanden-in .kop { font-weight: 700; color: var(--ink); }
+  .lade .check { display: flex; gap: 8px; align-items: center; font-size: 14px; color: var(--text); }
+  .lade .check input { width: auto; }
+  .lade-hint { font-size: 13px; color: var(--muted); margin-top: -4px; margin-bottom: 10px; }
+  .lade-voet { border-top: 1px solid var(--line); padding: 14px 22px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .lade-voet button { font: inherit; font-size: 14px; font-weight: 600; border-radius: 8px; border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 9px 14px; cursor: pointer; }
+  .lade-voet button.prim { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .lade-sluit { font: inherit; background: none; border: 0; font-size: 26px; line-height: 1; cursor: pointer; color: var(--muted); }
+  .klanten { display: flex; gap: 8px; align-items: center; margin-top: 14px; }
+  .klanten select { flex: 1; }
+  .klanten button { font: inherit; font-size: 13px; border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 8px 10px; cursor: pointer; }
+  .bed .prim-knop { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .bed .prim-knop:hover { color: #fff; }
+  .s-slot .contact small { text-transform: none; letter-spacing: 0; font-size: 16px; }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+<div class="stage" id="stage">
+
+  <!-- 1 Titel -->
+  <section class="slide s-titel" data-titel="Welkom" data-min="0.5">
+    <div class="links">
+      <div class="logo a">Avezaat <span>&amp;</span> Evers</div>
+      <div class="body">
+        <div class="kicker a a2" id="t-maand">Maandelijkse 1-op-1</div>
+        <h1 class="a a3" id="t-kop">Je maandelijkse 1-op-1.</h1>
+        <p class="sub a a4">Een half uur over jouw bedrijf: hoe het gaat, wat de cijfers zeggen en wat er de komende tijd aankomt.</p>
+        <div class="wie-chip a a5"><img id="t-foto" src="/assets/img/daan-160.webp" alt="" width="56" height="56"><span><strong id="t-wie">Daan Evers</strong>Jouw vaste boekhouder</span></div>
+      </div>
+    </div>
+    <div class="rechts">
+      <img src="/assets/img/koen-daan.webp" alt="Koen Avezaat en Daan Evers" width="1200" height="975">
+    </div>
+    <aside class="notes">
+      <ul>
+        <li>Check beeld en geluid. "Fijn dat je er weer bent."</li>
+        <li>"We nemen een half uur. Ik begin graag met hoe het met jóu gaat, daarna kijken we naar de cijfers."</li>
+        <li>Heb je de lade (B) vooraf ingevuld? Dan staan alle cijfers klaar.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 2 Agenda -->
+  <section class="slide" data-titel="Agenda" data-min="1">
+    <div class="kicker a">Het komende half uur</div>
+    <h2 class="a a2">Wat we vandaag doen</h2>
+    <ol class="agenda">
+      <li class="a a2"><b>1</b><strong>Hoe gaat het?<span>Jouw maand, je plannen en wat er veranderd is</span></strong><em>5 min</em></li>
+      <li class="a a3"><b>2</b><strong>Je cijfers<span>Deze maand, het jaar tot nu toe en je uren</span></strong><em>7 min</em></li>
+      <li class="a a4"><b>3</b><strong>Belasting en administratie<span>Wat je opzij zet, en wat er nog openstaat</span></strong><em>7 min</em></li>
+      <li class="a a5"><b>4</b><strong>Vooruitkijken<span>Deadlines en het onderwerp van deze maand</span></strong><em>5 min</em></li>
+      <li class="a a6"><b>5</b><strong>Jouw vragen en afspraken<span>Wat jij wilt bespreken, en wie wat doet</span></strong><em>6 min</em></li>
+    </ol>
+    <aside class="notes">
+      <ul>
+        <li>Kort doorlopen.</li>
+        <li>Vraag: "Is er iets wat je vandaag in ieder geval wilt bespreken?" Zet het op de dia met vragen (lade, B).</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 3 Check-in -->
+  <section class="slide" data-titel="Hoe gaat het?" data-min="3">
+    <div class="kicker a">Even bijpraten</div>
+    <h2 class="a a2" id="c-kop">Vertel eens, hoe was je maand?</h2>
+    <div class="checkin">
+      <ul class="checkin-vragen a a3">
+        <li>Hoe was het werk deze maand: druk, rustig, anders dan verwacht?</li>
+        <li>Zitten er nieuwe klanten of grote opdrachten aan te komen?</li>
+        <li>Waar loop je tegenaan, in je bedrijf of je administratie?</li>
+        <li>Hoe gaat het met jou zelf?</li>
+      </ul>
+      <div class="checkin-rel a a4">
+        <h3>Is er iets veranderd?</h3>
+        <p>Dit kan gevolgen hebben voor je belasting. Laat het ons altijd weten.</p>
+        <ul>
+          <li>Een grote aankoop of investering gepland</li>
+          <li>Een nieuwe bus of auto, of ander gebruik ervan</li>
+          <li>Verhuizing, samenwonen, trouwen of een kind</li>
+          <li>Klanten in het buitenland</li>
+          <li>Personeel of iemand inhuren</li>
+          <li>Plannen voor een bv of een compagnon</li>
+        </ul>
+      </div>
+    </div>
+    <aside class="notes">
+      <p><b>Laat de klant praten (3 min).</b> Dit is het moment waarop je bedrijf leert kennen.</p>
+      <ul>
+        <li>Luister naar signalen: groei (KIA, voorlopige aanslag omhoog), minder werk (voorlopige aanslag omlaag), privé-veranderingen (fiscaal partner, hypotheek).</li>
+        <li>Noteer wat je hoort direct bij de afspraken (laatste dia's).</li>
+        <li>Grote verandering? Dan straks extra tijd bij belasting.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 4 Vorige keer -->
+  <section class="slide" data-titel="Afspraken vorige keer" data-min="2">
+    <div class="kicker a">Terugblik</div>
+    <h2 class="a a2">Wat we vorige keer afspraken</h2>
+    <ul class="ap-lijst a a3" id="ap-lijst"></ul>
+    <p class="ap-hint a a4">Klik op een afspraak om de status te wijzigen.</p>
+    <aside class="notes">
+      <ul>
+        <li>Loop de punten langs. Klik om de status te zetten: open, loopt, klaar.</li>
+        <li>Iets nog niet gedaan? Geen verwijt, wel een nieuwe afspraak met datum.</li>
+        <li>Eerste gesprek? Sla deze dia over of vertel wat je sinds de start hebt ingericht.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 5 Cijfers maand -->
+  <section class="slide" data-titel="Je cijfers" data-min="4">
+    <div class="kicker a" id="m-kicker">Je cijfers</div>
+    <h2 class="a a2" id="m-kop">Zo ging je maand</h2>
+    <div class="kpis a a3">
+      <div class="kpi"><small>Omzet</small><b id="m-omzet">€0</b><em id="m-omzet-d"></em></div>
+      <div class="kpi"><small>Kosten</small><b id="m-kosten">€0</b><em id="m-kosten-d"></em></div>
+      <div class="kpi hoofd"><small>Winst</small><b id="m-winst">€0</b><em id="m-winst-d"></em></div>
+    </div>
+    <div class="grafiek a a4">
+      <svg id="m-grafiek" viewBox="0 0 1376 300" role="img" aria-label="Omzet en kosten per maand"></svg>
+      <div class="legenda"><span><i style="background:var(--accent)"></i>Omzet</span><span><i style="background:#CAD4E8"></i>Kosten</span><span id="m-lege"></span></div>
+    </div>
+    <aside class="notes">
+      <ul>
+        <li>Benoem de grote lijn: hoger of lager dan vorige maand, en waarom (vraag het de klant).</li>
+        <li>Opvallende kostenpost? Leg uit wat het was.</li>
+        <li>Omzet is excl. btw. Btw is niet van de klant.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 6 Jaar tot nu toe -->
+  <section class="slide" data-titel="Het jaar tot nu toe" data-min="3">
+    <div class="kicker a">Het jaar tot nu toe</div>
+    <h2 class="a a2" id="j-kop">Waar je staat</h2>
+    <div class="jaar2">
+      <div class="ytd a a3">
+        <div><span>Omzet tot nu toe<small id="j-vj"></small></span><b id="j-omzet">€0</b></div>
+        <div><span>Kosten tot nu toe</span><b id="j-kosten">€0</b></div>
+        <div><span>Winst tot nu toe</span><b id="j-winst">€0</b></div>
+        <div class="groot"><span>Verwachte winst dit jaar<small>Als het tempo gelijk blijft</small></span><b id="j-prog">€0</b></div>
+      </div>
+      <div class="uren a a4">
+        <h3>Urencriterium</h3>
+        <p>Voor de zelfstandigenaftrek heb je 1.225 uur per jaar nodig.</p>
+        <div class="uren-balk"><u id="u-prog"></u><i id="u-nu"></i></div>
+        <div class="uren-cijfers"><span id="u-tekst">0 uur</span><span>1.225 uur</span></div>
+        <div class="uren-oordeel" id="u-oordeel"></div>
+      </div>
+    </div>
+    <aside class="notes">
+      <ul>
+        <li>De prognose is simpel doorgetrokken. Vraag of de rest van het jaar anders loopt (seizoen, grote opdracht).</li>
+        <li>Urencriterium: ook administratie, acquisitie en reistijd tellen mee. Houdt de klant uren bij in de app?</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 7 Belasting -->
+  <section class="slide" data-titel="Belasting" data-min="3">
+    <div class="kicker a">Belasting</div>
+    <h2 class="a a2">Wat je opzij zet</h2>
+    <div class="bel">
+      <div class="bel-kaart a a3">
+        <h3>Btw dit kwartaal</h3>
+        <p id="b-kw"></p>
+        <div class="bel-r"><span>Te betalen tot nu toe</span><b id="b-btw">€0</b></div>
+        <div class="bel-r"><span>Aangifte en betalen uiterlijk</span><b id="b-dl"></b></div>
+        <div class="bel-r"><span>Bonnetjes en facturen bij ons uiterlijk</span><b id="b-aan"></b></div>
+      </div>
+      <div class="bel-kaart a a4">
+        <h3>Inkomstenbelasting en Zvw</h3>
+        <p id="b-jaar">Schatting op basis van de verwachte winst</p>
+        <div class="bel-r"><span>Verwacht te betalen over het jaar</span><b id="b-ib">€0</b></div>
+        <div class="bel-r"><span>Via je voorlopige aanslag</span><b id="b-va">€0</b></div>
+        <div class="bel-groot"><span id="b-verschil-l">Verschil</span><b id="b-verschil">€0</b></div>
+      </div>
+    </div>
+    <div class="advies a a5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><span id="b-advies"></span></div>
+    <p class="klein-noot">Indicatie voor een ondernemer zonder ander inkomen en zonder fiscaal partner, met de tarieven van dit jaar. Geen definitieve berekening.</p>
+    <aside class="notes">
+      <ul>
+        <li>Btw: herinner aan de aanleverdatum (10e na het kwartaal).</li>
+        <li>IB: is het verschil groot? Bied aan de voorlopige aanslag aan te passen (Mijn Belastingdienst, of wij doen het).</li>
+        <li>Advies: zet btw én een vast percentage voor IB apart op een spaarrekening.</li>
+        <li>Partner, ander inkomen of hypotheek? Dan wijkt de echte aanslag af. Zeg dat erbij.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 8 Administratie -->
+  <section class="slide" data-titel="Administratie" data-min="2">
+    <div class="kicker a">Administratie</div>
+    <h2 class="a a2">Wat er nog openstaat</h2>
+    <div class="adm">
+      <div class="adm-kaart a a3" id="a1"><small>Openstaande facturen van klanten</small><b id="a-open">€0</b><p id="a-open-t"></p></div>
+      <div class="adm-kaart a a4" id="a2"><small>Betalingen zonder bonnetje</small><b id="a-bon">0</b><p id="a-bon-t"></p></div>
+      <div class="adm-kaart a a5" id="a3"><small>Verwerkt tot en met</small><b id="a-tm"></b><p>Alles daarvoor is geboekt en gecontroleerd.</p></div>
+    </div>
+    <aside class="notes">
+      <ul>
+        <li>Openstaande facturen ouder dan 30 dagen: bespreek een herinnering. Wil de klant dat wij een herinneringstekst sturen?</li>
+        <li>Ontbrekende bonnetjes: laat zien waar ze in de app staan. Afspraak maken wanneer ze binnen zijn.</li>
+        <li>Btw van een factuur die echt niet meer betaald wordt, kunnen we terugvragen.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 9 Deadlines -->
+  <section class="slide" data-titel="Deadlines" data-min="2">
+    <div class="kicker a">Vooruitkijken</div>
+    <h2 class="a a2">Wat er aankomt</h2>
+    <ul class="dl a a3" id="dl-lijst"></ul>
+    <aside class="notes">
+      <ul>
+        <li>Benadruk alleen wat de klant zelf moet doen (geel gemarkeerd).</li>
+        <li>De rest regelen wij; dat geeft rust.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 10 Thema van de maand -->
+  <section class="slide" data-titel="Onderwerp van de maand" data-min="3">
+    <div class="kicker a">Onderwerp van deze maand</div>
+    <h2 class="a a2" id="th-kop"></h2>
+    <div class="thema">
+      <ol class="thema-punten a a3" id="th-punten"></ol>
+      <div class="thema-eigen a a4" id="th-eigen"></div>
+    </div>
+    <aside class="notes">
+      <ul>
+        <li>Het onderwerp volgt het jaar: wat nu speelt voor elke zzp'er. Je kunt een eigen onderwerp kiezen in de lade (B).</li>
+        <li>Maak het concreet voor deze klant: "Voor jou betekent dit..."</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 11 Vragen -->
+  <section class="slide" data-titel="Jouw vragen" data-min="4">
+    <div class="kicker a">Jouw vragen</div>
+    <h2 class="a a2">Wat wil jij bespreken?</h2>
+    <ol class="vr-lijst a a3" id="vr-lijst"></ol>
+    <p class="vr-open a a4">En verder: alles wat je bezighoudt. Geen vraag is te klein.</p>
+    <aside class="notes">
+      <ul>
+        <li>Begin met de vragen die de klant vooraf stuurde of bij de agenda noemde.</li>
+        <li>Weet je iets niet zeker? Zeg dat je het uitzoekt, en zet het bij de afspraken.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 12 Afspraken -->
+  <section class="slide" data-titel="Afspraken" data-min="2">
+    <div class="kicker a">Afspraken</div>
+    <h2 class="a a2">Wie doet wat</h2>
+    <div class="afspr a a3">
+      <div class="afspr-kol"><h3 id="af-jij-kop">Jij</h3><ul id="af-jij"></ul><button class="afspr-plus" type="button" data-lijst="jij">Afspraak toevoegen</button></div>
+      <div class="afspr-kol"><h3><img id="af-foto" src="/assets/img/daan-160.webp" alt="" width="40" height="40"><span id="af-wij-kop">Wij</span></h3><ul id="af-wij"></ul><button class="afspr-plus" type="button" data-lijst="wij">Afspraak toevoegen</button></div>
+    </div>
+    <aside class="notes">
+      <ul>
+        <li>Typ de afspraken samen in, direct op de dia. Ze worden bewaard en staan volgende maand klaar bij "Afspraken vorige keer".</li>
+        <li>Elke afspraak: concreet en met een datum.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <!-- 13 Slot -->
+  <section class="slide s-slot" data-titel="Tot volgende maand" data-min="1">
+    <div class="links">
+      <div class="logo">Avezaat <span>&amp;</span> Evers</div>
+      <div class="body">
+        <h2 id="s-kop">Dank je wel.</h2>
+        <p class="sub">Tussendoor een vraag? Stuur gewoon een appje. Binnen 2 uur heb je antwoord.</p>
+        <div class="volgende"><small>Volgende 1-op-1</small><b id="s-volgende">Plan je via de link in je mail</b></div>
+        <div class="contact">
+          <div><small>WhatsApp en bellen</small><b>085 060 4363</b></div>
+          <div><small>Mail</small><b>info@avezaatenevers.nl</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="rechts"><img src="/assets/img/koen-daan.webp" alt="" width="1200" height="975"></div>
+    <aside class="notes">
+      <ul>
+        <li>Herhaal kort de afspraken.</li>
+        <li>Plan de volgende 1-op-1 meteen, of verwijs naar de planlink.</li>
+        <li>Sla op (de lade, B) zodat de afspraken volgende maand klaarstaan.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <div class="voet" id="voet">
+    <span class="logo">Avezaat <span>&amp;</span> Evers</span>
+    <span class="voet-r"><span id="voet-titel"></span><span class="voet-balk"><i id="voet-balk"></i></span><span id="voet-nr"></span></span>
+  </div>
+</div>
+</div>
+
+<!-- Voorbereiden -->
+<aside class="lade" id="lade" aria-label="Gesprek voorbereiden">
+  <div class="lade-kop"><h2>Gesprek voorbereiden</h2><button class="lade-sluit" type="button" id="lade-sluit" aria-label="Sluiten">×</button></div>
+  <div class="lade-inhoud">
+    <div class="klanten"><select id="k-lijst" aria-label="Eerder opgeslagen gesprek"><option value="">Eerder opgeslagen gesprek openen</option></select><button type="button" id="k-nieuw">Nieuw</button></div>
+    <form id="vf" autocomplete="off">
+      <fieldset><legend>Klant</legend>
+        <div class="rij2"><label>Voornaam<input name="naam"></label><label>Bedrijf<input name="bedrijf"></label></div>
+        <div class="rij3"><label>Boekhouder<select name="wie"><option>Daan</option><option>Koen</option></select></label><label>Jaar<input name="jaar" type="number" min="2025" max="2030"></label><label>Maand<select name="maand"></select></label></div>
+        <label class="check"><input type="checkbox" name="starter"> Recht op startersaftrek</label>
+      </fieldset>
+      <fieldset><legend>Omzet en kosten per maand (excl. btw)</legend>
+        <p class="lade-hint">Uit MoneyMonk. Laat toekomstige maanden leeg.</p>
+        <div class="maanden-in" id="maanden-in"><span class="kop"></span><span class="kop">Omzet</span><span class="kop">Kosten</span></div>
+        <label style="margin-top:10px">Omzet vorig jaar in dezelfde periode<input name="omzetVJ" inputmode="decimal"></label>
+      </fieldset>
+      <fieldset><legend>Uren en belasting</legend>
+        <div class="rij2"><label>Uren tot nu toe dit jaar<input name="uren" inputmode="numeric"></label><label>Voorlopige aanslag IB + Zvw per jaar<input name="va" inputmode="decimal"></label></div>
+        <label>Btw te betalen dit kwartaal tot nu toe<input name="btw" inputmode="decimal"></label>
+      </fieldset>
+      <fieldset><legend>Administratie</legend>
+        <div class="rij3"><label>Open facturen €<input name="openBedrag" inputmode="decimal"></label><label>Aantal<input name="openAantal" inputmode="numeric"></label><label>Oudste (dagen)<input name="openOudste" inputmode="numeric"></label></div>
+        <div class="rij2"><label>Betalingen zonder bon<input name="bonnen" inputmode="numeric"></label><label>Verwerkt t/m<input name="verwerkt" type="date"></label></div>
+      </fieldset>
+      <fieldset><legend>Gesprek</legend>
+        <label>Afspraken vorige keer (één per regel)<textarea name="vorige"></textarea></label>
+        <label>Vragen van de klant (één per regel)<textarea name="vragen"></textarea></label>
+        <label>Onderwerp<select name="thema"></select></label>
+        <label>Eigen toelichting bij het onderwerp<textarea name="themaEigen" placeholder="Bijvoorbeeld: wat dit voor deze klant betekent"></textarea></label>
+        <label>Volgende 1-op-1<input name="volgende" type="datetime-local"></label>
+      </fieldset>
+    </form>
+  </div>
+  <div class="lade-voet"><button class="prim" type="button" id="l-opslaan">Opslaan</button><button type="button" id="l-volgende">Klaar voor volgende maand</button><button type="button" id="l-link">Link kopiëren</button><button type="button" id="l-wis">Wissen</button></div>
+</aside>
+
+<div class="hulp" id="hulp"><kbd>←</kbd> <kbd>→</kbd> bladeren, <kbd>B</kbd> voorbereiden, <kbd>F</kbd> volledig scherm, <kbd>N</kbd> notities</div>
+<div class="bed" id="bed">
+  <a href="/intern/" title="Terug naar dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Dashboard</a>
+  <button type="button" id="b-voorb" class="prim-knop" title="Gesprek voorbereiden (B)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Voorbereiden</button>
+  <button type="button" id="b-notities" title="Sprekersnotities in apart venster (N)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>Notities</button>
+  <button type="button" id="b-vol" title="Volledig scherm (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+  <button type="button" id="b-terug" aria-label="Vorige dia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+  <button type="button" id="b-verder" aria-label="Volgende dia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+</div>
+<div class="melding" id="melding"></div>
+
+<script>
+(function () {
+  var MND = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+  var MK = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+  var params = new URLSearchParams(location.search);
+  var isNotities = params.has('notities');
+  var stage = document.getElementById('stage');
+  var alle = [].slice.call(document.querySelectorAll('.slide'));
+  var kanaal = 'BroadcastChannel' in window ? new BroadcastChannel('ae-maandgesprek') : null;
+
+  // ---------- Notitievenster (zelfde opzet als de kennismaking) ----------
+  if (isNotities) {
+    document.body.classList.add('is-notities');
+    document.getElementById('deck').remove();
+    ['hulp', 'bed', 'lade'].forEach(function (id) { var el = document.getElementById(id); if (el) el.remove(); });
+    var w = document.createElement('div');
+    w.className = 'nt';
+    w.innerHTML = '<div class="nt-top"><div class="nt-klok"><span class="nt-tijd" id="nt-tijd">0:00</span><span class="nt-schema" id="nt-schema"></span></div>' +
+      '<div class="nt-nav"><button class="nt-knop" id="nt-reset" type="button">Timer opnieuw</button><button class="nt-knop" id="nt-terug" type="button">Vorige</button><button class="nt-knop prim" id="nt-verder" type="button">Volgende</button></div></div>' +
+      '<div class="nt-kaart"><small id="nt-nr"></small><h1 id="nt-titel"></h1><div class="nt-inhoud" id="nt-inhoud"></div></div>' +
+      '<div class="nt-volgende"><span id="nt-volgende"></span><span>Tip: zet dit venster naast je gedeelde scherm.</span></div>';
+    document.body.appendChild(w);
+    var start = null, hNt = 0;
+    function toonNt(i) {
+      var s = alle[i]; hNt = i;
+      document.getElementById('nt-nr').textContent = 'Dia ' + (i + 1) + ' van ' + alle.length;
+      document.getElementById('nt-titel').textContent = s.getAttribute('data-titel');
+      document.getElementById('nt-inhoud').innerHTML = s.querySelector('.notes').innerHTML;
+      var v = alle[i + 1];
+      document.getElementById('nt-volgende').textContent = v ? 'Hierna: ' + v.getAttribute('data-titel') : 'Laatste dia';
+      if (!start && i > 0) start = Date.now();
+      klok();
+    }
+    function klok() {
+      var sec = start ? Math.floor((Date.now() - start) / 1000) : 0;
+      var plan = 0; for (var k = 0; k < hNt; k++) plan += +alle[k].getAttribute('data-min');
+      var el = document.getElementById('nt-tijd');
+      el.textContent = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+      el.classList.toggle('achter', sec > (plan + 3) * 60 || sec > 30 * 60);
+      var p = Math.round(plan * 60);
+      document.getElementById('nt-schema').textContent = 'schema ' + Math.floor(p / 60) + ':' + String(p % 60).padStart(2, '0') + ' van 30:00';
+    }
+    setInterval(klok, 1000);
+    document.getElementById('nt-reset').onclick = function () { start = Date.now(); klok(); };
+    document.getElementById('nt-terug').onclick = function () { kanaal && kanaal.postMessage({ stap: -1 }); };
+    document.getElementById('nt-verder').onclick = function () { kanaal && kanaal.postMessage({ stap: 1 }); };
+    document.addEventListener('keydown', function (e) {
+      if (['ArrowRight', 'PageDown', ' '].indexOf(e.key) > -1) { e.preventDefault(); kanaal && kanaal.postMessage({ stap: 1 }); }
+      if (['ArrowLeft', 'PageUp'].indexOf(e.key) > -1) { e.preventDefault(); kanaal && kanaal.postMessage({ stap: -1 }); }
+    });
+    if (kanaal) { kanaal.onmessage = function (e) { if (e.data && typeof e.data.dia === 'number') toonNt(e.data.dia); }; kanaal.postMessage({ vraag: 1 }); }
+    toonNt(0);
+    document.title = 'Notities | Maandgesprek';
+    return;
+  }
+
+  // ---------- Gegevens ----------
+  var vandaag = new Date();
+  function leeg() {
+    var vm = new Date(vandaag.getFullYear(), vandaag.getMonth() - 1, 1);
+    return { naam: '', bedrijf: '', wie: 'Daan', jaar: vm.getFullYear(), maand: vm.getMonth(), starter: false,
+      omzet: Array(12).fill(''), kosten: Array(12).fill(''), omzetVJ: '', uren: '', va: '', btw: '',
+      openBedrag: '', openAantal: '', openOudste: '', bonnen: '', verwerkt: '',
+      vorige: '', vs: [], vragen: '', thema: 'auto', themaEigen: '', volgende: '', jij: [], wij: [] };
+  }
+  var D = leeg();
+  function lees() { try { return JSON.parse(localStorage.getItem('ae-1op1') || '{}'); } catch (e) { return {}; } }
+  function schrijf(o) { try { localStorage.setItem('ae-1op1', JSON.stringify(o)); return true; } catch (e) { return false; } }
+  function sleutel(d) { return ((d.naam || 'klant') + (d.bedrijf ? ' (' + d.bedrijf + ')' : '')).trim() + ' | ' + MND[d.maand] + ' ' + d.jaar; }
+  function opslaan(stil) {
+    var o = lees(); o[sleutel(D)] = D; var ok = schrijf(o);
+    try { localStorage.setItem('ae-1op1-laatst', sleutel(D)); } catch (e) {}
+    vulKlanten();
+    if (!stil) melding(ok ? 'Opgeslagen' : 'Opslaan lukt niet in deze browser');
+  }
+  // Uit link (?d=) of laatst gebruikte
+  try {
+    if (params.get('d')) D = Object.assign(leeg(), JSON.parse(decodeURIComponent(escape(atob(params.get('d'))))));
+    else { var l = localStorage.getItem('ae-1op1-laatst'); var o = lees(); if (l && o[l]) D = Object.assign(leeg(), o[l]); }
+  } catch (e) {}
+
+  function n(v) { var x = parseFloat(String(v).replace(/\./g, '').replace(',', '.')); return isFinite(x) ? x : 0; }
+  function heeft(v) { return String(v).trim() !== ''; }
+  var fmt = new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+  function eur(x) { return fmt.format(Math.round(x)).replace(/\s/g, ' '); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
+  function zet(id, t) { var el = document.getElementById(id); if (el) el.textContent = t; }
+  function datumNL(d, metJaar) { return d.toLocaleDateString('nl-NL', metJaar ? { day: 'numeric', month: 'long', year: 'numeric' } : { day: 'numeric', month: 'long' }); }
+
+  // ---------- Belasting (zelfde tarieven als de netto-calculator) ----------
+  var JAREN = {
+    2026: { schijven: [[38883, 0.3575], [78426, 0.3756], [Infinity, 0.495]], ahk: { max: 3115, start: 29736, pct: 0.06398 },
+      ak: [[11965, 0, 0.08324, 0], [25845, 996, 0.31009, 11965], [45592, 5300, 0.0195, 25845]], akMax: 5685, akAfStart: 45592, akAfPct: 0.0651,
+      za: 1200, sa: 2123, mkb: 0.127, zvw: { pct: 0.0485, max: 79409 } },
+    2027: { schijven: [[39247, 0.3623], [78426, 0.3816], [Infinity, 0.495]], ahk: { max: 3154, start: 30910, pct: 0.06638 },
+      ak: [[12438, 0, 0.09503, 0], [26866, 1182, 0.30205, 12438], [47834, 5540, 0.01855, 26866]], akMax: 5929, akAfStart: 47834, akAfPct: 0.0651,
+      za: 900, sa: 10, mkb: 0.127, zvw: { pct: 0.0502, max: 82547 } }
+  };
+  function belasting(jaar, winst, uren, starter) {
+    var t = JAREN[jaar] || JAREN[2026];
+    if (winst <= 0) return 0;
+    var za = uren ? Math.min(t.za, winst) : 0, sa = uren && starter ? Math.min(t.sa, winst - za) : 0;
+    var na = Math.max(0, winst - za - sa), bel = Math.max(0, na - na * t.mkb);
+    var rest = bel, onder = 0, ib = 0;
+    t.schijven.forEach(function (s) { var deel = Math.max(0, Math.min(rest, s[0] - onder)); ib += deel * s[1]; rest -= deel; onder = s[0]; });
+    var ahk = Math.max(0, t.ahk.max - Math.max(0, bel - t.ahk.start) * t.ahk.pct), ak = 0;
+    for (var i = 0; i < t.ak.length; i++) { var b = t.ak[i]; if (bel <= b[0]) { ak = b[1] + (bel - b[3]) * b[2]; break; } }
+    if (bel > t.ak[t.ak.length - 1][0]) ak = Math.max(0, t.akMax - (bel - t.akAfStart) * t.akAfPct);
+    return Math.max(0, ib - Math.min(ib, ahk + ak)) + Math.min(bel, t.zvw.max) * t.zvw.pct;
+  }
+
+  // ---------- Onderwerp van de maand ----------
+  var THEMA = [
+    ['Je jaarafsluiting', [['Bonnetjes van het vierde kwartaal', 'Lever alles aan vóór 10 januari. De btw-aangifte over oktober tot en met december moet uiterlijk 31 januari binnen zijn.'], ['Je jaarcijfers', 'Wij maken je winst- en verliesrekening en je balans. Daarmee doen we straks je aangifte inkomstenbelasting.'], ['Jaaropgaven bewaren', 'In januari en februari krijg je jaaropgaven van je bank, hypotheek en zorgverzekeraar. Die hebben we nodig voor je aangifte.']]],
+    ['Je aangifte inkomstenbelasting voorbereiden', [['Vanaf 1 maart', 'Dan kan de aangifte over vorig jaar worden ingediend. De deadline is 1 mei, of later met uitstel via ons.'], ['Wat we van je nodig hebben', 'Jaaropgaven van je bank- en spaarrekeningen, je WOZ-waarde en hypotheekgegevens, en gegevens van je fiscaal partner.'], ['Je voorlopige aanslag', 'Rond deze tijd krijg je de voorlopige aanslag voor dit jaar. We kijken of hij past bij wat je verwacht te verdienen.']]],
+    ['Je aangifte en je voorlopige aanslag', [['Aangifte vóór 1 mei', 'Moet je bijbetalen, dan voorkom je belastingrente door vóór 1 mei aangifte te doen.'], ['Voorlopige aanslag aanpassen', 'Verwacht je dit jaar meer of minder te verdienen? Dan passen we je voorlopige aanslag aan.'], ['Aftrekposten', 'Denk aan giften, zorgkosten en lijfrente-inleg. Die kunnen je belasting verlagen.']]],
+    ['Het eerste kwartaal', [['Btw-aangifte', 'De aangifte over januari tot en met maart moet uiterlijk 30 april binnen zijn. Lever aan vóór 10 april.'], ['Op koers?', 'Na drie maanden zie je of je jaar loopt zoals je verwachtte.'], ['Aangifte vorig jaar', 'Die dienen we in vóór 1 mei, of we vragen uitstel aan.']]],
+    ['Je pensioen en verzekeringen', [['Pensioen', 'Als zzp\'er bouw je zelf pensioen op. Inleg in een lijfrente binnen je jaarruimte is aftrekbaar.'], ['Arbeidsongeschiktheid', 'Ben je verzekerd als je niet kunt werken? De premie van een arbeidsongeschiktheidsverzekering is aftrekbaar.'], ['Bedrijfsverzekeringen', 'Check ook je aansprakelijkheidsverzekering en de verzekering van je spullen.']]],
+    ['Halverwege het jaar', [['Prognose', 'Na zes maanden is de verwachting voor het hele jaar een stuk betrouwbaarder.'], ['Voorlopige aanslag', 'Past je voorlopige aanslag nog bij je winst? Liever nu bijstellen dan straks bijbetalen.'], ['Urencriterium', 'Op 1 juli zit je idealiter rond de 612 uur, de helft van 1.225.']]],
+    ['Btw en de zomer', [['Btw-aangifte', 'De aangifte over april tot en met juni moet uiterlijk 31 juli binnen zijn. Lever aan vóór 10 juli.'], ['Op vakantie?', 'Lever vooraf aan, of spreek met ons af wanneer je het doet.'], ['Openstaande facturen', 'Een rustige maand is een goed moment om openstaande facturen na te lopen.']]],
+    ['Je tarief', [['Reken je genoeg?', 'Je tarief moet ook vakantie, ziekte, pensioen en uren die je niet kunt factureren dekken.'], ['Tarief verhogen', 'Dat werkt het best per 1 januari. Kondig het ruim van tevoren aan bij je klanten.'], ['Laag uurtarief', 'Werk je voor ongeveer €38 per uur of minder? Lees dan ons artikel over schijnzelfstandigheid.']]],
+    ['Investeringen plannen', [['Investeringsaftrek', 'Investeer je in een jaar meer dan €2.900 in bedrijfsmiddelen, dan krijg je 28% extra aftrek.'], ['Wat staat er nog op je lijst?', 'Kijk wat je dit jaar al hebt gekocht en wat je nog nodig hebt.'], ['Alleen wat je nodig hebt', 'De aftrek is een korting op je belasting, niet op je aankoop. Koop niet alleen voor de aftrek.']]],
+    ['Op weg naar het jaareinde', [['Btw-aangifte', 'De aangifte over juli tot en met september moet uiterlijk 31 oktober binnen zijn.'], ['Je uren', 'Nog drie maanden voor het urencriterium. Hoeveel uur heb je al?'], ['Kleineondernemersregeling', 'Overweeg je de KOR voor volgend jaar? Meld je dan uiterlijk 4 weken voor 1 januari aan.']]],
+    ['Je jaareinde-checklist', [['Investeringen en kosten', 'Wat in dit jaar moet vallen, moet vóór 31 december geregeld zijn.'], ['Oninbare facturen', 'Facturen die niet meer betaald worden, kunnen we afboeken. De btw vragen we terug.'], ['Voorraad en onderhanden werk', 'Tel je voorraad op 31 december en noteer werk dat je al deed maar nog niet factureerde.']]],
+    ['De laatste weken van het jaar', [['Kosten en investeringen', 'Alleen kosten die echt bij dit jaar horen, verlagen je winst van dit jaar.'], ['Pensioeninleg', 'Wil je lijfrente-inleg nog dit jaar aftrekken? Dan moet die vóór 31 december betaald zijn.'], ['Voorraad tellen', 'Tel je voorraad op 31 december, tegen de inkoopprijs.']]]
+  ];
+
+  // ---------- Deadlines ----------
+  function deadlines() {
+    var y = vandaag.getFullYear(), L = [];
+    [y - 1, y, y + 1].forEach(function (j) {
+      [[0, 10, 'Bonnetjes en facturen vierde kwartaal aanleveren', 'Zodat wij je btw-aangifte op tijd kunnen doen', 1],
+       [0, 31, 'Btw-aangifte vierde kwartaal', 'Wij dienen in, jij betaalt het bedrag', 0],
+       [2, 1, 'Aangifte inkomstenbelasting kan worden ingediend', 'Wij verzamelen je gegevens', 0],
+       [3, 10, 'Bonnetjes en facturen eerste kwartaal aanleveren', 'Zodat wij je btw-aangifte op tijd kunnen doen', 1],
+       [3, 30, 'Btw-aangifte eerste kwartaal', 'Wij dienen in, jij betaalt het bedrag', 0],
+       [4, 1, 'Aangifte inkomstenbelasting vorig jaar', 'Uiterlijk 1 mei, of later met uitstel via ons', 0],
+       [6, 10, 'Bonnetjes en facturen tweede kwartaal aanleveren', 'Zodat wij je btw-aangifte op tijd kunnen doen', 1],
+       [6, 31, 'Btw-aangifte tweede kwartaal', 'Wij dienen in, jij betaalt het bedrag', 0],
+       [9, 10, 'Bonnetjes en facturen derde kwartaal aanleveren', 'Zodat wij je btw-aangifte op tijd kunnen doen', 1],
+       [9, 31, 'Btw-aangifte derde kwartaal', 'Wij dienen in, jij betaalt het bedrag', 0],
+       [11, 31, 'Laatste dag van het boekjaar', 'Investeringen en kosten voor dit jaar', 1]
+      ].forEach(function (r) { L.push({ d: new Date(j, r[0], r[1]), t: r[2], s: r[3], jij: !!r[4] }); });
+    });
+    if (D.volgende) { var v = new Date(D.volgende); if (!isNaN(v)) L.push({ d: v, t: 'Volgende 1-op-1', s: v.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }) + ' uur', jij: false, gesprek: true }); }
+    var nu = new Date(vandaag.getFullYear(), vandaag.getMonth(), vandaag.getDate());
+    return L.filter(function (x) { return x.d >= nu; }).sort(function (a, b) { return a.d - b.d; }).slice(0, 5);
+  }
+
+  // ---------- Grafiek ----------
+  function grafiek(omzet, kosten, m) {
+    var W = 1376, H = 300, onder = 40, boven = 10, gw = W / 12, bw = 30;
+    var max = Math.max.apply(null, omzet.concat(kosten).concat([1]));
+    var s = '';
+    for (var q = 1; q <= 3; q++) { var yy = boven + (H - onder - boven) * (1 - q / 3); s += '<line x1="0" x2="' + W + '" y1="' + yy + '" y2="' + yy + '" stroke="#E5E7EB" stroke-width="1"/>'; }
+    for (var i = 0; i < 12; i++) {
+      var x = i * gw + gw / 2, toek = i > m;
+      var ho = (H - onder - boven) * omzet[i] / max, hk = (H - onder - boven) * kosten[i] / max;
+      var op = toek ? 0.25 : (i === m ? 1 : 0.55);
+      if (omzet[i] > 0) s += '<rect x="' + (x - bw - 2) + '" y="' + (H - onder - ho) + '" width="' + bw + '" height="' + ho + '" rx="5" fill="#26458F" opacity="' + op + '"/>';
+      if (kosten[i] > 0) s += '<rect x="' + (x + 2) + '" y="' + (H - onder - hk) + '" width="' + bw + '" height="' + hk + '" rx="5" fill="#AEBBD8" opacity="' + op + '"/>';
+      s += '<text x="' + x + '" y="' + (H - 12) + '" text-anchor="middle" font-family="Poppins, sans-serif" font-size="17" font-weight="' + (i === m ? 600 : 400) + '" fill="' + (i === m ? '#111827' : '#6B7280') + '">' + MK[i] + '</text>';
+    }
+    s += '<line x1="0" x2="' + W + '" y1="' + (H - onder) + '" y2="' + (H - onder) + '" stroke="#CAD4E8" stroke-width="2"/>';
+    return s;
+  }
+  function delta(nu, voor, omgekeerd) {
+    if (!voor) return ['', ''];
+    var p = Math.round((nu - voor) / Math.abs(voor) * 100);
+    if (p === 0) return ['gelijk', 'Gelijk aan vorige maand'];
+    var goed = omgekeerd ? p < 0 : p > 0;
+    return [goed ? 'op' : 'neer', (p > 0 ? '+' : '') + p + '% ten opzichte van vorige maand'];
+  }
+
+  // ---------- Alles tekenen ----------
+  function render() {
+    var naam = (D.naam || '').trim(), m = +D.maand, jaar = +D.jaar;
+    var wie = D.wie === 'Koen' ? 'Koen Avezaat' : 'Daan Evers', foto = D.wie === 'Koen' ? '/assets/img/koen-160.webp' : '/assets/img/daan-160.webp';
+    document.title = (naam ? '1-op-1 met ' + naam : '1-op-1') + ' | Avezaat & Evers';
+    zet('t-maand', 'Maandelijkse 1-op-1 over ' + MND[m] + ' ' + jaar);
+    document.getElementById('t-kop').textContent = naam ? 'Goed je te zien, ' + naam + '.' : 'Je maandelijkse 1-op-1.';
+    zet('t-wie', wie); document.getElementById('t-foto').src = foto; document.getElementById('af-foto').src = foto;
+    zet('c-kop', naam ? 'Hoe gaat het, ' + naam + '?' : 'Vertel eens, hoe was je maand?');
+    zet('af-jij-kop', naam || 'Jij'); zet('af-wij-kop', D.wie);
+
+    // Vorige afspraken
+    var vor = D.vorige.split('\n').map(function (t) { return t.trim(); }).filter(Boolean);
+    var tags = ['Open', 'Loopt', 'Klaar'];
+    document.getElementById('ap-lijst').innerHTML = vor.length ? vor.map(function (t, i) {
+      var s = D.vs[i] || 0;
+      return '<li data-i="' + i + '" data-s="' + s + '"><span class="ap-st"></span><span class="ap-t">' + esc(t) + '</span><span class="ap-tag">' + tags[s] + '</span></li>';
+    }).join('') : '<li style="cursor:default"><span></span><span class="leeg">Nog geen afspraken van vorige keer. Vul ze in bij Voorbereiden (B).</span><span></span></li>';
+
+    // Cijfers
+    var om = D.omzet.map(n), ko = D.kosten.map(n);
+    var o = om[m], k = ko[m], wi = o - k, vo = m > 0 ? om[m - 1] : 0, vk = m > 0 ? ko[m - 1] : 0;
+    zet('m-kicker', 'Je cijfers over ' + MND[m]);
+    zet('m-kop', heeft(D.omzet[m]) ? (wi >= 0 ? 'Je hield ' + eur(wi) + ' over in ' + MND[m] : 'Een maand met meer kosten dan omzet') : 'Zo ging je maand');
+    zet('m-omzet', eur(o)); zet('m-kosten', eur(k)); zet('m-winst', eur(wi));
+    [['m-omzet-d', delta(o, vo)], ['m-kosten-d', delta(k, vk, true)], ['m-winst-d', delta(wi, vo - vk)]].forEach(function (r) { var el = document.getElementById(r[0]); el.className = r[1][0]; el.textContent = r[1][1]; });
+    document.getElementById('m-grafiek').innerHTML = grafiek(om, ko, m);
+    zet('m-lege', 'Maanden na ' + MND[m] + ' zijn nog leeg');
+
+    // Jaar tot nu toe
+    var oY = 0, kY = 0; for (var i = 0; i <= m; i++) { oY += om[i]; kY += ko[i]; }
+    var wY = oY - kY, prog = wY / (m + 1) * 12;
+    zet('j-kop', 'Waar je staat na ' + MND[m]);
+    zet('j-omzet', eur(oY)); zet('j-kosten', eur(kY)); zet('j-winst', eur(wY)); zet('j-prog', eur(prog));
+    var vj = n(D.omzetVJ);
+    zet('j-vj', vj ? (oY >= vj ? '+' : '') + Math.round((oY - vj) / vj * 100) + '% ten opzichte van vorig jaar (' + eur(vj) + ')' : '');
+    var uren = n(D.uren), uProg = uren / (m + 1) * 12;
+    document.getElementById('u-nu').style.width = Math.min(100, uren / 1225 * 100) + '%';
+    document.getElementById('u-prog').style.width = Math.min(100, uProg / 1225 * 100) + '%';
+    zet('u-tekst', Math.round(uren).toLocaleString('nl-NL') + ' uur tot nu toe');
+    var uo = document.getElementById('u-oordeel');
+    if (!heeft(D.uren)) { uo.className = 'uren-oordeel let'; uo.textContent = 'Nog geen uren ingevuld. Houd je je uren bij in de app?'; }
+    else if (uren >= 1225) { uo.className = 'uren-oordeel goed'; uo.textContent = 'Je hebt het urencriterium al gehaald.'; }
+    else if (uProg >= 1225) { uo.className = 'uren-oordeel goed'; uo.textContent = 'Op dit tempo haal je het: ongeveer ' + Math.round(uProg).toLocaleString('nl-NL') + ' uur dit jaar.'; }
+    else { uo.className = 'uren-oordeel let'; uo.textContent = 'Op dit tempo kom je op ongeveer ' + Math.round(uProg).toLocaleString('nl-NL') + ' uur. Je hebt nog ' + Math.round(1225 - uren).toLocaleString('nl-NL') + ' uur nodig.'; }
+
+    // Belasting
+    var kw = Math.floor(m / 3), kwNamen = ['eerste', 'tweede', 'derde', 'vierde'];
+    var dl = new Date(jaar, kw * 3 + 4, 0), aan = new Date(jaar, kw * 3 + 3, 10);
+    zet('b-kw', 'Het ' + kwNamen[kw] + ' kwartaal: ' + MND[kw * 3] + ' tot en met ' + MND[kw * 3 + 2]);
+    zet('b-btw', heeft(D.btw) ? eur(n(D.btw)) : 'nog niet bekend'); zet('b-dl', datumNL(dl, true)); zet('b-aan', datumNL(aan, true));
+    var ib = belasting(jaar, prog, heeft(D.uren) ? uProg >= 1225 : true, D.starter), va = n(D.va), vers = ib - va;
+    zet('b-jaar', 'Schatting op basis van een verwachte winst van ' + eur(prog));
+    zet('b-ib', eur(ib)); zet('b-va', heeft(D.va) ? eur(va) : 'niet ingevuld');
+    zet('b-verschil-l', vers > 0 ? 'Mogelijk bij te betalen' : 'Mogelijk terug te krijgen');
+    zet('b-verschil', heeft(D.va) ? eur(Math.abs(vers)) : '');
+    var per = Math.max(0, ib) / 12, adv;
+    if (!heeft(D.va)) adv = 'Zet elke maand ongeveer ' + eur(per) + ' apart voor je inkomstenbelasting, naast de btw.';
+    else if (Math.abs(vers) < 500) adv = 'Je voorlopige aanslag past goed bij je verwachte winst. Zet daarnaast de btw apart.';
+    else if (vers > 0) adv = 'Je voorlopige aanslag is ongeveer ' + eur(vers) + ' te laag. We kunnen hem verhogen, dan betaal je het verspreid in plaats van achteraf in één keer.';
+    else adv = 'Je voorlopige aanslag is ongeveer ' + eur(-vers) + ' te hoog. We kunnen hem verlagen, zodat je niet te veel vooruitbetaalt.';
+    zet('b-advies', adv);
+
+    // Administratie
+    var ob = n(D.openBedrag), oa = n(D.openAantal), oo = n(D.openOudste), bn = n(D.bonnen);
+    zet('a-open', eur(ob));
+    zet('a-open-t', !heeft(D.openBedrag) ? 'Nog niet ingevuld.' : ob === 0 ? 'Alles is betaald. Netjes.' : oa + (oa === 1 ? ' factuur' : ' facturen') + (oo ? ', de oudste staat ' + oo + ' dagen open.' : '.'));
+    document.getElementById('a1').className = 'adm-kaart a a3 ' + (heeft(D.openBedrag) ? (oo > 30 ? 'let' : 'ok') : '');
+    zet('a-bon', String(bn));
+    zet('a-bon-t', !heeft(D.bonnen) ? 'Nog niet ingevuld.' : bn === 0 ? 'Bij elke betaling zit een bonnetje of factuur.' : 'Upload deze nog in de app, dan is je administratie compleet.');
+    document.getElementById('a2').className = 'adm-kaart a a4 ' + (heeft(D.bonnen) ? (bn > 0 ? 'let' : 'ok') : '');
+    zet('a-tm', D.verwerkt ? datumNL(new Date(D.verwerkt)) : datumNL(new Date(jaar, m + 1, 0)));
+
+    // Deadlines
+    document.getElementById('dl-lijst').innerHTML = deadlines().map(function (x) {
+      return '<li><span class="dl-datum">' + datumNL(x.d) + '</span><span><strong>' + esc(x.t) + '</strong><span>' + esc(x.s) + '</span></span><span class="dl-wie' + (x.jij ? ' jij' : '') + '">' + (x.gesprek ? 'Samen' : x.jij ? 'Jij' : 'Wij') + '</span></li>';
+    }).join('');
+
+    // Thema
+    var ti = D.thema === 'auto' ? vandaag.getMonth() : +D.thema, th = THEMA[ti];
+    zet('th-kop', th[0]);
+    document.getElementById('th-punten').innerHTML = th[1].map(function (p, i) { return '<li><b>' + (i + 1) + '</b><span><strong>' + esc(p[0]) + '</strong>' + esc(p[1]) + '</span></li>'; }).join('');
+    var te = document.getElementById('th-eigen');
+    te.innerHTML = D.themaEigen.trim() ? '<h3>Voor jou</h3>' + esc(D.themaEigen.trim()) : '<h3>Voor jou</h3><span class="leeg">Wat betekent dit voor ' + esc(naam || 'deze klant') + '? Vul een toelichting in bij Voorbereiden (B), of bespreek het live.</span>';
+
+    // Vragen
+    var vr = D.vragen.split('\n').map(function (t) { return t.trim(); }).filter(Boolean);
+    document.getElementById('vr-lijst').innerHTML = vr.length ? vr.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') : '<li class="leeg" style="list-style:none">Geen vragen vooraf doorgegeven.</li>';
+
+    // Afspraken
+    ['jij', 'wij'].forEach(function (k) {
+      var ul = document.getElementById('af-' + k);
+      if (document.activeElement && ul.contains(document.activeElement)) return;
+      var lijst = D[k].length ? D[k] : [''];
+      ul.innerHTML = lijst.map(function (t) { return '<li contenteditable="true" spellcheck="true">' + esc(t) + '</li>'; }).join('');
+    });
+
+    // Slot
+    zet('s-kop', naam ? 'Dank je wel, ' + naam + '.' : 'Dank je wel.');
+    if (D.volgende) { var v = new Date(D.volgende); if (!isNaN(v)) zet('s-volgende', v.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' }) + ', ' + v.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }) + ' uur'); }
+    else zet('s-volgende', 'Plan je via de link in je mail');
+  }
+
+  // Status vorige afspraken wisselen
+  document.getElementById('ap-lijst').addEventListener('click', function (e) {
+    var li = e.target.closest('li[data-i]'); if (!li) return;
+    var i = +li.getAttribute('data-i'); D.vs[i] = ((D.vs[i] || 0) + 1) % 3; render(); opslaan(true);
+  });
+  // Afspraken live bewerken
+  function leesAfspraken() {
+    ['jij', 'wij'].forEach(function (k) { D[k] = [].map.call(document.querySelectorAll('#af-' + k + ' li'), function (li) { return li.textContent.trim(); }).filter(Boolean); });
+    opslaan(true);
+  }
+  var at;
+  document.querySelector('.afspr').addEventListener('input', function () { clearTimeout(at); at = setTimeout(leesAfspraken, 400); });
+  document.querySelector('.afspr').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.matches('li')) {
+      e.preventDefault();
+      var li = document.createElement('li'); li.contentEditable = 'true'; e.target.after(li); li.focus();
+    }
+    if (e.key === 'Backspace' && e.target.matches('li') && !e.target.textContent && e.target.parentNode.children.length > 1) {
+      e.preventDefault(); var p = e.target.previousElementSibling || e.target.nextElementSibling; e.target.remove(); p.focus(); leesAfspraken();
+    }
+    e.stopPropagation();
+  });
+  document.querySelectorAll('.afspr-plus').forEach(function (b) {
+    b.addEventListener('click', function () { var ul = document.getElementById('af-' + b.getAttribute('data-lijst')); var li = document.createElement('li'); li.contentEditable = 'true'; ul.appendChild(li); li.focus(); });
+  });
+
+  // ---------- Voorbereiden (lade) ----------
+  var lade = document.getElementById('lade'), vf = document.getElementById('vf');
+  var mIn = document.getElementById('maanden-in');
+  MK.forEach(function (mk, i) { mIn.insertAdjacentHTML('beforeend', '<span>' + mk + '</span><input data-o="' + i + '" inputmode="decimal" aria-label="Omzet ' + MND[i] + '"><input data-k="' + i + '" inputmode="decimal" aria-label="Kosten ' + MND[i] + '">'); });
+  vf.maand.innerHTML = MND.map(function (x, i) { return '<option value="' + i + '">' + x + '</option>'; }).join('');
+  vf.thema.innerHTML = '<option value="auto">Automatisch: ' + THEMA[vandaag.getMonth()][0] + '</option>' + THEMA.map(function (t, i) { return '<option value="' + i + '">' + t[0] + '</option>'; }).join('');
+  function naarForm() {
+    ['naam', 'bedrijf', 'wie', 'jaar', 'maand', 'omzetVJ', 'uren', 'va', 'btw', 'openBedrag', 'openAantal', 'openOudste', 'bonnen', 'verwerkt', 'vorige', 'vragen', 'thema', 'themaEigen', 'volgende'].forEach(function (k) { if (vf[k]) vf[k].value = D[k]; });
+    vf.starter.checked = !!D.starter;
+    mIn.querySelectorAll('[data-o]').forEach(function (el) { el.value = D.omzet[+el.getAttribute('data-o')]; });
+    mIn.querySelectorAll('[data-k]').forEach(function (el) { el.value = D.kosten[+el.getAttribute('data-k')]; });
+  }
+  vf.addEventListener('input', function (e) {
+    var t = e.target;
+    if (t.hasAttribute('data-o')) D.omzet[+t.getAttribute('data-o')] = t.value;
+    else if (t.hasAttribute('data-k')) D.kosten[+t.getAttribute('data-k')] = t.value;
+    else if (t.name === 'starter') D.starter = t.checked;
+    else if (t.name) { D[t.name] = (t.name === 'maand' || t.name === 'jaar') ? +t.value : t.value; if (t.name === 'vorige') D.vs = []; }
+    render();
+  });
+  vf.addEventListener('change', function (e) { if (e.target.name === 'starter') { D.starter = e.target.checked; render(); } });
+  function openLade() { naarForm(); lade.classList.add('open'); setTimeout(function () { vf.naam.focus(); }, 300); }
+  function sluitLade() { lade.classList.remove('open'); }
+  document.getElementById('b-voorb').onclick = openLade;
+  document.getElementById('lade-sluit').onclick = sluitLade;
+  document.getElementById('l-opslaan').onclick = function () { opslaan(); };
+  document.getElementById('l-wis').onclick = function () { if (confirm('Alle velden wissen? Opgeslagen gesprekken blijven bewaard.')) { D = leeg(); naarForm(); render(); } };
+  document.getElementById('l-volgende').onclick = function () {
+    opslaan(true);
+    var afspr = D.jij.map(function (t) { return (D.naam || 'Klant') + ': ' + t; }).concat(D.wij.map(function (t) { return D.wie + ': ' + t; }));
+    var nm = (+D.maand + 1) % 12, nj = +D.maand === 11 ? +D.jaar + 1 : +D.jaar;
+    D = Object.assign({}, D, { maand: nm, jaar: nj, vorige: afspr.join('\n'), vs: [], vragen: '', themaEigen: '', thema: 'auto', btw: '', bonnen: '', openBedrag: '', openAantal: '', openOudste: '', verwerkt: '', volgende: '', jij: [], wij: [] });
+    if (nm === 0) { D.omzet = Array(12).fill(''); D.kosten = Array(12).fill(''); D.uren = ''; D.omzetVJ = ''; }
+    naarForm(); render(); opslaan(true);
+    melding('Klaar voor ' + MND[nm] + ': de afspraken staan bij "vorige keer"');
+  };
+  document.getElementById('l-link').onclick = function () {
+    var url = location.origin + location.pathname + '?d=' + encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(D)))));
+    (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function () { melding('Link gekopieerd. Hiermee open je dit gesprek op een ander apparaat.'); }, function () { prompt('Kopieer deze link:', url); });
+  };
+  var kl = document.getElementById('k-lijst');
+  function vulKlanten() {
+    var o = lees(), ks = Object.keys(o).sort();
+    kl.innerHTML = '<option value="">Eerder opgeslagen gesprek openen</option>' + ks.map(function (k) { return '<option>' + esc(k) + '</option>'; }).join('');
+  }
+  kl.onchange = function () { var o = lees(); if (o[kl.value]) { D = Object.assign(leeg(), o[kl.value]); naarForm(); render(); melding('Geopend: ' + kl.value); } };
+  document.getElementById('k-nieuw').onclick = function () { D = leeg(); naarForm(); render(); vf.naam.focus(); };
+  vulKlanten();
+
+  // ---------- Presenteren ----------
+  function schaal() { var s = Math.min(window.innerWidth / 1600, window.innerHeight / 900); stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')'; }
+  window.addEventListener('resize', schaal); schaal();
+  var huidig = 0;
+  function ga(i, stil) {
+    i = Math.max(0, Math.min(alle.length - 1, i)); huidig = i;
+    alle.forEach(function (s) { s.classList.remove('is-actief'); });
+    var dia = alle[i]; dia.classList.add('is-actief');
+    stage.classList.toggle('is-titel', dia.classList.contains('s-titel'));
+    stage.classList.toggle('is-slot', dia.classList.contains('s-slot'));
+    zet('voet-nr', (i + 1) + ' / ' + alle.length); zet('voet-titel', dia.getAttribute('data-titel'));
+    document.getElementById('voet-balk').style.width = ((i + 1) / alle.length * 100) + '%';
+    if (!stil) history.replaceState(null, '', location.pathname + location.search + '#' + (i + 1));
+    kanaal && kanaal.postMessage({ dia: i });
+  }
+  function stap(d) { ga(huidig + d); }
+  if (kanaal) kanaal.onmessage = function (e) { if (!e.data) return; if (e.data.stap) stap(e.data.stap); if (e.data.vraag) kanaal.postMessage({ dia: huidig }); };
+  document.addEventListener('keydown', function (e) {
+    if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable="true"]')) { if (e.key === 'Escape') { e.target.blur(); sluitLade(); } return; }
+    if (['ArrowRight', 'PageDown', ' '].indexOf(e.key) > -1) { e.preventDefault(); stap(1); }
+    else if (['ArrowLeft', 'PageUp'].indexOf(e.key) > -1) { e.preventDefault(); stap(-1); }
+    else if (e.key === 'Home') ga(0); else if (e.key === 'End') ga(alle.length - 1);
+    else if (e.key === 'f' || e.key === 'F') volScherm();
+    else if (e.key === 'n' || e.key === 'N') notities();
+    else if (e.key === 'b' || e.key === 'B') { lade.classList.contains('open') ? sluitLade() : openLade(); }
+    else if (e.key === 'Escape') sluitLade();
+  });
+  document.getElementById('b-terug').onclick = function () { stap(-1); };
+  document.getElementById('b-verder').onclick = function () { stap(1); };
+  document.getElementById('b-vol').onclick = volScherm;
+  document.getElementById('b-notities').onclick = notities;
+  stage.addEventListener('click', function (e) {
+    if (e.target.closest('button, a, li, [contenteditable]')) return;
+    stap(e.clientX < window.innerWidth * 0.25 ? -1 : 1);
+  });
+  function volScherm() { if (document.fullscreenElement) document.exitFullscreen(); else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
+  function notities() { var w = window.open(location.pathname + '?notities=1', 'ae-mg-notities', 'width=900,height=760'); if (!w) melding('Pop-up geblokkeerd. Sta pop-ups toe voor deze pagina.'); else setTimeout(function () { kanaal && kanaal.postMessage({ dia: huidig }); }, 600); }
+  var mt;
+  function melding(t) { var m = document.getElementById('melding'); m.textContent = t; m.classList.add('zicht'); clearTimeout(mt); mt = setTimeout(function () { m.classList.remove('zicht'); }, 3200); }
+  var mtimer;
+  document.addEventListener('mousemove', function () { document.body.classList.add('muis'); clearTimeout(mtimer); mtimer = setTimeout(function () { document.body.classList.remove('muis'); }, 2200); });
+
+  render();
+  var st = parseInt((location.hash || '').slice(1), 10);
+  ga(isNaN(st) ? 0 : st - 1, true);
+  if (params.has('voorbereiden') || (!D.naam && !params.get('d'))) openLade();
+  window.__mg = { D: function () { return D; }, render: render, belasting: belasting };
+})();
+</script>
+</body>
+</html>

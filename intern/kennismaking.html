@@ -398,7 +398,6 @@
         </div>
         <div class="chips" role="group" aria-label="Extra's">
           <button class="chip" type="button" data-k="icp" aria-pressed="false">Klanten in de EU</button>
-          <button class="chip" type="button" data-k="uren" aria-pressed="false">Uren of ritten bijhouden</button>
           <button class="chip" type="button" data-k="partner" aria-pressed="false">Fiscaal partner</button>
           <button class="chip" type="button" data-k="achterstand" aria-pressed="false">Achterstand</button>
           <button class="chip" type="button" data-k="veel" aria-pressed="false">Meer dan 100 transacties p/m</button>
@@ -413,10 +412,9 @@
         <li><b>Nu:</b> zelf in een programma, Excel/schoenendoos, of een boekhouder? Zo ja: wat kost die en waarom overstappen?</li>
         <li><b>Volume:</b> ongeveer hoeveel bonnetjes en facturen per maand? (Grens 100 banktransacties.)</li>
         <li><b>Klanten in de EU?</b> Dan ICP-aangifte (€15 p/m).</li>
-        <li><b>Uren- of kilometerregistratie</b> nodig (urencriterium, zakelijke ritten)? €10 p/m.</li>
         <li><b>Fiscaal partner?</b> Diens IB-aangifte erbij voor €150 per jaar.</li>
         <li><b>Achterstand?</b> Vooraf prijsafspraak, €60 per uur.</li>
-        <li><b>Personeel?</b> Loonadministratie via onze salarisspecialist, op aanvraag.</li>
+        <li><b>Personeel?</b> Loonadministratie samen met een salarisspecialist, op aanvraag.</li>
         <li><b>Pijnpunt</b> opschrijven en straks bij de oplossing letterlijk terug laten komen.</li>
       </ul>
     </aside>
@@ -601,7 +599,6 @@
         <p>Vooraf duidelijk, nooit achteraf.</p>
         <dl>
           <div><dt>ICP-aangifte (klanten in de EU)</dt><dd>€15 p/m</dd></div>
-          <div><dt>Uren- en rittenregistratie</dt><dd>€10 p/m</dd></div>
           <div><dt>IB-aangifte fiscaal partner</dt><dd>€150 p/jaar</dd></div>
           <div><dt>Overstappen (eenmalig)</dt><dd>€149</dd></div>
           <div><dt>Achterstallige administratie</dt><dd>€60 p/uur</dd></div>
@@ -922,7 +919,6 @@
   function rekenPrijs() {
     var maand = [['Boekhouding volledig uit handen', 80]];
     if (keuze.icp) maand.push(['ICP-aangifte', 15]);
-    if (keuze.uren) maand.push(['Uren- en rittenregistratie', 10]);
     var totaal = maand.reduce(function (a, r) { return a + r[1]; }, 0);
     document.getElementById('bon-maand').innerHTML = maand.map(function (r) {
       return '<div class="bon-r"><span>' + r[0] + '</span><b>' + euro(r[1]) + '</b></div>';

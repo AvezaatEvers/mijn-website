@@ -49,7 +49,6 @@
 
       <h2>Extra's</h2>
       <label class="vs-check"><input type="checkbox" name="icp">ICP-aangifte (€15 p/m)</label>
-      <label class="vs-check"><input type="checkbox" name="uren">Uren- en rittenregistratie (€10 p/m)</label>
       <label class="vs-check"><input type="checkbox" name="partner">IB-aangifte fiscaal partner (€150 per jaar)</label>
       <label>Overstappen<select name="overstap"><option value="nee">Niet van toepassing</option><option value="gratis">Gratis (per 1 januari, aangemeld vóór 15 december)</option><option value="betaald">€149 eenmalig</option></select></label>
       <label>Achterstand inhalen (geschat aantal uren à €60)<input type="number" name="achterstand" value="0" min="0" step="1"></label>
@@ -124,7 +123,6 @@
     var maand = pakket, jaar = 0, eenmalig = 0;
     var extra = '';
     if (v.icp.checked) { maand += 15; extra += lijn() + rij('ICP-aangifte (klanten binnen de EU)', '€15 p/m'); }
-    if (v.uren.checked) { maand += 10; extra += lijn() + rij('Uren- en rittenregistratie', '€10 p/m'); }
     if (v.partner.checked) { jaar += 150; extra += lijn() + rij('IB-aangifte fiscaal partner', '€150 per jaar'); }
     if (v.overstap.value === 'gratis') extra += lijn() + rij('Overstappen van je oude boekhouder', '<b>gratis</b>');
     if (v.overstap.value === 'betaald') { eenmalig += 149; extra += lijn() + rij('Overstappen van je oude boekhouder', '€149 eenmalig'); }

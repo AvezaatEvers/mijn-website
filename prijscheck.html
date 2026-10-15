@@ -43,11 +43,11 @@
     <div class="pc-kop">
       <span class="pill">Bereken je prijs</span>
       <h1>Wat kost jouw boekhouding?</h1>
-      <p class="lead">6 korte vragen. Je ziet je prijs meteen.</p>
+      <p class="lead">5 korte vragen. Je ziet je prijs meteen.</p>
     </div>
     <div class="pc-kaart" id="pc">
       <div class="pc-voortgang" aria-hidden="true"><span id="pc-balk"></span></div>
-      <div class="pc-nav"><button type="button" class="pc-terug" id="pc-terug" hidden>← Terug</button><span id="pc-teller">Vraag 1 van 6</span></div>
+      <div class="pc-nav"><button type="button" class="pc-terug" id="pc-terug" hidden>← Terug</button><span id="pc-teller">Vraag 1 van 5</span></div>
       <fieldset class="pc-stap" data-stap="1" data-key="situatie">
         <legend>Wat is je situatie?</legend>
         
@@ -92,15 +92,7 @@
           <button type="button" class="pc-opt" data-v="?"><strong>Weet ik niet</strong></button>
         </div>
       </fieldset>
-      <fieldset class="pc-stap" data-stap="5" data-key="uren" hidden>
-        <legend>Wil je je uren en kilometers bijhouden in de app?</legend>
-        <p class="pc-hint">Handig voor het urencriterium en je kilometervergoeding.</p>
-        <div class="pc-opts pc-rij">
-          <button type="button" class="pc-opt" data-v="nee"><strong>Nee, hoeft niet</strong></button>
-          <button type="button" class="pc-opt" data-v="ja"><strong>Ja, graag</strong></button>
-        </div>
-      </fieldset>
-      <fieldset class="pc-stap" data-stap="6" data-key="partner" hidden>
+      <fieldset class="pc-stap" data-stap="5" data-key="partner" hidden>
         <legend>Zullen we ook de aangifte van je fiscaal partner doen?</legend>
         <p class="pc-hint">Vaak slim, omdat je posten kunt verdelen.</p>
         <div class="pc-opts pc-rij">
@@ -122,7 +114,7 @@
           <p>Je vaste boekhouder neemt binnen 2 uur vrijblijvend contact met je op.</p>
           <input type="hidden" name="form-name" value="prijscheck">
           <p class="hidden"><label>Niet invullen: <input name="bot-field"></label></p>
-          <input type="hidden" name="situatie"><input type="hidden" name="branche"><input type="hidden" name="transacties"><input type="hidden" name="eu"><input type="hidden" name="uren"><input type="hidden" name="partner"><input type="hidden" name="prijs">
+          <input type="hidden" name="situatie"><input type="hidden" name="branche"><input type="hidden" name="transacties"><input type="hidden" name="eu"><input type="hidden" name="partner"><input type="hidden" name="prijs">
           <label>Naam<input type="text" name="naam" autocomplete="name" required></label>
           <label>E-mail<input type="email" name="email" autocomplete="email" required></label>
           <label><span>Telefoon <span class="pc-opt-label">(optioneel)</span></span><input type="tel" name="telefoon" autocomplete="tel"></label>
@@ -222,11 +214,10 @@
     meet('Prijscheck stap', { stap: k < n ? k + 1 : 'uitkomst' });
   }
   function bereken() {
-    var pm = 80, regels = [['Vast pakket, alles inbegrepen', '€80 p/m']], opMaat = false;
+    var pm = 80, regels = [['Vast pakket, alles inbegrepen', '€80 p/m'], ['Uren- en rittenregistratie in de app', 'inbegrepen']], opMaat = false;
     if (ant.transacties === '>100') { opMaat = true; regels[0] = ['Vast pakket, bij meer dan 100 transacties', 'prijs op maat']; }
     if (ant.eu === 'ja') { pm += 15; regels.push(['ICP-aangifte (klanten in de EU)', '€15 p/m']); }
     if (ant.eu === '?') regels.push(['Klanten in de EU? Dat zoeken we samen uit', 'eventueel €15 p/m']);
-    if (ant.uren === 'ja') { pm += 10; regels.push(['Uren- en rittenregistratie', '€10 p/m']); }
     if (ant.partner === 'ja') regels.push(['Aangifte fiscaal partner', '€150 per jaar']);
     if (ant.situatie === 'boekhouder') regels.push(['Overstappen, wij regelen de overdracht', '€149 eenmalig']);
     if (ant.situatie === 'achter') regels.push(['Achterstand inhalen, met vooraf een prijsafspraak', '€60 per uur']);

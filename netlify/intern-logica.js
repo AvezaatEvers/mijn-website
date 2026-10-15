@@ -51,13 +51,13 @@ export function inlogPagina(fout) {
 <meta name="robots" content="noindex, nofollow"><title>Intern | Avezaat &amp; Evers</title><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <style>
 @font-face{font-family:P;font-weight:500;src:url(/assets/fonts/poppins-500.woff2)}@font-face{font-family:P;font-weight:700;src:url(/assets/fonts/poppins-700.woff2)}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:P,system-ui,sans-serif;background:#EEF2FB;color:#111827;padding:24px}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:P,system-ui,sans-serif;background:#EEF2F8;color:#111827;padding:24px}
 form{width:100%;max-width:380px;background:#fff;border-radius:22px;padding:32px;box-shadow:0 20px 50px -24px rgba(17,24,39,.35);display:flex;flex-direction:column;gap:14px}
-.logo{font-weight:700;font-size:20px;letter-spacing:-.02em}.logo span{color:#1E40AF}h1{font-size:22px;margin:6px 0 0}p{margin:0;color:#4B5563;font-size:15px}
+.logo{font-weight:700;font-size:20px;letter-spacing:-.02em}.logo span{color:#26458F}h1{font-size:22px;margin:6px 0 0}p{margin:0;color:#4B5563;font-size:15px}
 .wie{display:grid;grid-template-columns:1fr 1fr;gap:8px}.wie label{display:block}.wie input{position:absolute;opacity:0}.wie span{display:block;text-align:center;padding:11px;border:1px solid #E5E7EB;border-radius:12px;cursor:pointer;font-weight:500}
-.wie input:checked+span{border-color:#1E40AF;background:#EEF2FB;color:#1E40AF}.wie input:focus-visible+span{outline:2px solid #1E40AF}
-input[type=password]{font:inherit;padding:12px 14px;border:1px solid #E5E7EB;border-radius:12px;font-size:16px}input[type=password]:focus{outline:2px solid #1E40AF;border-color:#1E40AF}
-button{font:inherit;font-weight:500;padding:13px;border:0;border-radius:12px;background:#1E40AF;color:#fff;font-size:16px;cursor:pointer}.fout{color:#B91C1C;font-size:14px}
+.wie input:checked+span{border-color:#26458F;background:#EEF2F8;color:#26458F}.wie input:focus-visible+span{outline:2px solid #26458F}
+input[type=password]{font:inherit;padding:12px 14px;border:1px solid #E5E7EB;border-radius:12px;font-size:16px}input[type=password]:focus{outline:2px solid #26458F;border-color:#26458F}
+button{font:inherit;font-weight:500;padding:13px;border:0;border-radius:12px;background:#26458F;color:#fff;font-size:16px;cursor:pointer}.fout{color:#B91C1C;font-size:14px}
 </style></head><body><form method="POST" action="/intern/login"><div class="logo">Avezaat <span>&amp;</span> Evers</div><h1>Intern</h1><p>Wie ben je?</p>
 <div class="wie"><label><input type="radio" name="wie" value="koen" required><span>Koen</span></label><label><input type="radio" name="wie" value="daan"><span>Daan</span></label></div>
 ${fout ? '<p class="fout">Naam of wachtwoord klopt niet.</p>' : ''}<input type="password" name="wachtwoord" placeholder="Wachtwoord" autocomplete="current-password" required><button type="submit">Inloggen</button></form></body></html>`;

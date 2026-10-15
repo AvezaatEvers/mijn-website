@@ -30,7 +30,7 @@ Cal("init", "kennismaking", { origin: "https://cal.com" });
   if (s) s.addEventListener("load", function () { window.__calReady = true; });
 })();
 Cal.ns.kennismaking("ui", {
-  cssVarsPerTheme: { light: { "cal-brand": "#1E40AF" }, dark: { "cal-brand": "#1E40AF" } },
+  cssVarsPerTheme: { light: { "cal-brand": "#26458F" }, dark: { "cal-brand": "#26458F" } },
   theme: "light",
   hideEventTypeDetails: false,
   layout: "month_view"

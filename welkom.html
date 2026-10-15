@@ -7,16 +7,16 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Je persoonlijke startpagina bij Avezaat &amp; Evers.">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/style.css?v=115">
+<link rel="stylesheet" href="/assets/style.css?v=116">
 <style>
   .wk { --wk-shadow: 0 1px 2px rgba(17,24,39,.04), 0 12px 32px -12px rgba(17,24,39,.14); }
 
   /* Kop */
   .wk-hero { position: relative; overflow: hidden; background: var(--tint); padding: 72px 0 80px; }
   .wk-hero::before, .wk-hero::after { content: ''; position: absolute; border-radius: 50%; filter: blur(0); pointer-events: none; }
-  .wk-hero::before { width: 560px; height: 560px; right: -160px; top: -220px; background: radial-gradient(closest-side, rgba(30,64,175,.12), rgba(30,64,175,0)); }
+  .wk-hero::before { width: 560px; height: 560px; right: -160px; top: -220px; background: radial-gradient(closest-side, rgba(38,69,143,.12), rgba(38,69,143,0)); }
   .wk-hero::after { width: 420px; height: 420px; left: -180px; bottom: -240px; background: radial-gradient(closest-side, rgba(99,102,241,.10), rgba(99,102,241,0)); }
-  .wk-amp { position: absolute; right: 4%; bottom: -120px; font-size: 420px; font-weight: 700; line-height: 1; color: rgba(30,64,175,.05); pointer-events: none; user-select: none; }
+  .wk-amp { position: absolute; right: 4%; bottom: -120px; font-size: 420px; font-weight: 700; line-height: 1; color: rgba(38,69,143,.05); pointer-events: none; user-select: none; }
   .wk-hero-grid { position: relative; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center; }
   .wk-pill { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; background: var(--white); color: var(--accent); box-shadow: 0 1px 2px rgba(17,24,39,.06); }
   .wk-pill i { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; box-shadow: 0 0 0 4px rgba(34,197,94,.18); }
@@ -105,7 +105,7 @@
   .wk-knop { display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; border-radius: 12px; background: rgba(255,255,255,.08); color: #fff; text-decoration: none; font-weight: 600; font-size: 15px; border: 1px solid rgba(255,255,255,.12); transition: background .2s, border-color .2s; }
   .wk-knop:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.24); }
   .wk-knop.is-wit { background: #fff; color: var(--accent); border-color: #fff; }
-  .wk-knop.is-wit:hover { background: #EEF2FB; }
+  .wk-knop.is-wit:hover { background: #EEF2F8; }
 
   /* Verschijnen bij scrollen */
   .js .wk-in { opacity: 0; transform: translateY(18px); transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1); transition-delay: var(--d, 0s); }
@@ -121,7 +121,7 @@
   .wk-tip-tickets { position: relative; width: 236px; height: 150px; }
   .wk-ticket { position: absolute; width: 132px; padding: 14px 16px; border-radius: 14px; background: #fff; border: 1px solid var(--tint-border); box-shadow: 0 10px 24px -14px rgba(17,24,39,.3); font-size: 13px; color: var(--muted); line-height: 1.3; transform: rotate(-6deg); left: 0; top: 10px; }
   .wk-ticket b { display: block; margin-top: 4px; font-size: 17px; line-height: 1.2; color: var(--ink); letter-spacing: -.01em; }
-  .wk-ticket.is-blauw { background: var(--accent); border-color: var(--accent); color: #C7D2FE; transform: rotate(5deg); left: 100px; top: 44px; }
+  .wk-ticket.is-blauw { background: var(--accent); border-color: var(--accent); color: #CAD4E8; transform: rotate(5deg); left: 100px; top: 44px; }
   .wk-ticket.is-blauw b { color: #fff; }
   .wk-tip h2 { font-size: clamp(22px, 2.6vw, 28px); margin: 0 0 8px; letter-spacing: -.02em; }
   .wk-tip p { margin: 0; color: var(--text); font-size: 16px; max-width: 620px; }
@@ -213,7 +213,7 @@
             <div class="wk-stap-kop"><h3>Stuur ons je identiteitsbewijs</h3><span class="wk-tijd">2 min</span></div>
             <p>Dat zijn we wettelijk verplicht. Een foto of scan van je paspoort of ID-kaart is genoeg.</p>
             <p class="wk-tip-klein"><strong>Tip:</strong> met de gratis app KopieID van de Rijksoverheid maak je een veilige kopie, met een watermerk erop.</p>
-            <a class="wk-actie" id="wk-mail-id" href="mailto:info@avezaatenevers.nl?subject=Identiteitsbewijs&amp;body=In%20de%20bijlage%20stuur%20ik%20de%20kopie%20van%20mijn%20identiteitsbewijs.">Mail je kopie <span aria-hidden="true">→</span><small class="wk-actie-hint">Vergeet de bijlage niet</small></a>
+            <a class="wk-actie" id="wk-mail-id" href="mailto:info@avezaatenevers.nl?subject=Identiteitsbewijs&amp;body=In%20de%20bijlage%20stuur%20ik%20de%20kopie%20van%20mijn%20identiteitsbewijs.">Mail je kopie<small class="wk-actie-hint">Vergeet de bijlage niet</small></a>
           </div>
         </li>
         <li class="wk-stap wk-in" data-stap="moneymonk">
@@ -221,7 +221,7 @@
           <div>
             <div class="wk-stap-kop"><h3>Accepteer je uitnodiging van MoneyMonk</h3><span class="wk-tijd">3 min</span></div>
             <p>Wij hebben je administratie al voor je aangemaakt. Je krijgt een mail van MoneyMonk: klik op de link en kies een wachtwoord. Geen mail gezien? Kijk even in je spam.</p>
-            <a class="wk-actie" href="/kennisbank/starten-met-moneymonk.html">Bekijk de handleiding <span aria-hidden="true">→</span></a>
+            <a class="wk-actie" href="/kennisbank/starten-met-moneymonk.html">Bekijk de handleiding</a>
           </div>
         </li>
         <li class="wk-stap wk-in" data-stap="bank">
@@ -229,7 +229,7 @@
           <div>
             <div class="wk-stap-kop"><h3>Koppel je zakelijke rekening</h3><span class="wk-tijd">5 min</span></div>
             <p>Dan komen je transacties vanzelf binnen en hoef je geen afschriften te sturen. Je koppelt via je eigen bank, wij kunnen nooit geld van je rekening halen.</p>
-            <a class="wk-actie" href="/veelgestelde-vragen.html#welke-banken">Welke banken kun je koppelen? <span aria-hidden="true">→</span></a>
+            <a class="wk-actie" href="/veelgestelde-vragen.html#welke-banken">Welke banken kun je koppelen?</a>
           </div>
         </li>
         <li class="wk-stap wk-in" data-stap="app">
@@ -314,7 +314,7 @@
           <span class="wk-label">Samen voordeliger</span>
           <h2>Ken je een collega-ondernemer?</h2>
           <p>Wordt iemand via jou klant, dan krijgen jullie <strong>allebei een maand gratis</strong>. Kwam je zelf via iemand bij ons? Laat ons de naam weten, dan regelen we het voor jullie allebei.</p>
-          <a class="wk-actie" href="/aanbevelen.html">Zo werkt aanbevelen <span aria-hidden="true">→</span></a>
+          <a class="wk-actie" href="/aanbevelen.html">Zo werkt aanbevelen</a>
         </div>
       </div>
     </div>
@@ -339,7 +339,7 @@
 
 <footer class="site-footer">
   <div class="container footer-bottom">
-    <span>© <span id="year">2026</span> Avezaat &amp; Evers · KvK 42133742</span>
+    <span>© <span id="year">2026</span> Avezaat &amp; Evers, KvK 42133742</span>
     <span><a href="/voorwaarden.html">Algemene voorwaarden</a> · <a href="/privacy.html">Privacyverklaring</a></span>
   </div>
 </footer>
@@ -427,7 +427,7 @@
     var c = document.getElementById('wk-confetti'), ctx = c.getContext('2d');
     var dpr = window.devicePixelRatio || 1;
     c.width = innerWidth * dpr; c.height = innerHeight * dpr; ctx.scale(dpr, dpr);
-    var kleuren = ['#1E40AF', '#3B5BDB', '#C7D2FE', '#EEF2FB', '#111827'];
+    var kleuren = ['#26458F', '#3B5BDB', '#CAD4E8', '#EEF2F8', '#111827'];
     var deeltjes = [];
     for (var i = 0; i < 90; i++) {
       deeltjes.push({
@@ -452,7 +452,7 @@
   }
 })();
 </script>
-<script src="/assets/main.js?v=115" defer></script>
-<script src="/assets/analytics.js?v=115" defer></script>
+<script src="/assets/main.js?v=116" defer></script>
+<script src="/assets/analytics.js?v=116" defer></script>
 </body>
 </html>

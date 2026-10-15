@@ -1503,3 +1503,6 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
 .valkuil strong { color: var(--ink); }
 .branche-diep .meta { font-size: 13.5px; color: var(--muted); margin-top: 28px; }
 @media (max-width: 640px) { .rekenvb { padding: 16px; } .rekenvb table, .rekenvb td { font-size: 14px; } }
+
+/* Lange woorden in koppen (bijv. kleineondernemersregeling) */
+h1, h2, h3 { overflow-wrap: break-word; hyphens: auto; }

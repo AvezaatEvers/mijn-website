@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IB-werkblad | Avezaat &amp; Evers intern</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css?v=118">
+<style>
+  body { background: var(--soft); }
+  .ib { max-width: 1240px; margin: 0 auto; padding: 24px 24px 100px; display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 28px; align-items: start; }
+  .ib-top { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .ib-top .logo { font-size: 20px; }
+  .ib-top a.terug { font-size: 14px; font-weight: 600; text-decoration: none; }
+  .ib-kop { grid-column: 1 / -1; display: grid; gap: 6px; }
+  .ib-kop h1 { font-size: clamp(28px, 4vw, 40px); letter-spacing: -.02em; }
+  .ib-kop p { color: var(--muted); max-width: 70ch; }
+
+  /* Zijbalk */
+  .nav { position: sticky; top: 16px; display: grid; gap: 14px; }
+  .kaart { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; }
+  .klant label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+  .klant input, .klant select, .veld input, .veld select, .veld textarea { font: inherit; font-size: 15px; color: var(--ink); border: 1px solid #D1D6E0; border-radius: 8px; padding: 8px 10px; background: #fff; width: 100%; }
+  .klant .rij { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .klant .knoppen { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .knop { font: inherit; font-size: 13.5px; font-weight: 600; border-radius: 8px; border: 1px solid var(--line); background: #fff; color: var(--ink); padding: 8px 12px; cursor: pointer; }
+  .knop.prim { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .knop:hover { border-color: var(--tint-border); }
+  .stappen-nav { list-style: none; margin: 0; padding: 6px 0; }
+  .stappen-nav a { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: center; padding: 9px 14px; text-decoration: none; color: var(--ink); font-size: 14.5px; font-weight: 500; border-radius: 8px; }
+  .stappen-nav a:hover { background: var(--soft); }
+  .stappen-nav b { width: 26px; height: 26px; border-radius: 50%; background: var(--tint); color: var(--accent); display: grid; place-items: center; font-size: 13px; }
+  .stappen-nav a.klaar b { background: var(--accent); color: #fff; }
+  .stappen-nav small { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .voortgang { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; margin-top: 8px; }
+  .voortgang i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .3s; }
+
+  /* Inhoud */
+  .inhoud { display: grid; gap: 22px; min-width: 0; }
+  .stap { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 26px 28px; scroll-margin-top: 16px; }
+  .stap-kop { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; flex-wrap: wrap; margin-bottom: 4px; }
+  .stap h2 { font-size: 23px; letter-spacing: -.015em; }
+  .stap-wanneer { font-size: 13.5px; font-weight: 600; color: var(--accent); background: var(--tint); border-radius: 6px; padding: 4px 10px; }
+  .stap > p { color: var(--muted); margin: 4px 0 14px; max-width: 75ch; }
+  .lijst { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .lijst > li { border-bottom: 1px solid var(--line); }
+  .item { display: grid; grid-template-columns: 26px 1fr; gap: 12px; padding: 12px 0; align-items: start; }
+  .item input[type=checkbox] { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--accent); cursor: pointer; }
+  .item-t { font-size: 15.5px; color: var(--ink); line-height: 1.45; }
+  .item-t.af { color: var(--muted); text-decoration: line-through; text-decoration-color: #B8BFCC; }
+  .item details { margin-top: 4px; }
+  .item summary { font-size: 13.5px; color: var(--accent); cursor: pointer; font-weight: 500; list-style: none; display: inline; }
+  .item summary::-webkit-details-marker { display: none; }
+  .item details p { font-size: 14.5px; color: var(--text); margin-top: 6px; line-height: 1.55; background: var(--soft); border-radius: 8px; padding: 10px 12px; }
+  .item[hidden] { display: none; }
+  .profiel { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 18px; }
+  .profiel label { display: inline-flex; gap: 8px; align-items: center; font-size: 14.5px; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; cursor: pointer; background: #fff; }
+  .profiel input { accent-color: var(--accent); }
+  .profiel label:has(input:checked) { border-color: var(--accent); background: var(--tint); }
+
+  /* Rekenblokken */
+  .reken { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; margin: 6px 0 18px; }
+  .velden { display: grid; gap: 10px; align-content: start; }
+  .veld { display: grid; gap: 4px; font-size: 13.5px; color: var(--muted); }
+  .veld small { font-size: 12.5px; color: #8A93A5; }
+  .uitkomst { background: var(--soft); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; align-self: start; }
+  .uitkomst h3 { font-size: 15px; margin-bottom: 8px; }
+  .regel { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px dashed var(--line); font-size: 14.5px; color: var(--text); }
+  .regel b { color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .regel.totaal { border-bottom: 0; border-top: 2px solid var(--line); margin-top: 4px; padding-top: 10px; font-weight: 600; color: var(--ink); }
+  .regel.totaal b { color: var(--accent); font-size: 18px; }
+  .waar { font-size: 12.5px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+  .let { background: #FFFBEB; border: 1px solid #FDE68A; color: #78350F; border-radius: 10px; padding: 12px 14px; font-size: 14.5px; line-height: 1.5; margin: 10px 0 14px; }
+  .tip { background: var(--tint); border-radius: 10px; padding: 12px 14px; font-size: 14.5px; line-height: 1.5; color: var(--ink); margin: 10px 0 14px; }
+  .bericht { width: 100%; min-height: 220px; font: inherit; font-size: 14.5px; border: 1px solid #D1D6E0; border-radius: 10px; padding: 12px; color: var(--ink); line-height: 1.55; }
+  .bericht-acties { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+
+  /* Eerste seizoen + bedragen */
+  .seizoen ul { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 6px; font-size: 15px; color: var(--text); }
+  .bedragen { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  .bedragen td { padding: 8px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .bedragen td:last-child { text-align: right; font-weight: 600; color: var(--ink); white-space: nowrap; padding-left: 16px; }
+  .melding { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 10px); background: var(--ink); color: #fff; font-size: 14px; padding: 10px 16px; border-radius: 10px; opacity: 0; transition: opacity .25s, transform .25s; z-index: 30; pointer-events: none; }
+  .melding.zicht { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 960px) {
+    .ib { grid-template-columns: minmax(0, 1fr); }
+    .nav { position: static; }
+    .reken { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .ib { padding: 16px 14px 80px; }
+    .stap { padding: 20px 16px; }
+    .bedragen td:last-child { white-space: normal; }
+  }
+  @media print {
+    body { background: #fff; }
+    .nav, .ib-top a, .bericht-acties, .knop, .seizoen, details summary { display: none !important; }
+    .ib { grid-template-columns: 1fr; }
+    .stap { break-inside: avoid; border: 0; padding: 0 0 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="ib">
+  <div class="ib-top"><span class="logo">Avezaat <span>&amp;</span> Evers</span><a class="terug" href="/intern/">Terug naar het dashboard</a></div>
+  <div class="ib-kop">
+    <h1>IB-werkblad</h1>
+    <p>Per klant stap voor stap van uitvraag tot aanslag. Vink af wat klaar is, vul de bedragen in en gebruik de uitkomsten als controle op je aangiftesoftware. Alles wordt per klant per jaar bewaard in deze browser.</p>
+  </div>
+
+  <aside class="nav">
+    <div class="kaart klant">
+      <label>Klant<input id="k-naam" placeholder="Voornaam en achternaam"></label>
+      <div class="rij">
+        <label>Belastingjaar<select id="k-jaar"><option>2026</option></select></label>
+        <label>Boekhouder<select id="k-wie"><option>Daan</option><option>Koen</option></select></label>
+      </div>
+      <label>Opgeslagen dossier<select id="k-lijst"><option value="">Kies een dossier</option></select></label>
+      <div class="knoppen"><button class="knop prim" type="button" id="b-opslaan">Opslaan</button><button class="knop" type="button" id="b-nieuw">Nieuw</button><button class="knop" type="button" id="b-link">Link</button><button class="knop" type="button" id="b-print">Afdrukken</button></div>
+      <div class="voortgang"><i id="voortgang"></i></div>
+    </div>
+    <div class="kaart" style="padding:8px"><ul class="stappen-nav" id="stappen-nav"></ul></div>
+  </aside>
+
+  <main class="inhoud" id="inhoud">
+
+    <section class="stap seizoen" id="s0">
+      <div class="stap-kop"><h2>Voor jullie eerste IB-seizoen</h2><span class="stap-wanneer">Eenmalig</span></div>
+      <p>De IB-aangifte is het onderdeel waar de meeste fouten ontstaan. Deze stappen maken het een stuk veiliger.</p>
+      <ul>
+        <li><strong>Aangiftesoftware met SBR.</strong> Als boekhouder dien je de aangifte niet in via de website van de Belastingdienst en ook niet via MoneyMonk, maar via aangiftesoftware die gegevens via Standard Business Reporting uitwisselt. Die software haalt ook de vooraf ingevulde gegevens (VIA) op en verdeelt posten tussen fiscale partners. Vergelijk een paar pakketten en kies er een met goede controles.</li>
+        <li><strong>Een cursus IB voor ondernemers.</strong> Eén dag of een paar avonden scheelt veel zoekwerk, bijvoorbeeld via een beroepsvereniging of je softwareleverancier.</li>
+        <li><strong>Begin eenvoudig.</strong> Ondernemer zonder partner of met een partner in loondienst, met of zonder koopwoning. Laat dossiers met buitenland, verhuur, een aanmerkelijk belang (bv), een overlijden of een scheiding de eerste jaren door een ervaren fiscalist controleren.</li>
+        <li><strong>Altijd vier ogen.</strong> Koen controleert de dossiers van Daan en andersom, met stap 5 van dit werkblad.</li>
+        <li><strong>Twijfel?</strong> De Helpdesk Intermediairs van de Belastingdienst is er voor boekhouders, op werkdagen overdag.</li>
+      </ul>
+      <h3 style="font-size:16px;margin:18px 0 6px">Bedragen 2026</h3>
+      <table class="bedragen">
+        <tr><td>Urencriterium</td><td>1.225 uur</td></tr>
+        <tr><td>Zelfstandigenaftrek</td><td>€1.200</td></tr>
+        <tr><td>Startersaftrek (max. 3x in de eerste 5 jaar)</td><td>€2.123</td></tr>
+        <tr><td>Mkb-winstvrijstelling</td><td>12,7%</td></tr>
+        <tr><td>KIA bij investeringen €2.901 t/m €71.683 (min. €450 per bedrijfsmiddel)</td><td>28%</td></tr>
+        <tr><td>Gemengde kosten (eten, drinken, representatie): aftrekbaar</td><td>80% of boven €5.700</td></tr>
+        <tr><td>Kilometervergoeding privéauto, zakelijk gebruik</td><td>€0,25 per km</td></tr>
+        <tr><td>Box 1: tot €38.883 / tot €78.426 / daarboven (onder AOW-leeftijd)</td><td>35,75% / 37,56% / 49,50%</td></tr>
+        <tr><td>Zvw-bijdrage ondernemer (tot €79.409)</td><td>4,85%</td></tr>
+        <tr><td>Eigenwoningforfait (WOZ €75.000 t/m €1.350.000)</td><td>0,35%</td></tr>
+        <tr><td>Box 3: heffingsvrij vermogen (partners samen €118.714)</td><td>€59.357</td></tr>
+        <tr><td>Box 3: tarief en forfaitair rendement overige bezittingen</td><td>36% en 6,04%</td></tr>
+      </table>
+      <p class="waar">Bronnen: Belastingplan 2026, overzichten van Knab, Rendement en Fiscalert. Check elk jaar de nieuwe bedragen en pas ze hier aan.</p>
+    </section>
+
+    <section class="stap" id="s1">
+      <div class="stap-kop"><h2>1. Voorbereiden</h2><span class="stap-wanneer">Januari en februari</span></div>
+      <p>Eerst de situatie van de klant in beeld. Wat je hieronder aanvinkt, bepaalt welke punten verderop verschijnen.</p>
+      <div class="profiel" id="profiel">
+        <label><input type="checkbox" data-p="partner"> Fiscaal partner</label>
+        <label><input type="checkbox" data-p="woning"> Koopwoning</label>
+        <label><input type="checkbox" data-p="loon"> Ook loon of uitkering</label>
+        <label><input type="checkbox" data-p="vermogen"> Spaargeld of beleggingen boven €59.357</label>
+        <label><input type="checkbox" data-p="auto"> Auto of bus van de zaak</label>
+        <label><input type="checkbox" data-p="starter"> Recht op startersaftrek</label>
+        <label><input type="checkbox" data-p="kinderen"> Kinderen</label>
+        <label><input type="checkbox" data-p="nieuw"> Nieuwe klant</label>
+      </div>
+      <ul class="lijst" data-stap="1"></ul>
+      <h3 style="font-size:16px;margin:20px 0 6px">Uitvraag aan de klant</h3>
+      <p class="waar" style="margin:0 0 8px">Dit bericht past zich aan het profiel hierboven aan. Pas het gerust aan en stuur het per mail of WhatsApp.</p>
+      <textarea class="bericht" id="uitvraag" readonly></textarea>
+      <div class="bericht-acties"><button class="knop" type="button" data-kopieer="uitvraag">Kopieer bericht</button></div>
+    </section>
+
+    <section class="stap" id="s2">
+      <div class="stap-kop"><h2>2. Jaarafsluiting in MoneyMonk</h2><span class="stap-wanneer">Januari tot maart</span></div>
+      <p>Een kloppende administratie is de basis. Pas als alles hieronder is afgevinkt, sluit je het jaar af en download je de balans en de winst-en-verliesrekening.</p>
+      <ul class="lijst" data-stap="2"></ul>
+    </section>
+
+    <section class="stap" id="s3">
+      <div class="stap-kop"><h2>3. Winst uit onderneming</h2><span class="stap-wanneer">Maart</span></div>
+      <p>Van de winst in MoneyMonk naar de belastbare winst. Vul de bedragen uit het jaarrapport in; de uitkomst is je controlegetal voor de aangiftesoftware.</p>
+      <div class="reken">
+        <div class="velden">
+          <label class="veld">Omzet (excl. btw)<input data-v="omzet" inputmode="decimal"></label>
+          <label class="veld">Kosten, zonder afschrijvingen<input data-v="kosten" inputmode="decimal"></label>
+          <label class="veld">Afschrijvingen<input data-v="afschr" inputmode="decimal"></label>
+          <label class="veld">Gemengde kosten: eten, drinken, representatie<small>Zitten al in de kosten. 20% is niet aftrekbaar (80%-regeling).</small><input data-v="gemengd" inputmode="decimal"></label>
+          <label class="veld" data-alleen="auto">Bijtelling of correctie privégebruik auto<input data-v="bijtelling" inputmode="decimal"></label>
+          <label class="veld">Investeringen dit jaar, totaal (excl. btw)<small>Alleen bedrijfsmiddelen van minstens €450 per stuk, geen personenauto.</small><input data-v="invest" inputmode="decimal"></label>
+          <label class="veld">Gewerkte uren dit jaar<input data-v="uren" inputmode="numeric"></label>
+        </div>
+        <div class="uitkomst">
+          <h3>Berekening</h3>
+          <div class="regel"><span>Winst volgens administratie</span><b id="r-winst"></b></div>
+          <div class="regel"><span>Bij: niet aftrekbaar deel gemengde kosten</span><b id="r-gemengd"></b></div>
+          <div class="regel" data-alleen="auto"><span>Bij: privégebruik auto</span><b id="r-auto"></b></div>
+          <div class="regel"><span>Af: kleinschaligheidsinvesteringsaftrek</span><b id="r-kia"></b></div>
+          <div class="regel totaal"><span>Fiscale winst</span><b id="r-fiscaal"></b></div>
+          <div class="regel"><span>Af: zelfstandigenaftrek</span><b id="r-za"></b></div>
+          <div class="regel" data-alleen="starter"><span>Af: startersaftrek</span><b id="r-sa"></b></div>
+          <div class="regel"><span>Af: mkb-winstvrijstelling (12,7%)</span><b id="r-mkb"></b></div>
+          <div class="regel totaal"><span>Belastbare winst</span><b id="r-belastbaar"></b></div>
+          <p class="waar" id="r-uren-noot"></p>
+          <p class="waar">In de aangifte: rubriek "Winst uit onderneming". De software vraagt de balans, de winst-en-verliesrekening, de investeringen en de uren. Vul de cijfers uit MoneyMonk in en vergelijk de uitkomst met dit blok.</p>
+        </div>
+      </div>
+      <ul class="lijst" data-stap="3"></ul>
+    </section>
+
+    <section class="stap" id="s4">
+      <div class="stap-kop"><h2>4. Privé: de rest van de aangifte</h2><span class="stap-wanneer">Maart en april</span></div>
+      <p>Alles wat niet uit de onderneming komt. De vooraf ingevulde gegevens (VIA) zijn je startpunt, maar check ze altijd met de stukken van de klant.</p>
+      <div class="reken">
+        <div class="velden">
+          <label class="veld" data-alleen="loon">Loon of uitkering (fiscaal loon, jaaropgave)<input data-v="loon" inputmode="decimal"></label>
+          <label class="veld" data-alleen="loon">Ingehouden loonheffing<input data-v="loonheffing" inputmode="decimal"></label>
+          <label class="veld" data-alleen="woning">WOZ-waarde woning<input data-v="woz" inputmode="decimal"></label>
+          <label class="veld" data-alleen="woning">Betaalde hypotheekrente (eigenwoningschuld)<input data-v="rente" inputmode="decimal"></label>
+          <label class="veld">Lijfrente- en AOV-premie<small>Alleen binnen de jaarruimte; de software rekent de ruimte uit.</small><input data-v="lijfrente" inputmode="decimal"></label>
+          <label class="veld" data-alleen="vermogen">Spaargeld op 1 januari<input data-v="spaar" inputmode="decimal"></label>
+          <label class="veld" data-alleen="vermogen">Beleggingen en overige bezittingen op 1 januari<input data-v="overig" inputmode="decimal"></label>
+          <label class="veld">Betaald via voorlopige aanslagen (IB en Zvw)<input data-v="va" inputmode="decimal"></label>
+        </div>
+        <div class="uitkomst">
+          <h3>Indicatie</h3>
+          <div class="regel" data-alleen="woning"><span>Eigenwoningforfait</span><b id="r-ewf"></b></div>
+          <div class="regel" data-alleen="woning"><span>Saldo eigen woning</span><b id="r-ew"></b></div>
+          <div class="regel"><span>Inkomen box 1 (indicatie)</span><b id="r-box1"></b></div>
+          <div class="regel"><span>Inkomstenbelasting na heffingskortingen</span><b id="r-ib"></b></div>
+          <div class="regel"><span>Zvw-bijdrage over de winst</span><b id="r-zvw"></b></div>
+          <div class="regel" data-alleen="vermogen"><span>Box 3 (indicatie, voorlopige percentages)</span><b id="r-box3"></b></div>
+          <div class="regel" data-alleen="loon"><span>Af: al ingehouden loonheffing</span><b id="r-lh"></b></div>
+          <div class="regel"><span>Af: voorlopige aanslagen</span><b id="r-va"></b></div>
+          <div class="regel totaal"><span id="r-saldo-l">Verwacht bij te betalen</span><b id="r-saldo"></b></div>
+          <p class="waar">Controlegetal voor een ondernemer onder de AOW-leeftijd, zonder partnerverdeling, giften of zorgkosten. Wijkt je software meer dan een paar honderd euro af, zoek dan uit waarom.</p>
+        </div>
+      </div>
+      <ul class="lijst" data-stap="4"></ul>
+    </section>
+
+    <section class="stap" id="s5">
+      <div class="stap-kop"><h2>5. Controle door de ander</h2><span class="stap-wanneer">Vóór het indienen</span></div>
+      <p>De andere boekhouder loopt dit na, met de aangifte uit de software en dit werkblad naast elkaar.</p>
+      <ul class="lijst" data-stap="5"></ul>
+      <div class="velden" style="grid-template-columns:1fr 1fr;margin-top:14px">
+        <label class="veld">Gecontroleerd door<input data-v="controleur"></label>
+        <label class="veld">Datum controle<input data-v="controledatum" type="date"></label>
+      </div>
+    </section>
+
+    <section class="stap" id="s6">
+      <div class="stap-kop"><h2>6. Akkoord van de klant en indienen</h2><span class="stap-wanneer">Uiterlijk 1 mei, of met uitstel</span></div>
+      <p>Pas indienen na schriftelijk akkoord van de klant. Bewaar dat akkoord bij het dossier.</p>
+      <ul class="lijst" data-stap="6"></ul>
+      <h3 style="font-size:16px;margin:20px 0 6px">Bericht met het concept</h3>
+      <textarea class="bericht" id="concept" readonly></textarea>
+      <div class="bericht-acties"><button class="knop" type="button" data-kopieer="concept">Kopieer bericht</button></div>
+      <div class="velden" style="grid-template-columns:1fr 1fr;margin-top:14px">
+        <label class="veld">Akkoord klant ontvangen op<input data-v="akkoord" type="date"></label>
+        <label class="veld">Ingediend op<input data-v="ingediend" type="date"></label>
+      </div>
+    </section>
+
+    <section class="stap" id="s7">
+      <div class="stap-kop"><h2>7. Na de aanslag</h2><span class="stap-wanneer">Als de aanslag binnenkomt</span></div>
+      <p>De Belastingdienst stuurt de (voorlopige of definitieve) aanslag. Vergelijk die altijd met de aangifte.</p>
+      <ul class="lijst" data-stap="7"></ul>
+    </section>
+  </main>
+</div>
+<div class="melding" id="melding"></div>
+
+<script>
+(function () {
+  var STAPPEN = [
+    [0, 'Eerste seizoen'], [1, 'Voorbereiden'], [2, 'Jaarafsluiting'], [3, 'Winst uit onderneming'], [4, 'Privé'], [5, 'Controle'], [6, 'Akkoord en indienen'], [7, 'Na de aanslag']
+  ];
+  // [stap, id, tekst, uitleg, alleen-bij-profiel]
+  var ITEMS = [
+    [1, 'machtiging', 'Machtiging voor de aangifte en de vooraf ingevulde gegevens geregeld', 'Vraag in je aangiftesoftware een (bij voorkeur doorlopende) machtiging aan. De klant krijgt een brief van de Belastingdienst met een activeringscode en geeft die aan jou door. De Belastingdienst verwerkt registraties wekelijks en op volgorde: begin in januari.'],
+    [1, 'machtiging-p', 'Machtiging ook voor de fiscaal partner', 'De partner heeft een eigen machtiging nodig als jij ook diens aangifte doet. Dat is een extra dienst (€150 per jaar).', 'partner'],
+    [1, 'uitvraag', 'Uitvraag verstuurd (bericht hieronder)', 'Vraag alles in één keer op. Spreek een datum af, bijvoorbeeld 1 maart.'],
+    [1, 'vorig', 'Vorige aangifte, laatste aanslag en eindbalans ontvangen', 'Bij een nieuwe klant: zonder vorige aangifte weet je niet hoe vaak er al startersaftrek is gebruikt, wat de boekwaarden zijn en of er nog iets loopt.', 'nieuw'],
+    [1, 'va-op', 'Voorlopige aanslagen van dit jaar opgevraagd', 'Wat heeft de klant al betaald via voorlopige aanslagen voor IB en Zvw? Dat verrekent de Belastingdienst straks.'],
+    [1, 'uitstel', 'Uitstel aangevraagd als het niet vóór 1 mei lukt', 'Via je aangiftesoftware kun je gebruikmaken van de uitstelregeling voor intermediairs. Vraag dat vóór 1 mei aan. Let op: moet de klant bijbetalen, dan kan na 1 juli belastingrente gaan lopen.'],
+
+    [2, 'facturen', 'Alle verkoopfacturen geboekt, ook die van december', 'Een factuur van december die in januari betaald wordt, hoort bij dit jaar.'],
+    [2, 'bank', 'Alle banktransacties van het jaar gekoppeld aan een bon of factuur', 'Ook betalingen van de zakelijke rekening die privé zijn: boek die als privé-opname.'],
+    [2, 'btw', 'Btw-aangiftes van alle vier de kwartalen kloppen met de boekhouding', 'Het saldo op de btw-rekening op 31 december moet gelijk zijn aan de btw van het vierde kwartaal. Verschil? Dan zit er ergens een fout of is een correctie nodig.'],
+    [2, 'beginbalans', 'Beginbalans is gelijk aan de eindbalans van vorig jaar', 'Bij een nieuwe klant: neem de eindbalans over van de vorige boekhouder of de vorige aangifte.'],
+    [2, 'activa', 'Investeringen van €450 of meer staan als bezitting op de balans, niet als kosten', 'Een laptop van €1.200 schrijf je af over een aantal jaren (maximaal 20% per jaar). Kleinere aankopen mogen direct als kosten.'],
+    [2, 'afschr', 'Afschrijvingen van het jaar geboekt', 'Afschrijven = aanschafprijs min restwaarde, verdeeld over de gebruiksduur. Maximaal 20% van de aanschafprijs per jaar.'],
+    [2, 'prive', 'Privégebruik gecorrigeerd (telefoon, internet, gemengd gebruik)', 'Wordt iets ook privé gebruikt, boek dan het privédeel als privé.'],
+    [2, 'auto', 'Auto of bus van de zaak: bijtelling geboekt, of bewijs van maximaal 500 privékilometers', 'Bijtelling = percentage van de cataloguswaarde (afhankelijk van bouwjaar en type). Bij maximaal 500 km privé geen bijtelling, maar dat moet aantoonbaar zijn, bijvoorbeeld met een rittenregistratie.', 'auto'],
+    [2, 'km', 'Zakelijke kilometers met een privéauto geboekt (€0,25 per km)', 'Alleen als de klant met een eigen auto zakelijk rijdt. Vraag om de rittenregistratie.'],
+    [2, 'voorraad', 'Voorraad en onderhanden werk op 31 december geboekt', 'Alleen als dat van toepassing is: inkoopwaarde van de voorraad, en werk dat al gedaan maar nog niet gefactureerd is.'],
+    [2, 'debcred', 'Openstaande facturen (debiteuren en crediteuren) op 31 december kloppen', 'Oninbare facturen afboeken. De btw daarop kan worden teruggevraagd.'],
+    [2, 'afsluiten', 'Jaar afgesloten in MoneyMonk, balans en winst-en-verliesrekening gedownload', 'Bewaar het jaarrapport bij het dossier.'],
+
+    [3, 'uren', 'Urencriterium onderbouwd met een urenregistratie', 'Minstens 1.225 uur per jaar, en meer dan de helft van de werktijd aan de onderneming als de klant ook in loondienst werkt. Ook indirecte uren tellen mee (administratie, acquisitie). Zonder registratie is het bij een controle lastig aan te tonen.'],
+    [3, 'starter', 'Startersaftrek: gecontroleerd hoe vaak die al is gebruikt', 'Maximaal drie keer in de eerste vijf jaar, en alleen als de klant in één of meer van de vijf voorgaande jaren geen ondernemer was.', 'starter'],
+    [3, 'kia', 'Investeringen gecontroleerd voor de KIA', 'Tel alleen bedrijfsmiddelen van minstens €450 per stuk. Geen personenauto, grond of woning. De software berekent de aftrek als je de investeringen invult.'],
+    [3, 'gemengd', 'Gemengde kosten gecorrigeerd (20% niet aftrekbaar)', 'Eten, drinken, recepties en congressen. Kies de 80%-regeling of de drempel van €5.700; voor vrijwel elke zzp\'er is 80% gunstiger.'],
+    [3, 'ingevoerd', 'Balans, winst-en-verliesrekening, investeringen en uren ingevoerd in de software', 'Vergelijk de belastbare winst in de software met het blok hierboven.'],
+
+    [4, 'via', 'Vooraf ingevulde gegevens opgehaald en gecontroleerd', 'Loon, uitkeringen, bankrekeningen, WOZ-waarde en hypotheek staan meestal al klaar. Controleer ze met de jaaropgaven van de klant: de VIA is niet altijd compleet.'],
+    [4, 'loon', 'Loon, uitkering en ingehouden loonheffing gecontroleerd met de jaaropgave', '', 'loon'],
+    [4, 'woning', 'Eigen woning: WOZ-waarde, hypotheekrente en eventuele erfpacht ingevoerd', 'Alleen rente op een lening voor de eigen woning is aftrekbaar, en alleen als die lening aan de voorwaarden voldoet (meestal annuïtair of lineair afgelost sinds 2013). De aftrek is beperkt tot het tarief van 37,56%, ook als de klant in de hoogste schijf zit.', 'woning'],
+    [4, 'partner', 'Partner: gezamenlijke posten verdeeld', 'Eigen woning, box 3 en aftrekposten mag je vrij verdelen tussen fiscale partners. Meestal is het gunstig bij de partner met het hoogste inkomen. Goede software rekent de beste verdeling uit.', 'partner'],
+    [4, 'box3', 'Box 3: bezittingen en schulden op 1 januari ingevoerd', 'Spaargeld, beleggingen, cryptovaluta, een tweede woning en schulden (niet de hypotheek van de eigen woning). Het heffingsvrij vermogen is €59.357 per persoon.', 'vermogen'],
+    [4, 'aftrek', 'Aftrekposten nagevraagd: giften, zorgkosten, lijfrente en AOV', 'Giften aan een ANBI zijn aftrekbaar boven een drempel (1% van het inkomen, minimaal €60). Specifieke zorgkosten alleen boven een inkomensafhankelijke drempel. Laat de software de drempels rekenen.'],
+    [4, 'kinderen', 'Kinderen: gegevens voor heffingskortingen en toeslagen gecontroleerd', 'Bijvoorbeeld de inkomensafhankelijke combinatiekorting voor de minstverdienende partner met jonge kinderen. Wijzigt het inkomen, check dan ook de toeslagen.', 'kinderen'],
+    [4, 'va', 'Betaalde voorlopige aanslagen ingevuld', ''],
+
+    [5, 'c-winst', 'Winst in de aangifte is gelijk aan de winst in het jaarrapport, plus en min de fiscale correcties', ''],
+    [5, 'c-aftrek', 'Ondernemersaftrek klopt: urencriterium gehaald en aantoonbaar', ''],
+    [5, 'c-via', 'Alle vooraf ingevulde gegevens zijn verwerkt of bewust aangepast', 'Een afwijking van de VIA leidt vaak tot vragen van de Belastingdienst. Noteer waarom je afwijkt.'],
+    [5, 'c-indicatie', 'Uitkomst van de software ligt in de buurt van de indicatie uit stap 4', ''],
+    [5, 'c-partner', 'Verdeling met de partner is gecontroleerd', '', 'partner'],
+    [5, 'c-vorig', 'Vergeleken met vorig jaar: grote verschillen zijn verklaarbaar', ''],
+
+    [6, 'concept', 'Concept-aangifte met toelichting naar de klant gestuurd', 'Stuur het overzicht uit je software met het bericht hieronder.'],
+    [6, 'akkoord', 'Schriftelijk akkoord van de klant ontvangen en bewaard', 'Een akkoord per mail is voldoende. Bewaar het bij het dossier.'],
+    [6, 'ingediend', 'Aangifte ingediend en ontvangstbevestiging bewaard', ''],
+    [6, 'va-nieuw', 'Voorlopige aanslag voor het lopende jaar aangepast als dat nodig is', 'Verdient de klant dit jaar duidelijk meer of minder? Pas de voorlopige aanslag aan, zodat er geen grote naheffing komt.'],
+    [6, 'archief', 'Dossier gearchiveerd: jaarrapport, aangifte, akkoord en dit werkblad', 'Bewaarplicht: 7 jaar.'],
+
+    [7, 'vergelijk', 'Aanslag vergeleken met de ingediende aangifte', 'Wijkt de aanslag af? Dan staat er meestal een toelichting bij.'],
+    [7, 'bezwaar', 'Bij een fout: bezwaar gemaakt binnen 6 weken na de datum op de aanslag', ''],
+    [7, 'klant-info', 'Klant geïnformeerd over het bedrag en de betaaltermijn', '']
+  ];
+
+  var JAAR = { 2026: { schijven: [[38883, 0.3575], [78426, 0.3756], [Infinity, 0.495]], ahk: { max: 3115, start: 29736, pct: 0.06398 },
+    ak: [[11965, 0, 0.08324, 0], [25845, 996, 0.31009, 11965], [45592, 5300, 0.0195, 25845]], akMax: 5685, akAfStart: 45592, akAfPct: 0.0651,
+    za: 1200, sa: 2123, mkb: 0.127, zvw: 0.0485, zvwMax: 79409, kia: [2900, 71683, 132746, 398236, 20072, 0.0756], hvv: 59357, b3: 0.36, rSpaar: 0.0128, rOverig: 0.0604 } };
+
+  function leeg() { return { naam: '', jaar: 2026, wie: 'Daan', p: {}, c: {}, v: {} }; }
+  var D = leeg();
+  var params = new URLSearchParams(location.search);
+  function lees() { try { return JSON.parse(localStorage.getItem('ae-ib') || '{}'); } catch (e) { return {}; } }
+  function sleutel() { return (D.naam || 'Zonder naam') + ' | ' + D.jaar; }
+  try {
+    if (params.get('d')) D = Object.assign(leeg(), JSON.parse(decodeURIComponent(escape(atob(params.get('d'))))));
+    else { var l = localStorage.getItem('ae-ib-laatst'), o = lees(); if (l && o[l]) D = Object.assign(leeg(), o[l]); }
+  } catch (e) {}
+
+  function n(x) { var v = parseFloat(String(x == null ? '' : x).replace(/\./g, '').replace(',', '.')); return isFinite(v) ? v : 0; }
+  var fmt = new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+  function eur(x) { return fmt.format(Math.round(x)).replace(/\s/g, ' '); }
+  function zet(id, t) { var el = document.getElementById(id); if (el) el.textContent = t; }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
+
+  // Lijsten opbouwen
+  ITEMS.forEach(function (it) {
+    var ul = document.querySelector('.lijst[data-stap="' + it[0] + '"]');
+    var li = document.createElement('li');
+    li.innerHTML = '<label class="item"' + (it[4] ? ' data-alleen="' + it[4] + '"' : '') + '><input type="checkbox" data-c="' + it[1] + '"><span><span class="item-t">' + esc(it[2]) + '</span>' +
+      (it[3] ? '<details><summary>Uitleg</summary><p>' + esc(it[3]) + '</p></details>' : '') + '</span></label>';
+    ul.appendChild(li);
+  });
+  document.getElementById('stappen-nav').innerHTML = STAPPEN.map(function (s) { return '<li><a href="#s' + s[0] + '" data-nav="' + s[0] + '"><b>' + (s[0] || 'i') + '</b><span>' + s[1] + '</span><small></small></a></li>'; }).join('');
+
+  function naarScherm() {
+    document.getElementById('k-naam').value = D.naam; document.getElementById('k-jaar').value = D.jaar; document.getElementById('k-wie').value = D.wie;
+    document.querySelectorAll('[data-p]').forEach(function (el) { el.checked = !!D.p[el.getAttribute('data-p')]; });
+    document.querySelectorAll('[data-c]').forEach(function (el) { el.checked = !!D.c[el.getAttribute('data-c')]; });
+    document.querySelectorAll('[data-v]').forEach(function (el) { el.value = D.v[el.getAttribute('data-v')] || ''; });
+  }
+
+  function kia(t, inv) {
+    var k = t.kia; if (inv <= k[0]) return 0; if (inv <= k[1]) return inv * 0.28; if (inv <= k[2]) return k[4]; if (inv <= k[3]) return Math.max(0, k[4] - (inv - k[2]) * k[5]); return 0;
+  }
+  function ewf(woz) {
+    if (woz <= 12500) return 0; if (woz <= 25000) return woz * 0.001; if (woz <= 50000) return woz * 0.002; if (woz <= 75000) return woz * 0.0025; if (woz <= 1350000) return woz * 0.0035; return 4725 + (woz - 1350000) * 0.0235;
+  }
+  function ib(t, inkomen, arbeid) {
+    var rest = Math.max(0, inkomen), onder = 0, tot = 0;
+    t.schijven.forEach(function (s) { var d = Math.max(0, Math.min(rest, s[0] - onder)); tot += d * s[1]; rest -= d; onder = s[0]; });
+    var ahk = Math.max(0, t.ahk.max - Math.max(0, inkomen - t.ahk.start) * t.ahk.pct), ak = 0;
+    if (arbeid > 0) { ak = Math.max(0, t.akMax - (arbeid - t.akAfStart) * t.akAfPct); for (var i = 0; i < t.ak.length; i++) { var b = t.ak[i]; if (arbeid <= b[0]) { ak = b[1] + (arbeid - b[3]) * b[2]; break; } } }
+    return Math.max(0, tot - Math.min(tot, ahk + ak));
+  }
+
+  function bereken() {
+    var t = JAAR[D.jaar] || JAAR[2026], v = D.v, p = D.p;
+    // Zichtbaarheid per profiel
+    document.querySelectorAll('[data-alleen]').forEach(function (el) { var k = el.getAttribute('data-alleen'), uit = !p[k]; el.hidden = uit; el.style.display = uit ? 'none' : ''; var li = el.classList.contains('item') ? el.closest('li') : null; if (li) li.style.display = uit ? 'none' : ''; });
+    // Winst
+    var winst = n(v.omzet) - n(v.kosten) - n(v.afschr), gem = n(v.gemengd) * 0.2, auto = p.auto ? n(v.bijtelling) : 0, k = kia(t, n(v.invest));
+    var fisc = winst + gem + auto - k, urenOk = n(v.uren) >= 1225;
+    var za = urenOk && fisc > 0 ? Math.min(t.za, fisc) : 0, sa = urenOk && p.starter && fisc > 0 ? Math.min(t.sa, fisc - za) : 0;
+    var na = Math.max(0, fisc - za - sa), mkb = na * t.mkb, bel = fisc > 0 ? na - mkb : fisc;
+    zet('r-winst', eur(winst)); zet('r-gemengd', '+ ' + eur(gem)); zet('r-auto', '+ ' + eur(auto)); zet('r-kia', '− ' + eur(k));
+    zet('r-fiscaal', eur(fisc)); zet('r-za', '− ' + eur(za)); zet('r-sa', '− ' + eur(sa)); zet('r-mkb', '− ' + eur(mkb)); zet('r-belastbaar', eur(bel));
+    zet('r-uren-noot', !v.uren ? 'Vul de uren in om de zelfstandigenaftrek mee te nemen.' : urenOk ? 'Urencriterium gehaald (' + Math.round(n(v.uren)).toLocaleString('nl-NL') + ' uur).' : 'Urencriterium niet gehaald: geen zelfstandigen- en startersaftrek. De mkb-winstvrijstelling blijft.');
+    // Privé
+    var f = p.woning ? ewf(n(v.woz)) : 0, rente = p.woning ? n(v.rente) : 0, ew = f - rente;
+    var loon = p.loon ? n(v.loon) : 0, box1 = Math.max(0, bel + loon + ew - n(v.lijfrente));
+    var belasting = ib(t, box1, Math.max(0, bel) + loon), zvw = Math.min(Math.max(0, bel), t.zvwMax) * t.zvw;
+    var box3 = 0;
+    if (p.vermogen) { var sp = n(v.spaar), ov = n(v.overig), tot = sp + ov; if (tot > t.hvv) { var rend = sp * t.rSpaar + ov * t.rOverig, grond = tot - t.hvv; box3 = tot ? rend / tot * grond * t.b3 : 0; } }
+    var lh = p.loon ? n(v.loonheffing) : 0, va = n(v.va), saldo = belasting + zvw + box3 - lh - va;
+    zet('r-ewf', eur(f)); zet('r-ew', eur(ew)); zet('r-box1', eur(box1)); zet('r-ib', eur(belasting)); zet('r-zvw', eur(zvw)); zet('r-box3', eur(box3));
+    zet('r-lh', '− ' + eur(lh)); zet('r-va', '− ' + eur(va));
+    zet('r-saldo-l', saldo >= 0 ? 'Verwacht bij te betalen' : 'Verwacht terug te krijgen'); zet('r-saldo', eur(Math.abs(saldo)));
+    D._r = { fisc: fisc, bel: bel, saldo: saldo };
+    berichten(bel, saldo);
+    voortgang();
+  }
+
+  function berichten(bel, saldo) {
+    var p = D.p, voor = (D.naam || '').split(' ')[0] || 'daar', j = D.jaar, regels = [];
+    regels.push('- Jaaropgaven van al je bankrekeningen (zakelijk en privé), met het saldo op 1 januari ' + j + ' en 1 januari ' + (j + 1));
+    if (p.loon) regels.push('- Jaaropgave van je werkgever of uitkeringsinstantie');
+    if (p.woning) regels.push('- Jaaroverzicht van je hypotheek (betaalde rente en schuld) en de WOZ-beschikking ' + j);
+    if (p.vermogen) regels.push('- Jaaroverzichten van beleggingen, crypto of andere bezittingen, met de waarde op 1 januari');
+    if (p.partner) regels.push('- Gegevens van je partner: jaaropgave(n) en of we ook zijn of haar aangifte doen');
+    if (p.kinderen) regels.push('- Geboortedata van je kinderen, en of er kinderopvang was');
+    if (p.auto) regels.push('- Je rittenregistratie en het kenteken van de auto of bus van de zaak');
+    regels.push('- Je urenregistratie van ' + j + ' (of een schatting van je gewerkte uren)');
+    regels.push('- Betaalde lijfrente- of arbeidsongeschiktheidspremies');
+    regels.push('- Giften aan goede doelen (ANBI) en grote zorgkosten die je zelf betaalde');
+    regels.push('- De voorlopige aanslagen ' + j + ' die je hebt ontvangen');
+    if (p.nieuw) regels.push('- Je aangifte inkomstenbelasting en de aanslag van vorig jaar');
+    document.getElementById('uitvraag').value = 'Hoi ' + voor + ',\n\nWe gaan aan de slag met je aangifte inkomstenbelasting over ' + j + '. Wil je ons deze stukken sturen? Een foto of pdf is prima.\n\n' + regels.join('\n') +
+      '\n\nAlles wat in MoneyMonk staat hebben we al. Graag uiterlijk 1 maart, dan hebben we ruim de tijd.\n\nHeb je vragen? Stuur gerust een appje.\n\nGroet,\n' + D.wie;
+    var uit = saldo >= 0 ? 'Je moet naar verwachting ongeveer ' + eur(saldo) + ' bijbetalen. Daarvoor krijg je een aanslag met een betaaltermijn.' : 'Je krijgt naar verwachting ongeveer ' + eur(-saldo) + ' terug.';
+    document.getElementById('concept').value = 'Hoi ' + voor + ',\n\nJe aangifte inkomstenbelasting over ' + j + ' staat klaar. In de bijlage vind je het overzicht.\n\nDe belangrijkste cijfers:\n- Winst uit je onderneming (na aftrekposten): ' + eur(bel) + '\n- ' + uit +
+      '\n\nWil je het overzicht even nalopen en laten weten of het klopt? Na je akkoord dienen we de aangifte in.\n\nGroet,\n' + D.wie;
+  }
+
+  function voortgang() {
+    var tot = 0, af = 0;
+    STAPPEN.forEach(function (s) {
+      var items = [].filter.call(document.querySelectorAll('.lijst[data-stap="' + s[0] + '"] [data-c]'), function (el) { var l = el.closest('.item'); return !l.hidden; });
+      var a = items.filter(function (el) { return el.checked; }).length; tot += items.length; af += a;
+      var nav = document.querySelector('[data-nav="' + s[0] + '"]');
+      if (nav) { nav.querySelector('small').textContent = items.length ? a + '/' + items.length : ''; nav.classList.toggle('klaar', items.length > 0 && a === items.length); }
+    });
+    document.querySelectorAll('[data-c]').forEach(function (el) { el.closest('.item').querySelector('.item-t').classList.toggle('af', el.checked); });
+    document.getElementById('voortgang').style.width = (tot ? af / tot * 100 : 0) + '%';
+  }
+
+  var bt;
+  function bewaar() { clearTimeout(bt); bt = setTimeout(function () { opslaan(true); }, 600); }
+  function opslaan(stil) {
+    var o = lees(); var kopie = Object.assign({}, D); delete kopie._r; o[sleutel()] = kopie;
+    try { localStorage.setItem('ae-ib', JSON.stringify(o)); localStorage.setItem('ae-ib-laatst', sleutel()); if (!stil) melding('Opgeslagen'); } catch (e) { if (!stil) melding('Opslaan lukt niet in deze browser'); }
+    vulLijst();
+  }
+  function vulLijst() {
+    var sel = document.getElementById('k-lijst'), o = lees(), huidig = sleutel();
+    sel.innerHTML = '<option value="">Kies een dossier</option>' + Object.keys(o).sort().map(function (k) { return '<option' + (k === huidig ? ' selected' : '') + '>' + esc(k) + '</option>'; }).join('');
+  }
+
+  document.addEventListener('input', function (e) {
+    var el = e.target;
+    if (el.id === 'k-naam') D.naam = el.value;
+    else if (el.id === 'k-jaar') D.jaar = +el.value;
+    else if (el.id === 'k-wie') D.wie = el.value;
+    else if (el.hasAttribute('data-p')) D.p[el.getAttribute('data-p')] = el.checked;
+    else if (el.hasAttribute('data-c')) D.c[el.getAttribute('data-c')] = el.checked;
+    else if (el.hasAttribute('data-v')) D.v[el.getAttribute('data-v')] = el.value;
+    else return;
+    bereken(); if (D.naam) bewaar();
+  });
+  document.addEventListener('change', function (e) { if (e.target.matches('select, input[type=checkbox], input[type=date]')) e.target.dispatchEvent(new Event('input', { bubbles: true })); });
+  document.getElementById('k-lijst').onchange = function () { var o = lees(), k = this.value; if (o[k]) { D = Object.assign(leeg(), o[k]); naarScherm(); bereken(); try { localStorage.setItem('ae-ib-laatst', k); } catch (e) {} melding('Geopend: ' + k); } };
+  document.getElementById('b-opslaan').onclick = function () { opslaan(false); };
+  document.getElementById('b-nieuw').onclick = function () { D = leeg(); naarScherm(); bereken(); document.getElementById('k-naam').focus(); };
+  document.getElementById('b-print').onclick = function () { window.print(); };
+  document.getElementById('b-link').onclick = function () {
+    var kopie = Object.assign({}, D); delete kopie._r;
+    var url = location.origin + location.pathname + '?d=' + encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(kopie)))));
+    (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function () { melding('Link gekopieerd. Hiermee opent de ander dit dossier, bijvoorbeeld voor de controle.'); }, function () { prompt('Kopieer deze link:', url); });
+  };
+  document.querySelectorAll('[data-kopieer]').forEach(function (b) {
+    b.onclick = function () { var t = document.getElementById(b.getAttribute('data-kopieer')).value; (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { melding('Bericht gekopieerd'); }, function () { melding('Kopiëren lukt niet, selecteer de tekst handmatig'); }); };
+  });
+  var mt;
+  function melding(t) { var m = document.getElementById('melding'); m.textContent = t; m.classList.add('zicht'); clearTimeout(mt); mt = setTimeout(function () { m.classList.remove('zicht'); }, 3000); }
+
+  naarScherm(); vulLijst(); bereken();
+  window.__ib = { D: function () { return D; } };
+})();
+</script>
+</body>
+</html>

@@ -1512,3 +1512,10 @@ h1, h2, h3 { overflow-wrap: break-word; }
 .cat-card:hover, .branch-card:hover, .contact-card:hover, .wb-voordeel:not(.is-groot):hover, .wb-waarde:hover, .wb-bron:hover, .wb-vac-kaart:hover, .br-lijst a:hover, .lees-ook a:hover { box-shadow: none; transform: none; }
 /* Categorie bij kennisbankartikelen als gewone tekst, geen pill */
 .article-card .pill { background: none; padding: 0; border-radius: 0; color: var(--muted); font-weight: 500; font-size: 14px; }
+
+/* Homepage desktop: foto even hoog als de tekstkolom */
+@media (min-width: 701px) {
+  .home .hero-grid { align-items: stretch; }
+  .home .hero-media { display: flex; }
+  .home .hero-media .photo-wide { aspect-ratio: auto; width: 100%; height: auto; min-height: 420px; object-fit: cover; object-position: 50% 30%; }
+}

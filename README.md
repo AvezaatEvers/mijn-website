@@ -13,8 +13,8 @@ Statische website (HTML + CSS), gehost op Netlify vanuit GitHub. Geen build-stap
 | `contact.html` | Kennismakingsformulier |
 | `bedankt.html` | Bedankpagina na formulier |
 | `kennisbank/` | Overzicht + 3 artikelen |
-| `voorwaarden.html` | Algemene voorwaarden (CONCEPT) |
-| `privacy.html` | Privacyverklaring (CONCEPT) |
+| `voorwaarden.html` | Algemene voorwaarden |
+| `privacy.html` | Privacyverklaring |
 | `404.html` | Foutpagina |
 
 Huisstijl: `assets/style.css` (kleuren bovenaan als variabelen). Menu en formulier-hulp: `assets/main.js`.

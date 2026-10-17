@@ -131,6 +131,26 @@
     .wk-tip-tickets { width: 236px; height: 140px; }
   }
 
+
+  /* Compacte checklist */
+  .wk-check-grid { gap: 48px; }
+  .wk-lijst { gap: 8px; }
+  .wk-stap { gap: 14px; padding: 14px 18px; border-radius: 12px; }
+  .wk-vink { width: 30px; height: 30px; margin-top: 1px; }
+  .wk-vink svg { width: 16px; height: 16px; }
+  .wk-stap-kop { margin: 3px 0 2px; gap: 8px; }
+  .wk-stap h3 { font-size: 16.5px; }
+  .wk-tijd { font-size: 11.5px; padding: 2px 8px; }
+  .wk-stap p { font-size: 14.5px; line-height: 1.5; }
+  .wk-tip-klein { margin-top: 2px !important; font-size: 13px !important; }
+  .wk-actie { margin-top: 4px; font-size: 14px; }
+  .wk-stap .store-badges { margin-top: 8px; }
+  .wk-stap .store-badges img { height: 32px; width: auto; }
+  @media (max-width: 700px) {
+    .wk-stap { padding: 12px 14px; gap: 12px; }
+    .wk-stap p { font-size: 14px; }
+  }
+
   #wk-confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
 
   @media (max-width: 960px) {
@@ -211,7 +231,7 @@
           <button class="wk-vink" type="button" aria-pressed="false" aria-label="Markeer als klaar: identiteitsbewijs"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
           <div>
             <div class="wk-stap-kop"><h3>Stuur ons je identiteitsbewijs</h3><span class="wk-tijd">2 min</span></div>
-            <p>Dat zijn we wettelijk verplicht. Een foto of scan van je paspoort of ID-kaart is genoeg.</p>
+            <p>Dat zijn we wettelijk verplicht. Een foto van je paspoort of ID-kaart is genoeg.</p>
             <p class="wk-tip-klein"><strong>Tip:</strong> met de gratis app KopieID van de Rijksoverheid maak je een veilige kopie, met een watermerk erop.</p>
             <a class="wk-actie" id="wk-mail-id" href="mailto:info@avezaatenevers.nl?subject=Identiteitsbewijs&amp;body=In%20de%20bijlage%20stuur%20ik%20de%20kopie%20van%20mijn%20identiteitsbewijs.">Mail je kopie<small class="wk-actie-hint">Vergeet de bijlage niet</small></a>
           </div>
@@ -220,7 +240,7 @@
           <button class="wk-vink" type="button" aria-pressed="false" aria-label="Markeer als klaar: MoneyMonk-uitnodiging"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
           <div>
             <div class="wk-stap-kop"><h3>Accepteer je uitnodiging van MoneyMonk</h3><span class="wk-tijd">3 min</span></div>
-            <p>Wij hebben je administratie al voor je aangemaakt. Je krijgt een mail van MoneyMonk: klik op de link en kies een wachtwoord. Geen mail gezien? Kijk even in je spam.</p>
+            <p>Je administratie staat al klaar. Klik op de link in de mail van MoneyMonk en kies een wachtwoord. Geen mail? Kijk in je spam.</p>
             <a class="wk-actie" href="/kennisbank/starten-met-moneymonk.html">Bekijk de handleiding</a>
           </div>
         </li>
@@ -228,7 +248,7 @@
           <button class="wk-vink" type="button" aria-pressed="false" aria-label="Markeer als klaar: bank koppelen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
           <div>
             <div class="wk-stap-kop"><h3>Koppel je zakelijke rekening</h3><span class="wk-tijd">5 min</span></div>
-            <p>Dan komen je transacties vanzelf binnen en hoef je geen afschriften te sturen. Je koppelt via je eigen bank, wij kunnen nooit geld van je rekening halen.</p>
+            <p>Je transacties komen dan vanzelf binnen. Je koppelt via je eigen bank, wij kunnen nooit geld van je rekening halen.</p>
             <a class="wk-actie" href="/veelgestelde-vragen.html#welke-banken">Welke banken kun je koppelen?</a>
           </div>
         </li>
@@ -236,7 +256,7 @@
           <button class="wk-vink" type="button" aria-pressed="false" aria-label="Markeer als klaar: app downloaden"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
           <div>
             <div class="wk-stap-kop"><h3>Download de app en maak je eerste foto</h3><span class="wk-tijd">2 min</span></div>
-            <p>Download de app en log in. Maak een foto van een bonnetje en klaar: dat is alles wat je voortaan doet.</p>
+            <p>Log in en maak een foto van een bonnetje. Dat is alles wat je voortaan doet.</p>
             <div class="store-badges">
               <a href="https://apps.apple.com/nl/app/moneymonk-online-boekhouden/id1069868581" target="_blank" rel="noopener"><img src="/assets/img/stores/app-store.svg" alt="Download MoneyMonk in de App Store" width="120" height="40"></a>
               <a href="https://play.google.com/store/apps/details?id=nl.moneymonk.app" target="_blank" rel="noopener"><img src="/assets/img/stores/google-play.png" alt="Download MoneyMonk op Google Play" width="134" height="40"></a>
@@ -247,7 +267,7 @@
           <button class="wk-vink" type="button" aria-pressed="false" aria-label="Markeer als klaar: brief Belastingdienst"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
           <div>
             <div class="wk-stap-kop"><h3>Houd je post in de gaten</h3><span class="wk-tijd">1 min</span></div>
-            <p>Om je aangiftes te mogen doen, vragen wij een machtiging aan bij de Belastingdienst. Je krijgt daarover binnen een paar weken een brief met een code. Stuur ons een foto van die brief, dan regelen wij de rest.</p>
+            <p>Wij vragen een machtiging aan bij de Belastingdienst. Binnen een paar weken krijg je een brief met een code. Stuur ons daar een foto van, wij doen de rest.</p>
           </div>
         </li>
       </ol>

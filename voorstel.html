@@ -6,10 +6,10 @@
 <title>Voorstel-mail | Avezaat &amp; Evers</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/style.css?v=118">
+<link rel="stylesheet" href="/assets/style.css?v=119">
 <style>
   .vs-page { padding: 40px 0 80px; }
-  .vs-wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: 380px 1fr; gap: 32px; align-items: start; }
+  .vs-wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 32px; align-items: start; }
   .vs-form { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 14px; background: var(--soft); border: 1px solid var(--line); border-radius: 20px; padding: 22px; max-height: calc(100vh - 48px); overflow: auto; }
   .vs-form h2 { font-size: 18px; margin: 6px 0 0; }
   .vs-form label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 500; color: var(--ink); }
@@ -18,10 +18,10 @@
   .vs-form .vs-check input { width: 18px; height: 18px; accent-color: var(--accent); }
   .vs-rij { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .vs-hint { font-size: 13px; color: var(--muted); margin: -6px 0 0; }
-  .vs-preview { background: #F3F4F6; display: flex; justify-content: center; border-radius: 20px; padding: 32px 16px; overflow-x: auto; }
+  .vs-preview { background: #F3F4F6; display: flex; justify-content: safe center; border-radius: 20px; padding: 32px 16px; overflow-x: auto; }
   .vs-acties { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
   .vs-ok { font-size: 14px; color: #15803D; margin: 0; }
-  @media (max-width: 960px) { .vs-wrap { grid-template-columns: 1fr; } .vs-form { position: static; max-height: none; } }
+  @media (max-width: 960px) { .vs-wrap { grid-template-columns: minmax(0, 1fr); } .vs-form { position: static; max-height: none; } }
 </style>
 </head>
 <body>

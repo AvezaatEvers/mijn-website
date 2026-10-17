@@ -6,7 +6,7 @@
 <title>IB-werkblad | Avezaat &amp; Evers intern</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/style.css?v=118">
+<link rel="stylesheet" href="/assets/style.css?v=119">
 <style>
   body { background: var(--soft); }
   .ib { max-width: 1240px; margin: 0 auto; padding: 24px 24px 100px; display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 28px; align-items: start; }
@@ -37,7 +37,7 @@
   .voortgang i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .3s; }
 
   /* Inhoud */
-  .inhoud { display: grid; gap: 22px; min-width: 0; }
+  .inhoud { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; min-width: 0; }
   .stap { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 26px 28px; scroll-margin-top: 16px; }
   .stap-kop { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; flex-wrap: wrap; margin-bottom: 4px; }
   .stap h2 { font-size: 23px; letter-spacing: -.015em; }
@@ -94,10 +94,12 @@
     .stap { padding: 20px 16px; }
     .bedragen td:last-child { white-space: normal; }
   }
+  .velden > *, .velden input { min-width: 0; }
+  @media (max-width: 420px) { .velden { grid-template-columns: minmax(0, 1fr) !important; } }
   @media print {
     body { background: #fff; }
     .nav, .ib-top a, .bericht-acties, .knop, .seizoen, details summary { display: none !important; }
-    .ib { grid-template-columns: 1fr; }
+    .ib { grid-template-columns: minmax(0, 1fr); }
     .stap { break-inside: avoid; border: 0; padding: 0 0 16px; }
   }
 </style>
@@ -139,15 +141,15 @@
       <h3 style="font-size:16px;margin:18px 0 6px">Bedragen 2026</h3>
       <table class="bedragen">
         <tr><td>Urencriterium</td><td>1.225 uur</td></tr>
-        <tr><td>Zelfstandigenaftrek</td><td>€1.200</td></tr>
+        <tr><td>Zelfstandigen&shy;aftrek</td><td>€1.200</td></tr>
         <tr><td>Startersaftrek (max. 3x in de eerste 5 jaar)</td><td>€2.123</td></tr>
-        <tr><td>Mkb-winstvrijstelling</td><td>12,7%</td></tr>
+        <tr><td>Mkb-winst&shy;vrijstelling</td><td>12,7%</td></tr>
         <tr><td>KIA bij investeringen €2.901 t/m €71.683 (min. €450 per bedrijfsmiddel)</td><td>28%</td></tr>
         <tr><td>Gemengde kosten (eten, drinken, representatie): aftrekbaar</td><td>80% of boven €5.700</td></tr>
-        <tr><td>Kilometervergoeding privéauto, zakelijk gebruik</td><td>€0,25 per km</td></tr>
+        <tr><td>Kilometer&shy;vergoeding privéauto, zakelijk gebruik</td><td>€0,25 per km</td></tr>
         <tr><td>Box 1: tot €38.883 / tot €78.426 / daarboven (onder AOW-leeftijd)</td><td>35,75% / 37,56% / 49,50%</td></tr>
         <tr><td>Zvw-bijdrage ondernemer (tot €79.409)</td><td>4,85%</td></tr>
-        <tr><td>Eigenwoningforfait (WOZ €75.000 t/m €1.350.000)</td><td>0,35%</td></tr>
+        <tr><td>Eigenwoning&shy;forfait (WOZ €75.000 t/m €1.350.000)</td><td>0,35%</td></tr>
         <tr><td>Box 3: heffingsvrij vermogen (partners samen €118.714)</td><td>€59.357</td></tr>
         <tr><td>Box 3: tarief en forfaitair rendement overige bezittingen</td><td>36% en 6,04%</td></tr>
       </table>
@@ -198,11 +200,11 @@
           <div class="regel"><span>Winst volgens administratie</span><b id="r-winst"></b></div>
           <div class="regel"><span>Bij: niet aftrekbaar deel gemengde kosten</span><b id="r-gemengd"></b></div>
           <div class="regel" data-alleen="auto"><span>Bij: privégebruik auto</span><b id="r-auto"></b></div>
-          <div class="regel"><span>Af: kleinschaligheidsinvesteringsaftrek</span><b id="r-kia"></b></div>
+          <div class="regel"><span>Af: kleinschaligheids&shy;investerings&shy;aftrek</span><b id="r-kia"></b></div>
           <div class="regel totaal"><span>Fiscale winst</span><b id="r-fiscaal"></b></div>
-          <div class="regel"><span>Af: zelfstandigenaftrek</span><b id="r-za"></b></div>
+          <div class="regel"><span>Af: zelfstandigen&shy;aftrek</span><b id="r-za"></b></div>
           <div class="regel" data-alleen="starter"><span>Af: startersaftrek</span><b id="r-sa"></b></div>
-          <div class="regel"><span>Af: mkb-winstvrijstelling (12,7%)</span><b id="r-mkb"></b></div>
+          <div class="regel"><span>Af: mkb-winst&shy;vrijstelling (12,7%)</span><b id="r-mkb"></b></div>
           <div class="regel totaal"><span>Belastbare winst</span><b id="r-belastbaar"></b></div>
           <p class="waar" id="r-uren-noot"></p>
           <p class="waar">In de aangifte: rubriek "Winst uit onderneming". De software vraagt de balans, de winst-en-verliesrekening, de investeringen en de uren. Vul de cijfers uit MoneyMonk in en vergelijk de uitkomst met dit blok.</p>
@@ -227,10 +229,10 @@
         </div>
         <div class="uitkomst">
           <h3>Indicatie</h3>
-          <div class="regel" data-alleen="woning"><span>Eigenwoningforfait</span><b id="r-ewf"></b></div>
+          <div class="regel" data-alleen="woning"><span>Eigenwoning&shy;forfait</span><b id="r-ewf"></b></div>
           <div class="regel" data-alleen="woning"><span>Saldo eigen woning</span><b id="r-ew"></b></div>
           <div class="regel"><span>Inkomen box 1 (indicatie)</span><b id="r-box1"></b></div>
-          <div class="regel"><span>Inkomstenbelasting na heffingskortingen</span><b id="r-ib"></b></div>
+          <div class="regel"><span>Inkomsten&shy;belasting na heffingskortingen</span><b id="r-ib"></b></div>
           <div class="regel"><span>Zvw-bijdrage over de winst</span><b id="r-zvw"></b></div>
           <div class="regel" data-alleen="vermogen"><span>Box 3 (indicatie, voorlopige percentages)</span><b id="r-box3"></b></div>
           <div class="regel" data-alleen="loon"><span>Af: al ingehouden loonheffing</span><b id="r-lh"></b></div>

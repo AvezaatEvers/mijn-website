@@ -6,7 +6,7 @@
 <title>Dashboard | Avezaat &amp; Evers intern</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/style.css?v=118">
+<link rel="stylesheet" href="/assets/style.css?v=119">
 <style>
   body { background: var(--soft); }
   .db { max-width: 1180px; margin: 0 auto; padding: 28px 24px 80px; }
@@ -154,6 +154,10 @@
     .db-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .db-form { grid-template-columns: 1fr; }
   }
+  @media (max-width: 480px) {
+    .db-tools, .db-paginas { grid-template-columns: 1fr; }
+  }
+  .db-kaart form .db-knop { white-space: normal; text-align: left; }
 </style>
 </head>
 <body>
@@ -216,7 +220,7 @@
     <!-- Maandelijkse 1-op-1 -->
     <div class="db-kaart s12 db-pres">
       <div>
-        <h2>Maandelijkse 1-op-1 presenteren</h2>
+        <h2>Maandelijkse <span class="nw">1-op-1</span> presenteren</h2>
         <p>Presentatie voor het maandgesprek van 30 minuten. Vul vooraf de cijfers in (B), typ live de afspraken en druk op N voor je notities en timer.</p>
       </div>
       <form action="/intern/maandgesprek.html" target="_blank">
@@ -260,7 +264,7 @@
         <a class="db-knop is-licht" id="w-open" href="/welkom.html" target="_blank" rel="noopener">Bekijk</a>
       </div>
       <p class="db-ok" id="w-ok"></p>
-      <p class="db-noot" style="margin-top:4px">Stuur deze link mee met de opdrachtbevestiging.</p>
+      <p class="db-noot" style="margin-top:4px">Stuur deze link mee met de opdracht&shy;bevestiging.</p>
     </div>
 
     <!-- Tools -->
@@ -269,7 +273,7 @@
       <div class="db-tools">
         <a class="db-tool" href="https://outlook.office.com" target="_blank" rel="noopener"><strong>Outlook</strong><span>Mail info@</span></a>
         <a class="db-tool" href="https://app.cal.com/bookings/upcoming" target="_blank" rel="noopener"><strong>Cal.com</strong><span>Kennismakingen</span></a>
-        <a class="db-tool" href="https://www.moneymonk.nl" target="_blank" rel="noopener"><strong>MoneyMonk</strong><span>Klantadministraties</span></a>
+        <a class="db-tool" href="https://www.moneymonk.nl" target="_blank" rel="noopener"><strong>MoneyMonk</strong><span>Klant&shy;administraties</span></a>
         <a class="db-tool" href="https://cloud.umami.is" target="_blank" rel="noopener"><strong>Umami</strong><span>Bezoekers en klikken</span></a>
         <a class="db-tool" href="https://app.netlify.com" target="_blank" rel="noopener"><strong>Netlify</strong><span>Website en formulieren</span></a>
         <a class="db-tool" href="https://search.google.com/search-console" target="_blank" rel="noopener"><strong>Search Console</strong><span>Vindbaarheid in Google</span></a>
@@ -304,7 +308,7 @@
         </ul></div>
         <div><h3>Kennisbank</h3><ul>
           <li><a href="/kennisbank/" target="_blank" rel="noopener">Overzicht</a></li>
-          <li><a href="/kennisbank/zelfstandigenaftrek.html" target="_blank" rel="noopener">Zelfstandigenaftrek</a></li>
+          <li><a href="/kennisbank/zelfstandigenaftrek.html" target="_blank" rel="noopener">Zelfstandigen&shy;aftrek</a></li>
           <li><a href="/kennisbank/netto-inkomen-berekenen.html" target="_blank" rel="noopener">Netto-inkomen calculator</a></li>
           <li><a href="/kennisbank/btw-aangifte-deadlines.html" target="_blank" rel="noopener">Btw-aangifte deadlines</a></li>
           <li><a href="/kennisbank/bonnetjes-bewaren.html" target="_blank" rel="noopener">Bonnetjes bewaren</a></li>

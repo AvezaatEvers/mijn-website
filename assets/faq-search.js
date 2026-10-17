@@ -74,7 +74,7 @@
   var STOP = ' de het een en of ik je jij jou jullie u we wij mijn mij me is zijn ben bent heb hebt heeft hoe wat wie waar wanneer waarom welke kan kun kunnen moet moeten mag doe doen dat dit die er in op aan van voor met bij naar om te tot als dan ook nog al wel niet geen hier daar zo maar want omdat dus over uit ';
 
   function norm(s) {
-    return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    return s.replace(/\u00ad/g, '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
       .replace(/1-op-1/g, '1op1').replace(/[^a-z0-9 ]+/g, ' ');
   }
   function stem(w) {

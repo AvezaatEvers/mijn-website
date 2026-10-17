@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Maandelijkse 1-op-1 | Avezaat &amp; Evers</title>
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/style.css?v=118">
+<link rel="stylesheet" href="/assets/style.css?v=119">
 <style>
   html, body { height: 100%; }
   body { margin: 0; overflow: hidden; background: #E6EBF5; }
@@ -467,8 +467,8 @@
     <div class="links">
       <div class="logo a">Avezaat <span>&amp;</span> Evers</div>
       <div class="body">
-        <div class="kicker a a2" id="t-maand">Maandelijkse 1-op-1</div>
-        <h1 class="a a3" id="t-kop">Je maandelijkse 1-op-1.</h1>
+        <div class="kicker a a2" id="t-maand">Maandelijkse <span class="nw">1-op-1</span></div>
+        <h1 class="a a3" id="t-kop">Je maandelijkse <span class="nw">1-op-1</span>.</h1>
         <p class="sub a a4">Een half uur over jouw bedrijf: hoe het gaat, wat de cijfers zeggen en wat er de komende tijd aankomt.</p>
         <div class="wie-chip a a5"><img id="t-foto" src="/assets/img/daan-160.webp" alt="" width="56" height="56"><span><strong id="t-wie">Daan Evers</strong>Jouw vaste boekhouder</span></div>
       </div>
@@ -588,7 +588,7 @@
       </div>
       <div class="uren a a4">
         <h3>Urencriterium</h3>
-        <p>Voor de zelfstandigenaftrek heb je 1.225 uur per jaar nodig.</p>
+        <p>Voor de zelfstandigen&shy;aftrek heb je 1.225 uur per jaar nodig.</p>
         <div class="uren-balk"><u id="u-prog"></u><i id="u-nu"></i></div>
         <div class="uren-cijfers"><span id="u-tekst">0 uur</span><span>1.225 uur</span></div>
         <div class="uren-oordeel" id="u-oordeel"></div>
@@ -615,7 +615,7 @@
         <div class="bel-r"><span>Bonnetjes en facturen bij ons uiterlijk</span><b id="b-aan"></b></div>
       </div>
       <div class="bel-kaart a a4">
-        <h3>Inkomstenbelasting en Zvw</h3>
+        <h3>Inkomsten&shy;belasting en Zvw</h3>
         <p id="b-jaar">Schatting op basis van de verwachte winst</p>
         <div class="bel-r"><span>Verwacht te betalen over het jaar</span><b id="b-ib">€0</b></div>
         <div class="bel-r"><span>Via je voorlopige aanslag</span><b id="b-va">€0</b></div>
@@ -718,7 +718,7 @@
       <div class="body">
         <h2 id="s-kop">Dank je wel.</h2>
         <p class="sub">Tussendoor een vraag? Stuur gewoon een appje. Binnen 2 uur heb je antwoord.</p>
-        <div class="volgende"><small>Volgende 1-op-1</small><b id="s-volgende">Plan je via de link in je mail</b></div>
+        <div class="volgende"><small>Volgende <span class="nw">1-op-1</span></small><b id="s-volgende">Plan je via de link in je mail</b></div>
         <div class="contact">
           <div><small>WhatsApp en bellen</small><b>085 060 4363</b></div>
           <div><small>Mail</small><b>info@avezaatenevers.nl</b></div>
@@ -729,7 +729,7 @@
     <aside class="notes">
       <ul>
         <li>Herhaal kort de afspraken.</li>
-        <li>Plan de volgende 1-op-1 meteen, of verwijs naar de planlink.</li>
+        <li>Plan de volgende <span class="nw">1-op-1</span> meteen, of verwijs naar de planlink.</li>
         <li>Sla op (de lade, B) zodat de afspraken volgende maand klaarstaan.</li>
       </ul>
     </aside>
@@ -771,7 +771,7 @@
         <label>Vragen van de klant (één per regel)<textarea name="vragen"></textarea></label>
         <label>Onderwerp<select name="thema"></select></label>
         <label>Eigen toelichting bij het onderwerp<textarea name="themaEigen" placeholder="Bijvoorbeeld: wat dit voor deze klant betekent"></textarea></label>
-        <label>Volgende 1-op-1<input name="volgende" type="datetime-local"></label>
+        <label><span>Volgende <span class="nw">1-op-1</span></span><input name="volgende" type="datetime-local"></label>
       </fieldset>
     </form>
   </div>
@@ -968,8 +968,8 @@
     var naam = (D.naam || '').trim(), m = +D.maand, jaar = +D.jaar;
     var wie = D.wie === 'Koen' ? 'Koen Avezaat' : 'Daan Evers', foto = D.wie === 'Koen' ? '/assets/img/koen-160.webp' : '/assets/img/daan-160.webp';
     document.title = (naam ? '1-op-1 met ' + naam : '1-op-1') + ' | Avezaat & Evers';
-    zet('t-maand', 'Maandelijkse 1-op-1 over ' + MND[m] + ' ' + jaar);
-    document.getElementById('t-kop').textContent = naam ? 'Goed je te zien, ' + naam + '.' : 'Je maandelijkse 1-op-1.';
+    document.getElementById('t-maand').innerHTML = 'Maandelijkse <span class="nw">1-op-1</span> over ' + MND[m] + ' ' + jaar;
+    if (naam) document.getElementById('t-kop').textContent = 'Goed je te zien, ' + naam + '.'; else document.getElementById('t-kop').innerHTML = 'Je maandelijkse <span class="nw">1-op-1</span>.';
     zet('t-wie', wie); document.getElementById('t-foto').src = foto; document.getElementById('af-foto').src = foto;
     zet('c-kop', naam ? 'Hoe gaat het, ' + naam + '?' : 'Vertel eens, hoe was je maand?');
     zet('af-jij-kop', naam || 'Jij'); zet('af-wij-kop', D.wie);

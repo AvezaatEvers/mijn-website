@@ -14,7 +14,7 @@ Website van Avezaat & Evers (statische HTML, gehost op Netlify).
 ## Overig
 
 - Na wijzigingen aan `assets/style.css` of `assets/*.js`: het versienummer (`?v=N`) in alle HTML-bestanden ophogen, anders tonen browsers de oude opmaak.
-- De site is afgeschermd met `netlify/edge-functions/toegang.js` tot de lancering (wachtwoord bekend bij de gebruiker).
+- De site is sinds 27 oktober 2026 live en open. Alleen `/intern/`, `/voorstel.html` en `/handtekening.html` zijn afgeschermd via `netlify/edge-functions/intern.js`.
 
 ## Contactgegevens
 

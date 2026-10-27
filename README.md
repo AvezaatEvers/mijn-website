@@ -19,11 +19,9 @@ Statische website (HTML + CSS), gehost op Netlify vanuit GitHub. Geen build-stap
 
 Huisstijl: `assets/style.css` (kleuren bovenaan als variabelen). Menu en formulier-hulp: `assets/main.js`.
 
-## Afscherming tot de lancering
+## Lancering
 
-Zolang `netlify/edge-functions/toegang.js` bestaat, ziet elke bezoeker `binnenkort.html`. Met het wachtwoord (via "Toegang" rechtsonder) krijg je 30 dagen toegang tot de echte site.
-
-**Lancering:** verwijder `netlify/edge-functions/toegang.js` – dan is de site direct open.
+De site is op 27 oktober 2026 gelanceerd en voor iedereen open. Alleen `/intern/`, `/voorstel.html` en `/handtekening.html` zijn nog afgeschermd (zie hieronder).
 
 ## Vóór livegang invullen
 
@@ -76,7 +74,7 @@ Gratis foto's van Pexels (Pexels-licentie: vrij te gebruiken, ook commercieel, n
 
 ## E-mailhandtekening
 
-Open `/handtekening.html` (niet gelinkt, noindex) en klik op "Kopieer handtekening". Afbeeldingen staan in `assets/email/` en zijn ook achter het wachtwoord bereikbaar (alles onder /assets/ is uitgezonderd). Het domein avezaatenevers.nl is gekoppeld; de handtekening gebruikt dat adres.
+Open `/handtekening.html` (niet gelinkt, noindex) en klik op "Kopieer handtekening". Afbeeldingen staan in `assets/email/`. Het domein avezaatenevers.nl is gekoppeld; de handtekening gebruikt dat adres.
 
 ## Voorstel-mail
 

@@ -156,6 +156,15 @@
     .wk-stap p { font-size: 14px; }
   }
 
+  /* Afspraken */
+  .wk-docs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .wk-docs a { display: flex; gap: 14px; align-items: flex-start; padding: 18px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--white); color: var(--ink); text-decoration: none; transition: border-color .2s; }
+  .wk-docs a:hover { border-color: var(--accent); }
+  .wk-docs svg { flex: none; color: var(--accent); margin-top: 2px; }
+  .wk-docs strong { display: block; font-size: 16px; }
+  .wk-docs small { display: block; font-size: 14px; color: var(--muted); margin-top: 2px; line-height: 1.45; }
+  @media (max-width: 860px) { .wk-docs { grid-template-columns: minmax(0, 1fr); } }
+
   #wk-confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
 
   @media (max-width: 960px) {
@@ -360,12 +369,25 @@
       </div>
     </div>
   </section>
+  <section class="wk-sectie" style="padding-top:0">
+    <div class="container">
+      <div class="wk-kop wk-in" style="margin-bottom:20px">
+        <h2 style="font-size:clamp(22px,2.4vw,28px)">Onze afspraken op een rij</h2>
+        <p>Deze documenten horen bij je opdrachtbevestiging. Handig om te bewaren.</p>
+      </div>
+      <div class="wk-docs wk-in">
+        <a href="/voorwaarden.html"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h4"/></svg><span><strong>Algemene voorwaarden</strong><small>Wat we voor je doen, betaling en opzeggen</small></span></a>
+        <a href="/verwerkersovereenkomst.html"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h4"/></svg><span><strong>Verwerkersovereenkomst</strong><small>Hoe we de gegevens in je administratie beveiligen</small></span></a>
+        <a href="/privacy.html"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h4"/></svg><span><strong>Privacyverklaring</strong><small>Welke gegevens we van jou bewaren en waarom</small></span></a>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer class="site-footer">
   <div class="container footer-bottom">
     <span>© <span id="year">2026</span> Avezaat &amp; Evers, KvK 42133742</span>
-    <span><a href="/voorwaarden.html">Algemene voorwaarden</a> · <a href="/privacy.html">Privacyverklaring</a></span>
+    <span><a href="/voorwaarden.html">Algemene voorwaarden</a> · <a href="/privacy.html">Privacyverklaring</a> · <a href="/verwerkersovereenkomst.html">Verwerkersovereenkomst</a></span>
   </div>
 </footer>
 <canvas id="wk-confetti" aria-hidden="true"></canvas>

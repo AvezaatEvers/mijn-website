@@ -185,7 +185,9 @@
       stap(3, 'We zetten alles klaar', 'Je MoneyMonk-account, de machtiging voor je aangiftes' + (v.overstap.value !== 'nee' ? ' en de overdracht met je oude boekhouder' : '') + '.') +
       stap(4, 'Je eerste 1-op-1', 'In je eerste maand lopen we samen alles door.') +
     '</table>') +
-    ruimte(12) +
+    ruimte(4) +
+    blok('<span style="font-size:14px;">Bij de opdrachtbevestiging horen onze <a href="' + BASE + '/voorwaarden.html">algemene voorwaarden</a>, <a href="' + BASE + '/verwerkersovereenkomst.html">verwerkersovereenkomst</a> en <a href="' + BASE + '/privacy.html">privacyverklaring</a>. Lees ze gerust alvast.</span>') +
+    ruimte(16) +
     // Knop als afbeelding
     blok('<a href="' + akkoordLink + '"><img src="' + BASE + '/assets/email/voorstel-knop.png" width="240" height="52" alt="Ja, ik wil starten" style="display:block;border:0;width:240px;height:52px;"></a>') +
     ruimte(16) +
@@ -196,7 +198,7 @@
     // Voet
     blok(tabel + lijn() + '</table>') +
     ruimte(14) +
-    blok('<span style="font-size:12px;">Avezaat &amp; Evers · <a href="mailto:' + MAIL + '">' + MAIL + '</a> · <a href="' + BASE + '/">avezaatenevers.nl</a><br>Alle bedragen excl. 21% btw, tenzij anders vermeld. Op onze diensten zijn onze <a href="' + BASE + '/voorwaarden.html">algemene voorwaarden</a> van toepassing.</span>') +
+    blok('<span style="font-size:12px;">Avezaat &amp; Evers · <a href="mailto:' + MAIL + '">' + MAIL + '</a> · <a href="' + BASE + '/">avezaatenevers.nl</a><br>Alle bedragen excl. 21% btw, tenzij anders vermeld. Op onze diensten zijn onze <a href="' + BASE + '/voorwaarden.html">algemene voorwaarden</a> en <a href="' + BASE + '/verwerkersovereenkomst.html">verwerkersovereenkomst</a> van toepassing.</span>') +
     ruimte(28) +
     '</table>';
 

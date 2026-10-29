@@ -211,3 +211,18 @@
   // Vangnet: na 4 seconden alles tonen wat nog verborgen is
   setTimeout(function () { els.forEach(function (el) { el.classList.add('is-in'); }); }, 4000);
 })();
+
+// Agendaknoppen: de knop die past bij het apparaat van de bezoeker vooraan en blauw
+(function () {
+  var groepen = document.querySelectorAll('.dl-knoppen');
+  if (!groepen.length) return;
+  var ua = navigator.userAgent || '';
+  var apple = /iPhone|iPad|iPod|Macintosh/.test(ua) && !/Android/.test(ua);
+  var voorkeur = apple ? 'apple' : 'google';
+  groepen.forEach(function (g) {
+    var knop = g.querySelector('[data-dl="' + voorkeur + '"]');
+    if (!knop) return;
+    knop.classList.add('is-hoofd');
+    g.insertBefore(knop, g.firstChild);
+  });
+})();

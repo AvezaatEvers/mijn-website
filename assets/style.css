@@ -1530,3 +1530,14 @@ p, li, dd, dt, td, th, blockquote, figcaption, summary, label { overflow-wrap: b
   .article-list .article-card h2 { font-size: 18px !important; }
   .card h3, .branche-diep h3 { font-size: 17px; }
 }
+
+/* KOR-check */
+.kc-sec { padding-bottom: 24px; }
+.kc-kop { max-width: 640px; margin-bottom: 24px; }
+.kc-kop h2 { margin: 0 0 8px; }
+.kc-kop p { margin: 0; color: var(--text); }
+.kc-big { font-size: clamp(30px, 4.4vw, 44px); }
+.kc-result.is-niet .kc-big { color: var(--ink); }
+.kc-deadline { margin: 18px 0 0; font-size: 14px; color: var(--muted); }
+.kc-knoppen { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.kc-knoppen .btn { flex: 1 1 200px; justify-content: center; }

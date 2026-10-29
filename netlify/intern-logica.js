@@ -2,7 +2,7 @@
 // Los van Netlify gehouden zodat het lokaal te testen is; intern.js koppelt de opslag.
 
 export const GEBRUIKERS = {
-  koen: { naam: "Koen", ww: "cdb513e66ec9f28dd349f7e10dd5548ed2700ef5e9d2fe0171223333bfc95559", token: "f22c1dbdc05db90390925e23ee897ae57de848e00172be81f1a2718c099c3bf9" },
+  koen: { naam: "Koen", ww: "4d145e1be9338e703b4ef3439309c1901f53f3a6b3d4e8d78c7d4fcaee69384a", token: "6a183805e91b11ed14fe55d8d60f44ff6b62411bb477b7c239bb5e8ecd943cc0" },
   daan: { naam: "Daan", ww: "9c9beef291a55bc0ac3f76e5facac1ae1a532eaf01819a42d47594f8321ae0f0", token: "53725357bdf816ded6bf89b45f6185ce63f6af76649c03bd6474073400509bbf" },
 };
 const SALT = "avezaat-evers:intern:v2:";

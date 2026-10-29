@@ -3,7 +3,6 @@
 // Jaarlijks bijwerken: alleen het object JAREN aanpassen.
 (function () {
   var form = document.getElementById('nc-form');
-  if (!form) return;
 
   var JAREN = {
     2026: {
@@ -67,7 +66,8 @@
       reserveer: winst > 0 ? (teBetalen + zvw) / winst : 0
     };
   }
-  window.__nettoBereken = bereken; // voor tests
+  window.__nettoBereken = bereken; // ook gebruikt door de opzijzet-calculator
+  if (!form) return;
 
   var fmt = new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
   function euro(n) { return fmt.format(Math.round(n)).replace(/\s/g, ' '); }

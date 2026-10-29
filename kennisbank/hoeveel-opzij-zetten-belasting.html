@@ -160,6 +160,50 @@
     <p class="crumbs"><a href="/">Home</a> / <a href="/kennisbank/">Kennisbank</a> / Belasting opzijzetten</p>
     <h1 style="font-size:clamp(32px,4.4vw,52px)">Hoeveel moet je als zzp'er opzijzetten voor belasting?</h1>
     <p class="meta">Door Koen Avezaat en Daan Evers. Bijgewerkt in oktober 2026, 4 minuten lezen.</p>
+    <p class="lead">Twee potjes: één voor de btw en één voor je inkomsten&shy;belasting. Reken hieronder uit hoeveel je van elke betaling apart zet.</p>
+  </div>
+</section>
+
+<section class="section kc-sec" id="opzij-calculator">
+  <div class="container">
+    <div class="kc-kop">
+      <h2>Reken uit wat je opzijzet</h2>
+      <p>Vul je verwachte winst en een factuurbedrag in. Je ziet direct hoeveel je van die betaling apart zet.</p>
+    </div>
+    <form class="nc" id="oz-form" novalidate>
+      <div class="nc-inputs">
+        <label class="nc-field" for="oz-winst">
+          <span>Verwachte winst dit jaar <small>omzet min zakelijke kosten</small></span>
+          <span class="nc-money"><span aria-hidden="true">€</span><input id="oz-winst" inputmode="numeric" autocomplete="off" value="50.000"></span>
+        </label>
+        <label class="nc-field" for="oz-factuur">
+          <span>Factuurbedrag <small>excl. btw</small></span>
+          <span class="nc-money"><span aria-hidden="true">€</span><input id="oz-factuur" inputmode="numeric" autocomplete="off" value="2.000"></span>
+        </label>
+        <fieldset class="nc-seg">
+          <legend>Btw op deze factuur</legend>
+          <label><input type="radio" name="oz-btw" value="0.21" checked><span>21%</span></label>
+          <label><input type="radio" name="oz-btw" value="0.09"><span>9%</span></label>
+          <label><input type="radio" name="oz-btw" value="0"><span>Geen <small>verlegd of vrijgesteld</small></span></label>
+        </fieldset>
+        <label class="nc-check"><input type="checkbox" id="oz-uren" checked><span>Ik werk minstens 1.225 uur per jaar in mijn bedrijf <small>(urencriterium)</small></span></label>
+      </div>
+      <div class="nc-result" aria-live="polite">
+        <p class="nc-kicker">Zet van deze betaling apart</p>
+        <p class="nc-big kc-big" id="oz-big">€ 0</p>
+        <p class="nc-sub" id="oz-sub"></p>
+        <dl class="nc-table">
+          <div><dt>Btw, voor je btw-aangifte</dt><dd id="oz-btw-bedrag">€ 0</dd></div>
+          <div><dt>Inkomsten&shy;belasting en Zvw (<span id="oz-pct">0%</span> van het bedrag excl. btw)</dt><dd id="oz-belasting">€ 0</dd></div>
+          <div class="nc-line"><dt>Wat je zelf mag houden</dt><dd id="oz-zelf">€ 0</dd></div>
+        </dl>
+        <div class="nc-tip">Maak er een vaste regel van: zet van elke betaling <strong id="oz-regel">0%</strong> apart. Over je hele winst betaal je in <span id="oz-jaartal">2026</span> ongeveer <strong id="oz-jaar">€ 0</strong>.</div>
+        <div class="kc-knoppen">
+          <a class="btn btn-primary" href="/contact.html#plannen">Laat ons het bijhouden</a>
+        </div>
+      </div>
+    </form>
+    <p class="nc-disclaimer">Indicatie voor een eenmanszaak zonder ander inkomen, jonger dan de AOW-leeftijd, zonder startersaftrek. We rekenen het percentage over het factuurbedrag, niet over je winst; daardoor houd je vanzelf een kleine buffer over. Heb je ook een baan in loondienst, dan zet je meer opzij. Aan deze berekening kun je geen rechten ontlenen.</p>
   </div>
 </section>
 
@@ -336,6 +380,8 @@
 </a>
 
 <script src="/assets/main.js?v=121" defer></script>
+<script src="/assets/netto-calc.js?v=121" defer></script>
+<script src="/assets/opzij-calc.js?v=121" defer></script>
 <script src="/assets/cal.js?v=121" defer></script>
 <script src="/assets/analytics.js?v=121" defer></script>
 </body>

@@ -1541,3 +1541,15 @@ p, li, dd, dt, td, th, blockquote, figcaption, summary, label { overflow-wrap: b
 .kc-deadline { margin: 18px 0 0; font-size: 14px; color: var(--muted); }
 .kc-knoppen { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
 .kc-knoppen .btn { flex: 1 1 200px; justify-content: center; }
+
+/* Deadlines in je agenda */
+.dl-agenda { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: start; background: var(--white); border: 1px solid var(--tint-border); border-radius: 14px; padding: 22px 24px; margin: 32px 0; }
+.dl-agenda > svg { color: var(--accent); margin-top: 2px; }
+.dl-agenda strong { display: block; font-size: 18px; color: var(--ink); }
+.dl-agenda p { margin: 4px 0 14px; font-size: 15px; color: var(--text); }
+.dl-knoppen { display: flex; flex-wrap: wrap; gap: 8px; }
+.dl-knoppen a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--ink); text-decoration: none; background: var(--white); transition: border-color .2s; }
+.dl-knoppen a:hover { border-color: var(--accent); }
+.dl-knoppen a.is-hoofd { background: var(--accent); border-color: var(--accent); color: #fff; }
+.dl-klein { margin: 10px 0 0 !important; font-size: 13px !important; color: var(--muted) !important; }
+@media (max-width: 560px) { .dl-agenda { grid-template-columns: minmax(0, 1fr); padding: 20px 18px; } .dl-agenda > svg { display: none; } .dl-knoppen a { flex: 1 1 140px; justify-content: center; } }

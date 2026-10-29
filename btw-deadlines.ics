@@ -1,0 +1,246 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Avezaat & Evers//Btw-deadlines//NL
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Btw- en belastingdeadlines (Avezaat & Evers)
+X-WR-CALDESC:De belangrijkste deadlines voor zzp'ers: btw-aangifte\, aangif
+ te inkomstenbelasting\, KOR en jaareinde. Bijgehouden door Avezaat & Evers.
+X-WR-TIMEZONE:Europe/Amsterdam
+REFRESH-INTERVAL;VALUE=DURATION:P1W
+X-PUBLISHED-TTL:P1W
+BEGIN:VEVENT
+UID:btw-q3-2026@avezaatenevers.nl
+DTSTAMP:20261029T100000Z
+DTSTART;VALUE=DATE:20261031
+DTEND;VALUE=DATE:20261101
+SUMMARY:Btw-aangifte Q3 2026: uiterlijk vandaag
+DESCRIPTION:Laatste dag om de btw-aangifte over Q3 2026 in te dienen en te 
+ betalen. Het bedrag moet vandaag op de rekening van de Belastingdienst sta
+ an\, dus betaal een paar dagen eerder. Valt de datum in het weekend\, dien
+  dan gewoon eerder in.\n\nUitleg: https://avezaatenevers.nl/kennisbank/btw
+ -aangifte-deadlines.html\n\nLiever niet zelf doen? Avezaat & Evers doet je
+  btw- en IB-aangifte voor €80 per maand: https://avezaatenevers.nl
+URL:https://avezaatenevers.nl/kennisbank/btw-aangifte-deadlines.html
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Btw-aangifte Q3 2026: uiterlijk vandaag
+TRIGGER:-P7D
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:jaareinde-2026@avezaatenevers.nl
+DTSTAMP:20261029T100000Z
+DTSTART;VALUE=DATE:20261201
+DTEND;VALUE=DATE:20261202
+SUMMARY:Jaareinde: dit regel je vóór 31 december
+DESCRIPTION:Urencriterium\, investeringen\, voorraad\, voorlopige aanslag e
+ n pensioen: loop de checklist door zolang je nog iets kunt veranderen.\n\n
+ https://avezaatenevers.nl/kennisbank/jaareinde-checklist-zzp.html\n\nLieve
+ r niet zelf doen? Avezaat & Evers doet je btw- en IB-aangifte voor €80 p
+ er maand: https://avezaatenevers.nl
+URL:https://avezaatenevers.nl/kennisbank/jaareinde-checklist-zzp.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:kor-2027@avezaatenevers.nl
+DTSTAMP:20261029T100000Z
+DTSTART;VALUE=DATE:20261203
+DTEND;VALUE=DATE:20261204
+SUMMARY:KOR per 1 januari 2027: laatste dag om aan te melden
+DESCRIPTION:Wil je per 1 januari 2027 meedoen aan de kleineondernemersregel
+ ing? Je aanmelding moet uiterlijk vier weken van tevoren binnen zijn. Doe 
+ eerst de KOR-check.\n\nhttps://avezaatenevers.nl/kennisbank/kleineondernem
+ ersregeling-kor.html#kor-check\n\nLiever niet zelf doen? Avezaat & Evers d
+ oet je btw- en IB-aangifte voor €80 per maand: https://avezaatenevers.nl
+URL:https://avezaatenevers.nl/kennisbank/kleineondernemersregeling-kor.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:btw-q4-2026@avezaatenevers.nl
+DTSTAMP:20261029T100000Z
+DTSTART;VALUE=DATE:20270131
+DTEND;VALUE=DATE:20270201
+SUMMARY:Btw-aangifte Q4 2026: uiterlijk vandaag
+DESCRIPTION:Laatste dag om de btw-aangifte over Q4 2026 in te dienen en te 
+ betalen. Het bedrag moet vandaag op de rekening van de Belastingdienst sta
+ an\, dus betaal een paar dagen eerder. Valt de datum in het weekend\, dien
+  dan gewoon eerder in.\n\nUitleg: https://avezaatenevers.nl/kennisbank/btw
+ -aangifte-deadlines.html\n\nLiever niet zelf doen? Avezaat & Evers doet je
+  btw- en IB-aangifte voor €80 per maand: https://avezaatenevers.nl
+URL:https://avezaatenevers.nl/kennisbank/btw-aangifte-deadlines.html
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Btw-aangifte Q4 2026: uiterlijk vandaag
+TRIGGER:-P7D
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:btw-q1-2027@avezaatenevers.nl
+DTSTAMP:20261029T100000Z
+DTSTART;VALUE=DATE:20270430
+DTEND;VALUE=DATE:20270501
+SUMMARY:Btw-aangifte Q1 2027: uiterlijk vandaag
+DESCRIPTION:Laatste dag om de btw-aangifte over Q1 2027 in te dienen en te 
+ betalen. Het bedrag moet vandaag op de rekening van de Belastingdienst sta
+ an\, dus betaal een paar dagen eerder. Valt de datum in het weekend\, dien
+  dan gewoon eerder in.\n\nUitleg: https://avezaatenevers.nl/kennisbank/btw
+ -aangifte-deadlines.html\n\nLiever niet zelf doen? Avezaat & Evers doet je
+  btw- en IB-aangifte voor €80 per maand: https://avezaatenevers.nl
+URL:https://avezaatenevers.nl/kennisbank/btw-aangifte-deadlines.html
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Btw-aangifte Q1 2027: uiterlijk vandaag
+TRIGGER:-P7D
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:ib-2026@avezaatenevers.nl
+DTSTAMP:20261029T100000Z
+DTSTART;VALUE=DATE:20270501
+DTEND;VALUE=DATE:20270502
+SUMMARY:Aangifte inkomstenbelasting 2026: uiterlijk vandaag
+DESCRIPTION:Laatste dag om je aangifte inkomstenbelasting over 2026 in te d
+ ienen\, tenzij je uitstel hebt. Dien je vóór 1 mei in\, dan voorkom je o
+ ok belastingrente.\n\nUitleg: https://avezaatenevers.nl/kennisbank/voorlop
+ ige-aanslag.html\n\nLiever niet zelf doen? Avezaat & Evers doet je btw- en
+  IB-aangifte voor €80 per maand: https://avezaatenevers.nl
+URL:https://avezaatenevers.nl/kennisbank/voorlopige-aanslag.html
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Aangifte inkomstenbelasting 2026: uiterlijk vandaag
+TRIGGER:-P7D
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:btw-q2-2027@avezaatenevers.nl
+DTSTAMP:20261029T100000Z
+DTSTART;VALUE=DATE:20270731
+DTEND;VALUE=DATE:20270801
+SUMMARY:Btw-aangifte Q2 2027: uiterlijk vandaag
+DESCRIPTION:Laatste dag om de btw-aangifte over Q2 2027 in te dienen en te 
+ betalen. Het bedrag moet vandaag op de rekening van de Belastingdienst sta
+ an\, dus betaal een paar dagen eerder. Valt de datum in het weekend\, dien
+  dan gewoon eerder in.\n\nUitleg: https://avezaatenevers.nl/kennisbank/btw
+ -aangifte-deadlines.html\n\nLiever niet zelf doen? Avezaat & Evers doet je
+  btw- en IB-aangifte voor €80 per maand: https://avezaatenevers.nl
+URL:https://avezaatenevers.nl/kennisbank/btw-aangifte-deadlines.html
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Btw-aangifte Q2 2027: uiterlijk vandaag
+TRIGGER:-P7D
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:btw-q3-2027@avezaatenevers.nl
+DTSTAMP:20261029T100000Z
+DTSTART;VALUE=DATE:20271031
+DTEND;VALUE=DATE:20271101
+SUMMARY:Btw-aangifte Q3 2027: uiterlijk vandaag
+DESCRIPTION:Laatste dag om de btw-aangifte over Q3 2027 in te dienen en te 
+ betalen. Het bedrag moet vandaag op de rekening van de Belastingdienst sta
+ an\, dus betaal een paar dagen eerder. Valt de datum in het weekend\, dien
+  dan gewoon eerder in.\n\nUitleg: https://avezaatenevers.nl/kennisbank/btw
+ -aangifte-deadlines.html\n\nLiever niet zelf doen? Avezaat & Evers doet je
+  btw- en IB-aangifte voor €80 per maand: https://avezaatenevers.nl
+URL:https://avezaatenevers.nl/kennisbank/btw-aangifte-deadlines.html
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Btw-aangifte Q3 2027: uiterlijk vandaag
+TRIGGER:-P7D
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:jaareinde-2027@avezaatenevers.nl
+DTSTAMP:20261029T100000Z
+DTSTART;VALUE=DATE:20271201
+DTEND;VALUE=DATE:20271202
+SUMMARY:Jaareinde: dit regel je vóór 31 december
+DESCRIPTION:Urencriterium\, investeringen\, voorraad\, voorlopige aanslag e
+ n pensioen: loop de checklist door zolang je nog iets kunt veranderen.\n\n
+ https://avezaatenevers.nl/kennisbank/jaareinde-checklist-zzp.html\n\nLieve
+ r niet zelf doen? Avezaat & Evers doet je btw- en IB-aangifte voor €80 p
+ er maand: https://avezaatenevers.nl
+URL:https://avezaatenevers.nl/kennisbank/jaareinde-checklist-zzp.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:kor-2028@avezaatenevers.nl
+DTSTAMP:20261029T100000Z
+DTSTART;VALUE=DATE:20271203
+DTEND;VALUE=DATE:20271204
+SUMMARY:KOR per 1 januari 2028: laatste dag om aan te melden
+DESCRIPTION:Wil je per 1 januari 2028 meedoen aan de kleineondernemersregel
+ ing? Je aanmelding moet uiterlijk vier weken van tevoren binnen zijn. Doe 
+ eerst de KOR-check.\n\nhttps://avezaatenevers.nl/kennisbank/kleineondernem
+ ersregeling-kor.html#kor-check\n\nLiever niet zelf doen? Avezaat & Evers d
+ oet je btw- en IB-aangifte voor €80 per maand: https://avezaatenevers.nl
+URL:https://avezaatenevers.nl/kennisbank/kleineondernemersregeling-kor.html
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:btw-q4-2027@avezaatenevers.nl
+DTSTAMP:20261029T100000Z
+DTSTART;VALUE=DATE:20280131
+DTEND;VALUE=DATE:20280201
+SUMMARY:Btw-aangifte Q4 2027: uiterlijk vandaag
+DESCRIPTION:Laatste dag om de btw-aangifte over Q4 2027 in te dienen en te 
+ betalen. Het bedrag moet vandaag op de rekening van de Belastingdienst sta
+ an\, dus betaal een paar dagen eerder. Valt de datum in het weekend\, dien
+  dan gewoon eerder in.\n\nUitleg: https://avezaatenevers.nl/kennisbank/btw
+ -aangifte-deadlines.html\n\nLiever niet zelf doen? Avezaat & Evers doet je
+  btw- en IB-aangifte voor €80 per maand: https://avezaatenevers.nl
+URL:https://avezaatenevers.nl/kennisbank/btw-aangifte-deadlines.html
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Btw-aangifte Q4 2027: uiterlijk vandaag
+TRIGGER:-P7D
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:btw-q1-2028@avezaatenevers.nl
+DTSTAMP:20261029T100000Z
+DTSTART;VALUE=DATE:20280430
+DTEND;VALUE=DATE:20280501
+SUMMARY:Btw-aangifte Q1 2028: uiterlijk vandaag
+DESCRIPTION:Laatste dag om de btw-aangifte over Q1 2028 in te dienen en te 
+ betalen. Het bedrag moet vandaag op de rekening van de Belastingdienst sta
+ an\, dus betaal een paar dagen eerder. Valt de datum in het weekend\, dien
+  dan gewoon eerder in.\n\nUitleg: https://avezaatenevers.nl/kennisbank/btw
+ -aangifte-deadlines.html\n\nLiever niet zelf doen? Avezaat & Evers doet je
+  btw- en IB-aangifte voor €80 per maand: https://avezaatenevers.nl
+URL:https://avezaatenevers.nl/kennisbank/btw-aangifte-deadlines.html
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Btw-aangifte Q1 2028: uiterlijk vandaag
+TRIGGER:-P7D
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:ib-2027@avezaatenevers.nl
+DTSTAMP:20261029T100000Z
+DTSTART;VALUE=DATE:20280501
+DTEND;VALUE=DATE:20280502
+SUMMARY:Aangifte inkomstenbelasting 2027: uiterlijk vandaag
+DESCRIPTION:Laatste dag om je aangifte inkomstenbelasting over 2027 in te d
+ ienen\, tenzij je uitstel hebt. Dien je vóór 1 mei in\, dan voorkom je o
+ ok belastingrente.\n\nUitleg: https://avezaatenevers.nl/kennisbank/voorlop
+ ige-aanslag.html\n\nLiever niet zelf doen? Avezaat & Evers doet je btw- en
+  IB-aangifte voor €80 per maand: https://avezaatenevers.nl
+URL:https://avezaatenevers.nl/kennisbank/voorlopige-aanslag.html
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Aangifte inkomstenbelasting 2027: uiterlijk vandaag
+TRIGGER:-P7D
+END:VALARM
+END:VEVENT
+END:VCALENDAR

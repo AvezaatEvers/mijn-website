@@ -87,3 +87,7 @@ Stuur nieuwe klanten na hun akkoord een persoonlijke link: `https://avezaateneve
 ## Intern dashboard
 
 `/intern/` is het dashboard voor Koen en Daan: gedeelde takenlijst met deadlines (wie heeft afgevinkt), kalender met vaste deadlines en taken, snelkoppelingen, welkomstlink maken en alle pagina's. Ieder logt in met een eigen wachtwoord. Afgeschermd via `netlify/edge-functions/intern.js` (logica in `netlify/intern-logica.js`), samen met `/voorstel.html` en `/handtekening.html`. Taken staan in Netlify Blobs (store `intern`), daarvoor is `package.json` met `@netlify/blobs` nodig. Wachtwoorden staan niet in de code (alleen hashes); bewaar ze in een wachtwoordmanager.
+
+## Agenda met deadlines (btw-deadlines.ics)
+
+`/btw-deadlines.ics` is een openbare agenda waarop bezoekers zich abonneren (knoppen in het btw-artikel, de jaareinde-checklist en de starterspagina). Hij bevat de btw-deadlines, de IB-deadline, de KOR-aanmelddatum en de jaareinde-herinnering tot en met april 2028. Vul hem elk najaar aan met een nieuw jaar; abonnees krijgen de wijziging vanzelf binnen een week.

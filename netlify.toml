@@ -8,3 +8,10 @@
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Openbare agenda met btw- en belastingdeadlines (abonneren via webcal)
+[[headers]]
+  for = "/btw-deadlines.ics"
+  [headers.values]
+    Content-Type = "text/calendar; charset=utf-8"
+    Cache-Control = "public, max-age=3600"

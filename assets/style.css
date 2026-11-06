@@ -206,7 +206,7 @@ table.compare tr:last-child td { border-bottom: 0; }
 /* Footer */
 .site-footer { border-top: 1px solid var(--line); margin-top: 0; }
 .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; padding: 56px 24px 32px; }
-.footer-grid h4 { margin: 0 0 12px; font-size: 15px; }
+.footer-grid h3 { margin: 0 0 12px; font-size: 15px; font-weight: 700; letter-spacing: 0; line-height: 1.4; color: var(--ink); }
 .footer-grid ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 15px; }
 .footer-grid a { color: var(--muted); text-decoration: none; }
 .footer-grid a:hover { color: var(--accent); }
@@ -1553,3 +1553,16 @@ p, li, dd, dt, td, th, blockquote, figcaption, summary, label { overflow-wrap: b
 .dl-knoppen a.is-hoofd { background: var(--accent); border-color: var(--accent); color: #fff; }
 .dl-klein { margin: 10px 0 0 !important; font-size: 13px !important; color: var(--muted) !important; }
 @media (max-width: 560px) { .dl-agenda { grid-template-columns: minmax(0, 1fr); padding: 20px 18px; } .dl-agenda > svg { display: none; } .dl-knoppen a { flex: 1 1 140px; justify-content: center; } }
+
+/* Hallmark-polish */
+.cta-alt { gap: 4px 18px; }
+.footer-legal { display: inline-flex; flex-wrap: wrap; gap: 4px 18px; }
+@media (min-width: 701px) {
+  .home .hero .checks { flex-direction: column; gap: 10px; margin-top: 4px; }
+}
+.app-visual::before { display: none; }
+@media (max-width: 420px) { .btn { padding-left: 16px; padding-right: 16px; } }
+@media (max-width: 374px) { .btn-opt { display: none; } }
+@media (max-width: 339px) { .btn { padding-left: 12px; padding-right: 12px; font-size: 14px; } }
+.cta-alt-label { flex-basis: 100%; }
+.cta-alt:not(.cta-alt-left) .cta-alt-label { text-align: center; }

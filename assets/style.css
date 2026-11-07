@@ -1584,3 +1584,4 @@ p, li, dd, dt, td, th, blockquote, figcaption, summary, label { overflow-wrap: b
 .over-kaart dd { margin: 0; color: var(--ink); }
 @media (max-width: 900px) { .over-lijst { grid-template-columns: minmax(0, 1fr); } .over-gegevens { grid-template-columns: minmax(0, 1fr); gap: 32px; } }
 @media (max-width: 480px) { .over-kaart dl > div { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+.wij-bio { display: block; margin-top: 6px; font-size: 14px; color: var(--text); line-height: 1.45; }

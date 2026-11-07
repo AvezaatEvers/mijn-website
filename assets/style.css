@@ -1566,3 +1566,21 @@ p, li, dd, dt, td, th, blockquote, figcaption, summary, label { overflow-wrap: b
 @media (max-width: 339px) { .btn { padding-left: 12px; padding-right: 12px; font-size: 14px; } }
 .cta-alt-label { flex-basis: 100%; }
 .cta-alt:not(.cta-alt-left) .cta-alt-label { text-align: center; }
+
+/* Over ons */
+.wij-grid .more { color: var(--accent); font-weight: 600; font-size: 16px; text-decoration: none; }
+.wij-grid .more:hover { text-decoration: underline; }
+.over-lijst { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 40px; }
+.over-lijst > div { padding: 24px 0; border-top: 1px solid var(--tint-border); }
+.over-lijst h3 { font-size: 19px; margin-bottom: 6px; color: var(--ink); }
+.over-lijst p { margin: 0; color: var(--text); }
+.over-gegevens { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 56px; align-items: start; }
+.over-badge { width: 200px; height: auto; margin-top: 8px; }
+.over-kaart { background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 26px 28px; }
+.over-kaart h3 { font-size: 19px; margin-bottom: 12px; }
+.over-kaart dl { margin: 0; display: grid; }
+.over-kaart dl > div { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 15px; }
+.over-kaart dt { color: var(--muted); }
+.over-kaart dd { margin: 0; color: var(--ink); }
+@media (max-width: 900px) { .over-lijst { grid-template-columns: minmax(0, 1fr); } .over-gegevens { grid-template-columns: minmax(0, 1fr); gap: 32px; } }
+@media (max-width: 480px) { .over-kaart dl > div { grid-template-columns: minmax(0, 1fr); gap: 2px; } }

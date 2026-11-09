@@ -475,7 +475,7 @@
         <div class="kicker a a2" id="t-maand">Maandelijkse <span class="nw">1-op-1</span></div>
         <h1 class="a a3" id="t-kop">Je maandelijkse <span class="nw">1-op-1</span>.</h1>
         <p class="sub a a4">Een half uur over jouw bedrijf: hoe het gaat, wat de cijfers zeggen en wat er de komende tijd aankomt.</p>
-        <div class="wie-chip a a5"><img id="t-foto" src="/assets/img/daan-160.webp" alt="" width="56" height="56"><span><strong id="t-wie">Daan Evers</strong>Jouw vaste boekhouder</span></div>
+        <div class="wie-chip a a5"><img id="t-foto" src="/assets/img/daan-160.webp?v=3" alt="" width="56" height="56"><span><strong id="t-wie">Daan Evers</strong>Jouw vaste boekhouder</span></div>
       </div>
     </div>
     <div class="rechts">
@@ -706,7 +706,7 @@
     <h2 class="a a2">Wie doet wat</h2>
     <div class="afspr a a3">
       <div class="afspr-kol"><h3 id="af-jij-kop">Jij</h3><ul id="af-jij"></ul><button class="afspr-plus" type="button" data-lijst="jij">Afspraak toevoegen</button></div>
-      <div class="afspr-kol"><h3><img id="af-foto" src="/assets/img/daan-160.webp" alt="" width="40" height="40"><span id="af-wij-kop">Wij</span></h3><ul id="af-wij"></ul><button class="afspr-plus" type="button" data-lijst="wij">Afspraak toevoegen</button></div>
+      <div class="afspr-kol"><h3><img id="af-foto" src="/assets/img/daan-160.webp?v=3" alt="" width="40" height="40"><span id="af-wij-kop">Wij</span></h3><ul id="af-wij"></ul><button class="afspr-plus" type="button" data-lijst="wij">Afspraak toevoegen</button></div>
     </div>
     <aside class="notes">
       <ul>
@@ -971,7 +971,7 @@
   // ---------- Alles tekenen ----------
   function render() {
     var naam = (D.naam || '').trim(), m = +D.maand, jaar = +D.jaar;
-    var wie = D.wie === 'Koen' ? 'Koen Avezaat' : 'Daan Evers', foto = D.wie === 'Koen' ? '/assets/img/koen-160.webp' : '/assets/img/daan-160.webp';
+    var wie = D.wie === 'Koen' ? 'Koen Avezaat' : 'Daan Evers', foto = D.wie === 'Koen' ? '/assets/img/koen-160.webp?v=3' : '/assets/img/daan-160.webp?v=3';
     document.title = (naam ? '1-op-1 met ' + naam : '1-op-1') + ' | Avezaat & Evers';
     document.getElementById('t-maand').innerHTML = 'Maandelijkse <span class="nw">1-op-1</span> over ' + MND[m] + ' ' + jaar;
     if (naam) document.getElementById('t-kop').textContent = 'Goed je te zien, ' + naam + '.'; else document.getElementById('t-kop').innerHTML = 'Je maandelijkse <span class="nw">1-op-1</span>.';

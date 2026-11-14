@@ -4,7 +4,7 @@ import { getStore } from "@netlify/blobs";
 import { verwerk } from "../intern-logica.js";
 
 export default async (request, context) =>
-  verwerk(request, context.cookies, () => context.next(), () => getStore({ name: "intern", consistency: "strong" }));
+  verwerk(request, context.cookies, () => context.next(), () => getStore({ name: "intern", consistency: "strong" }), (k) => Netlify.env.get(k));
 
 export const config = {
   path: ["/intern", "/intern/*", "/handtekening.html", "/voorstel.html"],

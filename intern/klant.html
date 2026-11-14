@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Klant | Avezaat &amp; Evers intern</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css?v=126">
+<link rel="stylesheet" href="/intern/klanten.css?v=1">
+</head>
+<body>
+<main class="db">
+  <div class="db-top">
+    <div><a class="logo" href="/intern/">Avezaat <span>&amp;</span> Evers</a><span class="db-tag">Intern</span></div>
+    <div class="db-wie"><span id="db-ik">Ingelogd</span><a href="/intern/">Dashboard</a><a href="/intern/logout">Uitloggen</a></div>
+  </div>
+
+  <a class="db-terug" href="/intern/klanten.html">Alle klanten</a>
+  <h1 id="titel">Klant</h1>
+  <p class="db-sub" id="sub"></p>
+
+  <div class="raster" id="inhoud" hidden>
+    <div class="db-kaart">
+      <div class="db-kop"><h2>Geplande mails</h2></div>
+      <div id="gepland"></div>
+      <p class="db-noot">Gaan automatisch om 08:00 de ochtend van de datum, vanaf info@avezaatenevers.nl, ondertekend door de vaste boekhouder. Vink uit om een soort mail voor deze klant over te slaan.</p>
+    </div>
+
+    <div class="db-kaart">
+      <div class="db-kop"><h2>Mail sturen</h2></div>
+      <div class="typen" id="typen"></div>
+    </div>
+
+    <div class="db-kaart">
+      <h2>Gegevens</h2>
+      <form id="gegevens" class="velden" autocomplete="off">
+        <label>Naam contactpersoon<input name="naam" required maxlength="200"></label>
+        <label>Bedrijfsnaam<input name="bedrijf" maxlength="200"></label>
+        <label>E-mailadres<input name="email" type="email" required></label>
+        <label>Telefoon<input name="telefoon" type="tel" maxlength="30"></label>
+        <label>Vaste boekhouder<select name="boekhouder"><option value="koen">Koen</option><option value="daan">Daan</option></select></label>
+        <label>Status<select name="status"><option value="klant">Klant</option><option value="prospect">Prospect</option><option value="gestopt">Gestopt</option></select></label>
+        <label>Startdatum<input name="start" type="date"></label>
+        <label>Link naar voorstel<input name="voorstelLink" type="url" placeholder="https://"></label>
+        <label class="breed">Notitie<textarea name="notitie" maxlength="2000" placeholder="Alleen intern zichtbaar"></textarea></label>
+        <div class="breed" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button class="db-knop" type="submit">Opslaan</button>
+          <button class="db-knop is-rood" type="button" id="verwijder">Klant verwijderen</button>
+          <span class="db-melding" id="g-melding"></span>
+        </div>
+      </form>
+    </div>
+
+    <div class="db-kaart">
+      <h2>Verstuurd</h2>
+      <ul class="log" id="log"></ul>
+    </div>
+  </div>
+</main>
+
+<dialog class="voorbeeld" id="vb">
+  <div class="vb-kop"><p id="vb-info"></p><button class="vb-sluit" type="button" id="vb-sluit" aria-label="Sluiten">&times;</button></div>
+  <iframe id="vb-frame" title="Voorbeeld van de mail"></iframe>
+  <div class="vb-voet">
+    <span class="db-melding" id="vb-melding"></span>
+    <button class="db-knop is-rand" type="button" id="vb-test">Test naar info@</button>
+    <button class="db-knop" type="button" id="vb-stuur">Versturen naar klant</button>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  var id = new URLSearchParams(location.search).get('id');
+  var klant = null, types = {}, huidig = null, zeker = false;
+  var AUTO = ['checkIn', 'kwartaal', 'jaareinde', 'inkomstenbelasting'];
+  var HANDMATIG = ['welkom', 'checkIn', 'voorstelHerinnering', 'kwartaal', 'jaareinde', 'inkomstenbelasting'];
+  var MAAND = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+  function d(s) { if (!s) return ''; var p = s.slice(0, 10).split('-'); return +p[2] + ' ' + MAAND[+p[1] - 1] + ' ' + p[0]; }
+  function dt(s) { var x = new Date(s); return x.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + x.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function naamVan(w) { return w === 'daan' ? 'Daan' : w === 'koen' ? 'Koen' : w === 'gepland' ? 'automatisch' : w; }
+  function api(pad, opt) {
+    return fetch(pad, Object.assign({ headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin' }, opt || {}))
+      .then(function (r) { if (r.status === 401) { location.reload(); throw new Error('uitgelogd'); } return r.json().then(function (j) { if (!r.ok) { var e = new Error(j.fout || 'Er ging iets mis'); e.data = j; throw e; } return j; }); });
+  }
+
+  function teken() {
+    var k = klant;
+    document.title = (k.bedrijf || k.naam) + ' | Avezaat & Evers intern';
+    document.getElementById('titel').textContent = k.bedrijf || k.naam;
+    document.getElementById('sub').textContent = (k.bedrijf ? k.naam + ', ' : '') + k.email + '. Vaste boekhouder: ' + naamVan(k.boekhouder) + '.';
+    document.getElementById('inhoud').hidden = false;
+
+    // Gepland
+    var g = document.getElementById('gepland');
+    if (k.status !== 'klant') g.innerHTML = '<p class="kl-leeg">Geplande mails gaan alleen naar klanten met status Klant.</p>';
+    else if (!k.gepland.length) g.innerHTML = '<p class="kl-leeg">Niets gepland.</p>';
+    else g.innerHTML = k.gepland.map(function (m) {
+      return '<div class="mail-rij' + (m.aan ? '' : ' is-uit') + '"><time>' + d(m.datum) + '</time><div><strong>' + esc(m.label) + '</strong><small>' + esc(m.data.kwartaal || (m.data.jaar ? 'Over ' + m.data.jaar : '')) + '</small></div>' +
+        '<div class="mail-acties"><label class="schakel"><input type="checkbox" data-type="' + m.type + '"' + (m.aan ? ' checked' : '') + '>Aan</label>' +
+        '<button class="db-knop is-licht is-klein" type="button" data-bekijk="' + m.type + '" data-sleutel="' + esc(m.sleutel) + '">Bekijk</button></div></div>';
+    }).join('');
+
+    // Handmatig
+    document.getElementById('typen').innerHTML = HANDMATIG.map(function (t) {
+      var verstuurd = (k.log || []).filter(function (l) { return l.type === t && l.ok && !l.test; })[0];
+      return '<div class="type"><strong>' + esc(types[t].label) + '</strong><small>' + esc(types[t].wanneer) + (verstuurd ? '<br>Laatst verstuurd: ' + dt(verstuurd.op) : '') + '</small>' +
+        '<div><button class="db-knop is-licht is-klein" type="button" data-bekijk="' + t + '">Bekijk en verstuur</button></div></div>';
+    }).join('');
+
+    // Log
+    var log = k.log || [];
+    document.getElementById('log').innerHTML = log.length ? log.map(function (l) {
+      return '<li>' + esc(l.onderwerp) + (l.test ? '<span class="label">Test</span>' : '') + (l.handmatig ? '' : '<span class="label">Automatisch</span>') +
+        '<small>' + dt(l.op) + ' naar ' + esc(l.aan) + ', door ' + naamVan(l.door) + '</small>' + (l.ok ? '' : '<small class="is-fout">Niet verstuurd: ' + esc(l.fout) + '</small>') + '</li>';
+    }).join('') : '<li class="kl-leeg">Nog niets verstuurd.</li>';
+
+    // Formulier
+    var f = document.getElementById('gegevens');
+    ['naam', 'bedrijf', 'email', 'telefoon', 'boekhouder', 'status', 'start', 'voorstelLink', 'notitie'].forEach(function (n) { f.elements[n].value = k[n] || ''; });
+  }
+
+  // Aan/uit per soort
+  document.getElementById('gepland').addEventListener('change', function (e) {
+    var t = e.target.dataset.type; if (!t) return;
+    var uit = (klant.uit || []).filter(function (x) { return x !== t; });
+    if (!e.target.checked) uit.push(t);
+    api('/intern/api/klant', { method: 'PATCH', body: JSON.stringify({ id: id, uit: uit }) }).then(function (r) { klant = r.klant; teken(); });
+  });
+
+  // Voorbeeld
+  var vb = document.getElementById('vb'), vbMelding = document.getElementById('vb-melding'), stuurKnop = document.getElementById('vb-stuur');
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-bekijk]'); if (!b) return;
+    huidig = b.dataset.bekijk; zeker = false;
+    stuurKnop.textContent = 'Versturen naar klant'; stuurKnop.disabled = false;
+    vbMelding.className = 'db-melding'; vbMelding.textContent = '';
+    var qs = '?id=' + encodeURIComponent(id) + '&type=' + huidig + (b.dataset.sleutel ? '&sleutel=' + encodeURIComponent(b.dataset.sleutel) : '');
+    document.getElementById('vb-info').innerHTML = 'Laden…';
+    document.getElementById('vb-frame').srcdoc = '';
+    vb.showModal();
+    api('/intern/api/klant/voorbeeld' + qs).then(function (r) {
+      document.getElementById('vb-info').innerHTML = '<b>Onderwerp:</b> ' + esc(r.onderwerp) + '<br><b>Aan:</b> ' + esc(r.aan) + '<br><b>Van:</b> Avezaat &amp; Evers &lt;info@avezaatenevers.nl&gt;';
+      document.getElementById('vb-frame').srcdoc = r.html;
+    }).catch(function (err) { document.getElementById('vb-info').textContent = err.message; });
+  });
+  document.getElementById('vb-sluit').addEventListener('click', function () { vb.close(); });
+  vb.addEventListener('click', function (e) { if (e.target === vb) vb.close(); });
+
+  function stuur(test) {
+    var knop = test ? document.getElementById('vb-test') : stuurKnop;
+    knop.disabled = true;
+    vbMelding.className = 'db-melding'; vbMelding.textContent = 'Versturen…';
+    api('/intern/api/klant/stuur', { method: 'POST', body: JSON.stringify({ id: id, type: huidig, test: test }) }).then(function (r) {
+      klant = r.klant; teken();
+      vbMelding.className = 'db-melding is-ok'; vbMelding.textContent = test ? 'Testmail verstuurd naar info@.' : 'Verstuurd naar ' + klant.email + '.';
+      if (!test) { stuurKnop.textContent = 'Verstuurd'; } else knop.disabled = false;
+    }).catch(function (err) {
+      if (err.data && err.data.klant) { klant = err.data.klant; teken(); }
+      vbMelding.className = 'db-melding is-fout'; vbMelding.textContent = err.message; knop.disabled = false;
+    });
+  }
+  document.getElementById('vb-test').addEventListener('click', function () { stuur(true); });
+  stuurKnop.addEventListener('click', function () {
+    if (!zeker) { zeker = true; stuurKnop.textContent = 'Zeker? Klik nogmaals'; return; }
+    stuur(false);
+  });
+
+  // Gegevens opslaan
+  var f = document.getElementById('gegevens'), gm = document.getElementById('g-melding');
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var data = Object.fromEntries(new FormData(f).entries()); data.id = id;
+    gm.className = 'db-melding'; gm.textContent = 'Opslaan…';
+    api('/intern/api/klant', { method: 'PATCH', body: JSON.stringify(data) }).then(function (r) {
+      klant = r.klant; teken(); gm.className = 'db-melding is-ok'; gm.textContent = 'Opgeslagen.';
+    }).catch(function (err) { gm.className = 'db-melding is-fout'; gm.textContent = err.message; });
+  });
+  var weg = document.getElementById('verwijder'), wegZeker = false;
+  weg.addEventListener('click', function () {
+    if (!wegZeker) { wegZeker = true; weg.textContent = 'Zeker? Klik nogmaals'; setTimeout(function () { wegZeker = false; weg.textContent = 'Klant verwijderen'; }, 4000); return; }
+    api('/intern/api/klant?id=' + encodeURIComponent(id), { method: 'DELETE' }).then(function () { location.href = '/intern/klanten.html'; });
+  });
+
+  api('/intern/api/ik').then(function (r) {
+    document.getElementById('db-ik').textContent = 'Ingelogd als ' + r.naam;
+    return api('/intern/api/klant?id=' + encodeURIComponent(id || ''));
+  }).then(function (r) {
+    klant = r.klant; types = r.types; teken();
+    if (/nieuw=1/.test(location.search) && klant.status === 'klant') {
+      var b = document.querySelector('[data-bekijk="welkom"]'); if (b) b.click();
+    }
+  }).catch(function (err) { document.getElementById('sub').textContent = err.message; });
+})();
+</script>
+</body>
+</html>

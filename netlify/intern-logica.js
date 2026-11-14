@@ -1,4 +1,5 @@
-// Logica van de interne omgeving (inloggen per persoon en de gedeelde takenlijst).
+// Logica van de interne omgeving (inloggen per persoon, gedeelde takenlijst en klanten met hun mails).
+import { TYPES, AUTOMATISCH, gepland, maakMail, handmatigeData, verstuur, vandaag } from "./klant-mails.js";
 // Los van Netlify gehouden zodat het lokaal te testen is; intern.js koppelt de opslag.
 
 export const GEBRUIKERS = {
@@ -84,7 +85,7 @@ function datum(d) { return /^\d{4}-\d{2}-\d{2}$/.test(d || "") ? d : ""; }
 function voor(v) { return ["koen", "daan", "samen"].includes(v) ? v : "samen"; }
 
 // request: Request, cookies: { get(naam) }, next: () => Response, store: Blobs-store
-export async function verwerk(request, cookies, next, maakStore) {
+export async function verwerk(request, cookies, next, maakStore, env = () => undefined) {
   const url = new URL(request.url);
   const pad = url.pathname;
 
@@ -147,5 +148,102 @@ export async function verwerk(request, cookies, next, maakStore) {
     return json(taken);
   }
 
+  if (pad.startsWith("/intern/api/klant")) return klantenApi(request, url, pad, wie, maakStore(), env);
+
   return next();
 }
+
+// ---------- Klanten ----------
+const KLANTEN = "klanten";
+const STATUS = ["prospect", "klant", "gestopt"];
+
+async function leesKlanten(store) {
+  const k = await store.get(KLANTEN, { type: "json" });
+  return Array.isArray(k) ? k : [];
+}
+function mailadres(e) { const v = String(e || "").trim().toLowerCase(); return /^[^\s@<>]+@[^\s@<>]+\.[a-z]{2,}$/.test(v) ? v : ""; }
+function link(l) { const v = String(l || "").trim(); return /^https:\/\/[^\s<>"]+$/.test(v) ? v.slice(0, 500) : ""; }
+function boekhouder(b) { return b === "daan" ? "daan" : "koen"; }
+
+function velden(body, k) {
+  if ("naam" in body) k.naam = schoon(body.naam);
+  if ("bedrijf" in body) k.bedrijf = schoon(body.bedrijf);
+  if ("email" in body) k.email = mailadres(body.email);
+  if ("telefoon" in body) k.telefoon = schoon(body.telefoon).slice(0, 30);
+  if ("boekhouder" in body) k.boekhouder = boekhouder(body.boekhouder);
+  if ("status" in body && STATUS.includes(body.status)) k.status = body.status;
+  if ("start" in body) k.start = datum(body.start);
+  if ("voorstelLink" in body) k.voorstelLink = link(body.voorstelLink);
+  if ("notitie" in body) k.notitie = String(body.notitie || "").replace(/[<>]/g, "").trim().slice(0, 2000);
+  if (Array.isArray(body.uit)) k.uit = body.uit.filter((t) => AUTOMATISCH.includes(t));
+}
+
+function metPlanning(k) { return { ...k, gepland: gepland(k) }; }
+
+async function klantenApi(request, url, pad, wie, store, env) {
+  const klanten = await leesKlanten(store);
+  const nu = new Date().toISOString();
+  const body = ["POST", "PATCH"].includes(request.method) ? await request.json().catch(() => ({})) : Object.fromEntries(url.searchParams);
+  const bewaar = () => store.setJSON(KLANTEN, klanten);
+  const vind = (id) => klanten.find((x) => x.id === id);
+
+  if (pad === "/intern/api/klanten") {
+    if (request.method === "GET") return json({ klanten: klanten.map(metPlanning), types: TYPES });
+    if (request.method === "POST") {
+      const k = { id: nieuweId(), naam: "", bedrijf: "", email: "", telefoon: "", boekhouder: wie, status: "klant", start: "", voorstelLink: "", notitie: "", uit: [], verstuurd: {}, log: [], door: wie, aangemaakt: nu };
+      velden(body, k);
+      if (!k.naam) return json({ fout: "Naam ontbreekt" }, 400);
+      if (!k.email) return json({ fout: "Geen geldig e-mailadres" }, 400);
+      klanten.push(k);
+      await bewaar();
+      return json(metPlanning(k));
+    }
+    return json({ fout: "Methode niet toegestaan" }, 405);
+  }
+
+  if (pad === "/intern/api/klant") {
+    const k = vind(body.id);
+    if (!k) return json({ fout: "Klant niet gevonden" }, 404);
+    if (request.method === "GET") return json({ klant: metPlanning(k), types: TYPES });
+    if (request.method === "PATCH") {
+      velden(body, k);
+      if (!k.naam || !k.email) return json({ fout: "Naam en e-mailadres zijn verplicht" }, 400);
+      k.gewijzigd = nu; k.gewijzigdDoor = wie;
+      await bewaar();
+      return json({ klant: metPlanning(k), types: TYPES });
+    }
+    if (request.method === "DELETE") {
+      klanten.splice(klanten.indexOf(k), 1);
+      await bewaar();
+      return json({ ok: true });
+    }
+    return json({ fout: "Methode niet toegestaan" }, 405);
+  }
+
+  if (pad === "/intern/api/klant/voorbeeld") {
+    const k = vind(body.id);
+    if (!k || !TYPES[body.type]) return json({ fout: "Niet gevonden" }, 404);
+    const data = body.sleutel ? (gepland(k).find((m) => m.sleutel === body.sleutel) || {}).data : handmatigeData(body.type);
+    const m = maakMail(k, body.type, data || {});
+    return json({ onderwerp: m.subject, html: m.html, aan: k.email });
+  }
+
+  if (pad === "/intern/api/klant/stuur" && request.method === "POST") {
+    const k = vind(body.id);
+    if (!k || !TYPES[body.type]) return json({ fout: "Niet gevonden" }, 404);
+    const test = body.test === true;
+    const aan = test ? (String(env("MAIL_TO") || "info@avezaatenevers.nl").split(",")[0].trim()) : k.email;
+    const m = maakMail(k, body.type, handmatigeData(body.type));
+    if (test) m.subject = "[TEST] " + m.subject;
+    const r = await verstuur(env, { aan, mail: m });
+    k.log = k.log || [];
+    k.log.unshift({ type: body.type, onderwerp: m.subject, aan, op: nu, door: wie, test, ok: r.ok, fout: r.fout || null, handmatig: true });
+    k.log = k.log.slice(0, 100);
+    await bewaar();
+    return json({ ...r, klant: metPlanning(k) }, r.ok ? 200 : 502);
+  }
+
+  return json({ fout: "Onbekende route" }, 404);
+}
+
+export { vandaag };

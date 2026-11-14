@@ -249,12 +249,12 @@ ${tabel(regels)}
       p(aanhef(d.naam)) +
       p(`We gaan aan de slag met je aangifte inkomstenbelasting over ${esc(d.jaar)}. Je bedrijfscijfers hebben we al. Voor de rest hebben we deze stukken nodig:`) +
       lijst(['Jaaropgaven van je bankrekeningen en spaarrekeningen', 'Jaaropgave van je hypotheek en de WOZ-waarde van je huis', 'Loonstroken of jaaropgaven als je ook in loondienst werkte', 'Gegevens van je fiscaal partner, als wij die aangifte ook doen']) +
-      kader(`<p style="margin:0;${font}font-size:15px;line-height:1.6;color:${GRIJS}">Upload ze in de app of mail ze naar <a href="mailto:${MAIL}" style="color:${KLEUR}">${MAIL}</a>. <strong style="color:${INKT}">Graag vóór ${esc(d.aanleverdatum)}</strong>, dan heb je ruim voor 1 mei duidelijkheid.</p>`) +
+      kader(`<p style="margin:0;${font}font-size:15px;line-height:1.6;color:${GRIJS}">Mail ze naar <a href="mailto:${MAIL}" style="color:${KLEUR}">${MAIL}</a>. <strong style="color:${INKT}">Graag vóór ${esc(d.aanleverdatum)}</strong>, dan heb je ruim voor 1 mei duidelijkheid.</p>`) +
       ondertekening(base, d.wie);
     return {
       subject: `Aangifte inkomstenbelasting ${d.jaar}: lever aan vóór ${d.aanleverdatum}`,
       html: omhulsel(base, { preheader: 'Jaaropgaven van bank, hypotheek en eventueel loondienst.', inhoud }),
-      text: `${aanhef(d.naam)}\n\nVoor je aangifte inkomstenbelasting over ${d.jaar} hebben we nodig: jaaropgaven bank en sparen, hypotheek en WOZ, loondienst, en gegevens van je fiscaal partner. Graag vóór ${d.aanleverdatum}.\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : 'Koen'}${tekstVoet}`,
+      text: `${aanhef(d.naam)}\n\nVoor je aangifte inkomstenbelasting over ${d.jaar} hebben we nodig: jaaropgaven bank en sparen, hypotheek en WOZ, loondienst, en gegevens van je fiscaal partner. Mail ze naar ${MAIL}, graag vóór ${d.aanleverdatum}.\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : 'Koen'}${tekstVoet}`,
     };
   },
 };

@@ -216,7 +216,7 @@ ${tabel(regels)}
     const inhoud = h1(`Lever je stukken aan vóór ${esc(d.aanleverdatum)}`) +
       p(aanhef(d.naam)) +
       p(`Het ${esc(d.kwartaal)} zit erop. Wij doen je btw-aangifte, jij levert alleen de laatste stukken aan.`) +
-      lijst(['Bonnetjes en inkoopfacturen in de app', 'Alle verkoopfacturen verstuurd of geüpload', 'Contante uitgaven? Even een foto van het bonnetje']) +
+      lijst(['Bonnetjes en inkoopfacturen in de app', 'Alle verkoopfacturen verstuurd of geüpload', 'Contante uitgaven? Even een foto van het bonnetje'].concat(d.icp ? ['Facturen aan klanten in de EU, voor je ICP-opgaaf'] : [])) +
       kader(`<p style="margin:0;${font}font-size:15px;line-height:1.6;color:${GRIJS}"><strong style="color:${INKT}">Uiterlijk ${esc(d.aanleverdatum)}</strong>, dan dienen wij de aangifte op tijd in (deadline ${esc(d.deadline)}). Later aanleveren kan, maar dan rekenen we €50 spoedtoeslag.</p>`) +
       p('Alles al in de app? Dan hoef je niets te doen.') +
       ondertekening(base, d.wie);
@@ -248,7 +248,7 @@ ${tabel(regels)}
     const inhoud = h1(`Aangifte ${esc(d.jaar)}: dit hebben we van je nodig`) +
       p(aanhef(d.naam)) +
       p(`We gaan aan de slag met je aangifte inkomstenbelasting over ${esc(d.jaar)}. Je bedrijfscijfers hebben we al. Voor de rest hebben we deze stukken nodig:`) +
-      lijst(['Jaaropgaven van je bankrekeningen en spaarrekeningen', 'Jaaropgave van je hypotheek en de WOZ-waarde van je huis', 'Loonstroken of jaaropgaven als je ook in loondienst werkte', 'Gegevens van je fiscaal partner, als wij die aangifte ook doen']) +
+      lijst(['Jaaropgaven van je bankrekeningen en spaarrekeningen', 'Jaaropgave van je hypotheek en de WOZ-waarde van je huis', 'Loonstroken of jaaropgaven als je ook in loondienst werkte'].concat(d.partner === false ? [] : ['Gegevens en jaaropgaven van je fiscaal partner'])) +
       kader(`<p style="margin:0;${font}font-size:15px;line-height:1.6;color:${GRIJS}">Mail ze naar <a href="mailto:${MAIL}" style="color:${KLEUR}">${MAIL}</a>. <strong style="color:${INKT}">Graag vóór ${esc(d.aanleverdatum)}</strong>, dan heb je ruim voor 1 mei duidelijkheid.</p>`) +
       ondertekening(base, d.wie);
     return {
@@ -257,6 +257,74 @@ ${tabel(regels)}
       text: `${aanhef(d.naam)}\n\nVoor je aangifte inkomstenbelasting over ${d.jaar} hebben we nodig: jaaropgaven bank en sparen, hypotheek en WOZ, loondienst, en gegevens van je fiscaal partner. Mail ze naar ${MAIL}, graag vóór ${d.aanleverdatum}.\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : 'Koen'}${tekstVoet}`,
     };
   },
+  // 10. Tweede kwartaalherinnering (rond de 8e, alleen als de stukken nog niet binnen zijn)
+  kwartaalTweede(d, base = '') {
+    const inhoud = h1(`Nog even: lever aan vóór ${esc(d.aanleverdatum)}`) +
+      p(aanhef(d.naam)) +
+      p(`We missen nog stukken voor je btw-aangifte over het ${esc(d.kwartaal)}. Zet je bonnetjes en facturen deze week in de app, dan regelen wij de rest.`) +
+      kader(`<p style="margin:0;${font}font-size:15px;line-height:1.6;color:${GRIJS}"><strong style="color:${INKT}">Uiterlijk ${esc(d.aanleverdatum)}</strong>. Daarna rekenen we €50 spoedtoeslag, zodat we de aangifte toch op tijd kunnen indienen (deadline ${esc(d.deadline)}).</p>`) +
+      p(`Alles al aangeleverd? Dan kruisen onze berichten elkaar. Stuur gerust een appje naar <a href="${WA_LINK}" style="color:${KLEUR};white-space:nowrap">${TEL}</a>.`) +
+      ondertekening(base, d.wie);
+    return {
+      subject: `Herinnering: btw ${d.kwartaal}, lever aan vóór ${d.aanleverdatum}`,
+      html: omhulsel(base, { preheader: `We missen nog stukken. Uiterlijk ${d.aanleverdatum}, daarna €50 spoedtoeslag.`, inhoud }),
+      text: `${aanhef(d.naam)}\n\nWe missen nog stukken voor je btw-aangifte over het ${d.kwartaal}. Lever aan vóór ${d.aanleverdatum}; daarna rekenen we €50 spoedtoeslag (deadline ${d.deadline}).\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : 'Koen'}${tekstVoet}`,
+    };
+  },
+
+  // 11. Review vragen (3 maanden na de start)
+  review(d, base = '') {
+    const link = d.reviewLink || `${base}/`;
+    const inhoud = h1('Mogen we je iets vragen?') +
+      p(aanhef(d.naam)) +
+      p('Je bent nu drie maanden klant. We hopen dat je administratie je minder tijd en zorgen kost dan eerst.') +
+      p('Als dat zo is: wil je dat in een paar zinnen op Google zetten? Andere ondernemers kiezen een boekhouder vaak op basis van reviews. Voor ons maakt het echt verschil.') +
+      knop(link, 'Schrijf een review') +
+      p('Is er juist iets wat beter kan? Laat het ons dan liever direct weten, dan lossen we het op.') +
+      ondertekening(base, d.wie);
+    return {
+      subject: 'Mogen we je iets vragen?',
+      html: omhulsel(base, { preheader: 'Drie maanden klant. Wil je een korte review op Google zetten?', inhoud }),
+      text: `${aanhef(d.naam)}\n\nJe bent nu drie maanden klant. Wil je in een paar zinnen een review op Google zetten? Dat helpt ons echt.\n\n${link}\n\nIets wat beter kan? Laat het ons direct weten.\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : 'Koen'}${tekstVoet}`,
+    };
+  },
+
+  // 12. Aanbevelen (na de eerste afgeronde IB-aangifte, alleen tevreden klanten)
+  aanbevelen(d, base = '') {
+    const inhoud = h1('Ken je iemand die hier ook last van heeft?') +
+      p(aanhef(d.naam)) +
+      p('Je aangifte inkomstenbelasting is ingediend. Weer een zorg minder.') +
+      p('Ken je een collega of vriend die nog zelf met bonnetjes en aangiftes worstelt? Stuur hem onze kant op. Noemt hij jouw naam bij de kennismaking, dan krijgen jullie <strong style="color:' + INKT + '">allebei een maand gratis</strong>.') +
+      knop(`${base}/aanbevelen.html`, 'Stuur de link door') +
+      p('Geen tijd of geen idee wie? Helemaal prima, dan hoef je niets te doen.') +
+      ondertekening(base, d.wie);
+    return {
+      subject: 'Je aangifte is ingediend. En dan nog dit...',
+      html: omhulsel(base, { preheader: 'Ken je iemand? Dan krijgen jullie allebei een maand gratis.', inhoud }),
+      text: `${aanhef(d.naam)}\n\nJe aangifte inkomstenbelasting is ingediend. Ken je iemand die ook nog worstelt met zijn administratie? Noemt hij jouw naam, dan krijgen jullie allebei een maand gratis.\n\n${base}/aanbevelen.html\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : 'Koen'}${tekstVoet}`,
+    };
+  },
+
+  // 13. Jubileum (1 jaar klant)
+  jubileum(d, base = '') {
+    const n = Number(d.btwAantal) || 0;
+    const items = [];
+    if (n) items.push(`${n} btw-aangifte${n === 1 ? '' : 's'} ingediend`);
+    if (d.ib) items.push('je aangifte inkomstenbelasting gedaan');
+    items.push('je bonnetjes en facturen verwerkt, zonder dat je er zelf naar om hoefde te kijken');
+    const inhoud = h1('Een jaar samen') +
+      p(aanhef(d.naam)) +
+      p('Vandaag is het precies een jaar geleden dat je klant werd. Even een korte terugblik:') +
+      lijst(items) +
+      p('Dank je voor het vertrouwen. Heb je wensen voor het komende jaar, of wil je eens sparren over je cijfers? App ons, dan plannen we een moment.') +
+      ondertekening(base, d.wie);
+    return {
+      subject: 'Een jaar samen',
+      html: omhulsel(base, { preheader: 'Een korte terugblik op je eerste jaar bij Avezaat & Evers.', inhoud }),
+      text: `${aanhef(d.naam)}\n\nVandaag ben je een jaar klant. Dit jaar: ${items.join('; ')}.\n\nDank je voor het vertrouwen.\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : 'Koen'}${tekstVoet}`,
+    };
+  },
+
 };
 
 export { mails, voornaam };

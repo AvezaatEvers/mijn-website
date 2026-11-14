@@ -8,7 +8,7 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/style.css?v=126">
-<link rel="stylesheet" href="/intern/klanten.css?v=1">
+<link rel="stylesheet" href="/intern/klanten.css?v=3">
 </head>
 <body>
 <main class="db">
@@ -20,6 +20,7 @@
   <a class="db-terug" href="/intern/klanten.html">Alle klanten</a>
   <h1 id="titel">Klant</h1>
   <p class="db-sub" id="sub"></p>
+  <div class="snel" id="snel" hidden></div>
 
   <div class="raster" id="inhoud" hidden>
     <div class="db-kaart">
@@ -31,6 +32,52 @@
     <div class="db-kaart">
       <div class="db-kop"><h2>Mail sturen</h2></div>
       <div class="typen" id="typen"></div>
+    </div>
+
+    <div class="db-kaart" id="kw-kaart">
+      <h2>Btw per kwartaal</h2>
+      <div id="kwartalen"></div>
+      <p class="db-noot">Staat "Stukken binnen" aan, dan krijgt de klant rond de 8e geen tweede herinnering. Alles staat ook op het <a href="/intern/kwartaal.html">kwartaalbord</a>.</p>
+    </div>
+
+    <div class="db-kaart">
+      <h2>Fiscaal profiel</h2>
+      <p class="sectie">Situatie</p>
+      <div class="vinken" id="profiel">
+        <label class="vink"><input type="checkbox" data-p="kor">KOR (geen btw-aangifte)</label>
+        <label class="vink"><input type="checkbox" data-p="icp">Klanten in de EU (ICP)</label>
+        <label class="vink"><input type="checkbox" data-p="partner">Fiscaal partner</label>
+        <label class="vink"><input type="checkbox" data-p="urencriterium">Haalt urencriterium</label>
+      </div>
+      <div class="rij-inline" style="margin-top:12px"><label for="branche" style="font-size:14px">Branche</label>
+        <select id="branche"><option value="">Kies…</option><option>Bouw</option><option>Installatie</option><option>Schilder / stukadoor</option><option>Hovenier</option><option>Kapper / barber</option><option>Zorg</option><option>Webshop</option><option>Maatwerk / ambacht</option><option>Anders</option></select></div>
+      <p class="sectie">Aangifte inkomstenbelasting ingediend</p>
+      <div class="vinken" id="ib"></div>
+      <p class="sectie">Relatie</p>
+      <div class="vinken"><label class="vink"><input type="checkbox" id="tevreden">Tevreden klant (krijgt de aanbevelingsmail)</label></div>
+      <p class="db-noot">KOR uit de kwartaalmails, ICP en fiscaal partner passen de tekst van de mails aan.</p>
+    </div>
+
+    <div class="db-kaart">
+      <h2>Tijdlijn</h2>
+      <form class="rij-inline" id="tl-form" autocomplete="off">
+        <select id="tl-soort" aria-label="Soort"><option value="notitie">Notitie</option><option value="gebeld">Gebeld</option><option value="geappt">Geappt</option><option value="gemaild">Gemaild</option><option value="gesprek">Gesprek</option></select>
+        <input type="text" id="tl-tekst" placeholder="Wat is er besproken of afgesproken?" maxlength="1000" required>
+        <button class="db-knop" type="submit">Toevoegen</button>
+      </form>
+      <ul class="tl" id="tijdlijn"></ul>
+    </div>
+
+    <div class="db-kaart">
+      <h2>Taken</h2>
+      <form class="rij-inline" id="tk-form" autocomplete="off">
+        <input type="text" id="tk-titel" placeholder="Nieuwe taak voor deze klant…" maxlength="160" required>
+        <input type="date" id="tk-datum" aria-label="Deadline">
+        <select id="tk-voor" aria-label="Voor wie"><option value="koen">Koen</option><option value="daan">Daan</option><option value="samen">Samen</option></select>
+        <button class="db-knop" type="submit">Toevoegen</button>
+      </form>
+      <ul class="tl" id="taken"></ul>
+      <p class="db-noot">Staan ook in de gedeelde takenlijst op het dashboard, met de klantnaam ervoor.</p>
     </div>
 
     <div class="db-kaart">
@@ -73,9 +120,7 @@
 <script>
 (function () {
   var id = new URLSearchParams(location.search).get('id');
-  var klant = null, types = {}, huidig = null, zeker = false;
-  var AUTO = ['checkIn', 'kwartaal', 'jaareinde', 'inkomstenbelasting'];
-  var HANDMATIG = ['welkom', 'checkIn', 'voorstelHerinnering', 'kwartaal', 'jaareinde', 'inkomstenbelasting'];
+  var klant = null, types = {}, huidig = null, zeker = false, HANDMATIG = [], kwartalen = [], reviewLink = false, taken = [];
   var MAAND = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
   function d(s) { if (!s) return ''; var p = s.slice(0, 10).split('-'); return +p[2] + ' ' + MAAND[+p[1] - 1] + ' ' + p[0]; }
   function dt(s) { var x = new Date(s); return x.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + x.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }); }
@@ -98,7 +143,8 @@
     if (k.status !== 'klant') g.innerHTML = '<p class="kl-leeg">Geplande mails gaan alleen naar klanten met status Klant.</p>';
     else if (!k.gepland.length) g.innerHTML = '<p class="kl-leeg">Niets gepland.</p>';
     else g.innerHTML = k.gepland.map(function (m) {
-      return '<div class="mail-rij' + (m.aan ? '' : ' is-uit') + '"><time>' + d(m.datum) + '</time><div><strong>' + esc(m.label) + '</strong><small>' + esc(m.data.kwartaal || (m.data.jaar ? 'Over ' + m.data.jaar : '')) + '</small></div>' +
+      var noot = m.vervalt ? '<small class="vervalt">' + (m.type === 'review' ? 'Wacht op REVIEW_LINK in Netlify' : 'Vervalt: stukken zijn binnen') + '</small>' : '<small>' + esc(m.data.kwartaal || (m.data.jaar ? 'Over ' + m.data.jaar : '')) + '</small>';
+      return '<div class="mail-rij' + (m.aan ? '' : ' is-uit') + (m.vervalt ? ' is-vervalt' : '') + '"><time>' + d(m.datum) + '</time><div><strong>' + esc(m.label) + '</strong>' + noot + '</div>' +
         '<div class="mail-acties"><label class="schakel"><input type="checkbox" data-type="' + m.type + '"' + (m.aan ? ' checked' : '') + '>Aan</label>' +
         '<button class="db-knop is-licht is-klein" type="button" data-bekijk="' + m.type + '" data-sleutel="' + esc(m.sleutel) + '">Bekijk</button></div></div>';
     }).join('');
@@ -109,6 +155,46 @@
       return '<div class="type"><strong>' + esc(types[t].label) + '</strong><small>' + esc(types[t].wanneer) + (verstuurd ? '<br>Laatst verstuurd: ' + dt(verstuurd.op) : '') + '</small>' +
         '<div><button class="db-knop is-licht is-klein" type="button" data-bekijk="' + t + '">Bekijk en verstuur</button></div></div>';
     }).join('');
+
+    // Snelknoppen
+    var tel = (k.telefoon || '').replace(/[^\d+]/g, ''), wa = tel.replace(/^\+/, '').replace(/^0/, '31');
+    var voornaam = (k.naam || '').split(' ')[0];
+    var mg = btoa(unescape(encodeURIComponent(JSON.stringify({ naam: voornaam, bedrijf: k.bedrijf || '', wie: naamVan(k.boekhouder) }))));
+    var snel = document.getElementById('snel'); snel.hidden = false;
+    snel.innerHTML = (tel ? '<a class="db-knop is-rand" href="tel:' + esc(tel) + '">Bellen</a><a class="db-knop is-rand" href="https://wa.me/' + esc(wa) + '" target="_blank" rel="noopener">WhatsApp</a>' : '') +
+      '<a class="db-knop is-rand" href="mailto:' + esc(k.email) + '">Mailen</a>' +
+      '<a class="db-knop is-rand" href="/intern/maandgesprek.html?voorbereiden=1&d=' + encodeURIComponent(mg) + '" target="_blank" rel="noopener">Maandgesprek voorbereiden</a>' +
+      '<button class="db-knop is-rand" type="button" id="kopieer-welkom">Kopieer welkomstlink</button>';
+    document.getElementById('kopieer-welkom').onclick = function () {
+      var url = 'https://avezaatenevers.nl/welkom.html?naam=' + encodeURIComponent(voornaam) + '&boekhouder=' + naamVan(k.boekhouder);
+      var b = this; (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function () { b.textContent = 'Gekopieerd'; }, function () { prompt('Kopieer de link:', url); });
+    };
+
+    // Kwartalen
+    var kwEl = document.getElementById('kwartalen'), pr = k.profiel || {};
+    if (pr.kor) kwEl.innerHTML = '<p class="kl-leeg">Deze klant zit in de KOR: geen btw-aangifte.</p>';
+    else kwEl.innerHTML = kwartalen.map(function (q) {
+      var st = (k.kwartalen || {})[q.sleutel] || {};
+      function v(veld, lbl) { return '<label class="vink"><input type="checkbox" data-kw="' + q.sleutel + '" data-veld="' + veld + '"' + (st[veld] ? ' checked' : '') + '>' + lbl + '</label>'; }
+      return '<div class="kw-rij"><b>' + q.kort + '<small>deadline ' + q.deadline + '</small></b><div class="vinken">' + v('binnen', 'Stukken binnen') + v('ingediend', 'Aangifte ingediend') + v('betaald', 'Btw betaald') + '</div></div>';
+    }).join('');
+
+    // Profiel
+    document.querySelectorAll('#profiel [data-p]').forEach(function (i) { i.checked = !!pr[i.dataset.p]; });
+    document.getElementById('branche').value = pr.branche || '';
+    document.getElementById('tevreden').checked = !!k.tevreden;
+    var jr = new Date().getFullYear();
+    document.getElementById('ib').innerHTML = [jr - 1, jr - 2].map(function (j) {
+      return '<label class="vink"><input type="checkbox" data-ib="' + j + '"' + ((k.ibIngediend || {})[j] ? ' checked' : '') + '>Over ' + j + '</label>';
+    }).join('');
+
+    // Tijdlijn
+    var tl = k.tijdlijn || [];
+    document.getElementById('tijdlijn').innerHTML = tl.length ? tl.map(function (n) {
+      return '<li><div><span class="soort">' + esc(n.soort) + '</span>' + esc(n.tekst) + '<small>' + dt(n.op) + ', ' + naamVan(n.door) + '</small></div><button class="weg" type="button" data-nid="' + n.id + '" aria-label="Verwijderen">&times;</button></li>';
+    }).join('') : '<li class="kl-leeg" style="display:block">Nog niets genoteerd.</li>';
+
+    tekenTaken();
 
     // Log
     var log = k.log || [];
@@ -127,7 +213,7 @@
     var t = e.target.dataset.type; if (!t) return;
     var uit = (klant.uit || []).filter(function (x) { return x !== t; });
     if (!e.target.checked) uit.push(t);
-    api('/intern/api/klant', { method: 'PATCH', body: JSON.stringify({ id: id, uit: uit }) }).then(function (r) { klant = r.klant; teken(); });
+    patch('/intern/api/klant', { uit: uit });
   });
 
   // Voorbeeld
@@ -154,7 +240,7 @@
     knop.disabled = true;
     vbMelding.className = 'db-melding'; vbMelding.textContent = 'Versturen…';
     api('/intern/api/klant/stuur', { method: 'POST', body: JSON.stringify({ id: id, type: huidig, test: test }) }).then(function (r) {
-      klant = r.klant; teken();
+      zet(r);
       vbMelding.className = 'db-melding is-ok'; vbMelding.textContent = test ? 'Testmail verstuurd naar info@.' : 'Verstuurd naar ' + klant.email + '.';
       if (!test) { stuurKnop.textContent = 'Verstuurd'; } else knop.disabled = false;
     }).catch(function (err) {
@@ -175,7 +261,7 @@
     var data = Object.fromEntries(new FormData(f).entries()); data.id = id;
     gm.className = 'db-melding'; gm.textContent = 'Opslaan…';
     api('/intern/api/klant', { method: 'PATCH', body: JSON.stringify(data) }).then(function (r) {
-      klant = r.klant; teken(); gm.className = 'db-melding is-ok'; gm.textContent = 'Opgeslagen.';
+      zet(r); gm.className = 'db-melding is-ok'; gm.textContent = 'Opgeslagen.';
     }).catch(function (err) { gm.className = 'db-melding is-fout'; gm.textContent = err.message; });
   });
   var weg = document.getElementById('verwijder'), wegZeker = false;
@@ -184,13 +270,58 @@
     api('/intern/api/klant?id=' + encodeURIComponent(id), { method: 'DELETE' }).then(function () { location.href = '/intern/klanten.html'; });
   });
 
+  function zet(r) { if (r.klant) klant = r.klant; if (r.types) types = r.types; if (r.handmatig) HANDMATIG = r.handmatig; if (r.kwartalen) kwartalen = r.kwartalen; if ('reviewLink' in r) reviewLink = r.reviewLink; teken(); }
+  function patch(pad, data) { data.id = id; return api(pad, { method: 'PATCH', body: JSON.stringify(data) }).then(zet); }
+
+  document.getElementById('kwartalen').addEventListener('change', function (e) {
+    var i = e.target; if (!i.dataset.kw) return;
+    patch('/intern/api/klant/kwartaal', { kw: i.dataset.kw, veld: i.dataset.veld, aan: i.checked });
+  });
+  document.getElementById('profiel').addEventListener('change', function (e) {
+    var p = {}; p[e.target.dataset.p] = e.target.checked; patch('/intern/api/klant', { profiel: p });
+  });
+  document.getElementById('branche').addEventListener('change', function () { patch('/intern/api/klant', { profiel: { branche: this.value } }); });
+  document.getElementById('tevreden').addEventListener('change', function () { patch('/intern/api/klant', { tevreden: this.checked }); });
+  document.getElementById('ib').addEventListener('change', function (e) { patch('/intern/api/klant/ib', { jaar: e.target.dataset.ib, aan: e.target.checked }); });
+
+  document.getElementById('tl-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var t = document.getElementById('tl-tekst');
+    api('/intern/api/klant/notitie', { method: 'POST', body: JSON.stringify({ id: id, tekst: t.value, soort: document.getElementById('tl-soort').value }) }).then(function (r) { t.value = ''; zet(r); });
+  });
+  document.getElementById('tijdlijn').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-nid]'); if (!b) return;
+    if (b.dataset.zeker !== '1') { b.dataset.zeker = '1'; b.textContent = 'Zeker?'; return; }
+    api('/intern/api/klant/notitie?id=' + encodeURIComponent(id) + '&nid=' + encodeURIComponent(b.dataset.nid), { method: 'DELETE' }).then(zet);
+  });
+
+  // Taken van deze klant (gedeelde takenlijst)
+  function tekenTaken() {
+    var eigen = taken.filter(function (t) { return t.klant === id; }).sort(function (a, b) { return (a.klaar - b.klaar) || String(a.deadline || '9').localeCompare(String(b.deadline || '9')); });
+    document.getElementById('taken').innerHTML = eigen.length ? eigen.map(function (t) {
+      var titel = t.titel.replace(/^[^:]+: /, '');
+      return '<li class="' + (t.klaar ? 'is-klaar' : '') + '"><label class="tk"><input type="checkbox" data-tid="' + t.id + '"' + (t.klaar ? ' checked' : '') + '><span>' + esc(titel) + '<small>' + (t.deadline ? d(t.deadline) + ', ' : '') + 'voor ' + naamVan(t.voor === 'samen' ? 'Samen' : t.voor) + '</small></span></label></li>';
+    }).join('') : '<li class="kl-leeg" style="display:block">Geen taken.</li>';
+  }
+  function laadTaken() { return api('/intern/api/taken').then(function (r) { taken = r; tekenTaken(); }); }
+  document.getElementById('tk-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var t = document.getElementById('tk-titel');
+    api('/intern/api/taken', { method: 'POST', body: JSON.stringify({ titel: (klant.bedrijf || klant.naam) + ': ' + t.value, deadline: document.getElementById('tk-datum').value, voor: document.getElementById('tk-voor').value, klant: id }) })
+      .then(function (r) { taken = r; t.value = ''; tekenTaken(); });
+  });
+  document.getElementById('taken').addEventListener('change', function (e) {
+    var i = e.target; if (!i.dataset.tid) return;
+    api('/intern/api/taken', { method: 'PATCH', body: JSON.stringify({ id: i.dataset.tid, klaar: i.checked }) }).then(function (r) { taken = r; tekenTaken(); });
+  });
+
   api('/intern/api/ik').then(function (r) {
     document.getElementById('db-ik').textContent = 'Ingelogd als ' + r.naam;
     return api('/intern/api/klant?id=' + encodeURIComponent(id || ''));
   }).then(function (r) {
-    klant = r.klant; types = r.types; teken();
+    zet(r); document.getElementById('tk-voor').value = klant.boekhouder; laadTaken();
     if (/nieuw=1/.test(location.search) && klant.status === 'klant') {
-      var b = document.querySelector('[data-bekijk="welkom"]'); if (b) b.click();
+      var b = document.querySelector('[data-bekijk="welkom"]'); if (b) b.click(); history.replaceState(null, '', '?id=' + encodeURIComponent(id));
     }
   }).catch(function (err) { document.getElementById('sub').textContent = err.message; });
 })();

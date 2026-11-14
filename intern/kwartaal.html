@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kwartaalbord | Avezaat &amp; Evers intern</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css?v=126">
+<link rel="stylesheet" href="/intern/klanten.css?v=3">
+</head>
+<body>
+<main class="db">
+  <div class="db-top">
+    <div><a class="logo" href="/intern/">Avezaat <span>&amp;</span> Evers</a><span class="db-tag">Intern</span></div>
+    <div class="db-wie"><span id="db-ik">Ingelogd</span><a href="/intern/">Dashboard</a><a href="/intern/klanten.html">Klanten</a><a href="/intern/logout">Uitloggen</a></div>
+  </div>
+
+  <a class="db-terug" href="/intern/">Terug naar dashboard</a>
+  <h1 id="titel">Kwartaalbord</h1>
+  <p class="db-sub" id="sub">Btw-aangiftes per klant: stukken binnen, aangifte ingediend, btw betaald.</p>
+
+  <div class="bord-tellers" id="tellers"></div>
+
+  <div class="db-kaart">
+    <div class="db-kop">
+      <div class="filters" id="f-kw"></div>
+      <div class="filters" id="f-wie">
+        <button type="button" data-v="ik" class="is-aan">Mijn klanten</button>
+        <button type="button" data-v="koen">Koen</button>
+        <button type="button" data-v="daan">Daan</button>
+        <button type="button" data-v="alle">Alle</button>
+      </div>
+    </div>
+    <table class="bord-tabel">
+      <thead><tr><th>Klant</th><th class="c">Stukken binnen</th><th class="c">Aangifte ingediend</th><th class="c">Btw betaald</th></tr></thead>
+      <tbody id="rijen"><tr><td colspan="4" class="kl-leeg">Laden…</td></tr></tbody>
+    </table>
+    <p class="db-noot">Klanten in de KOR staan er niet tussen. Wie rond de 8e nog niet op "Stukken binnen" staat, krijgt automatisch een tweede herinnering.</p>
+  </div>
+</main>
+
+<script>
+(function () {
+  var ik = null, data = null, fWie = 'ik', kw = new URLSearchParams(location.search).get('kw') || '';
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function api(pad, opt) {
+    return fetch(pad, Object.assign({ headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin' }, opt || {}))
+      .then(function (r) { if (r.status === 401) { location.reload(); throw new Error('uitgelogd'); } return r.json().then(function (j) { if (!r.ok) throw new Error(j.fout || 'Er ging iets mis'); return j; }); });
+  }
+  var VELDEN = [['binnen', 'Stukken binnen'], ['ingediend', 'Aangifte ingediend'], ['betaald', 'Btw betaald']];
+
+  function teken() {
+    var wie = fWie === 'ik' ? ik : fWie;
+    document.getElementById('titel').textContent = 'Kwartaalbord ' + data.info.kort;
+    document.getElementById('sub').textContent = 'Aanleveren vóór ' + data.info.aanleverdatum + ', aangifte en betaling vóór ' + data.info.deadline + '.';
+    document.getElementById('f-kw').innerHTML = data.kwartalen.map(function (q) { return '<button type="button" data-v="' + q.sleutel + '"' + (q.sleutel === data.kw ? ' class="is-aan"' : '') + '>' + q.kort + '</button>'; }).join('');
+    var lijst = data.klanten.filter(function (k) { return !k.kor && (fWie === 'alle' || k.boekhouder === wie); })
+      .sort(function (a, b) { return (a.bedrijf || a.naam).localeCompare(b.bedrijf || b.naam, 'nl'); });
+    var n = lijst.length;
+    document.getElementById('tellers').innerHTML = VELDEN.map(function (v) {
+      var x = lijst.filter(function (k) { return k.status[v[0]]; }).length;
+      return '<div><span>' + v[1] + '</span><b>' + x + ' van ' + n + '</b><div class="balk"><i style="width:' + (n ? x / n * 100 : 0) + '%"></i></div></div>';
+    }).join('');
+    document.getElementById('rijen').innerHTML = n ? lijst.map(function (k) {
+      var klaar = VELDEN.every(function (v) { return k.status[v[0]]; });
+      return '<tr' + (klaar ? ' class="is-klaar"' : '') + '><td><a href="/intern/klant.html?id=' + encodeURIComponent(k.id) + '">' + esc(k.bedrijf || k.naam) + '</a><small>' + esc(k.bedrijf ? k.naam : '') + (fWie === 'alle' ? (k.bedrijf ? ', ' : '') + (k.boekhouder === 'daan' ? 'Daan' : 'Koen') : '') + '</small></td>' +
+        VELDEN.map(function (v) { return '<td class="c" data-l="' + v[1] + '"><input type="checkbox" aria-label="' + v[1] + '" data-id="' + k.id + '" data-veld="' + v[0] + '"' + (k.status[v[0]] ? ' checked' : '') + '></td>'; }).join('') + '</tr>';
+    }).join('') : '<tr><td colspan="4" class="kl-leeg">Geen klanten in deze selectie.</td></tr>';
+  }
+
+  function laad() {
+    return api('/intern/api/kwartaalbord' + (kw ? '?kw=' + kw : '')).then(function (r) { data = r; kw = r.kw; teken(); });
+  }
+  document.getElementById('f-kw').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return; kw = b.dataset.v; history.replaceState(null, '', '?kw=' + kw); laad();
+  });
+  document.getElementById('f-wie').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    this.querySelectorAll('button').forEach(function (x) { x.classList.toggle('is-aan', x === b); }); fWie = b.dataset.v; teken();
+  });
+  document.getElementById('rijen').addEventListener('change', function (e) {
+    var i = e.target; if (!i.dataset.id) return;
+    i.disabled = true;
+    api('/intern/api/klant/kwartaal', { method: 'PATCH', body: JSON.stringify({ id: i.dataset.id, kw: kw, veld: i.dataset.veld, aan: i.checked }) })
+      .then(function () { var k = data.klanten.filter(function (x) { return x.id === i.dataset.id; })[0]; k.status[i.dataset.veld] = i.checked ? new Date().toISOString() : null; teken(); })
+      .catch(function (err) { i.checked = !i.checked; i.disabled = false; document.getElementById('sub').textContent = 'Opslaan mislukt: ' + err.message; });
+  });
+
+  api('/intern/api/ik').then(function (r) { ik = r.wie; document.getElementById('db-ik').textContent = 'Ingelogd als ' + r.naam; return laad(); })
+    .catch(function (err) { document.getElementById('rijen').innerHTML = '<tr><td colspan="4" class="kl-leeg">' + esc(err.message) + '</td></tr>'; });
+})();
+</script>
+</body>
+</html>

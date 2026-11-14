@@ -1,5 +1,5 @@
 // Logica van de interne omgeving (inloggen per persoon, gedeelde takenlijst en klanten met hun mails).
-import { TYPES, AUTOMATISCH, gepland, maakMail, handmatigeData, verstuur, vandaag } from "./klant-mails.js";
+import { TYPES, AUTOMATISCH, HANDMATIG, gepland, maakMail, handmatigeData, verstuur, vandaag, actueelKwartaal, kwartalenRond, kwartaalInfo } from "./klant-mails.js";
 // Los van Netlify gehouden zodat het lokaal te testen is; intern.js koppelt de opslag.
 
 export const GEBRUIKERS = {
@@ -128,7 +128,7 @@ export async function verwerk(request, cookies, next, maakStore, env = () => und
       const titel = schoon(body.titel);
       if (!titel) return json({ fout: "Titel ontbreekt" }, 400);
       taken.push({ id: nieuweId(), titel, notitie: schoon(body.notitie), deadline: datum(body.deadline), voor: voor(body.voor),
-        klaar: false, klaarDoor: null, klaarOp: null, door: wie, aangemaakt: nu });
+        klaar: false, klaarDoor: null, klaarOp: null, door: wie, aangemaakt: nu, klant: schoon(body.klant).slice(0, 60) || null });
     } else if (request.method === "PATCH") {
       const t = taken.find((x) => x.id === body.id);
       if (!t) return json({ fout: "Taak niet gevonden" }, 404);
@@ -148,7 +148,7 @@ export async function verwerk(request, cookies, next, maakStore, env = () => und
     return json(taken);
   }
 
-  if (pad.startsWith("/intern/api/klant")) return klantenApi(request, url, pad, wie, maakStore(), env);
+  if (pad.startsWith("/intern/api/klant") || pad === "/intern/api/kwartaalbord") return klantenApi(request, url, pad, wie, maakStore(), env);
 
   return next();
 }
@@ -176,9 +176,29 @@ function velden(body, k) {
   if ("voorstelLink" in body) k.voorstelLink = link(body.voorstelLink);
   if ("notitie" in body) k.notitie = String(body.notitie || "").replace(/[<>]/g, "").trim().slice(0, 2000);
   if (Array.isArray(body.uit)) k.uit = body.uit.filter((t) => AUTOMATISCH.includes(t));
+  if (body.profiel && typeof body.profiel === "object") {
+    const pr = body.profiel, oud = k.profiel || {};
+    k.profiel = {
+      kor: "kor" in pr ? !!pr.kor : !!oud.kor, icp: "icp" in pr ? !!pr.icp : !!oud.icp,
+      partner: "partner" in pr ? !!pr.partner : !!oud.partner, urencriterium: "urencriterium" in pr ? !!pr.urencriterium : !!oud.urencriterium,
+      branche: "branche" in pr ? schoon(pr.branche).slice(0, 60) : (oud.branche || ""),
+    };
+  }
+  if ("tevreden" in body) k.tevreden = !!body.tevreden;
 }
 
-function metPlanning(k) { return { ...k, gepland: gepland(k) }; }
+// Welke planningssleutel hoort bij een handmatig verstuurde mail (zodat hij niet nog eens automatisch gaat)
+function sleutelVoor(type, data) {
+  if (type === "kwartaal") return "kwartaal-" + data.sleutel;
+  if (type === "kwartaalTweede") return "kwartaal2-" + data.sleutel;
+  if (type === "jaareinde") return "jaareinde-" + vandaag().slice(0, 4);
+  if (type === "inkomstenbelasting") return "ib-" + data.jaar;
+  if (type === "jubileum") return "jubileum-1";
+  if (["checkIn", "review", "aanbevelen"].includes(type)) return type;
+  return null;
+}
+
+function metPlanning(k, env) { return { ...k, gepland: gepland(k, vandaag(), 8, env) }; }
 
 async function klantenApi(request, url, pad, wie, store, env) {
   const klanten = await leesKlanten(store);
@@ -188,7 +208,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
   const vind = (id) => klanten.find((x) => x.id === id);
 
   if (pad === "/intern/api/klanten") {
-    if (request.method === "GET") return json({ klanten: klanten.map(metPlanning), types: TYPES });
+    if (request.method === "GET") return json({ klanten: klanten.map((k) => metPlanning(k, env)), types: TYPES, handmatig: HANDMATIG, reviewLink: !!env("REVIEW_LINK") });
     if (request.method === "POST") {
       const k = { id: nieuweId(), naam: "", bedrijf: "", email: "", telefoon: "", boekhouder: wie, status: "klant", start: "", voorstelLink: "", notitie: "", uit: [], verstuurd: {}, log: [], door: wie, aangemaakt: nu };
       velden(body, k);
@@ -196,7 +216,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
       if (!k.email) return json({ fout: "Geen geldig e-mailadres" }, 400);
       klanten.push(k);
       await bewaar();
-      return json(metPlanning(k));
+      return json(metPlanning(k, env));
     }
     return json({ fout: "Methode niet toegestaan" }, 405);
   }
@@ -204,13 +224,13 @@ async function klantenApi(request, url, pad, wie, store, env) {
   if (pad === "/intern/api/klant") {
     const k = vind(body.id);
     if (!k) return json({ fout: "Klant niet gevonden" }, 404);
-    if (request.method === "GET") return json({ klant: metPlanning(k), types: TYPES });
+    if (request.method === "GET") return json({ klant: metPlanning(k, env), types: TYPES, handmatig: HANDMATIG, reviewLink: !!env("REVIEW_LINK"), kwartalen: kwartalenRond().slice(0, 4).map(kwartaalInfo) });
     if (request.method === "PATCH") {
       velden(body, k);
       if (!k.naam || !k.email) return json({ fout: "Naam en e-mailadres zijn verplicht" }, 400);
       k.gewijzigd = nu; k.gewijzigdDoor = wie;
       await bewaar();
-      return json({ klant: metPlanning(k), types: TYPES });
+      return json({ klant: metPlanning(k, env), types: TYPES, handmatig: HANDMATIG, reviewLink: !!env("REVIEW_LINK"), kwartalen: kwartalenRond().slice(0, 4).map(kwartaalInfo) });
     }
     if (request.method === "DELETE") {
       klanten.splice(klanten.indexOf(k), 1);
@@ -224,7 +244,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
     const k = vind(body.id);
     if (!k || !TYPES[body.type]) return json({ fout: "Niet gevonden" }, 404);
     const data = body.sleutel ? (gepland(k).find((m) => m.sleutel === body.sleutel) || {}).data : handmatigeData(body.type);
-    const m = maakMail(k, body.type, data || {});
+    const m = maakMail(k, body.type, data || {}, env);
     return json({ onderwerp: m.subject, html: m.html, aan: k.email });
   }
 
@@ -233,14 +253,68 @@ async function klantenApi(request, url, pad, wie, store, env) {
     if (!k || !TYPES[body.type]) return json({ fout: "Niet gevonden" }, 404);
     const test = body.test === true;
     const aan = test ? (String(env("MAIL_TO") || "info@avezaatenevers.nl").split(",")[0].trim()) : k.email;
-    const m = maakMail(k, body.type, handmatigeData(body.type));
+    const data = handmatigeData(body.type);
+    const m = maakMail(k, body.type, data, env);
     if (test) m.subject = "[TEST] " + m.subject;
     const r = await verstuur(env, { aan, mail: m });
     k.log = k.log || [];
     k.log.unshift({ type: body.type, onderwerp: m.subject, aan, op: nu, door: wie, test, ok: r.ok, fout: r.fout || null, handmatig: true });
     k.log = k.log.slice(0, 100);
+    const sl = sleutelVoor(body.type, data);
+    if (r.ok && !test && sl) k.verstuurd = { ...(k.verstuurd || {}), [sl]: nu };
     await bewaar();
-    return json({ ...r, klant: metPlanning(k) }, r.ok ? 200 : 502);
+    return json({ ...r, klant: metPlanning(k, env) }, r.ok ? 200 : 502);
+  }
+
+  // Kwartaalstatus: stukken binnen, aangifte ingediend, btw betaald
+  if (pad === "/intern/api/klant/kwartaal" && request.method === "PATCH") {
+    const k = vind(body.id);
+    if (!k || !/^\d{4}-Q[1-4]$/.test(body.kw || "") || !["binnen", "ingediend", "betaald"].includes(body.veld)) return json({ fout: "Ongeldig" }, 400);
+    k.kwartalen = k.kwartalen || {};
+    const kw = (k.kwartalen[body.kw] = k.kwartalen[body.kw] || {});
+    kw[body.veld] = body.aan ? nu : null;
+    kw[body.veld + "Door"] = body.aan ? wie : null;
+    await bewaar();
+    return json({ klant: metPlanning(k, env) });
+  }
+
+  // IB-aangifte ingediend per jaar
+  if (pad === "/intern/api/klant/ib" && request.method === "PATCH") {
+    const k = vind(body.id);
+    if (!k || !/^\d{4}$/.test(String(body.jaar || ""))) return json({ fout: "Ongeldig" }, 400);
+    k.ibIngediend = k.ibIngediend || {};
+    if (body.aan) k.ibIngediend[body.jaar] = nu; else delete k.ibIngediend[body.jaar];
+    await bewaar();
+    return json({ klant: metPlanning(k, env) });
+  }
+
+  // Tijdlijn
+  if (pad === "/intern/api/klant/notitie") {
+    const k = vind(body.id);
+    if (!k) return json({ fout: "Klant niet gevonden" }, 404);
+    k.tijdlijn = k.tijdlijn || [];
+    if (request.method === "POST") {
+      const tekst = String(body.tekst || "").replace(/[<>]/g, "").trim().slice(0, 1000);
+      if (!tekst) return json({ fout: "Leeg" }, 400);
+      const soort = ["notitie", "gebeld", "geappt", "gemaild", "gesprek"].includes(body.soort) ? body.soort : "notitie";
+      k.tijdlijn.unshift({ id: nieuweId(), tekst, soort, op: nu, door: wie });
+      k.tijdlijn = k.tijdlijn.slice(0, 300);
+    } else if (request.method === "DELETE") {
+      k.tijdlijn = k.tijdlijn.filter((x) => x.id !== body.nid);
+    } else return json({ fout: "Methode niet toegestaan" }, 405);
+    await bewaar();
+    return json({ klant: metPlanning(k, env) });
+  }
+
+  // Kwartaalbord
+  if (pad === "/intern/api/kwartaalbord") {
+    const kwartalen = kwartalenRond(vandaag(), 6).map(kwartaalInfo);
+    const kw = /^\d{4}-Q[1-4]$/.test(body.kw || "") ? body.kw : actueelKwartaal();
+    const lijst = klanten.filter((k) => k.status === "klant").map((k) => ({
+      id: k.id, naam: k.naam, bedrijf: k.bedrijf, boekhouder: k.boekhouder, telefoon: k.telefoon, kor: !!(k.profiel || {}).kor,
+      status: (k.kwartalen || {})[kw] || {}, start: k.start,
+    }));
+    return json({ kw, info: kwartaalInfo(kw), kwartalen, klanten: lijst });
   }
 
   return json({ fout: "Onbekende route" }, 404);

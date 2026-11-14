@@ -12,8 +12,8 @@ export default async () => {
 
   for (const k of klanten) {
     if (!k.email) continue;
-    for (const moment of teVersturen(k, nu)) {
-      const mail = maakMail(k, moment.type, moment.data);
+    for (const moment of teVersturen(k, nu, env)) {
+      const mail = maakMail(k, moment.type, moment.data, env);
       const r = await verstuur(env, { aan: k.email, mail });
       k.log = k.log || [];
       k.log.unshift({ type: moment.type, onderwerp: mail.subject, aan: k.email, op: new Date().toISOString(), door: "gepland", test: false, ok: r.ok, fout: r.fout || null, sleutel: moment.sleutel });

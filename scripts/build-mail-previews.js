@@ -25,6 +25,14 @@ const voorbeelden = [
     mails.jaareinde({ naam: 'Sanne de Vries', wie: 'koen' })],
   ['ib', 'Aangifte inkomstenbelasting', 'Later: begin maart, naar alle klanten.',
     mails.inkomstenbelasting({ naam: 'Sanne de Vries', wie: 'koen', jaar: '2026', aanleverdatum: '1 april' })],
+  ['kwartaal2', 'Tweede herinnering btw', 'Automatisch rond de 8e, alleen als de stukken nog niet binnen zijn.',
+    mails.kwartaalTweede({ naam: 'Sanne de Vries', wie: 'koen', kwartaal: '4e kwartaal van 2026', aanleverdatum: '10 januari', deadline: '31 januari' })],
+  ['review', 'Google-review vragen', 'Automatisch, 3 maanden na de start (zodra REVIEW_LINK in Netlify staat).',
+    mails.review({ naam: 'Sanne de Vries', wie: 'koen', reviewLink: 'https://g.page/r/voorbeeld/review' })],
+  ['aanbevelen', 'Aanbevelen', 'Automatisch, 2 weken na de eerste ingediende IB-aangifte, alleen bij tevreden klanten.',
+    mails.aanbevelen({ naam: 'Sanne de Vries', wie: 'koen' })],
+  ['jubileum', 'Een jaar klant', 'Automatisch, 1 jaar na de start.',
+    mails.jubileum({ naam: 'Sanne de Vries', wie: 'koen', btwAantal: 4, ib: true })],
 ];
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -50,7 +58,7 @@ iframe{width:100%;border:1px solid #E5E7EB;border-radius:12px;background:#EEF2F8
 @media (max-width:900px){.views{grid-template-columns:1fr}.mob{display:none}}
 </style></head><body><div class="wrap">
 <h1>Mailsjablonen</h1>
-<p class="sub">Voorbeelden van alle automatische mails, met voorbeeldgegevens. De eerste drie gaan live zodra we ze publiceren; de rest bouwen we later in.</p>
+<p class="sub">Voorbeelden van alle automatische mails, met voorbeeldgegevens. De eerste drie gaan naar websitebezoekers. De rest staat per klant in het dashboard onder Klanten.</p>
 <nav>${voorbeelden.map(([id, titel]) => `<a href="#${id}">${titel}</a>`).join('')}</nav>
 ${voorbeelden.map(([id, titel, wanneer, m]) => `<section id="${id}">
 <h2>${titel}</h2><p class="wanneer">${wanneer}</p>

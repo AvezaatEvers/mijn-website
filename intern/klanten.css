@@ -96,3 +96,62 @@ dialog.voorbeeld iframe { display: block; width: 100%; height: 56vh; border: 0; 
   .mail-rij time { grid-column: 1 / -1; }
   .zoek { width: 100%; }
 }
+
+/* Snelknoppen */
+.snel { display: flex; flex-wrap: wrap; gap: 8px; margin: -8px 0 24px; }
+.snel .db-knop { font-size: 13px; padding: 8px 12px; }
+
+/* Vinkjes en kwartalen */
+.vinken { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.vink { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ink); cursor: pointer; }
+.vink input { width: 18px; height: 18px; accent-color: var(--accent); margin: 0; }
+.kw-rij { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 12px; align-items: center; padding: 10px 2px; border-bottom: 1px solid var(--line); }
+.kw-rij:last-child { border-bottom: 0; }
+.kw-rij b { font-size: 14px; }
+.kw-rij small { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+.sectie { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 18px 0 10px; }
+.sectie:first-child { margin-top: 0; }
+.rij-inline { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.rij-inline input, .rij-inline select { font: inherit; font-size: 14px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: #fff; min-width: 0; }
+.rij-inline input[type=text] { flex: 1 1 200px; }
+.mail-rij.is-vervalt strong { color: var(--muted); }
+.mail-rij .vervalt { color: #B45309; }
+
+/* Tijdlijn en taken */
+.tl { list-style: none; margin: 12px 0 0; padding: 0; max-height: 420px; overflow-y: auto; }
+.tl li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 10px 2px; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--ink); }
+.tl li:last-child { border-bottom: 0; }
+.tl small { display: block; font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.tl .soort { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--accent); margin-right: 6px; }
+.tl .tk { display: flex; gap: 10px; align-items: flex-start; }
+.tl .tk input { width: 18px; height: 18px; accent-color: var(--accent); margin: 1px 0 0; flex: none; }
+.tl li.is-klaar .tk span { color: var(--muted); text-decoration: line-through; }
+.weg { font: inherit; font-size: 12px; border: 0; background: none; color: #9CA3AF; cursor: pointer; padding: 2px 4px; border-radius: 6px; align-self: start; }
+.weg:hover { color: #B91C1C; background: #FEF2F2; }
+
+/* Kwartaalbord */
+.bord-tabel { width: 100%; border-collapse: collapse; font-size: 14px; }
+.bord-tabel th { text-align: left; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; padding: 8px 8px 10px; border-bottom: 1px solid var(--line); }
+.bord-tabel td { padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.bord-tabel tr:last-child td { border-bottom: 0; }
+.bord-tabel td.c, .bord-tabel th.c { text-align: center; width: 110px; }
+.bord-tabel input { width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer; }
+.bord-tabel a { color: var(--ink); text-decoration: none; font-weight: 600; }
+.bord-tabel a:hover { color: var(--accent); }
+.bord-tabel small { display: block; color: var(--muted); font-size: 12.5px; font-weight: 400; }
+.bord-tabel tr.is-klaar td { background: #F0FDF4; }
+.bord-tellers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.bord-tellers > div { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.bord-tellers b { display: block; font-size: 26px; letter-spacing: -.02em; }
+.bord-tellers span { font-size: 13px; color: var(--muted); }
+.balk { height: 6px; border-radius: 3px; background: var(--tint); overflow: hidden; margin-top: 8px; }
+.balk i { display: block; height: 100%; background: var(--accent); }
+@media (max-width: 640px) {
+  .bord-tabel thead { display: none; }
+  .bord-tabel tr { display: grid; grid-template-columns: repeat(3, 1fr); padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .bord-tabel td { border: 0; padding: 4px 6px; }
+  .bord-tabel td:first-child { grid-column: 1 / -1; }
+  .bord-tabel td.c { width: auto; text-align: left; font-size: 12.5px; color: var(--muted); }
+  .bord-tabel td.c::before { content: attr(data-l); display: block; margin-bottom: 4px; }
+  .bord-tellers { grid-template-columns: 1fr; }
+}

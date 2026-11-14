@@ -231,7 +231,7 @@ ${tabel(regels)}
   jaareinde(d, base = '') {
     const inhoud = h1('Nog een paar weken tot 31 december') +
       p(aanhef(d.naam)) +
-      p('Een aantal dingen regel je vóór de jaarwisseling, anders ben je te laat voor dit belastingjaar:') +
+      p('Deze punten regel je vóór de jaarwisseling, anders ben je te laat voor dit belastingjaar:') +
       lijst(['Investeringen die je toch al van plan was? Vóór 31 december kan het schelen.', 'Haal je het urencriterium van 1.225 uur? Check je urenregistratie.', 'Facturen die niet meer betaald worden: laat het ons weten.', 'Overweeg je de KOR voor volgend jaar? Aanmelden kan tot begin december.']) +
       knop(`${base}/kennisbank/jaareinde-checklist-zzp.html`, 'Bekijk de jaareinde-checklist') +
       p('Twijfel je ergens over? App ons, dan kijken we samen of het voor jou iets oplevert.') +

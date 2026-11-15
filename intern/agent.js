@@ -69,7 +69,7 @@
     function welkom() {
       return AE.ik().then(function (ik) {
         var u = new Date().getHours(), groet = u < 12 ? 'Goedemorgen' : u < 18 ? 'Goedemiddag' : 'Goedenavond';
-        stroom.innerHTML = '<div class="ag-welkom">' + orb() + '<h2>' + groet + ', ' + esc(ik.naam) + '</h2><p>Ik ken jullie klanten, werkstromen en de kennisbank. Vraag me wat je wilt, of kies een start.</p><div class="ag-sug">' +
+        stroom.innerHTML = '<div class="ag-welkom">' + orb() + '<h2>Waar kan ik mee helpen?</h2><p>Ik ken jullie klanten, werkstromen en de kennisbank.</p><div class="ag-sug">' +
           suggesties(modus).map(function (s, i) { return '<button type="button" style="animation-delay:' + (.08 * i) + 's" data-vraag="' + esc(s[1]) + '"><small>' + esc(s[0]) + '</small>' + esc(s[1]) + '</button>'; }).join('') + '</div></div>';
       });
     }

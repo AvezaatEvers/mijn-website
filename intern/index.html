@@ -349,7 +349,7 @@
   <section class="vd" aria-label="Je dag">
     <div class="vd-tekst">
       <p class="vd-datum" id="datum"></p>
-      <h1 id="groet">Welkom</h1>
+      <h1 id="groet">&nbsp;</h1>
       <p class="vd-samen" id="samenvatting">&nbsp;</p>
       <div class="vd-knoppen">
         <button class="dag-knop" type="button" data-dagmodus id="dag-knop"><span id="dag-knop-tekst">Start je dag</span></button>
@@ -484,7 +484,8 @@
   var IK = null, NAAM = { koen: 'Koen', daan: 'Daan', samen: 'Samen' }, WIE = 'ik';
   var esc = AE.esc;
   var dt = nu.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  document.getElementById('datum').textContent = dt.charAt(0).toUpperCase() + dt.slice(1);
+  document.getElementById('datum').textContent = 'Vandaag';
+  document.getElementById('groet').textContent = (function (t) { t = t.replace(/\s\d{4}$/, ''); return t.charAt(0).toUpperCase() + t.slice(1); })(dt);
   function dagen(doel) { return Math.round((doel - vandaag) / 864e5); }
   function dagTekst(n) { return n === 0 ? 'vandaag' : n + (n === 1 ? ' dag' : ' dagen'); }
   var j = vandaag.getFullYear();
@@ -598,7 +599,7 @@
 
   AE.ik().then(function (d) {
     IK = d;
-    document.getElementById('groet').textContent = (uur < 12 ? 'Goedemorgen' : uur < 18 ? 'Goedemiddag' : 'Goedenavond') + ', ' + d.naam;
+    // Begroeting staat op het welkomstscherm; hier de dag zelf als titel
     document.getElementById('tk-voor').value = d.wie;
     tekenTaken();
     laad();

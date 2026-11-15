@@ -9,6 +9,7 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/style.css?v=126">
 <link rel="stylesheet" href="/intern/klanten.css?v=5">
+<link rel="stylesheet" href="/intern/app.css?v=1">
 </head>
 <body>
 <main class="db">
@@ -64,7 +65,7 @@
     </div>
 
     <div class="db-kaart">
-      <h2>Tijdlijn</h2>
+      <div class="db-kop"><h2>Tijdlijn en contact</h2><button class="ai-knop" type="button" data-contact style="font-size:13px;padding:8px 12px">+ Contact vastleggen</button></div>
       <form class="rij-inline" id="tl-form" autocomplete="off">
         <select id="tl-soort" aria-label="Soort"><option value="notitie">Notitie</option><option value="gebeld">Gebeld</option><option value="geappt">Geappt</option><option value="gemaild">Gemaild</option><option value="gesprek">Gesprek</option></select>
         <input type="text" id="tl-tekst" placeholder="Wat is er besproken of afgesproken?" maxlength="1000" required>
@@ -122,15 +123,16 @@
   </div>
 </dialog>
 
+<script src="/intern/app.js?v=1"></script>
 <script>
 (function () {
-  var id = new URLSearchParams(location.search).get('id');
+  var id = new URLSearchParams(location.search).get('id'); window.AE_KLANT = id;
   var klant = null, types = {}, huidig = null, zeker = false, HANDMATIG = [], kwartalen = [], reviewLink = false, taken = [];
   var MAAND = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
   function d(s) { if (!s) return ''; var p = s.slice(0, 10).split('-'); return +p[2] + ' ' + MAAND[+p[1] - 1] + ' ' + p[0]; }
   function dt(s) { var x = new Date(s); return x.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + x.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function naamVan(w) { return w === 'daan' ? 'Daan' : w === 'koen' ? 'Koen' : w === 'gepland' ? 'automatisch' : w; }
+  function naamVan(w) { return w === 'daan' ? 'Daan' : w === 'koen' ? 'Koen' : w === 'gepland' ? 'automatisch' : w === 'klant' ? 'klant' : w === 'formulier' ? 'websiteformulier' : w; }
   function api(pad, opt) {
     return fetch(pad, Object.assign({ headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin' }, opt || {}))
       .then(function (r) { if (r.status === 401) { location.reload(); throw new Error('uitgelogd'); } return r.json().then(function (j) { if (!r.ok) { var e = new Error(j.fout || 'Er ging iets mis'); e.data = j; throw e; } return j; }); });
@@ -210,9 +212,13 @@
     }).join('');
 
     // Tijdlijn
-    var tl = k.tijdlijn || [];
+    var KAN = { whatsapp: 'WhatsApp', gebeld: 'Gebeld', mail: 'Mail', gesprek: 'Gesprek' }, OND = { app: 'App en MoneyMonk', bonnetjes: 'Bonnetjes', facturen: 'Facturen', btw: 'Btw', ib: 'IB-aangifte', belastingdienst: 'Belastingdienst', prijs: 'Prijs en factuur', overig: 'Overig' }, GEV = { blij: 'tevreden', neutraal: 'neutraal', boos: 'ontevreden' };
+    var tl = (k.tijdlijn || []).concat((k.contacten || []).map(function (c) {
+      return { id: 'c:' + c.id, soort: KAN[c.kanaal] + (c.richting === 'klant' ? ' (klant)' : ''), tekst: (OND[c.onderwerp] || '') + ', ' + c.soort + (c.opgelost === false ? ', nog niet opgelost' : '') + (c.gevoel ? ', ' + GEV[c.gevoel] : '') + (c.vermijdbaar ? ', te voorkomen' : '') + (c.notitie ? ': ' + c.notitie : ''), op: c.op, door: c.door };
+    })).concat((k.nps || []).map(function (n) { return { id: 'n:' + n.ronde, soort: 'NPS ' + n.score, tekst: n.reden || 'Cijfer gegeven, zonder toelichting', op: n.op, door: 'klant' }; }))
+      .sort(function (a, b) { return b.op.localeCompare(a.op); });
     document.getElementById('tijdlijn').innerHTML = tl.length ? tl.map(function (n) {
-      return '<li><div><span class="soort">' + esc(n.soort) + '</span>' + esc(n.tekst) + '<small>' + dt(n.op) + ', ' + naamVan(n.door) + '</small></div><button class="weg" type="button" data-nid="' + n.id + '" aria-label="Verwijderen">&times;</button></li>';
+      return '<li><div><span class="soort">' + esc(n.soort) + '</span>' + esc(n.tekst) + '<small>' + dt(n.op) + ', ' + naamVan(n.door) + '</small></div>' + (String(n.id).indexOf('n:') === 0 ? '<span></span>' : '<button class="weg" type="button" data-nid="' + n.id + '" aria-label="Verwijderen">&times;</button>') + '</li>';
     }).join('') : '<li class="kl-leeg" style="display:block">Nog niets genoteerd.</li>';
 
     tekenTaken();
@@ -291,6 +297,7 @@
     api('/intern/api/klant?id=' + encodeURIComponent(id), { method: 'DELETE' }).then(function () { location.href = '/intern/klanten.html'; });
   });
 
+  document.addEventListener('ae:contact', function (e) { if (e.detail && e.detail.klant && e.detail.klant.id === id) zet(e.detail); });
   function zet(r) { if (r.klant) klant = r.klant; if (r.types) types = r.types; if (r.handmatig) HANDMATIG = r.handmatig; if (r.kwartalen) kwartalen = r.kwartalen; if ('reviewLink' in r) reviewLink = r.reviewLink; teken(); }
   function patch(pad, data) { data.id = id; return api(pad, { method: 'PATCH', body: JSON.stringify(data) }).then(zet); }
 
@@ -313,7 +320,10 @@
   document.getElementById('tijdlijn').addEventListener('click', function (e) {
     var b = e.target.closest('[data-nid]'); if (!b) return;
     if (b.dataset.zeker !== '1') { b.dataset.zeker = '1'; b.textContent = 'Zeker?'; return; }
-    api('/intern/api/klant/notitie?id=' + encodeURIComponent(id) + '&nid=' + encodeURIComponent(b.dataset.nid), { method: 'DELETE' }).then(zet);
+    var nid = b.dataset.nid;
+    if (nid.indexOf('n:') === 0) return;
+    if (nid.indexOf('c:') === 0) api('/intern/api/klant/contact?id=' + encodeURIComponent(id) + '&cid=' + encodeURIComponent(nid.slice(2)), { method: 'DELETE' }).then(zet);
+    else api('/intern/api/klant/notitie?id=' + encodeURIComponent(id) + '&nid=' + encodeURIComponent(nid), { method: 'DELETE' }).then(zet);
   });
 
   // Taken van deze klant (gedeelde takenlijst)

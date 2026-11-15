@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Presenteren en tools | Avezaat &amp; Evers intern</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-96.png" type="image/png" sizes="96x96">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#26458F">
+<link rel="stylesheet" href="/assets/style.css?v=126">
+<style>
+  body { background: var(--soft); }
+  .db { max-width: 1180px; margin: 0 auto; padding: 28px 24px 80px; }
+  .db-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; }
+  .db-top .logo { font-size: 20px; }
+  .db-tag { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); background: var(--tint); padding: 5px 10px; border-radius: 999px; margin-left: 10px; vertical-align: 3px; }
+  .db-site { font-size: 14px; font-weight: 600; color: var(--accent); text-decoration: none; }
+  .db h1 { font-size: clamp(28px, 4vw, 40px); margin: 0 0 4px; letter-spacing: -.02em; }
+  .db-sub { margin: 0 0 28px; color: var(--muted); }
+  .db h2 { font-size: 18px; margin: 0 0 14px; letter-spacing: -.01em; }
+  .db-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+  .db-grid > * { min-width: 0; }
+  .db-kaart { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+  .s3 { grid-column: span 3; } .s4 { grid-column: span 4; } .s5 { grid-column: span 5; } .s6 { grid-column: span 6; } .s7 { grid-column: span 7; } .s8 { grid-column: span 8; } .s12 { grid-column: span 12; }
+
+  /* Tellers */
+  .db-teller small { display: block; font-size: 13px; color: var(--muted); }
+  .db-teller b { display: block; font-size: 34px; letter-spacing: -.03em; line-height: 1.1; margin: 6px 0 2px; color: var(--ink); }
+  .db-teller span { font-size: 14px; color: var(--text); }
+  .db-teller.is-blauw { background: var(--accent); border-color: var(--accent); }
+  .db-teller.is-blauw small, .db-teller.is-blauw span { color: #CAD4E8; }
+  .db-teller.is-blauw b { color: #fff; }
+
+  /* Tegels */
+  .db-tegels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .db-tegel > div { min-width: 0; }
+  .db-tegel { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px; border: 1px solid var(--line); text-decoration: none; color: var(--ink); transition: border-color .2s, background .2s; }
+  .db-tegel:hover { border-color: var(--tint-border); background: #FAFBFF; }
+  .db-tegel i { width: 38px; height: 38px; flex: none; border-radius: 10px; background: var(--tint); color: var(--accent); display: grid; place-items: center; font-style: normal; }
+  .db-tegel strong { display: block; font-size: 15px; }
+  .db-tegel span { display: block; font-size: 13px; color: var(--muted); line-height: 1.35; }
+
+  /* Welkomstlink */
+  .db-form { display: grid; grid-template-columns: 1fr 140px; gap: 10px; }
+  .db-form input, .db-form select { font: inherit; font-size: 15px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; width: 100%; }
+  .db-uit { display: flex; gap: 8px; margin-top: 10px; }
+  .db-uit input { flex: 1; font: inherit; font-size: 13px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--soft); color: var(--text); min-width: 0; }
+  .db-knop { font: inherit; font-size: 14px; font-weight: 600; padding: 10px 14px; border-radius: 10px; border: 0; background: var(--accent); color: #fff; cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; }
+  .db-knop.is-licht { background: var(--tint); color: var(--accent); }
+  .db-ok { font-size: 13px; color: #15803D; margin: 8px 0 0; min-height: 1.2em; }
+
+  /* Open punten */
+  .db-todo { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .db-todo li { border-bottom: 1px solid var(--line); }
+  .db-todo li:last-child { border-bottom: 0; }
+  .db-todo label { display: flex; gap: 12px; align-items: flex-start; padding: 10px 2px; cursor: pointer; font-size: 15px; color: var(--ink); }
+  .db-todo input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); flex: none; }
+  .db-todo small { display: block; font-size: 13px; color: var(--muted); }
+  .db-todo input:checked + span { color: var(--muted); text-decoration: line-through; }
+  .db-voortgang { height: 6px; border-radius: 3px; background: var(--tint); overflow: hidden; margin: -4px 0 12px; }
+  .db-voortgang div { height: 100%; width: 0; background: var(--accent); transition: width .5s cubic-bezier(.22,1,.36,1); }
+  .db-teller-todo { font-size: 13px; color: var(--muted); font-weight: 500; float: right; }
+
+  /* Kennismaking presenteren */
+  .db-pres { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; background: var(--accent); border-color: var(--accent); color: #fff; }
+  .db-pres h2 { color: #fff; margin: 0 0 4px; }
+  .db-pres p { font-size: 14px; color: #CAD4E8; margin: 0; }
+  .db-pres form { display: flex; gap: 8px; flex: 1; max-width: 460px; min-width: 0; }
+  .db-pres input { flex: 1; min-width: 0; font: inherit; font-size: 15px; padding: 10px 12px; border-radius: 10px; border: 0; }
+  .db-pres .db-knop { background: #fff; color: var(--accent); }
+  @media (max-width: 600px) { .db-pres form { max-width: none; flex-basis: 100%; } }
+
+  /* Pagina's */
+  .db-paginas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .db-paginas h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); margin: 0 0 8px; }
+  .db-paginas ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .db-paginas a { font-size: 15px; color: var(--ink); text-decoration: none; }
+  .db-paginas a:hover { color: var(--accent); text-decoration: underline; }
+  .db-paginas em { font-style: normal; font-size: 11px; color: var(--muted); margin-left: 6px; }
+
+  /* Tools */
+  .db-tools { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+  .db-tool { padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); text-decoration: none; color: var(--ink); transition: border-color .2s; }
+  .db-tool:hover { border-color: var(--accent); }
+  .db-tool strong { display: block; font-size: 15px; overflow-wrap: anywhere; }
+  .db-tool span { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.35; margin-top: 2px; }
+  .db-noot { font-size: 13px; color: var(--muted); margin: 12px 0 0; }
+
+
+  .db-wie { display: flex; align-items: center; gap: 16px; font-size: 14px; color: var(--muted); }
+  .db-wie a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .db-kop { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .db-kop h2 { margin: 0; }
+
+  /* Taken */
+  .tk-nieuw { display: grid; grid-template-columns: 1fr 150px 100px auto; gap: 8px; margin-bottom: 12px; }
+  .tk-nieuw input, .tk-nieuw select { font: inherit; font-size: 14px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff; min-width: 0; }
+  .tk-filters { display: flex; gap: 6px; margin-bottom: 6px; }
+  .tk-filters button { font: inherit; font-size: 13px; font-weight: 500; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--text); cursor: pointer; }
+  .tk-filters button.is-aan { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .tk-lijst { list-style: none; margin: 0; padding: 0; max-height: 520px; overflow-y: auto; }
+  .tk-lijst li { display: grid; grid-template-columns: 22px 1fr auto; gap: 12px; align-items: start; padding: 11px 2px; border-bottom: 1px solid var(--line); }
+  .tk-lijst li:last-child { border-bottom: 0; }
+  .tk-lijst input[type=checkbox] { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--accent); cursor: pointer; }
+  .tk-titel { font-size: 15px; color: var(--ink); line-height: 1.4; }
+  .tk-meta { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 3px; font-size: 12.5px; color: var(--muted); }
+  .tk-meta .tk-voor { font-weight: 600; color: var(--accent); }
+  .tk-meta .is-laat { color: #B91C1C; font-weight: 600; }
+  .tk-meta .is-binnenkort { color: #B45309; font-weight: 600; }
+  .tk-meta .tk-afgevinkt { color: #15803D; }
+  li.is-klaar .tk-titel { color: var(--muted); text-decoration: line-through; }
+  .tk-weg { font: inherit; font-size: 12px; border: 0; background: none; color: #9CA3AF; cursor: pointer; padding: 2px 4px; border-radius: 6px; }
+  .tk-weg:hover { color: #B91C1C; background: #FEF2F2; }
+  .tk-weg.is-zeker { color: #fff; background: #B91C1C; }
+  .tk-leeg { display: block !important; color: var(--muted); font-size: 14px; padding: 14px 2px !important; }
+
+  /* Kalender */
+  .kal-nav { display: flex; gap: 6px; }
+  .kal-nav button { font: inherit; font-size: 14px; min-width: 34px; height: 34px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line); background: #fff; cursor: pointer; color: var(--ink); }
+  .kal-nav button:hover { border-color: var(--accent); }
+  .kal-raster { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+  .kal-raster .kal-wd { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); text-align: center; padding-bottom: 4px; }
+  .kal-raster button { font: inherit; position: relative; aspect-ratio: 1 / .9; min-height: 44px; border: 1px solid transparent; border-radius: 10px; background: var(--soft); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 6px 2px; color: var(--ink); font-size: 13px; }
+  .kal-raster button.is-anders { background: transparent; color: #C4C9D4; }
+  .kal-raster button.is-vandaag { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .kal-raster button.is-gekozen { background: var(--accent); color: #fff; }
+  .kal-raster button:hover { border-color: var(--tint-border); }
+  .kal-stip { display: flex; gap: 3px; margin-top: auto; }
+  .kal-stip i, .kal-legenda i { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .k-vast { background: #B45309; } .k-taak { background: var(--accent); } .k-klaar { background: #9CA3AF; }
+  .kal-raster button.is-gekozen .k-taak { background: #fff; }
+  .kal-legenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin: 12px 0 0; }
+  .kal-legenda span { display: inline-flex; align-items: center; gap: 6px; }
+  .kal-dag { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px; }
+  .kal-dag h3 { font-size: 14px; margin: 0 0 8px; }
+  .kal-dag ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .kal-dag li { font-size: 14px; color: var(--text); display: flex; gap: 8px; align-items: baseline; }
+  .kal-dag li i { flex: none; transform: translateY(-1px); }
+  .kal-dag p { margin: 0; font-size: 14px; color: var(--muted); }
+  @media (max-width: 600px) {
+    .tk-nieuw { grid-template-columns: 1fr 1fr; }
+    .tk-nieuw #tk-titel { grid-column: 1 / -1; }
+    .tk-nieuw button { grid-column: 1 / -1; justify-content: center; }
+    .db-wie { gap: 12px; }
+  }
+
+  @media (max-width: 1000px) {
+    .s3, .s4, .s5 { grid-column: span 6; } .s6, .s7, .s8 { grid-column: span 12; }
+    .db-paginas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .db-tools { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 600px) {
+    .s3, .s4, .s5, .s6 { grid-column: span 12; }
+    .db-tegels { grid-template-columns: 1fr; }
+    .db-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .db-form { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .db-tools, .db-paginas { grid-template-columns: 1fr; }
+  }
+  .db-kaart form .db-knop { white-space: normal; text-align: left; }
+</style>
+<link rel="stylesheet" href="/intern/app.css?v=1">
+</head>
+<body>
+<main class="db">
+  <div class="tl-kop in"><h1>Presenteren en tools</h1><p class="db-sub">Presentaties voor gesprekken, de welkomstlink en alles wat je verder nodig hebt.</p></div>
+  <div class="db-grid">
+    <!-- Kennismaking presenteren -->
+    <div class="db-kaart s12 db-pres">
+      <div>
+        <h2>Kennismaking presenteren</h2>
+        <p>Presentatie voor het gesprek van 20 minuten, met live prijsberekening. Druk op N voor je notities en timer.</p>
+      </div>
+      <form id="p-form" action="/intern/kennismaking.html" target="_blank">
+        <input name="naam" type="text" placeholder="Voornaam klant" autocomplete="off" aria-label="Voornaam van de klant">
+        <button class="db-knop" type="submit">Start presentatie</button>
+      </form>
+    </div>
+
+    <!-- Maandelijkse 1-op-1 -->
+    <div class="db-kaart s12 db-pres">
+      <div>
+        <h2>Maandelijkse <span class="nw">1-op-1</span> presenteren</h2>
+        <p>Presentatie voor het maandgesprek van 30 minuten. Vul vooraf de cijfers in (B), typ live de afspraken en druk op N voor je notities en timer.</p>
+      </div>
+      <form action="/intern/maandgesprek.html" target="_blank">
+        <input type="hidden" name="voorbereiden" value="1">
+        <button class="db-knop" type="submit">Gesprek voorbereiden</button>
+      </form>
+    </div>
+
+    <!-- IB-werkblad -->
+    <div class="db-kaart s12 db-pres">
+      <div>
+        <h2>IB-werkblad</h2>
+        <p>Per klant stap voor stap van uitvraag tot aanslag, met rekenblokken als controle op je aangiftesoftware en kant-en-klare berichten voor de klant.</p>
+      </div>
+      <form action="/intern/ib-werkblad.html" target="_blank"><button class="db-knop" type="submit">Open het werkblad</button></form>
+    </div>
+
+    <!-- Snel naar -->
+    <div class="db-kaart s7">
+      <h2>Snel naar</h2>
+      <div class="db-tegels">
+        <a class="db-tegel" href="/intern/overzicht.html"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></i><div><strong>Overzicht</strong><span>Warmste leads en wat aandacht nodig heeft</span></div></a>
+        <a class="db-tegel" href="/intern/klanten.html"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></i><div><strong>Klanten</strong><span>Per persoon, met geplande mails</span></div></a>
+        <a class="db-tegel" href="/intern/kwartaal.html"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18M8 15l2 2 4-4"/></svg></i><div><strong>Kwartaalbord</strong><span>Btw-aangiftes per klant afvinken</span></div></a>
+        <a class="db-tegel" href="/intern/mails/"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></i><div><strong>Mailsjablonen</strong><span>Alle automatische mails bekijken</span></div></a>
+        <a class="db-tegel" href="/voorstel.html"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 8l8 5 8-5"/></svg></i><div><strong>Voorstel-mail</strong><span>Prijsvoorstel maken en kopiëren</span></div></a>
+        <a class="db-tegel" href="/handtekening.html"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17c3 0 4-6 6-6s1 6 4 6 4-4 8-4"/><path d="M3 21h18"/></svg></i><div><strong>E-mailhandtekening</strong><span>Voor nieuwe contacten en klanten</span></div></a>
+        <a class="db-tegel" href="/bedankt.html?afspraak=1&amp;start=2027-01-12T09:00:00.000Z" target="_blank" rel="noopener"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></i><div><strong>Bedankpagina afspraak</strong><span>Zo ziet de klant hem na boeken</span></div></a>
+        <a class="db-tegel" href="/bedankt.html" target="_blank" rel="noopener"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></i><div><strong>Bedankpagina formulier</strong><span>Na een vraag via het formulier</span></div></a>
+        <a class="db-tegel" href="/aanbevelen.html" target="_blank" rel="noopener"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"/></svg></i><div><strong>Aanbevelen</strong><span>Link voor bestaande klanten</span></div></a>
+        <a class="db-tegel" href="/kennisbank/starten-met-moneymonk.html" target="_blank" rel="noopener"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg></i><div><strong>MoneyMonk-handleiding</strong><span>Voor nieuwe klanten</span></div></a>
+      </div>
+    </div>
+
+    <!-- Welkomstlink -->
+    <div class="db-kaart s5">
+      <h2>Welkomstlink voor een nieuwe klant</h2>
+      <div class="db-form">
+        <input id="w-naam" type="text" placeholder="Voornaam klant" autocomplete="off">
+        <select id="w-wie"><option>Daan</option><option>Koen</option></select>
+      </div>
+      <div class="db-uit">
+        <input id="w-link" type="text" readonly value="https://avezaatenevers.nl/welkom.html">
+        <button class="db-knop" type="button" id="w-kopieer">Kopieer</button>
+        <a class="db-knop is-licht" id="w-open" href="/welkom.html" target="_blank" rel="noopener">Bekijk</a>
+      </div>
+      <p class="db-ok" id="w-ok"></p>
+      <p class="db-noot" style="margin-top:4px">Stuur deze link mee met de opdracht&shy;bevestiging.</p>
+    </div>
+
+    <!-- Tools -->
+    <div class="db-kaart s12">
+      <h2>Tools</h2>
+      <div class="db-tools">
+        <a class="db-tool" href="https://outlook.office.com" target="_blank" rel="noopener"><strong>Outlook</strong><span>Mail info@</span></a>
+        <a class="db-tool" href="https://app.cal.com/bookings/upcoming" target="_blank" rel="noopener"><strong>Cal.com</strong><span>Kennismakingen</span></a>
+        <a class="db-tool" href="https://www.moneymonk.nl" target="_blank" rel="noopener"><strong>MoneyMonk</strong><span>Klant&shy;administraties</span></a>
+        <a class="db-tool" href="https://cloud.umami.is" target="_blank" rel="noopener"><strong>Umami</strong><span>Bezoekers en klikken</span></a>
+        <a class="db-tool" href="https://app.netlify.com" target="_blank" rel="noopener"><strong>Netlify</strong><span>Website en formulieren</span></a>
+        <a class="db-tool" href="https://search.google.com/search-console" target="_blank" rel="noopener"><strong>Search Console</strong><span>Vindbaarheid in Google</span></a>
+        <a class="db-tool" href="https://business.google.com" target="_blank" rel="noopener"><strong>Bedrijfsprofiel</strong><span>Google Maps en reviews</span></a>
+        <a class="db-tool" href="https://www.instagram.com/avezaat.evers/" target="_blank" rel="noopener"><strong>Instagram</strong><span>@avezaat.evers</span></a>
+        <a class="db-tool" href="https://github.com/AvezaatEvers/mijn-website" target="_blank" rel="noopener"><strong>GitHub</strong><span>Code van de site</span></a>
+        <a class="db-tool" href="https://www.belastingdienst.nl" target="_blank" rel="noopener"><strong>Belastingdienst</strong><span>Regels en tarieven</span></a>
+      </div>
+    </div>
+
+    <!-- Alle pagina's -->
+    <div class="db-kaart s12">
+      <h2>Alle pagina's</h2>
+      <div class="db-paginas">
+        <div><h3>Website</h3><ul>
+          <li><a href="/" target="_blank" rel="noopener">Homepage</a></li>
+          <li><a href="/tarieven.html" target="_blank" rel="noopener">Tarieven</a></li>
+          <li><a href="/starters.html" target="_blank" rel="noopener">Voor starters</a></li>
+          <li><a href="/overstappen.html" target="_blank" rel="noopener">Overstappen</a></li>
+          <li><a href="/contact.html" target="_blank" rel="noopener">Contact</a></li>
+          <li><a href="/veelgestelde-vragen.html" target="_blank" rel="noopener">Veelgestelde vragen</a></li>
+        </ul></div>
+        <div><h3>Branches</h3><ul>
+          <li><a href="/branches/bouw.html" target="_blank" rel="noopener">Bouw</a></li>
+          <li><a href="/branches/maatwerk.html" target="_blank" rel="noopener">Maatwerk</a></li>
+          <li><a href="/branches/hoveniers.html" target="_blank" rel="noopener">Hoveniers</a></li>
+          <li><a href="/branches/kappers-barbers.html" target="_blank" rel="noopener">Kappers &amp; barbers</a></li>
+          <li><a href="/branches/installateurs.html" target="_blank" rel="noopener">Installateurs</a></li>
+          <li><a href="/branches/schilders-stukadoors.html" target="_blank" rel="noopener">Schilders &amp; stukadoors</a></li>
+          <li><a href="/branches/e-commerce.html" target="_blank" rel="noopener">E-commerce</a></li>
+          <li><a href="/branches/zorgverleners.html" target="_blank" rel="noopener">Zorgverleners</a></li>
+        </ul></div>
+        <div><h3>Kennisbank</h3><ul>
+          <li><a href="/kennisbank/" target="_blank" rel="noopener">Overzicht</a></li>
+          <li><a href="/kennisbank/zelfstandigenaftrek.html" target="_blank" rel="noopener">Zelfstandigen&shy;aftrek</a></li>
+          <li><a href="/kennisbank/netto-inkomen-berekenen.html" target="_blank" rel="noopener">Netto-inkomen calculator</a></li>
+          <li><a href="/kennisbank/btw-aangifte-deadlines.html" target="_blank" rel="noopener">Btw-aangifte deadlines</a></li>
+          <li><a href="/kennisbank/bonnetjes-bewaren.html" target="_blank" rel="noopener">Bonnetjes bewaren</a></li>
+          <li><a href="/kennisbank/overstappen-boekhouder.html" target="_blank" rel="noopener">Overstappen van boekhouder</a></li>
+          <li><a href="/kennisbank/starten-met-moneymonk.html" target="_blank" rel="noopener">Van start met MoneyMonk</a></li>
+        </ul></div>
+        <div><h3>Klantreis en overig</h3><ul>
+          <li><a href="/welkom.html?naam=Sanne&amp;boekhouder=Daan" target="_blank" rel="noopener">Welkomstpagina</a><em>niet gelinkt</em></li>
+          <li><a href="/aanbevelen.html" target="_blank" rel="noopener">Aanbevelen</a><em>niet gelinkt</em></li>
+          <li><a href="/bedankt.html" target="_blank" rel="noopener">Bedankpagina</a><em>na formulier/afspraak</em></li>
+          <li><a href="/voorstel.html">Voorstel-mail</a><em>intern</em></li>
+          <li><a href="/handtekening.html">E-mailhandtekening</a><em>intern</em></li>
+          <li><a href="/privacy.html" target="_blank" rel="noopener">Privacyverklaring</a></li>
+          <li><a href="/voorwaarden.html" target="_blank" rel="noopener">Algemene voorwaarden</a></li>
+          <li><a href="/deze-pagina-bestaat-niet" target="_blank" rel="noopener">404-pagina</a></li>
+        </ul></div>
+      </div>
+    </div>
+  
+  </div>
+</main>
+<script src="/intern/app.js?v=1"></script>
+<script>
+(function () {
+  // Welkomstlink
+  var naam = document.getElementById('w-naam'), wie = document.getElementById('w-wie'), link = document.getElementById('w-link'), open = document.getElementById('w-open');
+  function maak() {
+    var n = naam.value.trim();
+    var pad = '/welkom.html?' + (n ? 'naam=' + encodeURIComponent(n) + '&' : '') + 'boekhouder=' + wie.value;
+    link.value = 'https://avezaatenevers.nl' + pad;
+    open.href = pad;
+  }
+  naam.addEventListener('input', maak); wie.addEventListener('change', maak); maak();
+  document.getElementById('w-kopieer').addEventListener('click', function () {
+    var ok = document.getElementById('w-ok');
+    function klaar() { ok.textContent = 'Link gekopieerd.'; setTimeout(function () { ok.textContent = ''; }, 2500); }
+    if (navigator.clipboard) navigator.clipboard.writeText(link.value).then(klaar, function () { link.select(); document.execCommand('copy'); klaar(); });
+    else { link.select(); document.execCommand('copy'); klaar(); }
+  });
+
+})();
+</script>
+<script>try { localStorage.setItem("umami.disabled", "1"); } catch (e) {}</script>
+</body>
+</html>

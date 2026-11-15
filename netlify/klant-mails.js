@@ -13,12 +13,13 @@ export const TYPES = {
   kwartaalTweede: { label: "Tweede herinnering btw", wanneer: "Automatisch rond de 8e, alleen als de stukken nog niet binnen zijn" },
   jaareinde: { label: "Jaareinde", wanneer: "Automatisch, 25 november" },
   inkomstenbelasting: { label: "Aangifte inkomstenbelasting", wanneer: "Automatisch, 2 maart" },
-  review: { label: "Google-review vragen", wanneer: "Automatisch, 3 maanden na de startdatum" },
+  nps: { label: "Tevredenheid meten (NPS)", wanneer: "Automatisch na 3 maanden, een week na de IB-aangifte, en op 10 juni en 10 november" },
+  review: { label: "Google-review vragen", wanneer: "Handmatig. Promoters krijgen de reviewvraag al na hun NPS-cijfer" },
   aanbevelen: { label: "Aanbevelen", wanneer: "Automatisch, 2 weken na de eerste ingediende IB-aangifte, alleen bij tevreden klanten" },
   jubileum: { label: "Een jaar klant", wanneer: "Automatisch, 1 jaar na de startdatum" },
 };
-export const AUTOMATISCH = ["voorstelHerinnering", "checkIn", "kwartaal", "kwartaalTweede", "jaareinde", "inkomstenbelasting", "review", "aanbevelen", "jubileum"];
-export const HANDMATIG = ["welkom", "voorstelHerinnering", "checkIn", "kwartaal", "kwartaalTweede", "jaareinde", "inkomstenbelasting", "review", "aanbevelen", "jubileum"];
+export const AUTOMATISCH = ["voorstelHerinnering", "checkIn", "kwartaal", "kwartaalTweede", "jaareinde", "inkomstenbelasting", "nps", "aanbevelen", "jubileum"];
+export const HANDMATIG = ["welkom", "voorstelHerinnering", "checkIn", "nps", "kwartaal", "kwartaalTweede", "jaareinde", "inkomstenbelasting", "review", "aanbevelen", "jubileum"];
 
 const MAANDEN = ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"];
 const KW = ["1e", "2e", "3e", "4e"];
@@ -68,12 +69,13 @@ function momenten(k, vanJaar, totJaar) {
   const start = k.start || (k.aangemaakt || "").slice(0, 10);
   if (start) {
     uit.push({ type: "checkIn", sleutel: "checkIn", datum: werkdag(plusDagen(start, 14)), data: {} });
-    uit.push({ type: "review", sleutel: "review", datum: werkdag(plusMaanden(start, 3)), data: {} });
+    uit.push({ type: "nps", sleutel: "nps-3m", datum: werkdag(plusMaanden(start, 3)), data: { ronde: "nps-3m" } });
     uit.push({ type: "jubileum", sleutel: "jubileum-1", datum: werkdag(plusMaanden(start, 12)), data: {} });
   }
   // Aanbevelen: 2 weken na de eerste ingediende IB-aangifte, alleen tevreden klanten
   const ib = Object.values(k.ibIngediend || {}).sort()[0];
   if (ib && k.tevreden) uit.push({ type: "aanbevelen", sleutel: "aanbevelen", datum: werkdag(plusDagen(ib.slice(0, 10), 14)), data: {} });
+  Object.entries(k.ibIngediend || {}).forEach(([jaar, op]) => uit.push({ type: "nps", sleutel: `nps-ib-${jaar}`, datum: werkdag(plusDagen(op.slice(0, 10), 7)), data: { ronde: `nps-ib-${jaar}` } }));
 
   for (let j = vanJaar; j <= totJaar; j++) {
     if (!pr.kor) {
@@ -89,6 +91,11 @@ function momenten(k, vanJaar, totJaar) {
         uit.push({ type: "kwartaalTweede", sleutel: `kwartaal2-${sleutel}`, datum: werkdag(`${j}-${mm}-08`), data: info, kw: sleutel });
       });
     }
+    [["06", "H1"], ["11", "H2"]].forEach(([mm, h]) => {
+      const datum = werkdag(`${j}-${mm}-10`);
+      if (start && plusMaanden(start, 3) > datum) return; // eerst de 3-maandenmeting
+      uit.push({ type: "nps", sleutel: `nps-${j}-${h}`, datum, data: { ronde: `nps-${j}-${h}` } });
+    });
     const jaareinde = werkdag(`${j}-11-25`);
     if (!start || start < jaareinde) uit.push({ type: "jaareinde", sleutel: `jaareinde-${j}`, datum: jaareinde, data: {} });
     const ibDatum = werkdag(`${j}-03-02`);
@@ -101,6 +108,12 @@ function momenten(k, vanJaar, totJaar) {
 function vervalt(k, m, env) {
   if (m.type === "kwartaalTweede") return !!((k.kwartalen || {})[m.kw] || {}).binnen;
   if (m.type === "review") return env ? !env("REVIEW_LINK") : false;
+  if (m.type === "nps") {
+    const grens = plusDagen(m.datum, -60);
+    const recent = Object.entries(k.verstuurd || {}).some(([sl, op]) => sl.startsWith("nps-") && sl !== m.sleutel && op.slice(0, 10) >= grens && op.slice(0, 10) <= m.datum)
+      || (k.nps || []).some((n) => n.op.slice(0, 10) >= grens && n.op.slice(0, 10) <= m.datum);
+    return recent;
+  }
   return false;
 }
 
@@ -144,6 +157,7 @@ export function maakMail(k, type, data = {}, env = () => undefined) {
     extra.btwAantal = Object.values(k.kwartalen || {}).filter((x) => x.ingediend && x.ingediend.slice(0, 10) >= jaarGeleden).length;
     extra.ib = Object.values(k.ibIngediend || {}).some((x) => x.slice(0, 10) >= jaarGeleden);
   }
+  if (type === "nps") extra.npsBasis = `${BASE}/nps?k=${encodeURIComponent(k.id)}&r=${encodeURIComponent(data.ronde || "handmatig-" + vandaag())}&t=${npsToken(env, k.id, data.ronde || "handmatig-" + vandaag())}`;
   return fn({ naam: k.naam, wie: k.boekhouder, bedrijf: k.bedrijf, link: k.voorstelLink, ...extra, ...data }, BASE);
 }
 
@@ -160,4 +174,15 @@ export async function verstuur(env, { aan, mail }) {
   const body = await res.json().catch(() => ({}));
   if (!res.ok) return { ok: false, fout: body.message || `Resend gaf fout ${res.status}` };
   return { ok: true, id: body.id };
+}
+
+// Ondertekening van NPS-links, zodat niemand cijfers voor een ander kan invullen
+export function npsToken(env, id, ronde) {
+  const geheim = String(env("NPS_SECRET") || env("RESEND_API_KEY") || "avezaat-evers");
+  let h = 2166136261;
+  const s = geheim + "|" + id + "|" + ronde;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  let h2 = 5381;
+  for (let i = s.length - 1; i >= 0; i--) h2 = (Math.imul(h2, 33) ^ s.charCodeAt(i)) >>> 0;
+  return (h >>> 0).toString(36) + h2.toString(36);
 }

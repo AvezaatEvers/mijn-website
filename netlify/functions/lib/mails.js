@@ -454,6 +454,30 @@ ${tabel(regels)}`) +
       text: `${hoiTekst(d.naam)}\n\nEen jaar geleden werd je klant. Dank je wel voor het vertrouwen. Wil je eens rustig door je cijfers lopen? App me, dan plannen we een moment.${voet(d.wie)}`,
     };
   },
+  // 14. NPS: hoe tevreden ben je?
+  nps(d, base = '') {
+    const basis = d.npsBasis || `${base}/nps?`;
+    const cel = (n) => {
+      const kleur = n <= 6 ? '#FDECEA' : n <= 8 ? '#FEF3E2' : '#E6F4EA';
+      return `<td align="center" style="padding:0 2px"><a href="${basis}&s=${n}" style="display:block;width:38px;line-height:40px;border-radius:10px;background:${kleur};${F}font-size:16px;font-weight:700;color:${INKT};text-decoration:none">${n}</a></td>`;
+    };
+    const rij = (van, tot) => `<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto 6px"><tr>${Array.from({ length: tot - van + 1 }, (_, i) => cel(van + i)).join('')}</tr></table>`;
+    const inhoud = kop('Hoe doen we het?') +
+      p(hoi(d.naam)) +
+      p('Eén korte vraag. Je antwoord helpt ons écht om het voor jou en andere ondernemers beter te maken.') +
+      blok(`<p style="margin:0 0 16px;${F}font-size:16px;line-height:1.5;font-weight:600;color:${INKT};text-align:center">Hoe waarschijnlijk is het dat je Avezaat &amp; Evers aanbeveelt aan een andere ondernemer?</p>
+${rij(0, 5)}${rij(6, 10)}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:6px"><tr>
+<td style="${F}font-size:12.5px;color:${ZACHT}">0 = zeker niet</td><td align="right" style="${F}font-size:12.5px;color:${ZACHT}">10 = zeker wel</td></tr></table>`) +
+      p('Klik op een cijfer. Daarna kun je nog kort vertellen waarom, als je wilt. Kost je 20 seconden.', `font-size:14px;color:${ZACHT}`) +
+      groet(base, d.wie);
+    return {
+      subject: 'Eén vraag: hoe doen we het?',
+      html: omhulsel(base, { preheader: 'Eén klik op een cijfer van 0 tot 10. Kost je 20 seconden.', inhoud, wie: d.wie }),
+      text: `${hoiTekst(d.naam)}\n\nHoe waarschijnlijk is het dat je Avezaat & Evers aanbeveelt aan een andere ondernemer? Kies een cijfer van 0 tot 10:\n\n${Array.from({ length: 11 }, (_, n) => `${n}: ${basis}&s=${n}`).join('\n')}${voet(d.wie)}`,
+    };
+  },
+
 };
 
 export { mails, voornaam };

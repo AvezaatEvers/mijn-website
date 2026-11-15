@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dashboard | Avezaat &amp; Evers intern</title>
+<title>Vandaag | Avezaat &amp; Evers intern</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
@@ -164,25 +164,120 @@
   }
   .db-kaart form .db-knop { white-space: normal; text-align: left; }
 </style>
+<link rel="stylesheet" href="/intern/app.css?v=1">
+<style>
+  .hk { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .hk h1 { font-size: clamp(28px, 3.6vw, 42px); margin: 0; letter-spacing: -.03em; }
+  .hk p { margin: 4px 0 0; color: var(--muted); font-size: 15px; }
+  .hk .rechts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .wissel { display: inline-flex; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 3px; }
+  .wissel button { font: inherit; font-size: 13.5px; font-weight: 600; padding: 7px 14px; border-radius: 9px; border: 0; background: none; color: var(--muted); cursor: pointer; }
+  .wissel button.is-aan { background: var(--navy); color: #fff; }
+
+  /* Briefing */
+  .briefing { position: relative; border-radius: 22px; padding: 2px; margin-bottom: 16px; background: linear-gradient(120deg, #3B63C4, #7FA4FF, #5CC8FF, #26458F, #3B63C4); background-size: 300% 300%; animation: stroom 12s ease infinite; box-shadow: 0 30px 60px -36px rgba(38, 69, 143, .55); }
+  @keyframes stroom { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+  .briefing-in { position: relative; overflow: hidden; border-radius: 20px; background: linear-gradient(135deg, #0D1838 0%, #16295C 55%, #1E3A80 100%); color: #DCE5FA; padding: 26px 28px; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; }
+  .briefing-in::before { content: ""; position: absolute; width: 420px; height: 420px; right: -120px; top: -180px; border-radius: 50%; background: radial-gradient(closest-side, rgba(127, 164, 255, .35), transparent); animation: aurora 18s ease-in-out infinite alternate; }
+  .briefing-in > * { position: relative; }
+  .bf-label { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #A9C1FF; margin-bottom: 12px; }
+  .bf-label svg { width: 16px; height: 16px; color: #7FA4FF; animation: twinkel 3s ease-in-out infinite; }
+  @keyframes twinkel { 50% { transform: rotate(18deg) scale(1.15); opacity: .7; } }
+  .bf-tekst { font-size: 17px; line-height: 1.7; color: #E7EDFC; }
+  .bf-tekst p { margin: 0 0 8px; animation: in .6s cubic-bezier(.2, .8, .2, 1) both; }
+  .bf-tekst strong { color: #fff; font-weight: 600; }
+  .bf-tekst .heet { color: #FFB4A3; font-weight: 600; }
+  .bf-acties h3 { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #A9C1FF; margin: 0 0 10px; }
+  .bf-actie { display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 7px; border-radius: 13px; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .08); color: #fff; text-decoration: none; transition: background .2s, transform .2s, border-color .2s; animation: in .55s cubic-bezier(.2, .8, .2, 1) both; }
+  .bf-actie:hover { background: rgba(255, 255, 255, .12); border-color: rgba(127, 164, 255, .5); transform: translateX(3px); }
+  .bf-actie i { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #7FA4FF; box-shadow: 0 0 10px #7FA4FF; }
+  .bf-actie i.r { background: #FF7A66; box-shadow: 0 0 10px #FF7A66; } .bf-actie i.o { background: #FFC266; box-shadow: 0 0 10px #FFC266; }
+  .bf-actie span { flex: 1; min-width: 0; font-size: 14px; line-height: 1.35; }
+  .bf-actie small { display: block; color: #A9B8DA; font-size: 12.5px; }
+  .bf-actie b { font-size: 12.5px; color: #A9C1FF; white-space: nowrap; }
+
+  /* Cijfers */
+  .kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
+  .kpi { padding: 16px 18px; position: relative; overflow: hidden; }
+  .kpi > span { display: block; font-size: 12.5px; font-weight: 500; color: var(--muted); }
+  .kpi b { display: block; font-size: 30px; letter-spacing: -.03em; color: var(--ink); font-variant-numeric: tabular-nums; margin: 4px 0 2px; line-height: 1.1; }
+  .kpi small { display: block; font-size: 12px; color: var(--muted); }
+  .kpi svg.spark { position: absolute; right: 12px; bottom: 12px; width: 92px; height: 34px; }
+  .kpi .ring { position: absolute; right: 14px; top: 14px; width: 46px; height: 46px; }
+  .kpi b .delta { font-size: 12px; vertical-align: 6px; letter-spacing: 0; }
+  .delta { font-size: 12px; font-weight: 600; padding: 1px 7px; border-radius: 999px; margin-left: 4px; }
+  .delta.op { background: var(--ok-bg); color: var(--ok); } .delta.neer { background: var(--bad-bg); color: var(--bad); }
+
+  /* Raster */
+  .home { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  .kol { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .db-kaart .db-kop { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+  .db-kaart .db-kop h2 { margin: 0; font-size: 17px; }
+  .meer { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
+  .lead { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 11px 6px; border-radius: 12px; transition: background .15s; }
+  .lead + .lead { border-top: 1px solid var(--line); }
+  .lead:hover { background: rgba(238, 242, 248, .6); }
+  .sc { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
+  .s-heet { background: linear-gradient(135deg, #FFE1DA, #FFC9BD); color: #B42318; } .s-warm { background: linear-gradient(135deg, #FFF0D9, #FFE0B0); color: #9A5B13; }
+  .s-lauw { background: var(--tint); color: var(--accent); } .s-koud { background: #F1F3F6; color: #6B7280; }
+  .lead a.n { font-weight: 600; color: var(--ink); text-decoration: none; font-size: 15px; } .lead a.n:hover { color: var(--accent); }
+  .lead .st { font-size: 13px; color: var(--muted); margin-top: 1px; } .lead .st.u { color: var(--bad); font-weight: 600; }
+  .mini-acties { display: flex; gap: 5px; }
+  .mini-acties a, .mini-acties button { font: inherit; font-size: 12.5px; font-weight: 600; padding: 6px 9px; border-radius: 9px; border: 1px solid var(--line); background: #fff; color: var(--ink); text-decoration: none; cursor: pointer; }
+  .mini-acties a:hover, .mini-acties button:hover { border-color: var(--accent-2); color: var(--accent); }
+  .rij { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 10px 4px; font-size: 14px; }
+  .rij + .rij { border-top: 1px solid var(--line); }
+  .stip { width: 9px; height: 9px; border-radius: 50%; margin-top: 6px; } .e3 { background: #E5484D; box-shadow: 0 0 0 4px #FDECEA; } .e2 { background: #F5A524; box-shadow: 0 0 0 4px #FEF3E2; } .e1 { background: #A3AEC2; }
+  .rij a.n { font-weight: 600; color: var(--ink); text-decoration: none; } .rij a.n:hover { color: var(--accent); }
+  .rij small { display: block; color: var(--muted); font-size: 12.5px; } .rij .knop { font-size: 12.5px; font-weight: 600; color: var(--accent); text-decoration: none; white-space: nowrap; }
+  .leeg { color: var(--muted); font-size: 14px; padding: 6px 4px; }
+  .aftellers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .afteller { border-radius: 14px; padding: 12px 14px; background: var(--tint); }
+  .afteller b { display: block; white-space: nowrap; font-size: 20px; letter-spacing: -.02em; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .afteller small { display: block; font-size: 12px; color: var(--text); line-height: 1.35; }
+  #taken-kaart, #kal-kaart { grid-column: auto; }
+  @media (max-width: 1200px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 1080px) { .briefing-in { grid-template-columns: 1fr; } .home { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) {
+    .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .kpi b { font-size: 24px; } .kpi svg.spark, .kpi .ring { display: none; }
+    .briefing-in { padding: 20px; } .bf-tekst { font-size: 15.5px; }
+    .lead { grid-template-columns: 42px minmax(0, 1fr); } .mini-acties { grid-column: 2; }
+    .tk-nieuw { grid-template-columns: 1fr 1fr; } .tk-nieuw #tk-titel { grid-column: 1 / -1; }
+    .aftellers { grid-template-columns: 1fr; }
+  }
+</style>
 </head>
 <body>
 <main class="db">
-  <div class="db-top">
-    <div><a class="logo" href="/">Avezaat <span>&amp;</span> Evers</a><span class="db-tag">Intern</span></div>
-    <div class="db-wie"><span id="db-ik">Ingelogd</span><a href="/intern/logout">Uitloggen</a><a class="db-site" href="/" target="_blank" rel="noopener">Website</a></div>
+  <div class="hk">
+    <div><h1 id="groet">Welkom</h1><p id="datum"></p></div>
+    <div class="rechts">
+      <div class="wissel" id="wissel"><button type="button" data-v="ik" class="is-aan">Mijn werk</button><button type="button" data-v="alle">Alles</button></div>
+      <button class="ai-knop" type="button" data-contact><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Contact vastleggen</button>
+    </div>
   </div>
 
-  <h1 id="db-groet">Goedemorgen</h1>
-  <p class="db-sub" id="db-datum"></p>
+  <section class="briefing in" aria-label="Slimme briefing">
+    <div class="briefing-in">
+      <div>
+        <div class="bf-label"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 5.6L19.5 9.5l-5.7 1.9L12 17l-1.8-5.6L4.5 9.5l5.7-1.9zM19 15l.9 2.6 2.6.9-2.6.9L19 22l-.9-2.6-2.6-.9 2.6-.9zM5 15l.6 1.7 1.7.6-1.7.6L5 19.6l-.6-1.7-1.7-.6 1.7-.6z"/></svg>Slimme briefing</div>
+        <div class="bf-tekst" id="briefing"><div class="skelet" style="width:90%;margin-bottom:12px;opacity:.15"></div><div class="skelet" style="width:70%;margin-bottom:12px;opacity:.15"></div><div class="skelet" style="width:80%;opacity:.15"></div></div>
+      </div>
+      <div class="bf-acties"><h3>Doe dit eerst</h3><div id="acties"></div></div>
+    </div>
+  </section>
 
-  <div class="db-grid">
-    <!-- Tellers -->
-    <div class="db-kaart db-teller is-blauw s4"><small>Start boekjaar 2027</small><b id="t-start">–</b><span>tot 1 januari</span></div>
-    <div class="db-kaart db-teller s4"><small>Overstapactie loopt af</small><b id="t-overstap">–</b><span id="t-overstap-tekst">gratis overstappen bij aanmelding t/m 15 december</span></div>
-    <div class="db-kaart db-teller s4"><small>Volgende btw-deadline</small><b id="t-btw">–</b><span id="t-btw-tekst"></span></div>
+  <div class="kpis" id="kpis">
+    <div class="db-kaart kpi"><div class="skelet" style="width:60%"></div></div><div class="db-kaart kpi"><div class="skelet" style="width:60%"></div></div><div class="db-kaart kpi"><div class="skelet" style="width:60%"></div></div><div class="db-kaart kpi"><div class="skelet" style="width:60%"></div></div><div class="db-kaart kpi"><div class="skelet" style="width:60%"></div></div>
+  </div>
 
-    <!-- Taken -->
-    <div class="db-kaart s6" id="taken-kaart">
+  <div class="home">
+    <div class="kol">
+      <div class="db-kaart zweef in" style="animation-delay:.1s">
+        <div class="db-kop"><h2>Leads op warmte</h2><a class="meer" href="/intern/klanten.html?status=prospect">Alle leads</a></div>
+        <div id="leads"></div>
+      </div>
+    <div class="db-kaart in" id="taken-kaart" style="animation-delay:.2s">
       <div class="db-kop"><h2>Taken</h2><span class="db-teller-todo" id="todo-teller"></span></div>
       <form class="tk-nieuw" id="tk-form" autocomplete="off">
         <input id="tk-titel" type="text" placeholder="Nieuwe taak…" maxlength="200" required>
@@ -200,7 +295,25 @@
     </div>
 
     <!-- Kalender -->
-    <div class="db-kaart s6">
+
+    </div>
+    <div class="kol">
+      <div class="db-kaart zweef in" style="animation-delay:.15s">
+        <div class="db-kop"><h2>Aandacht nodig</h2><span class="meer" id="n-aandacht" style="color:var(--muted)"></span></div>
+        <div id="aandacht"></div>
+      </div>
+      <div class="db-kaart in" style="animation-delay:.2s">
+        <div class="aftellers">
+          <div class="afteller"><b id="t-btw">–</b><small id="t-btw-tekst">tot de btw-deadline</small></div>
+          <div class="afteller"><b id="t-overstap">–</b><small>tot de overstapactie afloopt</small></div>
+          <div class="afteller"><b id="t-start">–</b><small>tot de start van boekjaar 2027</small></div>
+        </div>
+      </div>
+      <div class="db-kaart zweef in" style="animation-delay:.25s">
+        <div class="db-kop"><h2>Mails komende 7 dagen</h2><a class="meer" href="/intern/mails/">Sjablonen</a></div>
+        <div id="mails"></div>
+      </div>
+    <div class="db-kaart in" id="kal-kaart" style="animation-delay:.3s">
       <div class="db-kop">
         <h2 id="kal-titel">Kalender</h2>
         <div class="kal-nav"><button type="button" id="kal-vorige" aria-label="Vorige maand">‹</button><button type="button" id="kal-vandaag">Vandaag</button><button type="button" id="kal-volgende" aria-label="Volgende maand">›</button></div>
@@ -210,182 +323,136 @@
       <div class="kal-dag" id="kal-dag"></div>
     </div>
 
-    <!-- Kennismaking presenteren -->
-    <div class="db-kaart s12 db-pres">
-      <div>
-        <h2>Kennismaking presenteren</h2>
-        <p>Presentatie voor het gesprek van 20 minuten, met live prijsberekening. Druk op N voor je notities en timer.</p>
-      </div>
-      <form id="p-form" action="/intern/kennismaking.html" target="_blank">
-        <input name="naam" type="text" placeholder="Voornaam klant" autocomplete="off" aria-label="Voornaam van de klant">
-        <button class="db-knop" type="submit">Start presentatie</button>
-      </form>
-    </div>
-
-    <!-- Maandelijkse 1-op-1 -->
-    <div class="db-kaart s12 db-pres">
-      <div>
-        <h2>Maandelijkse <span class="nw">1-op-1</span> presenteren</h2>
-        <p>Presentatie voor het maandgesprek van 30 minuten. Vul vooraf de cijfers in (B), typ live de afspraken en druk op N voor je notities en timer.</p>
-      </div>
-      <form action="/intern/maandgesprek.html" target="_blank">
-        <input type="hidden" name="voorbereiden" value="1">
-        <button class="db-knop" type="submit">Gesprek voorbereiden</button>
-      </form>
-    </div>
-
-    <!-- IB-werkblad -->
-    <div class="db-kaart s12 db-pres">
-      <div>
-        <h2>IB-werkblad</h2>
-        <p>Per klant stap voor stap van uitvraag tot aanslag, met rekenblokken als controle op je aangiftesoftware en kant-en-klare berichten voor de klant.</p>
-      </div>
-      <form action="/intern/ib-werkblad.html" target="_blank"><button class="db-knop" type="submit">Open het werkblad</button></form>
-    </div>
-
-    <!-- Snel naar -->
-    <div class="db-kaart s7">
-      <h2>Snel naar</h2>
-      <div class="db-tegels">
-        <a class="db-tegel" href="/intern/overzicht.html"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></i><div><strong>Overzicht</strong><span>Warmste leads en wat aandacht nodig heeft</span></div></a>
-        <a class="db-tegel" href="/intern/klanten.html"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></i><div><strong>Klanten</strong><span>Per persoon, met geplande mails</span></div></a>
-        <a class="db-tegel" href="/intern/kwartaal.html"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18M8 15l2 2 4-4"/></svg></i><div><strong>Kwartaalbord</strong><span>Btw-aangiftes per klant afvinken</span></div></a>
-        <a class="db-tegel" href="/intern/mails/"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></i><div><strong>Mailsjablonen</strong><span>Alle automatische mails bekijken</span></div></a>
-        <a class="db-tegel" href="/voorstel.html"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 8l8 5 8-5"/></svg></i><div><strong>Voorstel-mail</strong><span>Prijsvoorstel maken en kopiëren</span></div></a>
-        <a class="db-tegel" href="/handtekening.html"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17c3 0 4-6 6-6s1 6 4 6 4-4 8-4"/><path d="M3 21h18"/></svg></i><div><strong>E-mailhandtekening</strong><span>Voor nieuwe contacten en klanten</span></div></a>
-        <a class="db-tegel" href="/bedankt.html?afspraak=1&amp;start=2027-01-12T09:00:00.000Z" target="_blank" rel="noopener"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></i><div><strong>Bedankpagina afspraak</strong><span>Zo ziet de klant hem na boeken</span></div></a>
-        <a class="db-tegel" href="/bedankt.html" target="_blank" rel="noopener"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></i><div><strong>Bedankpagina formulier</strong><span>Na een vraag via het formulier</span></div></a>
-        <a class="db-tegel" href="/aanbevelen.html" target="_blank" rel="noopener"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"/></svg></i><div><strong>Aanbevelen</strong><span>Link voor bestaande klanten</span></div></a>
-        <a class="db-tegel" href="/kennisbank/starten-met-moneymonk.html" target="_blank" rel="noopener"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg></i><div><strong>MoneyMonk-handleiding</strong><span>Voor nieuwe klanten</span></div></a>
-      </div>
-    </div>
-
-    <!-- Welkomstlink -->
-    <div class="db-kaart s5">
-      <h2>Welkomstlink voor een nieuwe klant</h2>
-      <div class="db-form">
-        <input id="w-naam" type="text" placeholder="Voornaam klant" autocomplete="off">
-        <select id="w-wie"><option>Daan</option><option>Koen</option></select>
-      </div>
-      <div class="db-uit">
-        <input id="w-link" type="text" readonly value="https://avezaatenevers.nl/welkom.html">
-        <button class="db-knop" type="button" id="w-kopieer">Kopieer</button>
-        <a class="db-knop is-licht" id="w-open" href="/welkom.html" target="_blank" rel="noopener">Bekijk</a>
-      </div>
-      <p class="db-ok" id="w-ok"></p>
-      <p class="db-noot" style="margin-top:4px">Stuur deze link mee met de opdracht&shy;bevestiging.</p>
-    </div>
-
-    <!-- Tools -->
-    <div class="db-kaart s12">
-      <h2>Tools</h2>
-      <div class="db-tools">
-        <a class="db-tool" href="https://outlook.office.com" target="_blank" rel="noopener"><strong>Outlook</strong><span>Mail info@</span></a>
-        <a class="db-tool" href="https://app.cal.com/bookings/upcoming" target="_blank" rel="noopener"><strong>Cal.com</strong><span>Kennismakingen</span></a>
-        <a class="db-tool" href="https://www.moneymonk.nl" target="_blank" rel="noopener"><strong>MoneyMonk</strong><span>Klant&shy;administraties</span></a>
-        <a class="db-tool" href="https://cloud.umami.is" target="_blank" rel="noopener"><strong>Umami</strong><span>Bezoekers en klikken</span></a>
-        <a class="db-tool" href="https://app.netlify.com" target="_blank" rel="noopener"><strong>Netlify</strong><span>Website en formulieren</span></a>
-        <a class="db-tool" href="https://search.google.com/search-console" target="_blank" rel="noopener"><strong>Search Console</strong><span>Vindbaarheid in Google</span></a>
-        <a class="db-tool" href="https://business.google.com" target="_blank" rel="noopener"><strong>Bedrijfsprofiel</strong><span>Google Maps en reviews</span></a>
-        <a class="db-tool" href="https://www.instagram.com/avezaat.evers/" target="_blank" rel="noopener"><strong>Instagram</strong><span>@avezaat.evers</span></a>
-        <a class="db-tool" href="https://github.com/AvezaatEvers/mijn-website" target="_blank" rel="noopener"><strong>GitHub</strong><span>Code van de site</span></a>
-        <a class="db-tool" href="https://www.belastingdienst.nl" target="_blank" rel="noopener"><strong>Belastingdienst</strong><span>Regels en tarieven</span></a>
-      </div>
-    </div>
-
-    <!-- Alle pagina's -->
-    <div class="db-kaart s12">
-      <h2>Alle pagina's</h2>
-      <div class="db-paginas">
-        <div><h3>Website</h3><ul>
-          <li><a href="/" target="_blank" rel="noopener">Homepage</a></li>
-          <li><a href="/tarieven.html" target="_blank" rel="noopener">Tarieven</a></li>
-          <li><a href="/starters.html" target="_blank" rel="noopener">Voor starters</a></li>
-          <li><a href="/overstappen.html" target="_blank" rel="noopener">Overstappen</a></li>
-          <li><a href="/contact.html" target="_blank" rel="noopener">Contact</a></li>
-          <li><a href="/veelgestelde-vragen.html" target="_blank" rel="noopener">Veelgestelde vragen</a></li>
-        </ul></div>
-        <div><h3>Branches</h3><ul>
-          <li><a href="/branches/bouw.html" target="_blank" rel="noopener">Bouw</a></li>
-          <li><a href="/branches/maatwerk.html" target="_blank" rel="noopener">Maatwerk</a></li>
-          <li><a href="/branches/hoveniers.html" target="_blank" rel="noopener">Hoveniers</a></li>
-          <li><a href="/branches/kappers-barbers.html" target="_blank" rel="noopener">Kappers &amp; barbers</a></li>
-          <li><a href="/branches/installateurs.html" target="_blank" rel="noopener">Installateurs</a></li>
-          <li><a href="/branches/schilders-stukadoors.html" target="_blank" rel="noopener">Schilders &amp; stukadoors</a></li>
-          <li><a href="/branches/e-commerce.html" target="_blank" rel="noopener">E-commerce</a></li>
-          <li><a href="/branches/zorgverleners.html" target="_blank" rel="noopener">Zorgverleners</a></li>
-        </ul></div>
-        <div><h3>Kennisbank</h3><ul>
-          <li><a href="/kennisbank/" target="_blank" rel="noopener">Overzicht</a></li>
-          <li><a href="/kennisbank/zelfstandigenaftrek.html" target="_blank" rel="noopener">Zelfstandigen&shy;aftrek</a></li>
-          <li><a href="/kennisbank/netto-inkomen-berekenen.html" target="_blank" rel="noopener">Netto-inkomen calculator</a></li>
-          <li><a href="/kennisbank/btw-aangifte-deadlines.html" target="_blank" rel="noopener">Btw-aangifte deadlines</a></li>
-          <li><a href="/kennisbank/bonnetjes-bewaren.html" target="_blank" rel="noopener">Bonnetjes bewaren</a></li>
-          <li><a href="/kennisbank/overstappen-boekhouder.html" target="_blank" rel="noopener">Overstappen van boekhouder</a></li>
-          <li><a href="/kennisbank/starten-met-moneymonk.html" target="_blank" rel="noopener">Van start met MoneyMonk</a></li>
-        </ul></div>
-        <div><h3>Klantreis en overig</h3><ul>
-          <li><a href="/welkom.html?naam=Sanne&amp;boekhouder=Daan" target="_blank" rel="noopener">Welkomstpagina</a><em>niet gelinkt</em></li>
-          <li><a href="/aanbevelen.html" target="_blank" rel="noopener">Aanbevelen</a><em>niet gelinkt</em></li>
-          <li><a href="/bedankt.html" target="_blank" rel="noopener">Bedankpagina</a><em>na formulier/afspraak</em></li>
-          <li><a href="/voorstel.html">Voorstel-mail</a><em>intern</em></li>
-          <li><a href="/handtekening.html">E-mailhandtekening</a><em>intern</em></li>
-          <li><a href="/privacy.html" target="_blank" rel="noopener">Privacyverklaring</a></li>
-          <li><a href="/voorwaarden.html" target="_blank" rel="noopener">Algemene voorwaarden</a></li>
-          <li><a href="/deze-pagina-bestaat-niet" target="_blank" rel="noopener">404-pagina</a></li>
-        </ul></div>
-      </div>
     </div>
   </div>
 </main>
-
+<script src="/intern/app.js?v=1"></script>
 <script>
 (function () {
-  var nu = new Date(), vandaag = new Date(nu.getFullYear(), nu.getMonth(), nu.getDate());
-  var uur = nu.getHours();
-  document.getElementById('db-groet').textContent = (uur < 12 ? 'Goedemorgen' : uur < 18 ? 'Goedemiddag' : 'Goedenavond') + ', Koen en Daan';
-  var d = nu.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  document.getElementById('db-datum').textContent = d.charAt(0).toUpperCase() + d.slice(1);
+  var nu = new Date(), vandaag = new Date(nu.getFullYear(), nu.getMonth(), nu.getDate()), uur = nu.getHours();
+  var IK = null, NAAM = { koen: 'Koen', daan: 'Daan', samen: 'Samen' }, WIE = 'ik';
+  var esc = AE.esc;
+  var dt = nu.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('datum').textContent = dt.charAt(0).toUpperCase() + dt.slice(1);
   function dagen(doel) { return Math.round((doel - vandaag) / 864e5); }
-  function tekst(n) { return n === 0 ? 'Vandaag' : n + (n === 1 ? ' dag' : ' dagen'); }
-
-  var start = new Date(2027, 0, 1);
-  document.getElementById('t-start').textContent = dagen(start) > 0 ? tekst(dagen(start)) : 'Gestart';
-
-  var j = vandaag.getFullYear(), overstap = new Date(j, 11, 15);
-  if (vandaag > overstap) overstap = new Date(j + 1, 11, 15);
-  document.getElementById('t-overstap').textContent = tekst(dagen(overstap));
-
+  function dagTekst(n) { return n === 0 ? 'vandaag' : n + (n === 1 ? ' dag' : ' dagen'); }
+  var j = vandaag.getFullYear();
+  var overstap = new Date(j, 11, 15); if (vandaag > overstap) overstap = new Date(j + 1, 11, 15);
   var btw = [new Date(j, 0, 31), new Date(j, 3, 30), new Date(j, 6, 31), new Date(j, 9, 31), new Date(j + 1, 0, 31)].filter(function (x) { return x >= vandaag; })[0];
-  document.getElementById('t-btw').textContent = tekst(dagen(btw));
-  document.getElementById('t-btw-tekst').textContent = 'op ' + btw.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }) + ' · klanten leveren aan vóór de 10e';
+  var start27 = dagen(new Date(2027, 0, 1));
+  document.getElementById('t-btw').textContent = dagTekst(dagen(btw));
+  document.getElementById('t-btw-tekst').textContent = 'tot de btw-deadline van ' + btw.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' });
+  document.getElementById('t-overstap').textContent = dagTekst(dagen(overstap));
+  document.getElementById('t-start').textContent = start27 > 0 ? dagTekst(start27) : 'gestart';
 
-  // Welkomstlink
-  var naam = document.getElementById('w-naam'), wie = document.getElementById('w-wie'), link = document.getElementById('w-link'), open = document.getElementById('w-open');
-  function maak() {
-    var n = naam.value.trim();
-    var pad = '/welkom.html?' + (n ? 'naam=' + encodeURIComponent(n) + '&' : '') + 'boekhouder=' + wie.value;
-    link.value = 'https://avezaatenevers.nl' + pad;
-    open.href = pad;
+  // ---------- Telanimatie ----------
+  function tel(el, doel, opmaak) {
+    var stil = matchMedia('(prefers-reduced-motion: reduce)').matches, t0 = performance.now(), duur = 900;
+    function stap(t) { var p = Math.min(1, (t - t0) / duur), e = 1 - Math.pow(1 - p, 3); el.textContent = opmaak(Math.round(doel * e)); if (p < 1) requestAnimationFrame(stap); }
+    if (stil) el.textContent = opmaak(doel); else requestAnimationFrame(stap);
   }
-  naam.addEventListener('input', maak); wie.addEventListener('change', maak); maak();
-  document.getElementById('w-kopieer').addEventListener('click', function () {
-    var ok = document.getElementById('w-ok');
-    function klaar() { ok.textContent = 'Link gekopieerd.'; setTimeout(function () { ok.textContent = ''; }, 2500); }
-    if (navigator.clipboard) navigator.clipboard.writeText(link.value).then(klaar, function () { link.select(); document.execCommand('copy'); klaar(); });
-    else { link.select(); document.execCommand('copy'); klaar(); }
-  });
+  function spark(punten) {
+    var max = Math.max.apply(null, punten.concat([1])), w = 92, h = 34;
+    var pts = punten.map(function (v, i) { return [i * (w / (punten.length - 1)), h - 3 - (v / max) * (h - 8)]; });
+    var d = pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ');
+    var laatste = pts[pts.length - 1];
+    return '<svg class="spark" viewBox="0 0 ' + w + ' ' + h + '" aria-hidden="true"><defs><linearGradient id="sg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#3B63C4" stop-opacity=".28"/><stop offset="1" stop-color="#3B63C4" stop-opacity="0"/></linearGradient></defs>' +
+      '<path d="' + d + ' L' + w + ' ' + h + ' L0 ' + h + 'Z" fill="url(#sg)"/><path d="' + d + '" fill="none" stroke="#3B63C4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="' + laatste[0] + '" cy="' + laatste[1] + '" r="3" fill="#26458F"/></svg>';
+  }
+  function ring(nps) {
+    var r = 19, o = 2 * Math.PI * r, deel = nps == null ? 0 : (nps + 100) / 200;
+    var kleur = nps == null ? '#C9D1E0' : nps >= 50 ? '#16A34A' : nps >= 0 ? '#3B63C4' : '#E5484D';
+    return '<svg class="ring" viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="' + r + '" fill="none" stroke="#E9EEF6" stroke-width="5"/><circle cx="23" cy="23" r="' + r + '" fill="none" stroke="' + kleur + '" stroke-width="5" stroke-linecap="round" stroke-dasharray="' + (o * deel).toFixed(1) + ' ' + o.toFixed(1) + '" transform="rotate(-90 23 23)"/></svg>';
+  }
 
-  // ===== Ingelogde gebruiker =====
-  var IK = null, NAAM = { koen: 'Koen', daan: 'Daan', samen: 'Samen' };
-  fetch('/intern/api/ik', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
-    if (!d) return;
-    IK = d.wie;
-    document.getElementById('db-ik').textContent = 'Ingelogd als ' + d.naam;
-    document.getElementById('db-groet').textContent = (uur < 12 ? 'Goedemorgen' : uur < 18 ? 'Goedemiddag' : 'Goedenavond') + ', ' + d.naam;
+  // ---------- Overzicht laden ----------
+  var FASE = { nieuw: 'Nieuw', contact: 'Contact gehad', gesprek: 'Gesprek gehad', voorstel: 'Voorstel open' };
+  function laad() {
+    var wie = WIE === 'ik' ? IK.wie : 'alle';
+    Promise.all([AE.api('/intern/api/overzicht?wie=' + wie), AE.api('/intern/api/inzichten?wie=' + wie + '&dagen=30')]).then(function (r) { teken(r[0], r[1]); })
+      .catch(function (e) { document.getElementById('briefing').textContent = e.message; });
+  }
+  function teken(o, z) {
+    var c = o.cijfers, zc = z.cijfers;
+    // Cijfers
+    var kpis = document.getElementById('kpis');
+    var wkn = z.weken.map(function (w) { return w.aantal; });
+    var dezeMaand = zc.contacten, delta = zc.vorige ? Math.round((dezeMaand / zc.vorige - 1) * 100) : null;
+    kpis.innerHTML =
+      '<div class="db-kaart kpi zweef in"><span>Actieve klanten</span><b data-n="' + c.klanten + '">0</b><small>Koen ' + c.perBoekhouder.koen + ', Daan ' + c.perBoekhouder.daan + '</small></div>' +
+      '<div class="db-kaart kpi zweef in" style="animation-delay:.05s"><span>Vaste omzet per maand</span><b data-n="' + c.mrr + '" data-euro>€0</b><small>excl. btw</small></div>' +
+      '<div class="db-kaart kpi zweef in" style="animation-delay:.1s"><span>Open leads</span><b data-n="' + c.prospects + '">0</b><small>€' + Math.round(c.pijplijn).toLocaleString('nl-NL') + ' p/m in open voorstellen</small></div>' +
+      '<div class="db-kaart kpi zweef in" style="animation-delay:.15s"><span>NPS</span><b>' + (zc.nps.score == null ? '–' : (zc.nps.score > 0 ? '+' : '') + zc.nps.score) + '</b><small>' + (zc.nps.n ? zc.nps.n + ' klanten gaven een cijfer' : 'nog geen antwoorden') + '</small>' + ring(zc.nps.score) + '</div>' +
+      '<div class="db-kaart kpi zweef in" style="animation-delay:.2s"><span>Contact, 30 dagen</span><b><span data-n="' + dezeMaand + '">0</span>' + (delta != null && zc.vorige >= 3 ? '<span class="delta ' + (delta <= 0 ? 'op' : 'neer') + '">' + (delta > 0 ? '+' : '') + delta + '%</span>' : '') + '</b><small style="padding-right:96px">' + (zc.vermijdbaar != null ? zc.vermijdbaar + '% was te voorkomen' : 'leg contact vast voor inzicht') + '</small>' + spark(wkn) + '</div>';
+    kpis.querySelectorAll('[data-n]').forEach(function (b) { var n = +b.dataset.n; tel(b, n, b.hasAttribute('data-euro') ? function (v) { return '€' + v.toLocaleString('nl-NL'); } : String); });
+
+    // Briefing
+    var heet = o.leads.filter(function (l) { return l.label === 'Heet'; }), laat = o.leads.filter(function (l) { return /te laat/.test(l.actie); });
+    var dringend = o.aandacht.filter(function (a) { return a.ernst === 3; });
+    var tl = o.taken.teLaat.length, tv = o.taken.vandaag.length, zinnen = [];
+    var naam = IK.naam;
+    if (o.leads.length) zinnen.push('Er ' + (o.leads.length === 1 ? 'staat <strong>1 lead</strong>' : 'staan <strong>' + o.leads.length + ' leads</strong>') + ' open' + (heet.length ? ', waarvan <span class="heet">' + heet.length + ' heet</span>' : '') + '.' + (laat.length ? ' ' + (laat.length === 1 ? 'Eén wacht' : laat.length + ' wachten') + ' te lang op een reactie: <strong>pak ' + (laat.length === 1 ? 'die' : 'die') + ' als eerste op</strong>.' : ''));
+    else zinnen.push('Geen open leads op dit moment. Nieuwe aanvragen via de site verschijnen hier vanzelf, met een warmtescore.');
+    if (dringend.length) zinnen.push('<strong>' + dringend.length + (dringend.length === 1 ? ' klant heeft' : ' klanten hebben') + ' dringend aandacht nodig</strong>, onder andere ' + esc(dringend[0].naam) + ': ' + esc(dringend[0].tekst.charAt(0).toLowerCase() + dringend[0].tekst.slice(1)) + '.');
+    else if (o.aandacht.length) zinnen.push('Bij je klanten loopt alles, op ' + o.aandacht.length + (o.aandacht.length === 1 ? ' klein punt' : ' kleine punten') + ' na.');
+    else if (c.klanten) zinnen.push('Bij je klanten loopt alles. Niets dat aandacht nodig heeft.');
+    if (tl || tv) zinnen.push('Je hebt ' + (tl ? '<strong>' + tl + (tl === 1 ? ' taak' : ' taken') + ' over de deadline</strong>' : '') + (tl && tv ? ' en ' : '') + (tv ? tv + (tv === 1 ? ' taak' : ' taken') + ' voor vandaag' : '') + '.');
+    var dOver = dagen(overstap);
+    if (dOver >= 0 && dOver <= 30) zinnen.push('Nog <strong>' + dagTekst(dOver) + '</strong> voor de gratis overstapactie. Overstappers scoren nu extra hoog: bel ze vandaag nog.');
+    if (zc.nps.score != null) zinnen.push('Je NPS staat op <strong>' + (zc.nps.score > 0 ? '+' : '') + zc.nps.score + '</strong>' + (zc.nps.criticasters ? ', met ' + zc.nps.criticasters + (zc.nps.criticasters === 1 ? ' criticaster' : ' criticasters') + ' om te bellen' : '') + '.');
+    var adv = z.adviezen.filter(function (a) { return a.soort !== 'start' && a.soort !== 'klant'; })[0];
+    if (adv) zinnen.push('Advies: ' + esc(adv.titel.charAt(0).toLowerCase() + adv.titel.slice(1)) + '. ' + esc(adv.tekst));
+    document.getElementById('briefing').innerHTML = zinnen.map(function (zz, i) { return '<p style="animation-delay:' + (0.15 + i * 0.18) + 's">' + zz + '</p>'; }).join('');
+
+    // Doe dit eerst
+    var acties = [];
+    o.leads.filter(function (l) { return l.urgent; }).forEach(function (l) { acties.push({ k: 'r', t: l.actie, s: (l.bedrijf || l.naam) + ', warmte ' + l.score, url: '/intern/klant.html?id=' + l.id, b: 'Lead' }); });
+    o.aandacht.filter(function (a) { return a.ernst === 3; }).forEach(function (a) { acties.push({ k: 'r', t: a.actie, s: a.naam + ': ' + a.tekst, url: a.id ? '/intern/klant.html?id=' + a.id : '#', b: 'Klant' }); });
+    o.taken.teLaat.forEach(function (t) { acties.push({ k: 'o', t: t.titel, s: 'Taak, deadline verlopen', url: '#taken', b: 'Taak' }); });
+    o.aandacht.filter(function (a) { return a.ernst === 2; }).forEach(function (a) { acties.push({ k: 'o', t: a.actie, s: a.naam + ': ' + a.tekst, url: a.id ? '/intern/klant.html?id=' + a.id : '#', b: 'Klant' }); });
+    o.taken.vandaag.forEach(function (t) { acties.push({ k: '', t: t.titel, s: 'Taak voor vandaag', url: '#taken', b: 'Taak' }); });
+    o.leads.filter(function (l) { return !l.urgent && l.score >= 50; }).forEach(function (l) { acties.push({ k: '', t: l.actie, s: (l.bedrijf || l.naam) + ', warmte ' + l.score, url: '/intern/klant.html?id=' + l.id, b: 'Lead' }); });
+    document.getElementById('acties').innerHTML = acties.length ? acties.slice(0, 5).map(function (a, i) {
+      return '<a class="bf-actie" style="animation-delay:' + (0.25 + i * 0.08) + 's" href="' + a.url + '"><i class="' + a.k + '"></i><span>' + esc(a.t) + '<small>' + esc(a.s) + '</small></span><b>' + a.b + '</b></a>';
+    }).join('') : '<p style="color:#A9B8DA;margin:0">Niets dringends. Tijd om leads op te volgen of een klant te bellen.</p>';
+
+    // Leads
+    document.getElementById('leads').innerHTML = o.leads.length ? o.leads.slice(0, 6).map(function (l) {
+      var tel2 = (l.telefoon || '').replace(/[^\d+]/g, ''), wa = tel2.replace(/^\+/, '').replace(/^0/, '31');
+      var cls = { Heet: 's-heet', Warm: 's-warm', Lauw: 's-lauw', Koud: 's-koud' }[l.label];
+      return '<div class="lead"><div class="sc ' + cls + '" title="' + l.label + '">' + l.score + '</div><div style="min-width:0"><a class="n" href="/intern/klant.html?id=' + encodeURIComponent(l.id) + '">' + esc(l.bedrijf || l.naam || l.email) + '</a>' +
+        '<div class="st' + (l.urgent ? ' u' : '') + '">' + FASE[l.fase] + ': ' + esc(l.actie) + '</div></div>' +
+        '<div class="mini-acties">' + (tel2 ? '<a href="tel:' + esc(tel2) + '">Bel</a><a href="https://wa.me/' + esc(wa) + '" target="_blank" rel="noopener">App</a>' : '<a href="mailto:' + esc(l.email) + '">Mail</a>') + '<button type="button" data-contact="' + l.id + '">Log</button></div></div>';
+    }).join('') : '<p class="leeg">Geen open leads. Ze verschijnen hier vanzelf zodra iemand een formulier invult.</p>';
+
+    // Aandacht
+    document.getElementById('n-aandacht').textContent = o.aandacht.length ? o.aandacht.length + (o.aandacht.length === 1 ? ' punt' : ' punten') : '';
+    document.getElementById('aandacht').innerHTML = o.aandacht.length ? o.aandacht.slice(0, 7).map(function (a) {
+      return '<div class="rij"><i class="stip e' + a.ernst + '"></i><div>' + (a.id ? '<a class="n" href="/intern/klant.html?id=' + encodeURIComponent(a.id) + '">' + esc(a.naam) + '</a>' : '<strong>' + esc(a.naam) + '</strong>') + '<small>' + esc(a.tekst) + '</small></div>' +
+        (a.id ? '<a class="knop" href="/intern/klant.html?id=' + encodeURIComponent(a.id) + '">' + esc(a.actie) + '</a>' : '<span class="knop">' + esc(a.actie) + '</span>') + '</div>';
+    }).join('') : '<p class="leeg">Alles loopt. Niets dat aandacht nodig heeft.</p>';
+
+    // Mails
+    var MND = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+    document.getElementById('mails').innerHTML = o.mailsDezeWeek.length ? o.mailsDezeWeek.map(function (m) {
+      var p = m.datum.split('-');
+      return '<div class="rij"><i class="stip e1"></i><div><a class="n" href="/intern/klant.html?id=' + encodeURIComponent(m.id) + '">' + esc(m.naam) + '</a><small>' + esc(m.label) + '</small></div><span class="knop" style="color:var(--muted)">' + (+p[2]) + ' ' + MND[+p[1] - 1] + '</span></div>';
+    }).join('') : '<p class="leeg">Geen automatische mails de komende week.</p>';
+  }
+  document.getElementById('wissel').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    this.querySelectorAll('button').forEach(function (x) { x.classList.toggle('is-aan', x === b); }); WIE = b.dataset.v; laad();
+  });
+  document.addEventListener('ae:contact', laad);
+
+  AE.ik().then(function (d) {
+    IK = d;
+    document.getElementById('groet').textContent = (uur < 12 ? 'Goedemorgen' : uur < 18 ? 'Goedemiddag' : 'Goedenavond') + ', ' + d.naam;
     document.getElementById('tk-voor').value = d.wie;
     tekenTaken();
-  }).catch(function () {});
+    laad();
+  });
+  setInterval(function () { if (!document.hidden && IK) laad(); }, 300000);
 
   // ===== Taken (gedeeld, opgeslagen op de server) =====
   var TAKEN = [], filter = 'open';
@@ -407,10 +474,10 @@
   }
   function tekenTaken() {
     var open = TAKEN.filter(function (t) { return !t.klaar; }).length;
-    document.getElementById('todo-teller').textContent = open + ' open · ' + (TAKEN.length - open) + ' afgerond';
+    document.getElementById('todo-teller').textContent = open + ' open, ' + (TAKEN.length - open) + ' afgerond';
     var lijstje = TAKEN.filter(function (t) {
       if (filter === 'klaar') return t.klaar;
-      if (filter === 'mijn') return !t.klaar && (t.voor === IK || t.voor === 'samen');
+      if (filter === 'mijn') return !t.klaar && (t.voor === (IK && IK.wie) || t.voor === 'samen');
       return !t.klaar;
     }).sort(function (a, b) {
       if (filter === 'klaar') return (b.klaarOp || '').localeCompare(a.klaarOp || '');
@@ -429,7 +496,7 @@
       m(t.voor === 'samen' ? 'Samen' : 'Voor ' + NAAM[t.voor], 'tk-voor');
       if (t.deadline && !t.klaar) {
         var n = Math.round((vanIso(t.deadline) - vandaag) / 864e5);
-        m(n < 0 ? 'Verlopen: ' + kort(vanIso(t.deadline)) : n === 0 ? 'Vandaag' : kort(vanIso(t.deadline)) + ' · nog ' + n + (n === 1 ? ' dag' : ' dagen'), n < 0 ? 'is-laat' : n <= 7 ? 'is-binnenkort' : '');
+        m(n < 0 ? 'Verlopen: ' + kort(vanIso(t.deadline)) : n === 0 ? 'Vandaag' : kort(vanIso(t.deadline)) + ', nog ' + n + (n === 1 ? ' dag' : ' dagen'), n < 0 ? 'is-laat' : n <= 7 ? 'is-binnenkort' : '');
       }
       if (t.klaar) m('✓ Afgevinkt door ' + NAAM[t.klaarDoor] + ' op ' + kort(new Date(t.klaarOp)), 'tk-afgevinkt');
       if (t.notitie) m(t.notitie);
@@ -517,6 +584,6 @@
   tekenKalender();
 })();
 </script>
-<script>/* Eigen bezoeken niet meetellen in Umami (geldt voor dit apparaat) */ try { localStorage.setItem("umami.disabled", "1"); } catch (e) {}</script>
+<script>try { localStorage.setItem("umami.disabled", "1"); } catch (e) {}</script>
 </body>
 </html>

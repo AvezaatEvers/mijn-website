@@ -9,6 +9,7 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/style.css?v=126">
 <link rel="stylesheet" href="/intern/klanten.css?v=5">
+<link rel="stylesheet" href="/intern/app.css?v=1">
 </head>
 <body>
 <main class="db">
@@ -42,7 +43,7 @@
     </div>
 
     <div class="db-kaart breed">
-      <h2>Nieuwe klant toevoegen</h2>
+      <h2 id="nieuw-kop">Nieuwe klant of lead toevoegen</h2>
       <form id="nieuw" class="velden" autocomplete="off">
         <label>Naam contactpersoon<input name="naam" required maxlength="200" placeholder="Sanne de Vries"></label>
         <label>Bedrijfsnaam<input name="bedrijf" maxlength="200" placeholder="De Vries Schilderwerken"></label>
@@ -62,10 +63,11 @@
   </div>
 </main>
 
+<script src="/intern/app.js?v=1"></script>
 <script>
 (function () {
   var ik = null, klanten = [], types = {};
-  var fWie = 'ik', fStatus = 'klant', q = '';
+  var fWie = 'ik', fStatus = new URLSearchParams(location.search).get('status') || 'klant', q = '';
   var MAAND = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
   function d(s) { if (!s) return ''; var p = s.split('-'); return +p[2] + ' ' + MAAND[+p[1] - 1] + ' ' + p[0]; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -79,7 +81,7 @@
     var lijst = klanten.filter(function (k) {
       return (fWie === 'alle' || k.boekhouder === wie || !k.boekhouder) && k.status === fStatus &&
         (!q || (k.naam + ' ' + k.bedrijf + ' ' + k.email).toLowerCase().indexOf(q) > -1);
-    }).sort(function (a, b) { return (a.bedrijf || a.naam).localeCompare(b.bedrijf || b.naam, 'nl'); });
+    }).sort(function (a, b) { if (a.leadInfo && b.leadInfo && a.leadInfo.score !== b.leadInfo.score) return b.leadInfo.score - a.leadInfo.score; return (a.bedrijf || a.naam).localeCompare(b.bedrijf || b.naam, 'nl'); });
     var ul = document.getElementById('lijst');
     if (!lijst.length) { ul.innerHTML = '<li class="kl-leeg">' + (klanten.length ? 'Geen klanten in deze selectie.' : 'Nog geen klanten. Voeg je eerste klant hieronder toe.') + '</li>'; return; }
     ul.innerHTML = lijst.map(function (k) {
@@ -102,6 +104,8 @@
   }
   filter('f-wie', function (v) { fWie = v; });
   filter('f-status', function (v) { fStatus = v; });
+  document.querySelectorAll('#f-status button').forEach(function (x) { x.classList.toggle('is-aan', x.dataset.v === fStatus); });
+  if (location.hash === '#nieuw') setTimeout(function () { var f = document.getElementById('nieuw'); f.scrollIntoView({ behavior: 'smooth' }); f.naam.focus(); }, 300);
   document.getElementById('zoek').addEventListener('input', function () { q = this.value.trim().toLowerCase(); teken(); });
 
   var form = document.getElementById('nieuw'), melding = document.getElementById('nieuw-melding');

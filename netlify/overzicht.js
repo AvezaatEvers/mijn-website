@@ -15,7 +15,13 @@ export function maandbedrag(k) {
 }
 
 function laatsteContact(k) {
-  return (k.tijdlijn || []).filter((t) => CONTACT.includes(t.soort)).map((t) => t.op).sort().pop() || null;
+  const a = (k.tijdlijn || []).filter((t) => CONTACT.includes(t.soort)).map((t) => t.op);
+  const b = (k.contacten || []).map((c) => c.op);
+  return a.concat(b).sort().pop() || null;
+}
+function gesprekken(k) {
+  return (k.tijdlijn || []).filter((t) => t.soort === "gesprek").map((t) => t.op)
+    .concat((k.contacten || []).filter((c) => c.kanaal === "gesprek").map((c) => c.op)).sort();
 }
 
 // ---------- Leads ----------
@@ -23,7 +29,7 @@ export function leadInfo(k, nu = vandaag()) {
   const lead = k.lead || {};
   const tl = k.tijdlijn || [];
   const contact = laatsteContact(k);
-  const gesprek = tl.some((t) => t.soort === "gesprek");
+  const gesprek = gesprekken(k).length > 0;
   const fase = k.voorstel ? "voorstel" : gesprek ? "gesprek" : contact ? "contact" : "nieuw";
   const sinds = lead.op || k.aangemaakt;
   const leeftijd = dagenSinds(sinds, nu) ?? 0;
@@ -71,7 +77,7 @@ export function leadInfo(k, nu = vandaag()) {
     else { actie = "Bel of app binnen 2 uur"; urgent = true; }
   } else if (fase === "contact") actie = "Plan de kennismaking";
   else if (fase === "gesprek") {
-    const g = tl.filter((t) => t.soort === "gesprek").map((t) => t.op).sort().pop();
+    const g = gesprekken(k).pop();
     const d = dagenSinds(g, nu);
     actie = "Stuur het voorstel"; urgent = d >= 2;
   } else if (fase === "voorstel") {
@@ -110,6 +116,12 @@ export function aandachtVoor(k, nu = vandaag(), env) {
     const stil = dagenSinds(laatst, nu);
     if (stil != null && stil > 60) uit.push({ ernst: 1, tekst: `${stil} dagen geen contact genoteerd`, actie: "Plan een maandgesprek" });
   }
+  const laatsteNps = (k.nps || [])[0];
+  if (laatsteNps && laatsteNps.score <= 6 && dagenSinds(laatsteNps.op, nu) <= 30 && !((laatsteContact(k) || "") > laatsteNps.op)) {
+    uit.push({ ernst: 3, tekst: `Gaf een ${laatsteNps.score} voor tevredenheid${laatsteNps.reden ? `: "${laatsteNps.reden.slice(0, 80)}"` : ""}`, actie: "Bel binnen 48 uur" });
+  }
+  const klachten = (k.contacten || []).filter((c) => ["klacht", "probleem"].includes(c.soort) && dagenSinds(c.op, nu) <= 30).length;
+  if (klachten >= 3) uit.push({ ernst: 2, tekst: `${klachten} problemen of klachten in 30 dagen`, actie: "Bel proactief" });
   const fout = log.find((l) => !l.ok && !l.test);
   if (fout && dagenSinds(fout.op, nu) <= 7) uit.push({ ernst: 3, tekst: `Mail niet verstuurd: ${fout.onderwerp}`, actie: "Bekijk de fout" });
   return uit.map((a) => ({ ...a, id: k.id, naam, boekhouder: k.boekhouder }));

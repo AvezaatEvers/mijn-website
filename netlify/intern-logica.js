@@ -2,6 +2,7 @@
 import { BASE, TYPES, AUTOMATISCH, HANDMATIG, gepland, maakMail, handmatigeData, verstuur, vandaag, actueelKwartaal, kwartalenRond, kwartaalInfo } from "./klant-mails.js";
 import { mails } from "./functions/lib/mails.js";
 import { overzicht, leadInfo } from "./overzicht.js";
+import { inzichten, KANALEN, ONDERWERPEN, SOORTEN, GEVOEL } from "./inzichten.js";
 // Los van Netlify gehouden zodat het lokaal te testen is; intern.js koppelt de opslag.
 
 export const GEBRUIKERS = {
@@ -150,7 +151,7 @@ export async function verwerk(request, cookies, next, maakStore, env = () => und
     return json(taken);
   }
 
-  if (pad.startsWith("/intern/api/klant") || pad.startsWith("/intern/api/voorstel") || pad === "/intern/api/kwartaalbord" || pad === "/intern/api/overzicht") return klantenApi(request, url, pad, wie, maakStore(), env);
+  if (pad.startsWith("/intern/api/klant") || pad.startsWith("/intern/api/voorstel") || pad === "/intern/api/kwartaalbord" || pad === "/intern/api/overzicht" || pad === "/intern/api/inzichten" || pad === "/intern/api/zoek") return klantenApi(request, url, pad, wie, maakStore(), env);
 
   return next();
 }
@@ -353,6 +354,40 @@ async function klantenApi(request, url, pad, wie, store, env) {
       await bewaar();
       return json({ ok: true, klantId: k.id, status: k.status });
     }
+  }
+
+  // Contactmoment vastleggen
+  if (pad === "/intern/api/klant/contact") {
+    const k = vind(body.id);
+    if (!k) return json({ fout: "Klant niet gevonden" }, 404);
+    k.contacten = k.contacten || [];
+    if (request.method === "POST") {
+      const c = {
+        id: nieuweId(), op: /^\d{4}-\d{2}-\d{2}$/.test(body.datum || "") && body.datum !== vandaag() ? body.datum + "T12:00:00.000Z" : nu,
+        kanaal: KANALEN[body.kanaal] ? body.kanaal : "whatsapp", richting: body.richting === "wij" ? "wij" : "klant",
+        onderwerp: ONDERWERPEN[body.onderwerp] ? body.onderwerp : "overig", soort: SOORTEN[body.soort] ? body.soort : "vraag",
+        opgelost: body.opgelost === true ? true : body.opgelost === false ? false : null, gevoel: GEVOEL[body.gevoel] ? body.gevoel : null,
+        vermijdbaar: body.vermijdbaar === true, notitie: String(body.notitie || "").replace(/[<>]/g, "").trim().slice(0, 1000), door: wie,
+      };
+      k.contacten.unshift(c);
+      k.contacten = k.contacten.slice(0, 1000);
+    } else if (request.method === "DELETE") {
+      k.contacten = k.contacten.filter((c) => c.id !== body.cid);
+    } else return json({ fout: "Methode niet toegestaan" }, 405);
+    await bewaar();
+    return json({ klant: metPlanning(k, env) });
+  }
+
+  // Inzichten
+  if (pad === "/intern/api/inzichten") {
+    const voor = ["koen", "daan", "alle"].includes(body.wie) ? body.wie : wie;
+    const dagen = [30, 90, 365].includes(Number(body.dagen)) ? Number(body.dagen) : 90;
+    return json(inzichten(klanten, voor, dagen));
+  }
+
+  // Zoeken (opdrachtbalk)
+  if (pad === "/intern/api/zoek") {
+    return json(klanten.map((k) => ({ id: k.id, naam: k.naam, bedrijf: k.bedrijf, email: k.email, telefoon: k.telefoon, status: k.status, boekhouder: k.boekhouder })));
   }
 
   // Werkoverzicht

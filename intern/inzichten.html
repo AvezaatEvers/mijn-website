@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact en NPS | Avezaat &amp; Evers intern</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css?v=126">
+<link rel="stylesheet" href="/intern/klanten.css?v=5">
+<link rel="stylesheet" href="/intern/app.css?v=1">
+<style>
+  .hk { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .hk h1 { font-size: clamp(28px, 3.6vw, 40px); margin: 0; letter-spacing: -.03em; }
+  .hk p { margin: 4px 0 0; color: var(--muted); }
+  .hk .rechts { display: flex; gap: 8px; flex-wrap: wrap; }
+  .wissel { display: inline-flex; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 3px; }
+  .wissel button { font: inherit; font-size: 13.5px; font-weight: 600; padding: 7px 13px; border-radius: 9px; border: 0; background: none; color: var(--muted); cursor: pointer; }
+  .wissel button.is-aan { background: var(--navy); color: #fff; }
+  .raster-i { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+  .raster-i > * { min-width: 0; }
+  .c4 { grid-column: span 4; } .c5 { grid-column: span 5; } .c6 { grid-column: span 6; } .c7 { grid-column: span 7; } .c8 { grid-column: span 8; } .c12 { grid-column: span 12; }
+  .db-kaart h2 { font-size: 17px; margin: 0 0 14px; }
+  .sub { font-size: 13px; color: var(--muted); margin: -8px 0 14px; }
+
+  /* NPS */
+  .nps-groot { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 22px; align-items: center; }
+  .meter { position: relative; width: 170px; height: 100px; }
+  .meter svg { width: 170px; height: 100px; }
+  .meter b { position: absolute; left: 0; right: 0; bottom: 4px; text-align: center; font-size: 34px; letter-spacing: -.03em; color: var(--ink); }
+  .verdeling { display: flex; height: 12px; border-radius: 6px; overflow: hidden; background: #EEF1F6; margin: 10px 0 8px; }
+  .verdeling i { display: block; height: 100%; transition: width .8s cubic-bezier(.2, .8, .2, 1); }
+  .legenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--text); }
+  .legenda span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: var(--k); }
+
+  /* Adviezen */
+  .advies { position: relative; display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 14px; padding: 14px; border-radius: 16px; background: linear-gradient(135deg, rgba(59, 99, 196, .07), rgba(92, 200, 255, .05)); border: 1px solid rgba(59, 99, 196, .14); }
+  .advies + .advies { margin-top: 10px; }
+  .advies .ic { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: linear-gradient(135deg, #3B63C4, #26458F); color: #fff; box-shadow: 0 8px 18px -10px rgba(38, 69, 143, .8); }
+  .advies .ic svg { width: 18px; height: 18px; }
+  .advies.p3 .ic { background: linear-gradient(135deg, #F06548, #C2341D); }
+  .advies strong { display: block; color: var(--ink); font-size: 15px; line-height: 1.4; }
+  .advies p { margin: 4px 0 0; font-size: 14px; color: var(--text); line-height: 1.55; }
+  .advies a { font-size: 13px; font-weight: 600; color: var(--accent); }
+
+  /* Balken */
+  .balk-rij { display: grid; grid-template-columns: 130px minmax(0, 1fr) 46px; gap: 10px; align-items: center; font-size: 13.5px; padding: 5px 0; }
+  .balk-rij .b { height: 10px; border-radius: 5px; background: #EEF1F6; overflow: hidden; position: relative; }
+  .balk-rij .b i { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: linear-gradient(90deg, #3B63C4, #7FA4FF); transition: width .8s cubic-bezier(.2, .8, .2, 1); }
+  .balk-rij .b em { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: repeating-linear-gradient(45deg, rgba(229, 72, 77, .55) 0 4px, rgba(229, 72, 77, .3) 4px 8px); }
+  .balk-rij b { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .mini-kpi { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .mini-kpi div { padding: 14px 16px; border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+  .mini-kpi span { display: block; font-size: 12.5px; color: var(--muted); }
+  .mini-kpi b { display: block; font-size: 26px; letter-spacing: -.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .weken { display: flex; align-items: flex-end; gap: 6px; height: 130px; padding-top: 10px; }
+  .weken div { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px; height: 100%; min-width: 0; }
+  .weken i { display: block; width: 100%; max-width: 28px; border-radius: 7px 7px 3px 3px; background: linear-gradient(180deg, #7FA4FF, #3B63C4); position: relative; transition: height .8s cubic-bezier(.2, .8, .2, 1); min-height: 2px; }
+  .weken i em { position: absolute; left: 0; right: 0; bottom: 0; border-radius: 3px; background: #26458F; }
+  .weken small { font-size: 10.5px; color: var(--muted); white-space: nowrap; }
+  .tabel { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .tabel th { text-align: left; font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); padding: 0 8px 8px; border-bottom: 1px solid var(--line); }
+  .tabel td { padding: 9px 8px; border-bottom: 1px solid var(--line); }
+  .tabel tr:last-child td { border-bottom: 0; }
+  .tabel a { color: var(--ink); font-weight: 600; text-decoration: none; } .tabel a:hover { color: var(--accent); }
+  .tabel .r { text-align: right; font-variant-numeric: tabular-nums; }
+  .reactie { padding: 10px 2px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .reactie:last-child { border-bottom: 0; }
+  .reactie .cijfer { display: inline-grid; place-items: center; min-width: 28px; height: 28px; border-radius: 8px; font-weight: 700; margin-right: 8px; font-size: 13.5px; }
+  .reactie small { color: var(--muted); font-size: 12.5px; }
+  .reactie q { display: block; margin: 6px 0 0 36px; color: var(--text); }
+  .cp { background: var(--ok-bg); color: var(--ok); } .cn { background: var(--warn-bg); color: var(--warn); } .cc { background: var(--bad-bg); color: var(--bad); }
+  .leeg { color: var(--muted); font-size: 14px; }
+  @media (max-width: 1100px) { .c4, .c5, .c6, .c7, .c8 { grid-column: span 12; } }
+  @media (max-width: 560px) { .nps-groot { grid-template-columns: 1fr; } .mini-kpi { grid-template-columns: 1fr 1fr; } .balk-rij { grid-template-columns: 96px minmax(0, 1fr) 36px; } .tabel .verberg { display: none; } }
+</style>
+</head>
+<body>
+<main class="db">
+  <div class="hk">
+    <div><h1>Contact en NPS</h1><p>Waarom klanten contact zoeken, hoe goed we helpen, en hoe tevreden ze zijn.</p></div>
+    <div class="rechts">
+      <div class="wissel" id="f-wie"><button type="button" data-v="ik" class="is-aan">Mijn klanten</button><button type="button" data-v="alle">Alles</button></div>
+      <div class="wissel" id="f-dagen"><button type="button" data-v="30">30 dagen</button><button type="button" data-v="90" class="is-aan">90 dagen</button><button type="button" data-v="365">Jaar</button></div>
+      <button class="ai-knop" type="button" data-contact><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Contact vastleggen</button>
+    </div>
+  </div>
+
+  <div class="raster-i">
+    <div class="db-kaart c7 in">
+      <h2>Adviezen</h2>
+      <p class="sub">Automatisch bepaald uit vastgelegd contact en NPS-antwoorden.</p>
+      <div id="adviezen"><div class="skelet" style="width:80%"></div></div>
+    </div>
+    <div class="db-kaart c5 in" style="animation-delay:.08s">
+      <h2>NPS</h2>
+      <p class="sub">Per klant het laatste cijfer van de afgelopen 12 maanden.</p>
+      <div id="nps"></div>
+    </div>
+
+    <div class="c12 in" style="animation-delay:.12s"><div class="mini-kpi" id="mini"></div></div>
+
+    <div class="db-kaart c8 in" style="animation-delay:.16s">
+      <h2>Contact per week</h2>
+      <p class="sub">Laatste 12 weken. Donker deel: de klant nam contact op.</p>
+      <div class="weken" id="weken"></div>
+    </div>
+    <div class="db-kaart c4 in" style="animation-delay:.2s">
+      <h2>Kanaal</h2>
+      <div id="kanalen"></div>
+      <h2 style="margin-top:18px">Soort</h2>
+      <div id="soorten"></div>
+    </div>
+
+    <div class="db-kaart c6 in" style="animation-delay:.24s">
+      <h2>Onderwerpen</h2>
+      <p class="sub">Gestreept deel: had niet nodig hoeven zijn.</p>
+      <div id="onderwerpen"></div>
+    </div>
+    <div class="db-kaart c6 in" style="animation-delay:.28s">
+      <h2>NPS-reacties</h2>
+      <div id="reacties"></div>
+    </div>
+
+    <div class="db-kaart c6 in" style="animation-delay:.32s">
+      <h2>Klanten met het meeste contact</h2>
+      <table class="tabel"><thead><tr><th>Klant</th><th class="r">Contact</th><th class="r">Problemen</th><th class="r verberg">Stil</th><th class="r">NPS</th></tr></thead><tbody id="klanten"></tbody></table>
+    </div>
+    <div class="db-kaart c6 in" style="animation-delay:.36s">
+      <h2>Laatst vastgelegd</h2>
+      <div id="recent"></div>
+    </div>
+  </div>
+</main>
+<script src="/intern/app.js?v=1"></script>
+<script>
+(function () {
+  var esc = AE.esc, IK = null, wie = 'ik', dagen = 90;
+  var ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 5.6L19.5 9.5l-5.7 1.9L12 17l-1.8-5.6L4.5 9.5l5.7-1.9z"/></svg>';
+  var MND = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+  var KAN = { whatsapp: 'WhatsApp', gebeld: 'Gebeld', mail: 'Mail', gesprek: 'Gesprek' }, OND = { app: 'App en MoneyMonk', bonnetjes: 'Bonnetjes', facturen: 'Facturen', btw: 'Btw', ib: 'IB-aangifte', belastingdienst: 'Belastingdienst', prijs: 'Prijs en factuur', overig: 'Overig' };
+  function dk(s) { var p = s.slice(0, 10).split('-'); return +p[2] + ' ' + MND[+p[1] - 1]; }
+  function balken(lijst, totaal, extra) {
+    var max = Math.max.apply(null, lijst.map(function (x) { return x.aantal; }).concat([1]));
+    return lijst.filter(function (x) { return x.aantal; }).map(function (x) {
+      return '<div class="balk-rij"><span>' + esc(x.label) + '</span><span class="b"><i style="width:' + (x.aantal / max * 100) + '%"></i>' + (extra && x.vermijdbaar ? '<em style="width:' + (x.vermijdbaar / max * 100) + '%"></em>' : '') + '</span><b>' + x.aantal + '</b></div>';
+    }).join('') || '<p class="leeg">Nog niets vastgelegd.</p>';
+  }
+  function meter(score) {
+    var w = 170, h = 100, r = 72, cx = 85, cy = 90, deel = score == null ? 0 : (score + 100) / 200;
+    var hoek = Math.PI * (1 - deel), x = cx + r * Math.cos(hoek), y = cy - r * Math.sin(hoek);
+    var kleur = score == null ? '#C9D1E0' : score >= 50 ? '#16A34A' : score >= 0 ? '#3B63C4' : '#E5484D';
+    return '<svg viewBox="0 0 ' + w + ' ' + h + '" aria-hidden="true"><path d="M13 90 A72 72 0 0 1 157 90" fill="none" stroke="#EEF1F6" stroke-width="14" stroke-linecap="round"/>' +
+      (score == null ? '' : '<path d="M13 90 A72 72 0 0 1 ' + x.toFixed(1) + ' ' + y.toFixed(1) + '" fill="none" stroke="' + kleur + '" stroke-width="14" stroke-linecap="round"/>') + '</svg>';
+  }
+  function teken(z) {
+    var c = z.cijfers;
+    document.getElementById('adviezen').innerHTML = z.adviezen.length ? z.adviezen.slice(0, 6).map(function (a) {
+      return '<div class="advies p' + a.prioriteit + '"><div class="ic">' + ICON + '</div><div><strong>' + esc(a.titel) + '</strong><p>' + esc(a.tekst) + '</p>' + (a.id ? '<a href="/intern/klant.html?id=' + encodeURIComponent(a.id) + '">Open klant</a>' : '') + '</div></div>';
+    }).join('') : '<p class="leeg">Geen adviezen. Alles ziet er goed uit.</p>';
+
+    var n = c.nps;
+    document.getElementById('nps').innerHTML = '<div class="nps-groot"><div class="meter">' + meter(n.score) + '<b>' + (n.score == null ? '–' : (n.score > 0 ? '+' : '') + n.score) + '</b></div><div>' +
+      '<div class="verdeling"><i style="width:' + (n.n ? n.promotors / n.n * 100 : 0) + '%;background:#16A34A"></i><i style="width:' + (n.n ? n.passief / n.n * 100 : 0) + '%;background:#F5A524"></i><i style="width:' + (n.n ? n.criticasters / n.n * 100 : 0) + '%;background:#E5484D"></i></div>' +
+      '<div class="legenda"><span style="--k:#16A34A">' + n.promotors + ' promotors (9-10)</span><span style="--k:#F5A524">' + n.passief + ' passief (7-8)</span><span style="--k:#E5484D">' + n.criticasters + ' criticasters (0-6)</span></div>' +
+      '<p class="sub" style="margin:12px 0 0">' + (n.n ? n.n + ' klanten' : 'Nog geen antwoorden') + (c.responsratio != null ? ', ' + c.responsratio + '% reageert op de mail' : '') + '. NPS = % promotors min % criticasters.</p></div></div>';
+
+    document.getElementById('mini').innerHTML =
+      '<div><span>Contactmomenten</span><b>' + c.contacten + '</b></div>' +
+      '<div><span>Meteen opgelost</span><b>' + (c.opgelost == null ? '–' : c.opgelost + '%') + '</b></div>' +
+      '<div><span>Te voorkomen</span><b>' + (c.vermijdbaar == null ? '–' : c.vermijdbaar + '%') + '</b></div>' +
+      '<div><span>Klant tevreden na contact</span><b>' + (c.tevreden == null ? '–' : c.tevreden + '%') + '</b></div>';
+
+    var max = Math.max.apply(null, z.weken.map(function (w) { return w.aantal; }).concat([1]));
+    document.getElementById('weken').innerHTML = z.weken.map(function (w) {
+      return '<div title="Week van ' + dk(w.week) + ': ' + w.aantal + ' contact"><i style="height:' + (w.aantal / max * 100) + '%"><em style="height:' + (w.aantal ? w.inkomend / w.aantal * 100 : 0) + '%"></em></i><small>' + dk(w.week) + '</small></div>';
+    }).join('');
+    document.getElementById('kanalen').innerHTML = balken(z.kanalen);
+    document.getElementById('soorten').innerHTML = balken(z.soorten);
+    document.getElementById('onderwerpen').innerHTML = balken(z.onderwerpen, c.contacten, true);
+
+    document.getElementById('reacties').innerHTML = z.npsReacties.length ? z.npsReacties.slice(0, 8).map(function (r) {
+      var cls = r.score >= 9 ? 'cp' : r.score >= 7 ? 'cn' : 'cc';
+      return '<div class="reactie"><span class="cijfer ' + cls + '">' + r.score + '</span><a href="/intern/klant.html?id=' + encodeURIComponent(r.klantId) + '" style="color:var(--ink);font-weight:600;text-decoration:none">' + esc(r.klant) + '</a> <small>' + dk(r.op) + '</small>' + (r.reden ? '<q>' + esc(r.reden) + '</q>' : '') + '</div>';
+    }).join('') : '<p class="leeg">Nog geen NPS-antwoorden. De eerste meting gaat automatisch 3 maanden na de start van een klant.</p>';
+
+    document.getElementById('klanten').innerHTML = z.klanten.length ? z.klanten.map(function (k) {
+      return '<tr><td><a href="/intern/klant.html?id=' + encodeURIComponent(k.id) + '">' + esc(k.naam) + '</a></td><td class="r">' + k.aantal + '</td><td class="r">' + (k.problemen || '–') + '</td><td class="r verberg">' + (k.stil == null ? '–' : k.stil + ' d') + '</td><td class="r">' + (k.nps == null ? '–' : k.nps) + '</td></tr>';
+    }).join('') : '<tr><td colspan="5" class="leeg">Nog geen klanten.</td></tr>';
+
+    document.getElementById('recent').innerHTML = z.recent.length ? z.recent.map(function (r) {
+      return '<div class="reactie"><a href="/intern/klant.html?id=' + encodeURIComponent(r.klantId) + '" style="color:var(--ink);font-weight:600;text-decoration:none">' + esc(r.klant) + '</a> <small>' + dk(r.op) + ', ' + KAN[r.kanaal] + ', ' + (OND[r.onderwerp] || r.onderwerp) + (r.opgelost === false ? ', nog niet opgelost' : '') + '</small>' + (r.notitie ? '<q>' + esc(r.notitie) + '</q>' : '') + '</div>';
+    }).join('') : '<p class="leeg">Nog niets vastgelegd. Gebruik de knop Contact vastleggen, of Ctrl/Cmd + K.</p>';
+  }
+  function laad() { AE.api('/intern/api/inzichten?wie=' + (wie === 'ik' ? IK.wie : 'alle') + '&dagen=' + dagen).then(teken); }
+  function wissel(id, cb) { document.getElementById(id).addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; this.querySelectorAll('button').forEach(function (x) { x.classList.toggle('is-aan', x === b); }); cb(b.dataset.v); laad(); }); }
+  wissel('f-wie', function (v) { wie = v; }); wissel('f-dagen', function (v) { dagen = +v; });
+  document.addEventListener('ae:contact', laad);
+  AE.ik().then(function (d) { IK = d; laad(); });
+})();
+</script>
+</body>
+</html>

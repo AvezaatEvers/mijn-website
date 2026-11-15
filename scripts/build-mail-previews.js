@@ -35,6 +35,8 @@ const voorbeelden = [
     mails.aanbevelen({ naam: 'Sanne de Vries', wie: 'koen' })],
   ['jubileum', 'Een jaar klant', 'Automatisch, 1 jaar na de start.',
     mails.jubileum({ naam: 'Sanne de Vries', wie: 'koen', btwAantal: 4, ib: true })],
+  ['nps', 'Tevredenheid meten (NPS)', 'Automatisch na 3 maanden, een week na de IB-aangifte, en op 10 juni en 10 november.',
+    mails.nps({ naam: 'Sanne de Vries', wie: 'koen', npsBasis: '#' })],
 ];
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

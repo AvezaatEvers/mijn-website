@@ -508,7 +508,7 @@ async function webZoeken(env, vraag, stuur) {
   try {
     r = await fetch("https://api.tavily.com/search", {
       method: "POST", headers: { "content-type": "application/json", Authorization: "Bearer " + sleutel }, signal: stop.signal,
-      body: JSON.stringify({ query: vraag, search_depth: "basic", max_results: 6, chunks_per_source: 3, topic: "general", include_answer: false }),
+      body: JSON.stringify({ query: vraag, search_depth: "fast", max_results: 5, chunks_per_source: 2, topic: "general", include_answer: false }),
     });
   } catch (e) { throw Object.assign(new Error(e.name === "AbortError" ? "zoekmachine reageerde te traag" : "zoekmachine niet bereikbaar"), { status: 504 }); }
   finally { clearTimeout(klok); }
@@ -546,9 +546,17 @@ async function paginaLezen(url, stuur) {
 // Context vooraf meegeven, zodat het model voor veelgestelde vragen geen extra rondes nodig heeft
 async function vooraf(c, body) {
   try {
-    const uit = { dag: await voerUit("dagoverzicht", {}, c) };
+    const d = await voerUit("dagoverzicht", {}, c);
+    const uit = { dag: { datum: d.datum, cijfers: d.cijfers, leads: d.leads.slice(0, 5), aandacht: d.aandacht.slice(0, 5), taken: d.taken } };
     if (body.klant) { const k = (c.klanten || []).find((x) => x.id === body.klant); if (k) uit.openKlant = klantDetails(k, c.h, c.taken || [], c.runs || []); }
-    return JSON.stringify(uit).slice(0, 9000);
+    // De kennisbank alvast doorzoeken op de vraag: scheelt vaak een hele ronde naar Gemini
+    const vraag = ((berichtenVan(body).filter((b) => b.role === "user").pop()) || {}).content || "";
+    const kennis = zoekKennis(vraag, 3);
+    if (kennis.length) {
+      uit.kennisbank = kennis.map((x) => ({ titel: x.titel, bron: x.bron, tekst: x.tekst.slice(0, 900) }));
+      c.stuur({ t: "bronnen", v: kennis.map((x) => ({ titel: x.titel, bron: x.bron, groep: x.groep })) });
+    }
+    return JSON.stringify(uit).slice(0, 7000);
   } catch { return ""; }
 }
 
@@ -557,7 +565,7 @@ async function slim(c, body) {
   const start = Date.now();
   const context = await vooraf(c, body);
   const sys = systeem(wie, { pagina: schoon(body.pagina, 80), klant: schoon(body.klant, 40) }) +
-    (context ? "\n\nActuele gegevens (al opgehaald, je hoeft hiervoor geen tool aan te roepen; gebruik tools alleen voor wat hier niet staat):\n" + context : "");
+    (context ? "\n\nActuele gegevens en de best passende stukken uit onze kennisbank (al opgehaald; roep hiervoor geen tool aan. Gebruik kennis_zoeken alleen als dit niet genoeg is, en web_zoeken alleen voor actuele bedragen, regels of iets wat hier niet staat):\n" + context : "");
   const lijst = berichtenVan(body);
   if (!lijst.length) throw new Error("Geen vraag");
   const contents = lijst.map((b) => ({ role: b.role === "assistant" ? "model" : "user", parts: [{ text: b.content }] }));

@@ -151,6 +151,15 @@ const TOOLS = [
     input_schema: { type: "object", properties: { klant_id: { type: "string" }, tekst: { type: "string" }, soort: { type: "string", enum: ["notitie", "gebeld", "geappt", "gemaild", "gesprek"] } }, required: ["klant_id", "tekst"] } },
   { name: "taak_afvinken", description: "Vink direct een open taak af. Geef (een deel van) de titel.",
     input_schema: { type: "object", properties: { titel: { type: "string" } }, required: ["titel"] } },
+  { name: "mail_ontwerpen", description: "Ontwerp zelf een complete mail in onze huisstijl en zet hem klaar om te versturen via Resend (na Bevestigen). Gebruik dit voor nieuwsbrieven, uitleg, aanbiedingen, herinneringen op maat of elke mail die meer nodig heeft dan een paar alinea's. Bouw de mail op uit blokken. Ontvanger: een bestaande klant (klant_id) of een los e-mailadres (aan_email + aan_naam).",
+    input_schema: { type: "object", properties: {
+      klant_id: { type: "string" }, aan_email: { type: "string" }, aan_naam: { type: "string" },
+      onderwerp: { type: "string" }, preheader: { type: "string", description: "Korte voorbeeldtekst die mailprogramma's naast het onderwerp tonen" },
+      aanhef: { type: "boolean", description: "Standaard true: begint met 'Hoi <voornaam>,'" },
+      blokken: { type: "array", description: "De inhoud van boven naar beneden. Afsluiting met foto en het WhatsApp-blok worden automatisch toegevoegd.", items: { type: "object", properties: {
+        type: { type: "string", enum: ["kop", "tussenkop", "alinea", "lijst", "stappen", "blok", "tabel", "knop"], description: "kop = grote titel; tussenkop = kleine kop; alinea = tekst (**vet** mag); lijst = vinkjeslijst; stappen = genummerde stappen ('Titel: uitleg'); blok = uitgelicht kader; tabel = regels 'Label: waarde'; knop = knop met link" },
+        tekst: { type: "string" }, items: { type: "array", items: { type: "string" } }, label: { type: "string" }, url: { type: "string", description: "https://, mailto: of tel:" } }, required: ["type"] } } },
+      required: ["onderwerp", "blokken"] } },
 ];
 
 const LABELS = {
@@ -158,7 +167,7 @@ const LABELS = {
   werkstroom_info: "Pakt de werkstroom erbij", lopende_werkstromen: "Bekijkt lopende werkstromen", werkstroom_starten: "Start werkstroom",
   taak_toevoegen: "Zet taak klaar", contact_inzichten: "Analyseert klantcontact",
   klant_toevoegen: "Bereidt nieuwe klant voor", klant_bijwerken: "Bereidt wijziging voor", mail_versturen: "Stelt mail op",
-  contact_vastleggen: "Legt contact vast", notitie_toevoegen: "Zet notitie op de tijdlijn", taak_afvinken: "Vinkt taak af",
+  contact_vastleggen: "Legt contact vast", mail_ontwerpen: "Ontwerpt mail", notitie_toevoegen: "Zet notitie op de tijdlijn", taak_afvinken: "Vinkt taak af",
 };
 
 async function voerUit(naam, input, c) {
@@ -269,6 +278,20 @@ async function voerUit(naam, input, c) {
         voorbeeld: "/intern/api/klant/voorbeeld?" + new URLSearchParams(type === "bericht" ? { id: k.id, type, onderwerp: body.onderwerp, tekst: body.tekst } : { id: k.id, type }) });
       return { status: "Mail staat klaar; de gebruiker kan een voorbeeld bekijken en moet op Versturen klikken. Nog niet verstuurd." };
     }
+    case "mail_ontwerpen": {
+      const k = input.klant_id ? klanten.find((x) => x.id === input.klant_id) : null;
+      if (input.klant_id && !k) return { fout: "Klant niet gevonden. Gebruik eerst zoek_klanten." };
+      const aan = k ? k.email : String(input.aan_email || "").trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(aan || "")) return { fout: "Geen geldig e-mailadres voor de ontvanger. Vraag het na." };
+      const blokken = (Array.isArray(input.blokken) ? input.blokken : []).slice(0, 30);
+      if (!input.onderwerp || !blokken.length) return { fout: "Onderwerp en blokken zijn nodig" };
+      const body = { klant: k ? k.id : null, aan, naam: k ? k.naam : schoon(input.aan_naam || ""), onderwerp: schoon(input.onderwerp, 140), preheader: schoon(input.preheader || "", 120), aanhef: input.aanhef !== false, blokken };
+      const regels = [["Aan", (body.naam ? body.naam + " " : "") + "<" + aan + ">"], ["Onderwerp", body.onderwerp], ["Opbouw", blokken.map((b) => b.type).join(", ")]];
+      stuur({ t: "bevestig", id: id(), titel: "Ontworpen mail versturen", regels, knop: "Versturen", klaar: "Verstuurd", link: k ? "/intern/klant.html?id=" + k.id : null,
+        verzoek: { method: "POST", url: "/intern/api/mail/stuur", body }, test: { method: "POST", url: "/intern/api/mail/stuur", body: { ...body, test: true } },
+        voorbeeld: { method: "POST", url: "/intern/api/mail/voorbeeld", body }, toonVoorbeeld: true });
+      return { status: "Mail ontworpen en klaargezet. De gebruiker ziet een voorbeeld en klikt op Versturen. Nog niet verstuurd." };
+    }
     case "contact_vastleggen": {
       const k = klanten.find((x) => x.id === input.klant_id);
       if (!k) return { fout: "Klant niet gevonden" };
@@ -325,6 +348,7 @@ Werkwijze:
 - Taken en werkstromen maak je alleen aan als hij dat vraagt of bevestigt.
 - Je kunt ook acties uitvoeren: klanten toevoegen of wijzigen, mails sturen (vaste sjablonen of een eigen bericht), contact vastleggen, notities zetten en taken afvinken. Klant toevoegen, klant wijzigen en mails sturen worden pas uitgevoerd als hij in de kaart op de knop klikt: zeg dat in één zin ('Staat klaar, klik op Versturen'). Vraag ontbrekende gegevens (zoals e-mailadres) na in plaats van te gokken. Zoek bij een klantnaam eerst het id op met zoek_klanten.
 - Een eigen bericht schrijf je in onze toon: je-vorm, persoonlijk, kort, zonder aanhef of afsluiting (die zitten in het sjabloon).
+- Voor een mail met meer opmaak (kopjes, lijstjes, stappen, een knop, een tabel) gebruik je mail_ontwerpen. Ontwerp als een goede marketeer: één duidelijke boodschap, een sterke kop, korte alinea's, hooguit één knop. Gebruik alleen echte links (zoals https://avezaatenevers.nl/... of wa.me/31850604363), verzin geen URL's.
 
 Stijl:
 - Nederlands, je-vorm, kort en direct, in steekzinnen waar dat kan. Geen inleiding of herhaling van de vraag.
@@ -625,9 +649,36 @@ async function lokaal(c, body) {
   for (let i = 0; i < delen.length; i += 3) { stuur({ t: "tekst", v: delen.slice(i, i + 3).join("") }); await pauze(14); }
 }
 
+// ---------- Gesprekken (per persoon bewaard, zichtbaar op elk apparaat) ----------
+async function gesprekkenApi(request, url, pad, wie, store) {
+  const sleutel = "gesprekken-" + wie;
+  const lijst = (await store.get(sleutel, { type: "json" })) || [];
+  const meta = (g) => ({ id: g.id, titel: g.titel, bijgewerkt: g.bijgewerkt, aantal: (g.berichten || []).length });
+  if (pad === "/intern/api/gesprekken") return json(lijst.map(meta).sort((a, b) => b.bijgewerkt.localeCompare(a.bijgewerkt)));
+  if (request.method === "GET") { const g = lijst.find((x) => x.id === url.searchParams.get("id")); return g ? json(g) : json({ fout: "Gesprek niet gevonden" }, 404); }
+  if (request.method === "DELETE") { const i = lijst.findIndex((x) => x.id === url.searchParams.get("id")); if (i >= 0) { lijst.splice(i, 1); await store.setJSON(sleutel, lijst); } return json({ ok: true }); }
+  if (request.method === "POST") {
+    const body = await request.json().catch(() => ({}));
+    const berichten = (Array.isArray(body.berichten) ? body.berichten : []).slice(-60).map((b) => ({
+      rol: b.rol === "agent" ? "agent" : "gebruiker", tekst: String(b.tekst || "").slice(0, 12000),
+      stappen: Array.isArray(b.stappen) ? b.stappen.slice(0, 12).map((x) => String(x).slice(0, 80)) : undefined, extra: b.extra ? String(b.extra).slice(0, 30000) : undefined,
+    }));
+    let g = body.id && lijst.find((x) => x.id === body.id);
+    if (!g) { g = { id: id(), aangemaakt: new Date().toISOString() }; lijst.push(g); }
+    if (body.titel) g.titel = schoon(body.titel, 80);
+    if (!g.titel) { const eerste = berichten.find((b) => b.rol === "gebruiker"); g.titel = eerste ? schoon(eerste.tekst.replace(/\s+/g, " "), 60) : "Nieuw gesprek"; }
+    g.berichten = berichten; g.bijgewerkt = new Date().toISOString();
+    lijst.sort((a, b) => b.bijgewerkt.localeCompare(a.bijgewerkt));
+    await store.setJSON(sleutel, lijst.slice(0, 80));
+    return json(meta(g));
+  }
+  return json({ fout: "Methode niet toegestaan" }, 405);
+}
+
 // ---------- Ingang ----------
 export async function agentApi(request, url, pad, wie, store, env, h) {
   if (pad === "/intern/api/werkstromen" || pad === "/intern/api/werkstroom") return werkstromenApi(request, url, pad, wie, store, h);
+  if (pad === "/intern/api/gesprekken" || pad === "/intern/api/gesprek") return gesprekkenApi(request, url, pad, wie, store);
   if (pad === "/intern/api/dagplan") {
     const nu = h.vandaag();
     const [klanten, taken, runs] = await Promise.all([h.leesKlanten(store), h.leesTaken(store), leesRuns(store)]);

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Agent en kennisbank | Avezaat &amp; Evers intern</title>
+<title>Agent | Avezaat &amp; Evers intern</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
@@ -11,129 +11,129 @@
 <link rel="stylesheet" href="/intern/klanten.css?v=6">
 <link rel="stylesheet" href="/intern/app.css?v=4">
 <style>
-  .ap-kop { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 18px; }
-  .ap-kop .orb-plek { width: 64px; height: 64px; }
-  .ap-kop h1 { font-size: clamp(26px, 3.2vw, 38px); margin: 0; letter-spacing: -.03em; }
-  .ap-kop p { margin: 2px 0 0; color: var(--muted); font-size: 15px; }
-  .modi { margin-left: auto; display: inline-flex; background: var(--vlak, #fff); border: 1px solid var(--line); border-radius: 14px; padding: 4px; gap: 2px; flex-wrap: wrap; }
-  .modi button { font: inherit; font-size: 13.5px; font-weight: 600; padding: 8px 14px; border-radius: 10px; border: 0; background: none; color: var(--muted); cursor: pointer; transition: all .2s; }
-  .modi button.is-aan { background: linear-gradient(135deg, var(--navy), var(--accent)); color: #fff; box-shadow: 0 8px 18px -10px rgba(38, 69, 143, .8); }
-  .ap { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
-  .ap-chat { height: calc(100vh - 170px); min-height: 520px; display: flex; flex-direction: column; overflow: hidden; padding: 0 !important; position: relative; }
-  .ap-chat::before { content: ""; position: absolute; inset: auto -120px -160px auto; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(closest-side, rgba(92, 200, 255, .14), transparent); pointer-events: none; }
-  .ap-chat .ag-stroom { padding: 26px clamp(16px, 4vw, 48px) 10px; }
-  .ap-chat .ag-invoer { padding: 10px clamp(16px, 4vw, 48px) 18px; }
-  .ap-chat .ag-welkom .orb { --m: 120px; }
-  .ap-chat .ag-welkom h2 { font-size: 28px; }
-  .ap-chat .ag-sug { max-width: 640px; }
-  .ap-chat .md { font-size: 15px; }
-  .ap-rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 20px; }
-  .ap-rail h2 { font-size: 16px; margin: 0 0 10px; }
-  .kz { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; background: var(--vlak, #fff); }
-  .kz:focus-within { border-color: var(--accent-2); }
-  .kz svg { width: 16px; height: 16px; color: var(--muted); flex: none; }
-  .kz input { flex: 1; min-width: 0; border: 0; outline: 0; font: inherit; font-size: 14px; background: transparent; }
-  .kr { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; max-height: 46vh; overflow-y: auto; }
-  .kr details { border: 1px solid var(--line); border-radius: 12px; background: var(--vlak, #fff); }
-  .kr summary { list-style: none; cursor: pointer; padding: 9px 11px; font-size: 13.5px; font-weight: 600; color: var(--ink); line-height: 1.35; }
-  .kr summary::-webkit-details-marker { display: none; }
-  .kr summary small { display: block; font-weight: 500; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--accent-2); margin-bottom: 2px; }
-  .kr details[open] summary { border-bottom: 1px solid var(--line); }
-  .kr .kt { padding: 9px 11px; font-size: 13px; line-height: 1.55; color: var(--text); }
-  .kr .kt a, .kr .kt button { font: inherit; font-size: 12.5px; font-weight: 600; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; margin-right: 12px; text-decoration: none; }
-  .kr-leeg { font-size: 13px; color: var(--muted); padding: 6px 2px; }
-  .lw a { display: block; padding: 9px 0; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--ink); font-size: 14px; font-weight: 500; }
-  .lw a:last-child { border-bottom: 0; }
-  .lw small { display: block; color: var(--muted); font-size: 12.5px; font-weight: 400; }
-  .lw .balk { height: 5px; border-radius: 3px; background: var(--tint); margin-top: 6px; overflow: hidden; }
-  .lw .balk i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, #5CC8FF, var(--accent)); }
-  .st-kaart p { font-size: 13.5px; color: var(--text); margin: 0 0 8px; line-height: 1.55; }
-  .st-kaart code { font-size: 12.5px; background: var(--tint); color: var(--accent); padding: 1px 5px; border-radius: 5px; }
-  .st-kaart .st { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
-  .st-kaart .st i { width: 8px; height: 8px; border-radius: 50%; background: #FBBF24; box-shadow: 0 0 8px #FBBF24; }
-  .st-kaart .st.aan i { background: #34D399; box-shadow: 0 0 8px #34D399; }
-  @media (max-width: 1180px) { .ap { grid-template-columns: 1fr; } .ap-rail { position: static; } .ap-chat { height: calc(100vh - 150px); } }
-  @media (max-width: 960px) { .ap-chat { height: calc(100dvh - 210px); min-height: 460px; } .modi { margin-left: 0; } }
+  /* Volledig chatscherm: gesprekken links, chat in het midden */
+  body.app main.db.chatpagina { padding: 0; max-width: none; height: 100vh; height: 100dvh; display: grid; grid-template-columns: 272px minmax(0, 1fr); }
+  body.app main.db.chatpagina > * { max-width: none; }
+  .gs { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--line); background: rgba(255, 255, 255, .55); padding: 16px 10px 12px; }
+  .gs-nieuw { display: flex; align-items: center; gap: 10px; font: inherit; font-size: 14.5px; font-weight: 600; color: var(--ink); background: #fff; border: 0; border-radius: 12px; padding: 11px 12px; cursor: pointer; box-shadow: 0 1px 2px rgba(0, 0, 0, .06), 0 0 0 1px var(--line); transition: background .2s; }
+  .gs-nieuw:hover { background: #FAFAFC; }
+  .gs-nieuw svg { width: 18px; height: 18px; color: var(--accent); }
+  .gs-zoek { margin: 12px 2px 6px; }
+  .gs-zoek input { width: 100%; font: inherit; font-size: 13.5px; padding: 8px 10px; border-radius: 9px; border: 0; }
+  .gs-lijst { flex: 1; min-height: 0; overflow-y: auto; margin: 4px 0; padding: 0 2px; }
+  .gs-groep { font-size: 11.5px; font-weight: 600; color: #A1A1A6; padding: 14px 10px 4px; }
+  .gs-item { position: relative; display: flex; align-items: center; gap: 6px; border-radius: 9px; transition: background .15s; }
+  body.app .gs-item a { flex: 1; min-width: 0; display: block; padding: 8px 10px; font-size: 14px; color: var(--text); text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gs-item:hover { background: rgba(0, 0, 0, .04); }
+  .gs-item.is-aan { background: rgba(0, 0, 0, .07); }
+  body.app .gs-item.is-aan a { color: var(--ink); font-weight: 500; }
+  .gs-item button { opacity: 0; width: 26px; height: 26px; margin-right: 4px; border: 0; border-radius: 7px; background: none; color: var(--muted); cursor: pointer; font-size: 16px; flex: none; }
+  .gs-item:hover button, .gs-item.is-aan button { opacity: 1; }
+  .gs-item button:hover { background: rgba(0, 0, 0, .07); color: #D70015; }
+  .gs-leeg { padding: 14px 10px; font-size: 13.5px; color: var(--muted); }
+  .gs-voet { border-top: 1px solid var(--line); padding: 10px 6px 0; font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .gs-voet b { color: var(--text); font-weight: 600; }
+  .gs-voet i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #34C759; margin-right: 6px; vertical-align: 1px; }
+  .gs-voet i.uit { background: #FF9F0A; }
+
+  .cp { position: relative; display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+  .cp-kop { display: flex; align-items: center; gap: 10px; padding: 14px 24px; border-bottom: 1px solid var(--line); min-height: 58px; }
+  .cp-kop h1 { font-family: var(--sys) !important; font-size: 15.5px !important; font-weight: 600 !important; letter-spacing: -.01em !important; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cp-kop .orb { --m: 26px; }
+  .cp-menu { display: none; width: 34px; height: 34px; border-radius: 9px; border: 0; background: rgba(0, 0, 0, .05); cursor: pointer; font-size: 18px; }
+  #grote-chat { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  #grote-chat .ag-stroom { padding: 28px max(24px, calc((100% - 760px) / 2)) 12px; }
+  #grote-chat .ag-invoer { padding: 8px max(24px, calc((100% - 760px) / 2)) 22px; }
+  #grote-chat .ag-veld { background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .05), 0 0 0 1px var(--line), 0 10px 30px -18px rgba(0, 0, 0, .2); border-radius: 22px; padding: 10px 10px 10px 18px; }
+  #grote-chat .ag-veld textarea { font-size: 16px; }
+  #grote-chat .ag-welkom { padding-top: 9vh; }
+  #grote-chat .ag-welkom .orb { --m: 96px; }
+  #grote-chat .ag-welkom h2 { font-size: 30px; letter-spacing: -.03em; }
+  #grote-chat .ag-sug { max-width: 640px; }
+  #grote-chat .md { font-size: 15.5px; }
+  #grote-chat .ag-msg { margin-bottom: 22px; }
+  .ag-laden { display: grid; place-items: center; padding: 18vh 0; }
+  body.app.chatmodus .ag-zweef { display: none; }
+
+  @media (max-width: 960px) {
+    body.app main.db.chatpagina { grid-template-columns: 1fr; height: calc(100dvh - 56px); }
+    .gs { position: fixed; z-index: 60; top: 0; bottom: 0; left: 0; width: min(300px, 86vw); background: #F6F6F8; transform: translateX(-102%); transition: transform .35s var(--veer); box-shadow: 20px 0 50px -20px rgba(0, 0, 0, .3); }
+    body.gs-open .gs { transform: none; }
+    .cp-menu { display: grid; place-items: center; }
+    .cp-kop { padding: 10px 14px; }
+  }
 </style>
 </head>
-<body>
-<main class="db">
-  <div class="ap-kop">
-    <div class="orb-plek" id="kop-orb"></div>
-    <div><h1>Agent en kennisbank</h1><p>Je AI-collega. Kent jullie klanten, werkstromen en de kennisbank.</p></div>
-    <div class="modi" id="modi">
-      <button type="button" data-m="dag" class="is-aan">Dagcoach</button>
-      <button type="button" data-m="boek">Boekhoudvraag</button>
-      <button type="button" data-m="werk">Werkstromen</button>
-      <button type="button" id="nieuw-gesprek">Nieuw gesprek</button>
-    </div>
-  </div>
-
-  <div class="ap">
-    <section class="db-kaart ap-chat" id="grote-chat" aria-label="Chat met de agent"></section>
-    <aside class="ap-rail">
-      <div class="db-kaart">
-        <h2>Zelf zoeken in de kennisbank</h2>
-        <label class="kz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="kz" type="search" placeholder="Bijv. creditfactuur, KOR, ICP" aria-label="Zoek in de kennisbank"></label>
-        <div class="kr" id="kr"><div class="kr-leeg">Boekhouden, btw, inkomstenbelasting, onze tarieven en werkwijze, plus al onze kennisbankartikelen.</div></div>
-      </div>
-      <div class="db-kaart">
-        <div class="db-kop"><h2 style="margin:0">Lopende werkstromen</h2><a class="meer" href="/intern/werkstromen.html">Alle</a></div>
-        <div class="lw" id="lw"><div class="skelet" style="width:70%"></div></div>
-      </div>
-      <div class="db-kaart st-kaart" id="st"></div>
-    </aside>
-  </div>
+<body class="chatmodus">
+<main class="db chatpagina">
+  <aside class="gs" aria-label="Gesprekken">
+    <button class="gs-nieuw" type="button" id="nieuw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Nieuw gesprek</button>
+    <div class="gs-zoek"><input id="gs-zoek" type="search" placeholder="Zoek in gesprekken" aria-label="Zoek in gesprekken"></div>
+    <nav class="gs-lijst" id="gs-lijst"><div class="gs-leeg">Laden…</div></nav>
+    <div class="gs-voet" id="gs-voet"></div>
+  </aside>
+  <section class="cp">
+    <div class="cp-kop"><button class="cp-menu" type="button" id="menu" aria-label="Gesprekken tonen">☰</button><div id="kop-orb"></div><h1 id="titel">Nieuw gesprek</h1></div>
+    <div id="grote-chat"></div>
+  </section>
 </main>
 
 <script src="/intern/app.js?v=3"></script>
 <script>
 (function () {
   function start() {
-    var AE = window.AE, esc = AE.esc;
+    var AE = window.AE, esc = AE.esc, lijst = [], q = '';
     document.getElementById('kop-orb').innerHTML = AE.agent.orb();
-    document.querySelector('#kop-orb .orb').style.setProperty('--m', '64px');
-    var chat = AE.agent.maakChat(document.getElementById('grote-chat'), { placeholder: 'Stel je vraag, of vraag waar je moet beginnen…' });
+    var param = new URLSearchParams(location.search);
+    var chat = AE.agent.maakChat(document.getElementById('grote-chat'), { placeholder: 'Stel een vraag, of laat de agent iets voor je doen…', gesprek: param.get('g') || (param.get('nieuw') ? null : undefined) });
     window.AE_GROTE_CHAT = chat;
-    var q = new URLSearchParams(location.search).get('q'); if (q) chat.vraag(q);
+    if (param.get('q')) setTimeout(function () { chat.vraag(param.get('q')); }, 400);
 
-    document.getElementById('modi').addEventListener('click', function (e) {
-      var b = e.target.closest('button'); if (!b) return;
-      if (b.id === 'nieuw-gesprek') { chat.reset(); return; }
-      this.querySelectorAll('[data-m]').forEach(function (x) { x.classList.toggle('is-aan', x === b); });
-      chat.modus(b.dataset.m);
-    });
-
-    // Kennisbank zelf doorzoeken
-    var kz = document.getElementById('kz'), kr = document.getElementById('kr'), tm;
-    kz.addEventListener('input', function () {
-      clearTimeout(tm); var v = kz.value.trim();
-      if (v.length < 2) { kr.innerHTML = '<div class="kr-leeg">Typ minimaal twee letters.</div>'; return; }
-      tm = setTimeout(function () {
-        AE.api('/intern/api/kennis?q=' + encodeURIComponent(v)).then(function (r) {
-          kr.innerHTML = r.resultaten.length ? r.resultaten.map(function (x, i) {
-            return '<details' + (i === 0 ? ' open' : '') + '><summary><small>' + esc(x.groep) + '</small>' + esc(x.titel) + '</summary><div class="kt">' + esc(x.tekst) +
-              '<div style="margin-top:8px">' + (x.bron ? '<a href="' + esc(x.bron) + '" target="_blank" rel="noopener">Open artikel</a>' : '') + '<button type="button" data-v="' + esc(x.titel) + '">Vraag de agent hierover</button></div></div></details>';
-          }).join('') : '<div class="kr-leeg">Niets gevonden. Vraag het de agent, die zoekt breder.</div>';
-        });
-      }, 180);
-    });
-    kr.addEventListener('click', function (e) { var b = e.target.closest('[data-v]'); if (b) chat.vraag('Leg uit: ' + b.dataset.v + '. Wat moet ik hier in de praktijk mee bij een klant?'); });
-
-    // Lopende werkstromen
-    function laadWerk() {
-      AE.api('/intern/api/werkstromen').then(function (r) {
-        document.getElementById('lw').innerHTML = r.lopend.length ? r.lopend.slice(0, 6).map(function (w) {
-          return '<a href="/intern/werkstromen.html?run=' + encodeURIComponent(w.id) + '">' + esc(w.titel) + '<small>' + (w.klantNaam ? esc(w.klantNaam) + ', ' : '') + w.klaar + ' van ' + w.totaal + ' stappen</small><div class="balk"><i style="width:' + Math.round(w.klaar / w.totaal * 100) + '%"></i></div></a>';
-        }).join('') : '<p class="db-noot" style="margin:0">Geen lopende werkstromen. Vraag de agent er een te starten, of kies er een op de werkstromenpagina.</p>';
-      });
+    function groep(iso) {
+      var d = new Date(iso), nu = new Date(), dag = 864e5, verschil = Math.floor((new Date(nu.toDateString()) - new Date(d.toDateString())) / dag);
+      return verschil <= 0 ? 'Vandaag' : verschil === 1 ? 'Gisteren' : verschil < 7 ? 'Afgelopen week' : verschil < 31 ? 'Afgelopen maand' : 'Eerder';
     }
-    laadWerk(); document.addEventListener('ae:agent-actie', laadWerk);
+    function teken() {
+      var huidig = chat.id(), html = '', vorige = '';
+      var l = lijst.filter(function (g) { return !q || (g.titel || '').toLowerCase().indexOf(q) > -1; });
+      l.forEach(function (g) {
+        var gr = groep(g.bijgewerkt);
+        if (gr !== vorige) { html += '<div class="gs-groep">' + gr + '</div>'; vorige = gr; }
+        html += '<div class="gs-item' + (g.id === huidig ? ' is-aan' : '') + '"><a href="?g=' + encodeURIComponent(g.id) + '" data-g="' + esc(g.id) + '" title="' + esc(g.titel) + '">' + esc(g.titel || 'Gesprek') + '</a><button type="button" data-weg="' + esc(g.id) + '" title="Verwijderen" aria-label="Gesprek verwijderen">×</button></div>';
+      });
+      document.getElementById('gs-lijst').innerHTML = html || '<div class="gs-leeg">' + (q ? 'Geen gesprekken gevonden.' : 'Nog geen gesprekken. Stel je eerste vraag.') + '</div>';
+      var g = lijst.filter(function (x) { return x.id === huidig; })[0];
+      document.getElementById('titel').textContent = g ? g.titel : 'Nieuw gesprek';
+      document.title = (g ? g.titel + ' | ' : '') + 'Agent | Avezaat & Evers intern';
+    }
+    function laadLijst() { return AE.api('/intern/api/gesprekken').then(function (r) { lijst = r; teken(); }); }
+
+    document.getElementById('nieuw').addEventListener('click', function () { chat.reset(); history.replaceState(null, '', location.pathname); teken(); document.body.classList.remove('gs-open'); chat.focus(); });
+    document.getElementById('gs-zoek').addEventListener('input', function () { q = this.value.trim().toLowerCase(); teken(); });
+    document.getElementById('menu').addEventListener('click', function () { document.body.classList.toggle('gs-open'); });
+    document.getElementById('gs-lijst').addEventListener('click', function (e) {
+      var w = e.target.closest('[data-weg]');
+      if (w) {
+        if (!w.dataset.zeker) { w.dataset.zeker = '1'; w.textContent = '?'; w.title = 'Klik nogmaals om te verwijderen'; setTimeout(function () { if (w.isConnected) { delete w.dataset.zeker; w.textContent = '×'; } }, 2500); return; }
+        var id = w.dataset.weg;
+        AE.api('/intern/api/gesprek?id=' + encodeURIComponent(id), { method: 'DELETE' }).then(function () { if (chat.id() === id) chat.reset(); laadLijst(); });
+        return;
+      }
+      var a = e.target.closest('[data-g]'); if (!a) return;
+      e.preventDefault(); chat.laad(a.dataset.g); history.replaceState(null, '', '?g=' + encodeURIComponent(a.dataset.g));
+      document.body.classList.remove('gs-open');
+      setTimeout(teken, 50);
+    });
+    document.addEventListener('ae:gesprek', function (e) {
+      if (e.detail && chat.id()) history.replaceState(null, '', '?g=' + encodeURIComponent(chat.id()));
+      laadLijst();
+    });
+    laadLijst();
 
     AE.api('/intern/api/agent/status').then(function (s) {
-      document.getElementById('st').innerHTML = s.slim
-        ? '<div class="st aan"><i></i>Slim, en gratis</div><p>De agent denkt mee via Google Gemini (gratis versie) en zoekt waar nodig actuele informatie op het web, zoals bedragen van de Belastingdienst of uitleg over MoneyMonk. Hij gebruikt daarnaast jullie klanten, taken, werkstromen en kennisbank.</p><p>Binnen de EU gebruikt Google je vragen niet om zijn AI te trainen. Is de daglimiet op, dan valt hij terug op de lokale modus.</p>'
-        : '<div class="st"><i></i>Lokale modus</div><p>De agent zoekt nu alleen in de kennisbank, werkstromen en klanten. Zet in Netlify <code>GEMINI_API_KEY</code> (gratis via aistudio.google.com) en hij denkt echt mee en zoekt op het web.</p>';
+      document.getElementById('gs-voet').innerHTML = s.slim
+        ? '<i></i><b>Gemini</b>, gratis. Kent jullie klanten, kennisbank en het web, en kan mails opstellen en klanten bijwerken na jouw bevestiging.'
+        : '<i class="uit"></i><b>Lokale modus.</b> Zet <code>GEMINI_API_KEY</code> in Netlify voor de slimme agent.';
     });
   }
   if (window.AE && window.AE.agent) start(); else document.addEventListener('ae:agent-klaar', start);

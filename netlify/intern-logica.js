@@ -245,14 +245,14 @@ export async function verwerk(request, cookies, next, maakStore, env = () => und
     return json(taken);
   }
 
-  if (pad.startsWith("/intern/api/agent") || pad.startsWith("/intern/api/werkstro") || pad === "/intern/api/kennis" || pad === "/intern/api/dagplan") {
+  if (pad.startsWith("/intern/api/agent") || pad.startsWith("/intern/api/werkstro") || pad === "/intern/api/kennis" || pad === "/intern/api/dagplan" || pad.startsWith("/intern/api/gesprek")) {
     // Het agentgesprek zelf draait in een gewone Netlify Function (netlify/functions/agent.mjs):
     // edge functions mogen maar 50 ms rekenen, te weinig voor een AI-gesprek met tools.
     if (pad === "/intern/api/agent" && request.method === "POST") return next();
     return agentApi(request, url, pad, wie, maakStore(), env, agentHulp(env));
   }
 
-  if (pad.startsWith("/intern/api/klant") || pad.startsWith("/intern/api/voorstel") || pad === "/intern/api/kwartaalbord" || pad === "/intern/api/overzicht" || pad === "/intern/api/inzichten" || pad === "/intern/api/zoek") return klantenApi(request, url, pad, wie, maakStore(), env);
+  if (pad.startsWith("/intern/api/klant") || pad.startsWith("/intern/api/voorstel") || pad === "/intern/api/kwartaalbord" || pad === "/intern/api/overzicht" || pad === "/intern/api/inzichten" || pad === "/intern/api/zoek" || pad.startsWith("/intern/api/mail/")) return klantenApi(request, url, pad, wie, maakStore(), env);
 
   return next();
 }
@@ -383,6 +383,29 @@ async function klantenApi(request, url, pad, wie, store, env) {
     if (r.ok && !test && sl) k.verstuurd = { ...(k.verstuurd || {}), [sl]: nu };
     await bewaar();
     return json({ ...r, klant: metPlanning(k, env) }, r.ok ? 200 : 502);
+  }
+
+  // Door de agent ontworpen mail: voorbeeld en versturen (aan een klant of een los e-mailadres)
+  if ((pad === "/intern/api/mail/voorbeeld" || pad === "/intern/api/mail/stuur") && request.method === "POST") {
+    const k = body.klant ? vind(body.klant) : klanten.find((x) => x.email && x.email === mailadres(body.aan));
+    const aanEcht = k ? k.email : mailadres(body.aan);
+    if (!aanEcht) return json({ fout: "Geen geldig e-mailadres" }, 400);
+    const d = { naam: k ? k.naam : schoon(body.naam), wie: boekhouder(body.wie) || (k && k.boekhouder) || wie, onderwerp: schoon(body.onderwerp).slice(0, 140), preheader: schoon(body.preheader).slice(0, 120),
+      aanhef: body.aanhef !== false, blokken: Array.isArray(body.blokken) ? body.blokken : [] };
+    if (!d.onderwerp || !d.blokken.length) return json({ fout: "Onderwerp en inhoud zijn nodig" }, 400);
+    const m = mails.ontwerp(d, BASE);
+    if (pad === "/intern/api/mail/voorbeeld") return json({ onderwerp: m.subject, html: m.html.split(BASE + "/assets/").join(url.origin + "/assets/"), aan: aanEcht });
+    const test = body.test === true;
+    const aan = test ? String(env("MAIL_TO") || "info@avezaatenevers.nl").split(",")[0].trim() : aanEcht;
+    if (test) m.subject = "[TEST] " + m.subject;
+    const r = await verstuur(env, { aan, mail: m });
+    if (k) {
+      k.log = k.log || [];
+      k.log.unshift({ type: "ontwerp", onderwerp: m.subject, aan, op: nu, door: wie, test, ok: r.ok, fout: r.fout || null, handmatig: true });
+      k.log = k.log.slice(0, 100);
+      await bewaar();
+    }
+    return json({ ...r, id: k ? k.id : null }, r.ok ? 200 : 502);
   }
 
   // Kwartaalstatus: stukken binnen, aangifte ingediend, btw betaald

@@ -478,6 +478,37 @@ ${rij(0, 5)}${rij(6, 10)}
     };
   },
 
+  // Door de agent ontworpen mail, opgebouwd uit blokken in onze huisstijl (altijd mailveilig)
+  ontwerp(d, base = '') {
+    const veiligUrl = (u) => (/^(https:\/\/|mailto:|tel:)[^\s"<>]+$/i.test(String(u || '').trim()) ? String(u).trim() : '');
+    const opmaak = (t) => esc(t).replace(/\*\*([^*]+)\*\*/g, (m, x) => sterk(x)).replace(/\n/g, '<br>');
+    const delen = [], tekstDelen = [];
+    if (d.aanhef !== false) { delen.push(p(hoi(d.naam))); tekstDelen.push(hoiTekst(d.naam)); }
+    for (const b of (Array.isArray(d.blokken) ? d.blokken : []).slice(0, 30)) {
+      const t = String(b.tekst || '').slice(0, 3000), items = (Array.isArray(b.items) ? b.items : []).map((x) => String(x).slice(0, 400)).slice(0, 12);
+      if (b.type === 'kop' && t) { delen.push(kop(opmaak(t))); tekstDelen.push(t.toUpperCase()); }
+      else if (b.type === 'tussenkop' && t) { delen.push(tussenkop(opmaak(t))); tekstDelen.push(t); }
+      else if (b.type === 'alinea' && t) { delen.push(p(opmaak(t))); tekstDelen.push(t); }
+      else if (b.type === 'lijst' && items.length) { delen.push(vinkjes(items.map(opmaak))); tekstDelen.push(items.map((x) => '- ' + x).join('\n')); }
+      else if (b.type === 'stappen' && items.length) {
+        const st = items.map((x) => { const i = x.indexOf(':'); return i > 0 ? [opmaak(x.slice(0, i).trim()), opmaak(x.slice(i + 1).trim())] : [opmaak(x), '']; });
+        delen.push(stappen(st)); tekstDelen.push(items.map((x, i) => (i + 1) + '. ' + x).join('\n'));
+      }
+      else if (b.type === 'blok' && t) { delen.push(blok(blokTekst(opmaak(t)))); tekstDelen.push(t); }
+      else if (b.type === 'tabel' && items.length) {
+        const rijen = items.map((x) => { const i = x.indexOf(':'); return i > 0 ? [opmaak(x.slice(0, i).trim()), opmaak(x.slice(i + 1).trim())] : [opmaak(x), '']; });
+        delen.push(blok(tabel(rijen))); tekstDelen.push(items.join('\n'));
+      }
+      else if (b.type === 'knop' && b.label && veiligUrl(b.url)) { delen.push(knop(veiligUrl(b.url), esc(String(b.label).slice(0, 60)))); tekstDelen.push(b.label + ': ' + veiligUrl(b.url)); }
+    }
+    delen.push(groet(base, d.wie));
+    return {
+      subject: String(d.onderwerp || 'Bericht van Avezaat & Evers').slice(0, 140),
+      html: omhulsel(base, { preheader: String(d.preheader || tekstDelen[1] || '').slice(0, 120), inhoud: delen.join(''), wie: d.wie }),
+      text: tekstDelen.join('\n\n') + voet(d.wie),
+    };
+  },
+
   // Eigen bericht in huisstijl (opgesteld door Koen of Daan, bijvoorbeeld via de agent)
   bericht(d, base = '') {
     const alineas = String(d.tekst || '').split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean);

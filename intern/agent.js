@@ -82,7 +82,7 @@
     var b = e.target.closest('[data-bev]'); if (!b) return;
     var k = b.closest('.ag-bev'), d = JSON.parse(k.getAttribute('data-bev-data')), wat = b.dataset.bev;
     if (wat === 'nee') { bevStatus(k.dataset.id, { staat: 'weg' }); return zetKaart(k, 'weg', 'Geannuleerd'); }
-    if (wat === 'voorbeeld') return AE.api(d.voorbeeld).then(toonVoorbeeld).catch(function (err) { zetKaart(k, 'fout', err.message); });
+    if (wat === 'voorbeeld') return (typeof d.voorbeeld === 'string' ? AE.api(d.voorbeeld) : AE.api(d.voorbeeld.url, { method: 'POST', body: JSON.stringify(d.voorbeeld.body) })).then(toonVoorbeeld).catch(function (err) { zetKaart(k, 'fout', err.message); });
     var v = wat === 'test' ? d.test : d.verzoek;
     if (!v || String(v.url).indexOf('/intern/api/') !== 0) return;
     b.disabled = true; zetKaart(k, null, wat === 'test' ? 'Testmail versturen…' : 'Bezig…');
@@ -106,13 +106,13 @@
   }
 
   // ---------- Herbruikbare chat ----------
-  var GESCHIEDENIS = 'ae-agent-v1';
-  function laad() { try { return JSON.parse(localStorage.getItem(GESCHIEDENIS) || '[]'); } catch (e) { return []; } }
-  function bewaar(l) { try { localStorage.setItem(GESCHIEDENIS, JSON.stringify(l.slice(-40))); } catch (e) {} }
+  // Gesprekken staan op de server (per persoon). Lokaal onthouden we alleen welk gesprek open staat.
+  var ACTIEF = 'ae-gesprek-actief';
+  function actief(v) { try { if (v === undefined) return localStorage.getItem(ACTIEF); if (v) localStorage.setItem(ACTIEF, v); else localStorage.removeItem(ACTIEF); } catch (e) { return null; } }
 
   function maakChat(root, opt) {
     opt = opt || {};
-    var berichten = laad(), bezig = false, modus = opt.modus || null;
+    var berichten = [], bezig = false, modus = opt.modus || null, gid = null, laadNr = 0;
     root.classList.add('ag-chat');
     root.innerHTML = '<div class="ag-stroom" aria-live="polite"></div><form class="ag-invoer"><div class="ag-veld"><textarea rows="1" placeholder="' + (opt.placeholder || 'Vraag het de agent…') + '" aria-label="Bericht aan de agent"></textarea><button type="submit" aria-label="Versturen" disabled>' + PIJL + '</button></div><div class="ag-hint"><span>Enter om te versturen, Shift+Enter voor een nieuwe regel</span><span class="ag-modus"></span></div></form>';
     var stroom = root.querySelector('.ag-stroom'), form = root.querySelector('form'), ta = root.querySelector('textarea'), knop = root.querySelector('button[type=submit]');
@@ -220,7 +220,7 @@
           if (info) extra += '<div class="ag-info">' + esc(info) + '</div>';
           exEl.innerHTML = extra + exEl.innerHTML;
           orbEl.classList.remove('denkt'); document.querySelectorAll('.ag-kop .orb').forEach(function (o) { o.classList.remove('denkt'); });
-          if (antwoord) { berichten.push({ rol: 'agent', tekst: antwoord, stappen: stappen, extra: extra }); bewaar(berichten); }
+          if (antwoord) { berichten.push({ rol: 'agent', tekst: antwoord, stappen: stappen, extra: extra }); bewaar(); }
           else berichten.pop();
           bezig = false; knop.disabled = !ta.value.trim();
           if (acties.length) document.dispatchEvent(new CustomEvent('ae:agent-actie'));
@@ -233,13 +233,31 @@
     form.addEventListener('submit', function (e) { e.preventDefault(); vraag(ta.value); });
     stroom.addEventListener('click', function (e) { var b = e.target.closest('[data-vraag]'); if (b) vraag(b.getAttribute('data-vraag')); });
     stroom.addEventListener('click', kaartKlik);
-    tekenAlles();
+
+    function bewaar() {
+      return AE.api('/intern/api/gesprek', { method: 'POST', body: JSON.stringify({ id: gid, berichten: berichten }) }).then(function (m) {
+        gid = m.id; actief(gid);
+        document.dispatchEvent(new CustomEvent('ae:gesprek', { detail: m }));
+      }).catch(function () {});
+    }
+    function laadGesprek(id) {
+      var nr = ++laadNr;
+      if (!id) { gid = null; berichten = []; return welkom(); }
+      stroom.innerHTML = '<div class="ag-laden"><div class="ag-denkt"><span></span><span></span><span></span></div></div>';
+      return AE.api('/intern/api/gesprek?id=' + encodeURIComponent(id)).then(function (g) {
+        if (nr !== laadNr) return;
+        gid = g.id; berichten = g.berichten || []; actief(gid); tekenAlles();
+      }).catch(function () { if (nr !== laadNr) return; gid = null; berichten = []; actief(null); welkom(); });
+    }
+    laadGesprek(opt.gesprek !== undefined ? opt.gesprek : actief());
     return {
       vraag: vraag,
-      reset: function () { berichten = []; bewaar(berichten); welkom(); },
+      reset: function () { if (bezig) return; actief(null); laadGesprek(null); document.dispatchEvent(new CustomEvent('ae:gesprek', { detail: null })); },
+      laad: function (id) { if (bezig) return; laadGesprek(id); },
+      id: function () { return gid; },
       modus: function (m) { modus = m; if (!berichten.length) welkom(); },
       focus: function () { ta.focus(); },
-      herteken: function () { berichten = laad(); tekenAlles(); }
+      herteken: function () { if (!bezig && actief() !== gid) laadGesprek(actief()); }
     };
   }
 

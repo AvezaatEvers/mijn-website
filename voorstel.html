@@ -18,14 +18,14 @@
   .vs-form { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 14px; background: var(--soft); border: 1px solid var(--line); border-radius: 20px; padding: 22px; max-height: calc(100vh - 48px); overflow: auto; }
   .vs-form h2 { font-size: 18px; margin: 6px 0 0; }
   .vs-form label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 500; color: var(--ink); }
-  .vs-form input[type=text], .vs-form input[type=number], .vs-form input[type=date], .vs-form select, .vs-form textarea { font: inherit; font-weight: 400; font-size: 15px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  .vs-form input[type=text], .vs-form input[type=email], .vs-form input[type=number], .vs-form input[type=date], .vs-form select, .vs-form textarea { font: inherit; font-weight: 400; font-size: 15px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
   .vs-form .vs-check { flex-direction: row; align-items: center; gap: 10px; font-weight: 400; }
   .vs-form .vs-check input { width: 18px; height: 18px; accent-color: var(--accent); }
-  .vs-rij { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .vs-rij { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; } .vs-rij label { min-width: 0; } .vs-form input, .vs-form select, .vs-form textarea { width: 100%; min-width: 0; box-sizing: border-box; }
   .vs-hint { font-size: 13px; color: var(--muted); margin: -6px 0 0; }
   .vs-preview { background: #F3F4F6; display: flex; justify-content: safe center; border-radius: 20px; padding: 32px 16px; overflow-x: auto; }
   .vs-acties { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
-  .vs-ok { font-size: 14px; color: #15803D; margin: 0; }
+  .vs-ok { font-size: 14px; color: #15803D; margin: 0 0 14px; min-height: 1.2em; } .vs-ok.is-fout { color: #B91C1C; } .vs-ok a { color: inherit; font-weight: 600; }
   @media (max-width: 960px) { .vs-wrap { grid-template-columns: minmax(0, 1fr); } .vs-form { position: static; max-height: none; } }
 </style>
 </head>
@@ -34,13 +34,15 @@
   <div class="vs-wrap">
     <form class="vs-form" id="vs-form" autocomplete="off">
       <a class="logo" href="/">Avezaat <span>&amp;</span> Evers</a>
-      <p class="vs-hint" style="margin:0">Interne pagina. Vul in, controleer de mail rechts en klik op Kopieer mail.</p>
+      <p class="vs-hint" style="margin:0">Interne pagina. Vul in, controleer de mail rechts en verstuur hem via Resend. De klant komt als prospect in <a href="/intern/klanten.html">Klanten</a>.</p>
 
       <h2>Klant</h2>
       <div class="vs-rij">
         <label>Voornaam<input type="text" name="voornaam" value="Sanne"></label>
         <label>Bedrijfsnaam<input type="text" name="bedrijf" value="Studio Sanne"></label>
       </div>
+      <label>E-mailadres<input type="email" name="email" placeholder="sanne@voorbeeld.nl" required></label>
+      <label>Telefoon (optioneel)<input type="text" name="telefoon" placeholder="06 12345678"></label>
       <label>Wat hebben we besproken? <textarea name="situatie" rows="3">je net gestart bent als grafisch ontwerper en je je administratie vanaf het begin goed wilt regelen</textarea></label>
       <p class="vs-hint">Loopt door na "Leuk je gesproken te hebben. Je vertelde dat …"</p>
 
@@ -65,200 +67,86 @@
 
     <div>
       <div class="vs-acties">
-        <button class="btn btn-primary" type="button" id="vs-kopieer">Kopieer mail</button>
-        <button class="btn btn-ghost" type="button" id="vs-download">Download als .htm</button>
+        <button class="btn btn-ghost" type="button" id="vs-test">Test naar info@</button>
+        <button class="btn btn-primary" type="button" id="vs-stuur">Verstuur naar klant</button>
         <span class="vs-hint" style="margin:0">Onderwerp: <strong id="vs-onderwerp"></strong></span>
-        <p class="vs-ok" id="vs-ok"></p>
       </div>
-      <div class="vs-preview"><div id="vs-mail"></div></div>
+      <p class="vs-ok" id="vs-ok" role="status"></p>
+      <div class="vs-preview"><iframe id="vs-mail" title="Voorbeeld van de voorstelmail" style="width:100%;max-width:680px;height:1600px;border:0;border-radius:12px;background:#F4F6FA"></iframe></div>
     </div>
   </div>
 </main>
 
 <script>
 (function () {
-  // Afbeeldingen en links moeten openbaar bereikbaar zijn voor Outlook, dus altijd het live domein.
-  var BASE = 'https://avezaatenevers.nl';
-  var MAIL = 'info@avezaatenevers.nl', TEL = '085 060 4363', TELLINK = 'tel:+31850604363', WA = 'https://wa.me/31850604363';
-  var BLAUW = '#26458F', INKT = '#111827', TEKST = '#374151', GRIJS = '#6B7280', LIJN = '#E5E7EB', TINT = '#EEF2F8';
-  var F = 'font-family:Arial,Helvetica,sans-serif;';
   var form = document.getElementById('vs-form');
+  var ok = document.getElementById('vs-ok');
+  var frame = document.getElementById('vs-mail');
+  var stuurKnop = document.getElementById('vs-stuur'), zeker = false, timer = null;
 
   // Standaard geldig tot: over 14 dagen
   var g = form.elements.geldig;
-  if (!g.value) {
-    var d = new Date(Date.now() + 14 * 864e5);
-    g.value = d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
-  }
+  if (!g.value) g.value = new Date(Date.now() + 14 * 864e5).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  function esc(t) { return String(t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-  function euro(n) {
-    var heel = Math.round(n * 100) % 100 === 0;
-    return '€' + n.toLocaleString('nl-NL', { minimumFractionDigits: heel ? 0 : 2, maximumFractionDigits: 2 });
+  function api(pad, data) {
+    return fetch(pad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify(data) })
+      .then(function (r) { if (r.status === 401) { location.reload(); throw new Error('uitgelogd'); } return r.json().then(function (j) { if (!r.ok) throw new Error(j.fout || 'Er ging iets mis'); return j; }); });
   }
-  // Ontwerp dat ook goed blijft als Outlook bij plakken kleuren en lettergroottes weghaalt:
-  // opbouw met tabellen en HTML-attributen (bgcolor, width, height), nadruk met vet,
-  // en de kop en de knop als afbeelding.
-  var T = F + 'font-size:15px;line-height:1.6;color:' + INKT + ';';
-  function ruimte(h) { return '<tr><td colspan="3" height="' + h + '" style="height:' + h + 'px;font-size:1px;line-height:1px;"></td></tr>'; }
-  function blok(inhoud) { return '<tr><td width="40" style="width:40px;">&nbsp;</td><td width="520" style="width:520px;' + T + '">' + inhoud + '</td><td width="40" style="width:40px;">&nbsp;</td></tr>'; }
-  function lijn() { return '<tr><td colspan="2" height="1" bgcolor="' + LIJN + '" style="height:1px;background:' + LIJN + ';font-size:1px;line-height:1px;"></td></tr>'; }
-  function kopje(t) { return '<b style="' + F + 'font-size:15px;color:' + INKT + ';">' + t + '</b>'; }
-  function rij(links, rechts, sterk) {
-    var st = T + 'padding:8px 0;' + (sterk ? 'font-weight:bold;' : '');
-    return '<tr><td style="' + st + '">' + (sterk ? '<b>' + links + '</b>' : links) + '</td><td align="right" style="' + st + 'white-space:nowrap;">' + (sterk ? '<b>' + rechts + '</b>' : rechts) + '</td></tr>';
-  }
-  function vinkje(t) {
-    return '<tr><td width="24" valign="top" style="' + T + 'padding:3px 0;"><b>&#10003;</b></td><td valign="top" style="' + T + 'padding:3px 0;">' + t + '</td></tr>';
-  }
-  function stap(n, titel, tekst) {
-    return '<tr>' +
-      '<td width="30" valign="top" style="padding:2px 0 12px 0;"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td width="26" height="26" align="center" valign="middle" bgcolor="' + TINT + '" style="width:26px;height:26px;background:' + TINT + ';border-radius:13px;' + F + 'font-size:13px;font-weight:bold;color:' + INKT + ';"><b>' + n + '</b></td></tr></table></td>' +
-      '<td width="12">&nbsp;</td>' +
-      '<td valign="top" style="' + T + 'padding:0 0 12px 0;"><b>' + titel + '</b><br>' + tekst + '</td>' +
-    '</tr>';
-  }
-
-  function bouw() {
+  function gegevens() {
     var v = form.elements;
-    var naam = esc(v.voornaam.value.trim() || 'daar');
-    var bedrijf = esc(v.bedrijf.value.trim());
-    var wie = v.boekhouder.value;
-    var pakket = Math.max(0, parseFloat(v.pakket.value) || 0);
-    var maand = pakket, jaar = 0, eenmalig = 0;
-    var extra = '';
-    if (v.icp.checked) { maand += 15; extra += lijn() + rij('ICP-aangifte (klanten binnen de EU)', '€15 p/m'); }
-    if (v.partner.checked) { jaar += 150; extra += lijn() + rij('IB-aangifte fiscaal partner', '€150 per jaar'); }
-    if (v.overstap.value === 'gratis') extra += lijn() + rij('Overstappen van je oude boekhouder', '<b>gratis</b>');
-    if (v.overstap.value === 'betaald') { eenmalig += 149; extra += lijn() + rij('Overstappen van je oude boekhouder', '€149 eenmalig'); }
-    var uren = Math.max(0, parseInt(v.achterstand.value, 10) || 0);
-    if (uren) { eenmalig += uren * 60; extra += lijn() + rij('Achterstand inhalen (± ' + uren + ' uur à €60)', euro(uren * 60) + ' eenmalig'); }
-
-    var situatie = esc(v.situatie.value.trim());
-    var noot = esc(v.noot.value.trim()).replace(/\n/g, '<br>');
-    var onderwerp = 'Je voorstel van Avezaat & Evers' + (bedrijf ? ' voor ' + v.bedrijf.value.trim() : '');
-    document.getElementById('vs-onderwerp').textContent = onderwerp;
-
-    var akkoordLink = 'mailto:' + MAIL + '?subject=' + encodeURIComponent('Akkoord voorstel' + (bedrijf ? ' ' + v.bedrijf.value.trim() : '')) +
-      '&body=' + encodeURIComponent('Hoi ' + wie + ',\n\nIk ga akkoord met het voorstel en wil graag starten per ' + v.start.value.trim() + '.\n\nGroet,\n' + v.voornaam.value.trim());
-
-    var tabel = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">';
-    var html = '' +
-    '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFFFFF" style="width:600px;background:#FFFFFF;">' +
-    ruimte(32) +
-    // Kop als afbeelding
-    blok('<a href="' + BASE + '/"><img src="' + BASE + '/assets/email/voorstel-kop.png" width="520" height="150" alt="Je voorstel op maat van Avezaat &amp; Evers" style="display:block;border:0;width:520px;height:150px;"></a>') +
-    ruimte(28) +
-    // Intro
-    blok('Hoi ' + naam + ',<br><br>Leuk je gesproken te hebben!' + (situatie ? ' Je vertelde dat ' + situatie + '.' : '') +
-      ' Zoals beloofd zetten we hieronder op een rij wat we ' + (bedrijf ? 'voor <b>' + bedrijf + '</b> ' : 'voor je ') + 'gaan doen en wat het kost. Geen kleine lettertjes, en je zit nergens aan vast.') +
-    ruimte(24) +
-    // Prijs
-    blok('<table role="presentation" width="100%" cellpadding="20" cellspacing="0" border="0" bgcolor="' + TINT + '" style="background:' + TINT + ';"><tr><td style="' + T + '">' +
-      'Jouw vaste prijs<br><b style="font-size:28px;line-height:1.3;">' + euro(maand) + ' per maand</b> excl. btw<br>' +
-      euro(maand * 1.21) + ' incl. btw, maandelijks opzegbaar' +
-      (jaar ? '<br>Plus ' + euro(jaar) + ' per jaar' : '') + (eenmalig ? '<br>Eenmalig ' + euro(eenmalig) : '') +
-    '</td></tr></table>') +
-    ruimte(28) +
-    // Inbegrepen
-    blok(kopje('Altijd inbegrepen') + tabel + '<tr><td colspan="2" height="8" style="font-size:1px;line-height:1px;"></td></tr>' +
-      vinkje('Eén vaste boekhouder: <b>' + wie + '</b>, die jouw bedrijf kent') +
-      vinkje('Je complete boekhouding, tot 100 banktransacties per maand') +
-      vinkje('4× btw-aangifte per jaar, vooraf met je besproken') +
-      vinkje('Je aangifte inkomstenbelasting en jaarcijfers') +
-      vinkje('MoneyMonk-software en app om je bonnetjes aan te leveren') +
-      vinkje('Elke maand een 1-op-1 gesprek, en vragen stellen wanneer je wilt') +
-    '</table>') +
-    ruimte(28) +
-    // Overzicht
-    blok(kopje('Overzicht') + '<table role="presentation" width="100%" cellpadding="4" cellspacing="0" border="0">' +
-      rij('Pakket boekhouding volledig uit handen', euro(pakket) + ' p/m') +
-      extra + lijn() +
-      rij('Totaal per maand', euro(maand) + ' excl. btw', true) +
-    '</table>' +
-    'Startdatum: <b>' + esc(v.start.value.trim()) + '</b>. Je zegt maandelijks op. Stop je binnen 12 maanden nadat we je aangifte inkomstenbelasting hebben gedaan, dan rekenen we die aangifte apart af (€250).') +
-    ruimte(28) +
-    // Stappen
-    blok(kopje('Zo starten we') + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td colspan="3" height="10" style="font-size:1px;line-height:1px;"></td></tr>' +
-      stap(1, 'Jij geeft akkoord', 'Met de knop hieronder, of gewoon door op deze mail te reageren.') +
-      stap(2, 'Wij sturen de opdrachtbevestiging', 'En we vragen je identiteitsbewijs, dat zijn we wettelijk verplicht.') +
-      stap(3, 'We zetten alles klaar', 'Je MoneyMonk-account, de machtiging voor je aangiftes' + (v.overstap.value !== 'nee' ? ' en de overdracht met je oude boekhouder' : '') + '.') +
-      stap(4, 'Je eerste 1-op-1', 'In je eerste maand lopen we samen alles door.') +
-    '</table>') +
-    ruimte(4) +
-    blok('<span style="font-size:14px;">Bij de opdrachtbevestiging horen onze <a href="' + BASE + '/voorwaarden.html">algemene voorwaarden</a>, <a href="' + BASE + '/verwerkersovereenkomst.html">verwerkersovereenkomst</a> en <a href="' + BASE + '/privacy.html">privacyverklaring</a>. Lees ze gerust alvast.</span>') +
-    ruimte(16) +
-    // Knop als afbeelding
-    blok('<a href="' + akkoordLink + '"><img src="' + BASE + '/assets/email/voorstel-knop.png" width="240" height="52" alt="Ja, ik wil starten" style="display:block;border:0;width:240px;height:52px;"></a>') +
-    ruimte(16) +
-    blok('Dit voorstel is geldig tot <b>' + esc(v.geldig.value.trim()) + '</b>. Nog vragen? Bel of app me op <a href="' + TELLINK + '">' + TEL + '</a>.' +
-      (noot ? '<br><br>' + noot : '') +
-      '<br><br>Hartelijke groet,<br><b>' + wie + (wie === 'Daan' ? ' Evers' : ' Avezaat') + '</b><br>Avezaat &amp; Evers') +
-    ruimte(28) +
-    // Voet
-    blok(tabel + lijn() + '</table>') +
-    ruimte(14) +
-    blok('<span style="font-size:12px;">Avezaat &amp; Evers · <a href="mailto:' + MAIL + '">' + MAIL + '</a> · <a href="' + BASE + '/">avezaatenevers.nl</a><br>Alle bedragen excl. 21% btw, tenzij anders vermeld. Op onze diensten zijn onze <a href="' + BASE + '/voorwaarden.html">algemene voorwaarden</a> en <a href="' + BASE + '/verwerkersovereenkomst.html">verwerkersovereenkomst</a> van toepassing.</span>') +
-    ruimte(28) +
-    '</table>';
-
-    document.getElementById('vs-mail').innerHTML = html;
-    toonAfbeeldingen(false);
+    return {
+      voornaam: v.voornaam.value, bedrijf: v.bedrijf.value, situatie: v.situatie.value, start: v.start.value, boekhouder: v.boekhouder.value,
+      pakket: v.pakket.value, icp: v.icp.checked, partner: v.partner.checked, overstap: v.overstap.value, achterstand: v.achterstand.value, noot: v.noot.value, geldig: v.geldig.value,
+    };
   }
-
-  // In de voorbeeldweergave laden we de afbeeldingen van deze site zelf, zodat je ze ook op de conceptversie ziet.
-  // Bij kopiëren en downloaden zetten we ze terug naar het live domein: alleen dat kan Outlook bereiken.
-  function toonAfbeeldingen(live) {
-    document.querySelectorAll('#vs-mail img').forEach(function (img) {
-      var pad = img.getAttribute('src').replace(/^https?:\/\/[^/]+/, '');
-      img.setAttribute('src', (live ? BASE : location.origin) + pad);
-    });
+  function melding(t, fout) { ok.className = 'vs-ok' + (fout ? ' is-fout' : ''); ok.innerHTML = t; }
+  function voorbeeld() {
+    api('/intern/api/voorstel/voorbeeld', { voorstel: gegevens() }).then(function (r) {
+      document.getElementById('vs-onderwerp').textContent = r.onderwerp;
+      frame.srcdoc = r.html;
+    }).catch(function (e) { melding(e.message, true); });
   }
+  frame.addEventListener('load', function () { try { frame.style.height = (frame.contentDocument.body.scrollHeight + 20) + 'px'; } catch (e) {} });
+  function wijziging() { clearTimeout(timer); timer = setTimeout(voorbeeld, 350); zeker = false; stuurKnop.textContent = 'Verstuur naar klant'; stuurKnop.disabled = false; }
+  form.addEventListener('input', wijziging);
+  form.addEventListener('change', wijziging);
+  form.addEventListener('submit', function (e) { e.preventDefault(); });
 
-  document.getElementById('vs-download').addEventListener('click', function () {
-    toonAfbeeldingen(true);
-    setTimeout(function () { toonAfbeeldingen(false); }, 500);
-    var html = '<!DOCTYPE html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' +
-      esc(document.getElementById('vs-onderwerp').textContent) + '</title></head><body style="margin:0;padding:24px 0;background:#F3F4F6;">' +
-      document.getElementById('vs-mail').innerHTML + '</body></html>';
-    var naam = (form.elements.bedrijf.value.trim() || 'klant').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
-    a.download = 'voorstel-' + naam + '.htm';
-    document.body.appendChild(a); a.click(); a.remove();
-    document.getElementById('vs-ok').textContent = 'Gedownload. In Outlook voor Windows: Invoegen → Bestand bijvoegen → kies het bestand → pijltje naast Invoegen → Invoegen als tekst.';
+  document.getElementById('vs-test').addEventListener('click', function () {
+    var b = this; b.disabled = true; melding('Testmail versturen…');
+    api('/intern/api/voorstel/stuur', { voorstel: gegevens(), test: true })
+      .then(function () { melding('Testmail verstuurd naar info@.'); }, function (e) { melding(e.message, true); })
+      .then(function () { b.disabled = false; });
+  });
+  stuurKnop.addEventListener('click', function () {
+    var email = form.elements.email.value.trim();
+    if (!email) { melding('Vul eerst het e-mailadres van de klant in.', true); form.elements.email.focus(); return; }
+    if (!zeker) { zeker = true; stuurKnop.textContent = 'Zeker? Naar ' + email; return; }
+    stuurKnop.disabled = true; melding('Versturen…');
+    api('/intern/api/voorstel/stuur', { voorstel: gegevens(), email: email, telefoon: form.elements.telefoon.value })
+      .then(function (r) {
+        stuurKnop.textContent = 'Verstuurd';
+        melding('Verstuurd naar ' + email + '. Staat als prospect in <a href="/intern/klant.html?id=' + encodeURIComponent(r.klantId) + '">Klanten</a>. Na 2 dagen gaat er automatisch een herinnering, tenzij je de status op Klant zet.');
+      }, function (e) { stuurKnop.disabled = false; zeker = false; stuurKnop.textContent = 'Verstuur naar klant'; melding(e.message, true); });
   });
 
-  form.addEventListener('input', bouw);
-  form.addEventListener('change', bouw);
-  bouw();
-
-  document.getElementById('vs-kopieer').addEventListener('click', function () {
-    var el = document.getElementById('vs-mail'), ok = document.getElementById('vs-ok');
-    toonAfbeeldingen(true);
-    setTimeout(function () { toonAfbeeldingen(false); }, 1500);
-    function klaar() { ok.textContent = 'Gekopieerd. Plak hem in een nieuwe mail in Outlook (Ctrl+V of Cmd+V).'; }
-    function oudeManier() {
-      var r = document.createRange(); r.selectNodeContents(el);
-      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
-      try { document.execCommand('copy'); klaar(); } catch (e) { ok.textContent = 'Selecteer de mail en kopieer hem handmatig.'; }
-      s.removeAllRanges();
-    }
-    // Eerst kopiëren via een selectie: dan neemt de browser (ook Safari) de opmaak mee zoals je hem ziet.
-    // Safari haalt bij de andere methode alle opmaak weg.
-    var r0 = document.createRange(); r0.selectNodeContents(el);
-    var sel0 = window.getSelection(); sel0.removeAllRanges(); sel0.addRange(r0);
-    var gelukt = false;
-    try { gelukt = document.execCommand('copy'); } catch (e) {}
-    sel0.removeAllRanges();
-    if (gelukt) { klaar(); return; }
-    if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
-      navigator.clipboard.write([new ClipboardItem({
-        'text/html': new Blob([el.innerHTML], { type: 'text/html' }),
-        'text/plain': new Blob([el.innerText], { type: 'text/plain' })
-      })]).then(klaar, oudeManier);
-    } else oudeManier();
-  });
+  // Vooraf invullen vanuit een klant (?klant=id)
+  var id = new URLSearchParams(location.search).get('klant');
+  if (id) {
+    fetch('/intern/api/klant?id=' + encodeURIComponent(id), { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (r) {
+      var k = r.klant; if (!k) return;
+      var v = form.elements;
+      v.voornaam.value = (k.naam || '').split(' ')[0]; v.bedrijf.value = k.bedrijf || ''; v.email.value = k.email || ''; v.telefoon.value = k.telefoon || '';
+      v.boekhouder.value = k.boekhouder === 'daan' ? 'Daan' : 'Koen';
+      if (k.voorstel && k.voorstel.data) {
+        var d = k.voorstel.data;
+        v.situatie.value = d.situatie || ''; v.start.value = d.start || v.start.value; v.pakket.value = d.pakket || 80;
+        v.icp.checked = !!d.icp; v.partner.checked = !!d.partner; v.overstap.value = d.overstap || 'nee'; v.achterstand.value = d.achterstand || 0; v.noot.value = d.noot || '';
+      }
+      voorbeeld();
+    }).catch(function () {});
+  }
+  voorbeeld();
 })();
 </script>
 </body>

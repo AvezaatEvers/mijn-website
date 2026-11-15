@@ -29,6 +29,8 @@ const hoi = (naam) => (voornaam(naam) ? `Hoi ${esc(voornaam(naam))},` : 'Hoi,');
 const hoiTekst = (naam) => (voornaam(naam) ? `Hoi ${voornaam(naam)},` : 'Hoi,');
 const wieNaam = (wie) => (wie === 'daan' ? 'Daan' : wie === 'koen' ? 'Koen' : 'Koen en Daan');
 const wieVol = (wie) => (wie === 'daan' ? 'Daan Evers' : wie === 'koen' ? 'Koen Avezaat' : 'Koen en Daan');
+const euro = (n) => { const heel = Math.round(n * 100) % 100 === 0; return '€' + Number(n).toLocaleString('nl-NL', { minimumFractionDigits: heel ? 0 : 2, maximumFractionDigits: 2 }); };
+const akkoordLink = (d) => `mailto:${MAIL}?subject=${encodeURIComponent('Akkoord voorstel' + (d.bedrijf ? ' ' + d.bedrijf : ''))}&body=${encodeURIComponent(`Hoi ${wieNaam(d.wie)},\n\nIk ga akkoord met het voorstel en wil graag starten${d.start ? ' per ' + d.start : ''}.\n\nGroet,\n${voornaam(d.naam)}`)}`;
 
 // ---------- Bouwstenen ----------
 const p = (t, extra = '') => `<p style="margin:0 0 18px;${F}font-size:16px;line-height:1.7;color:${TEKST};${extra}">${t}</p>`;
@@ -218,17 +220,75 @@ ${tabel(regels)}
 
   // 4. Herinnering voorstel
   voorstelHerinnering(d, base = '') {
+    const akkoord = akkoordLink(d);
+    const datum = d.voorstelDatum ? ` van ${esc(d.voorstelDatum)}` : '';
     const inhoud = kop('Heb je ons voorstel nog kunnen bekijken?') +
       p(hoi(d.naam)) +
-      p('Twee dagen geleden stuurde ik je ons voorstel. Misschien is het erbij ingeschoten, of zit je nog met een vraag. Allebei prima.') +
-      p(`Ben je eruit? Dan teken je het voorstel online. Dat is ${sterk('in een minuut')} geregeld, en daarna zetten wij alles voor je klaar.`) +
-      knop(d.link || `${base}/voorstel.html`, 'Bekijk het voorstel') +
+      p(`Een paar dagen geleden stuurde ik je ons voorstel. Misschien is het erbij ingeschoten, of zit je nog met een vraag. Allebei prima.`) +
+      p(`Ben je eruit? Klik dan op de knop hieronder. Dan sturen wij je de opdrachtbevestiging en ${sterk('zetten we alles voor je klaar')}.`) +
+      knop(akkoord, 'Ja, ik wil starten') +
+      p(`Het voorstel zelf vind je in mijn mail${datum}, met als onderwerp "Je voorstel van Avezaat &amp; Evers".`, `font-size:14px;color:${ZACHT}`) +
       p('Twijfel je nog ergens over? Bel of app me even. Dan lopen we het samen door, zonder verplichtingen.', 'margin-bottom:22px') +
       groet(base, d.wie);
     return {
       subject: 'Heb je ons voorstel nog kunnen bekijken?',
-      html: omhulsel(base, { preheader: 'Ben je eruit? Dan teken je het voorstel online, in een minuut.', inhoud, wie: d.wie }),
-      text: `${hoiTekst(d.naam)}\n\nTwee dagen geleden stuurde ik je ons voorstel. Ben je eruit? Dan teken je het online, in een minuut.\n\n${d.link || base + '/voorstel.html'}\n\nTwijfel je nog? Bel of app me even.${voet(d.wie)}`,
+      html: omhulsel(base, { preheader: 'Ben je eruit? Met één klik geef je akkoord en zetten wij alles klaar.', inhoud, wie: d.wie }),
+      text: `${hoiTekst(d.naam)}\n\nEen paar dagen geleden stuurde ik je ons voorstel. Ben je eruit? Reageer dan op deze mail, dan sturen wij je de opdrachtbevestiging.\n\nTwijfel je nog? Bel of app me even.${voet(d.wie)}`,
+    };
+  },
+
+  // 4b. Voorstel (na de kennismaking)
+  voorstel(d, base = '') {
+    const wie = d.wie === 'daan' ? 'daan' : 'koen';
+    const wieKort = wieNaam(wie);
+    const pakket = Math.max(0, Number(d.pakket) || 80);
+    let maand = pakket, jaar = 0, eenmalig = 0;
+    const regels = [['Boekhouding volledig uit handen', `${euro(pakket)} p/m`]];
+    if (d.icp) { maand += 15; regels.push(['ICP-aangifte (klanten in de EU)', '€15 p/m']); }
+    if (d.partner) { jaar += 150; regels.push(['IB-aangifte fiscaal partner', '€150 per jaar']); }
+    if (d.overstap === 'gratis') regels.push(['Overstappen, wij regelen de overdracht', 'gratis']);
+    if (d.overstap === 'betaald') { eenmalig += 149; regels.push(['Overstappen, wij regelen de overdracht', '€149 eenmalig']); }
+    const uren = Math.max(0, parseInt(d.achterstand, 10) || 0);
+    if (uren) { eenmalig += uren * 60; regels.push([`Achterstand inhalen (± ${uren} uur à €60)`, `${euro(uren * 60)} eenmalig`]); }
+    const bedrijf = esc(d.bedrijf || '');
+    const situatie = esc(d.situatie || '').trim();
+    const noot = esc(d.noot || '').trim().replace(/\n/g, '<br>');
+    const extraPrijs = [jaar ? `plus ${euro(jaar)} per jaar` : '', eenmalig ? `eenmalig ${euro(eenmalig)}` : ''].filter(Boolean).join(', ');
+
+    const inhoud = kop(`Je voorstel${bedrijf ? ` voor ${bedrijf}` : ''}`) +
+      p(hoi(d.naam)) +
+      p(`Leuk je gesproken te hebben!${situatie ? ` Je vertelde dat ${situatie}.` : ''} Zoals beloofd zet ik hieronder op een rij wat we voor je gaan doen en wat het kost. Geen kleine lettertjes, en je zit nergens aan vast.`) +
+      blok(`<p style="margin:0 0 2px;${F}font-size:13px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;color:${ACCENT}">Jouw vaste prijs</p>
+<p style="margin:0 0 4px;${F}font-size:34px;line-height:1.15;font-weight:700;letter-spacing:-0.6px;color:${INKT}">${euro(maand)} <span style="font-size:17px;font-weight:600;letter-spacing:0">per maand</span></p>
+<p style="margin:0 0 16px;${F}font-size:14px;line-height:1.5;color:${ZACHT}">excl. btw (${euro(maand * 1.21)} incl. btw)${extraPrijs ? `, ${extraPrijs}` : ''}. Maandelijks opzegbaar.</p>
+${tabel(regels)}`) +
+      tussenkop('Altijd inbegrepen') +
+      vinkjes([
+        `Eén vaste boekhouder: ${sterk(wieKort)}, die jouw bedrijf kent`,
+        'Je complete boekhouding, tot 100 banktransacties per maand',
+        '4 btw-aangiftes per jaar, vooraf met je besproken',
+        'Je aangifte inkomstenbelasting en je jaarcijfers',
+        'MoneyMonk: software en app om je bonnetjes aan te leveren',
+        'Elke maand een 1-op-1 gesprek, en vragen stellen wanneer je wilt',
+      ]) +
+      tussenkop('Zo starten we') +
+      stappen([
+        ['Jij geeft akkoord', 'Met de knop hieronder, of gewoon door op deze mail te reageren.'],
+        ['Wij sturen de opdrachtbevestiging', 'En we vragen je identiteitsbewijs. Dat zijn we wettelijk verplicht.'],
+        ['We zetten alles klaar', `Je MoneyMonk-account, de machtiging voor je aangiftes${d.overstap && d.overstap !== 'nee' ? ' en de overdracht met je oude boekhouder' : ''}.`],
+        ['Je eerste 1-op-1', 'In je eerste maand lopen we samen alles door.'],
+      ]) +
+      knop(akkoordLink(d), 'Ja, ik wil starten') +
+      blok(blokTekst(`${sterk('Startdatum:')} ${esc(d.start || 'in overleg')}. ${sterk('Geldig tot:')} ${esc(d.geldig || '')}.<br>Je zegt maandelijks op. Stop je binnen 12 maanden nadat we je aangifte inkomstenbelasting hebben gedaan, dan rekenen we die aangifte apart af (€250).`)) +
+      (noot ? p(noot) : '') +
+      p(`Nog vragen? Bel of app me gerust. Ik denk graag met je mee.`, 'margin-bottom:22px') +
+      groet(base, wie) +
+      `<p style="margin:26px 0 0;padding-top:18px;border-top:1px solid ${LIJN};${F}font-size:12.5px;line-height:1.6;color:${ZACHT}">Alle bedragen excl. 21% btw, tenzij anders vermeld. Op onze diensten zijn onze ${link(`${base}/voorwaarden.html`, 'algemene voorwaarden')}, ${link(`${base}/verwerkersovereenkomst.html`, 'verwerkersovereenkomst')} en ${link(`${base}/privacy.html`, 'privacyverklaring')} van toepassing.</p>`;
+    const onderwerp = `Je voorstel van Avezaat & Evers${d.bedrijf ? ` voor ${d.bedrijf}` : ''}`;
+    return {
+      subject: onderwerp,
+      html: omhulsel(base, { preheader: `Jouw vaste prijs: ${euro(maand)} per maand, alles inbegrepen. Maandelijks opzegbaar.`, inhoud, wie }),
+      text: `${hoiTekst(d.naam)}\n\nLeuk je gesproken te hebben! Hieronder ons voorstel.\n\nJouw vaste prijs: ${euro(maand)} per maand excl. btw${extraPrijs ? `, ${extraPrijs}` : ''}.\n${regels.map((r) => `- ${r[0]}: ${r[1]}`).join('\n')}\n\nVaste boekhouder: ${wieKort}\nStartdatum: ${d.start || 'in overleg'}\nGeldig tot: ${d.geldig || ''}\n\nAkkoord? Reageer op deze mail, dan sturen wij de opdrachtbevestiging.${voet(wie)}`,
     };
   },
 

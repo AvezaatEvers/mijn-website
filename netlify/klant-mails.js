@@ -7,7 +7,8 @@ export const BASE = "https://avezaatenevers.nl";
 export const TYPES = {
   welkom: { label: "Welkomstmail", wanneer: "Handmatig, na het tekenen" },
   checkIn: { label: "Check-in na 2 weken", wanneer: "Automatisch, 14 dagen na de startdatum" },
-  voorstelHerinnering: { label: "Herinnering voorstel", wanneer: "Handmatig, als het voorstel nog niet getekend is" },
+  voorstelHerinnering: { label: "Herinnering voorstel", wanneer: "Automatisch 2 dagen na het voorstel, zolang de status Prospect is" },
+  voorstel: { label: "Voorstel", wanneer: "Via de voorstelpagina" },
   kwartaal: { label: "Kwartaalherinnering btw", wanneer: "Automatisch, rond de 3e van januari, april, juli en oktober" },
   kwartaalTweede: { label: "Tweede herinnering btw", wanneer: "Automatisch rond de 8e, alleen als de stukken nog niet binnen zijn" },
   jaareinde: { label: "Jaareinde", wanneer: "Automatisch, 25 november" },
@@ -16,7 +17,7 @@ export const TYPES = {
   aanbevelen: { label: "Aanbevelen", wanneer: "Automatisch, 2 weken na de eerste ingediende IB-aangifte, alleen bij tevreden klanten" },
   jubileum: { label: "Een jaar klant", wanneer: "Automatisch, 1 jaar na de startdatum" },
 };
-export const AUTOMATISCH = ["checkIn", "kwartaal", "kwartaalTweede", "jaareinde", "inkomstenbelasting", "review", "aanbevelen", "jubileum"];
+export const AUTOMATISCH = ["voorstelHerinnering", "checkIn", "kwartaal", "kwartaalTweede", "jaareinde", "inkomstenbelasting", "review", "aanbevelen", "jubileum"];
 export const HANDMATIG = ["welkom", "voorstelHerinnering", "checkIn", "kwartaal", "kwartaalTweede", "jaareinde", "inkomstenbelasting", "review", "aanbevelen", "jubileum"];
 
 const MAANDEN = ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"];
@@ -30,6 +31,7 @@ function dag(s) { return new Date(s + "T12:00:00Z"); }
 export function plusDagen(s, n) { const d = dag(s); d.setUTCDate(d.getUTCDate() + n); return iso(d); }
 function plusMaanden(s, n) { const d = dag(s); d.setUTCMonth(d.getUTCMonth() + n); return iso(d); }
 // Valt een datum in het weekend, dan de maandag erna
+function mooieDatumKort(s) { const d = dag(s); return `${d.getUTCDate()} ${MAANDEN[d.getUTCMonth()]}`; }
 function werkdag(s) { const d = dag(s); const w = d.getUTCDay(); if (w === 6) d.setUTCDate(d.getUTCDate() + 2); if (w === 0) d.setUTCDate(d.getUTCDate() + 1); return iso(d); }
 
 // Kwartaal-sleutel ("2026-Q4") en gegevens voor de mails over dat kwartaal
@@ -57,6 +59,10 @@ export function kwartalenRond(nu = vandaag(), aantal = 6) {
 // Alle momenten van een klant tussen twee jaren
 function momenten(k, vanJaar, totJaar) {
   const uit = [];
+  if (k.status === "prospect" && k.voorstel && k.voorstel.op) {
+    const op = k.voorstel.op.slice(0, 10);
+    uit.push({ type: "voorstelHerinnering", sleutel: `voorstelHerinnering-${op}`, datum: werkdag(plusDagen(op, 2)), data: { voorstelDatum: mooieDatumKort(op), start: (k.voorstel.data || {}).start || "" } });
+  }
   if (k.status !== "klant") return uit;
   const pr = k.profiel || {};
   const start = k.start || (k.aangemaakt || "").slice(0, 10);
@@ -131,13 +137,14 @@ export function maakMail(k, type, data = {}, env = () => undefined) {
   const fn = mails[type];
   if (!fn) throw new Error("Onbekend mailtype");
   const pr = k.profiel || {};
-  const extra = { icp: !!pr.icp, partner: pr.partner === false ? false : undefined, reviewLink: env("REVIEW_LINK") || "" };
+  const vs = (k.voorstel && k.voorstel.op) ? { voorstelDatum: mooieDatumKort(k.voorstel.op.slice(0, 10)), start: (k.voorstel.data || {}).start || "" } : {};
+  const extra = { ...(type === "voorstelHerinnering" ? vs : {}), icp: !!pr.icp, partner: pr.partner === false ? false : undefined, reviewLink: env("REVIEW_LINK") || "" };
   if (type === "jubileum") {
     const jaarGeleden = plusMaanden(vandaag(), -12);
     extra.btwAantal = Object.values(k.kwartalen || {}).filter((x) => x.ingediend && x.ingediend.slice(0, 10) >= jaarGeleden).length;
     extra.ib = Object.values(k.ibIngediend || {}).some((x) => x.slice(0, 10) >= jaarGeleden);
   }
-  return fn({ naam: k.naam, wie: k.boekhouder, link: k.voorstelLink, ...extra, ...data }, BASE);
+  return fn({ naam: k.naam, wie: k.boekhouder, bedrijf: k.bedrijf, link: k.voorstelLink, ...extra, ...data }, BASE);
 }
 
 // Versturen via Resend. env: (naam) => waarde

@@ -140,8 +140,8 @@
 
     // Gepland
     var g = document.getElementById('gepland');
-    if (k.status !== 'klant') g.innerHTML = '<p class="kl-leeg">Geplande mails gaan alleen naar klanten met status Klant.</p>';
-    else if (!k.gepland.length) g.innerHTML = '<p class="kl-leeg">Niets gepland.</p>';
+    if (k.status === 'gestopt') g.innerHTML = '<p class="kl-leeg">Gestopte klanten krijgen geen geplande mails.</p>';
+    else if (!k.gepland.length) g.innerHTML = '<p class="kl-leeg">' + (k.status === 'prospect' ? 'Niets gepland. Stuur een voorstel via de voorstelpagina, dan volgt na 2 dagen automatisch een herinnering.' : 'Niets gepland.') + '</p>';
     else g.innerHTML = k.gepland.map(function (m) {
       var noot = m.vervalt ? '<small class="vervalt">' + (m.type === 'review' ? 'Wacht op REVIEW_LINK in Netlify' : 'Vervalt: stukken zijn binnen') + '</small>' : '<small>' + esc(m.data.kwartaal || (m.data.jaar ? 'Over ' + m.data.jaar : '')) + '</small>';
       return '<div class="mail-rij' + (m.aan ? '' : ' is-uit') + (m.vervalt ? ' is-vervalt' : '') + '"><time>' + d(m.datum) + '</time><div><strong>' + esc(m.label) + '</strong>' + noot + '</div>' +
@@ -164,6 +164,7 @@
     snel.innerHTML = (tel ? '<a class="db-knop is-rand" href="tel:' + esc(tel) + '">Bellen</a><a class="db-knop is-rand" href="https://wa.me/' + esc(wa) + '" target="_blank" rel="noopener">WhatsApp</a>' : '') +
       '<a class="db-knop is-rand" href="mailto:' + esc(k.email) + '">Mailen</a>' +
       '<a class="db-knop is-rand" href="/intern/maandgesprek.html?voorbereiden=1&d=' + encodeURIComponent(mg) + '" target="_blank" rel="noopener">Maandgesprek voorbereiden</a>' +
+      '<a class="db-knop is-rand" href="/voorstel.html?klant=' + encodeURIComponent(k.id) + '">' + (k.voorstel ? 'Voorstel opnieuw sturen' : 'Voorstel maken') + '</a>' +
       '<button class="db-knop is-rand" type="button" id="kopieer-welkom">Kopieer welkomstlink</button>';
     document.getElementById('kopieer-welkom').onclick = function () {
       var url = 'https://avezaatenevers.nl/welkom.html?naam=' + encodeURIComponent(voornaam) + '&boekhouder=' + naamVan(k.boekhouder);

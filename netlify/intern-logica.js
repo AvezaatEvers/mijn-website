@@ -1,5 +1,6 @@
 // Logica van de interne omgeving (inloggen per persoon, gedeelde takenlijst en klanten met hun mails).
-import { TYPES, AUTOMATISCH, HANDMATIG, gepland, maakMail, handmatigeData, verstuur, vandaag, actueelKwartaal, kwartalenRond, kwartaalInfo } from "./klant-mails.js";
+import { BASE, TYPES, AUTOMATISCH, HANDMATIG, gepland, maakMail, handmatigeData, verstuur, vandaag, actueelKwartaal, kwartalenRond, kwartaalInfo } from "./klant-mails.js";
+import { mails } from "./functions/lib/mails.js";
 // Los van Netlify gehouden zodat het lokaal te testen is; intern.js koppelt de opslag.
 
 export const GEBRUIKERS = {
@@ -148,7 +149,7 @@ export async function verwerk(request, cookies, next, maakStore, env = () => und
     return json(taken);
   }
 
-  if (pad.startsWith("/intern/api/klant") || pad === "/intern/api/kwartaalbord") return klantenApi(request, url, pad, wie, maakStore(), env);
+  if (pad.startsWith("/intern/api/klant") || pad.startsWith("/intern/api/voorstel") || pad === "/intern/api/kwartaalbord") return klantenApi(request, url, pad, wie, maakStore(), env);
 
   return next();
 }
@@ -188,7 +189,8 @@ function velden(body, k) {
 }
 
 // Welke planningssleutel hoort bij een handmatig verstuurde mail (zodat hij niet nog eens automatisch gaat)
-function sleutelVoor(type, data) {
+function sleutelVoor(type, data, k = {}) {
+  if (type === "voorstelHerinnering") return k.voorstel && k.voorstel.op ? "voorstelHerinnering-" + k.voorstel.op.slice(0, 10) : null;
   if (type === "kwartaal") return "kwartaal-" + data.sleutel;
   if (type === "kwartaalTweede") return "kwartaal2-" + data.sleutel;
   if (type === "jaareinde") return "jaareinde-" + vandaag().slice(0, 4);
@@ -262,7 +264,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
     k.log = k.log || [];
     k.log.unshift({ type: body.type, onderwerp: m.subject, aan, op: nu, door: wie, test, ok: r.ok, fout: r.fout || null, handmatig: true });
     k.log = k.log.slice(0, 100);
-    const sl = sleutelVoor(body.type, data);
+    const sl = sleutelVoor(body.type, data, k);
     if (r.ok && !test && sl) k.verstuurd = { ...(k.verstuurd || {}), [sl]: nu };
     await bewaar();
     return json({ ...r, klant: metPlanning(k, env) }, r.ok ? 200 : 502);
@@ -306,6 +308,44 @@ async function klantenApi(request, url, pad, wie, store, env) {
     } else return json({ fout: "Methode niet toegestaan" }, 405);
     await bewaar();
     return json({ klant: metPlanning(k, env) });
+  }
+
+  // Voorstel: voorbeeld en versturen
+  if (pad.startsWith("/intern/api/voorstel") && request.method === "POST") {
+    const v = body.voorstel || {};
+    const data = {
+      naam: schoon(v.voornaam).slice(0, 80), bedrijf: schoon(v.bedrijf).slice(0, 120), situatie: schoon(v.situatie).slice(0, 600),
+      start: schoon(v.start).slice(0, 60), wie: boekhouder(String(v.boekhouder || "").toLowerCase()), pakket: Math.min(10000, Math.max(0, Number(v.pakket) || 80)),
+      icp: !!v.icp, partner: !!v.partner, overstap: ["nee", "gratis", "betaald"].includes(v.overstap) ? v.overstap : "nee",
+      achterstand: Math.min(500, Math.max(0, parseInt(v.achterstand, 10) || 0)), noot: String(v.noot || "").replace(/[<>]/g, "").trim().slice(0, 1000), geldig: schoon(v.geldig).slice(0, 60),
+    };
+    const m = mails.voorstel(data, BASE);
+    if (pad === "/intern/api/voorstel/voorbeeld") {
+      return json({ onderwerp: m.subject, html: m.html.split(BASE + "/assets/").join(url.origin + "/assets/") });
+    }
+    if (pad === "/intern/api/voorstel/stuur") {
+      const test = body.test === true;
+      const email = mailadres(body.email);
+      if (!test && !email) return json({ fout: "Vul een geldig e-mailadres van de klant in" }, 400);
+      const aan = test ? String(env("MAIL_TO") || "info@avezaatenevers.nl").split(",")[0].trim() : email;
+      const mail = test ? { ...m, subject: "[TEST] " + m.subject } : m;
+      const r = await verstuur(env, { aan, mail });
+      if (!r.ok) return json(r, 502);
+      if (test) return json({ ok: true, test: true });
+      let k = klanten.find((x) => x.email === email);
+      if (!k) {
+        k = { id: nieuweId(), naam: data.naam, bedrijf: data.bedrijf, email, telefoon: schoon(body.telefoon).slice(0, 30), boekhouder: data.wie, status: "prospect", start: "", voorstelLink: "", notitie: "", uit: [], verstuurd: {}, log: [], door: wie, aangemaakt: nu };
+        klanten.push(k);
+      }
+      if (!k.bedrijf && data.bedrijf) k.bedrijf = data.bedrijf;
+      k.boekhouder = data.wie;
+      k.voorstel = { op: nu, door: wie, data };
+      k.log = k.log || [];
+      k.log.unshift({ type: "voorstel", onderwerp: m.subject, aan: email, op: nu, door: wie, test: false, ok: true, fout: null, handmatig: true });
+      k.log = k.log.slice(0, 100);
+      await bewaar();
+      return json({ ok: true, klantId: k.id, status: k.status });
+    }
   }
 
   // Kwartaalbord

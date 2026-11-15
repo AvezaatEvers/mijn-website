@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Werkstromen | Avezaat &amp; Evers intern</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css?v=126">
+<link rel="stylesheet" href="/intern/klanten.css?v=5">
+<link rel="stylesheet" href="/intern/app.css?v=1">
+<style>
+  .wk-kop { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+  .wk-kop h1 { font-size: clamp(28px, 3.6vw, 42px); margin: 0; letter-spacing: -.03em; }
+  .wk-kop p { margin: 4px 0 0; color: var(--muted); font-size: 15px; max-width: 640px; }
+  .sectie { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 26px 0 12px; display: flex; align-items: center; gap: 10px; }
+  .sectie::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .lopend { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .lp { display: flex; align-items: center; gap: 14px; padding: 14px 16px; cursor: pointer; text-align: left; font: inherit; color: inherit; width: 100%; }
+  .ring { --p: 0; width: 46px; height: 46px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: var(--accent);
+    background: radial-gradient(closest-side, #fff 76%, transparent 78%), conic-gradient(#3B63C4 calc(var(--p) * 1%), #E3E8F1 0); }
+  .lp b { display: block; font-size: 14.5px; color: var(--ink); }
+  .lp small { color: var(--muted); font-size: 12.5px; }
+  .procs { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+  .pk { position: relative; text-align: left; font: inherit; color: inherit; cursor: pointer; padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; width: 100%; }
+  .pk::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: linear-gradient(90deg, #5CC8FF, var(--accent)); opacity: 0; transition: opacity .25s; }
+  .pk:hover::before { opacity: 1; }
+  .pk h3 { font-size: 15.5px; margin: 0; color: var(--ink); letter-spacing: -.01em; }
+  .pk p { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.45; }
+  .pk .meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .pk .meta span { font-size: 11.5px; font-weight: 600; color: var(--accent); background: var(--tint); padding: 3px 8px; border-radius: 7px; }
+  .pk .meta span.pk-k { color: #7C3AED; background: #F3EEFF; }
+  .afg { font-size: 13.5px; color: var(--muted); }
+  .afg a { color: var(--text); }
+
+  /* Detail */
+  .wd { position: fixed; inset: 0; z-index: 65; display: none; justify-content: flex-end; background: rgba(13, 24, 56, .3); backdrop-filter: blur(3px); }
+  .wd.open { display: flex; animation: vervaag .2s ease-out; }
+  .wd-doos { width: min(620px, 100%); height: 100%; background: #fff; overflow-y: auto; box-shadow: -40px 0 100px -40px rgba(13, 24, 56, .55); animation: schuif .35s cubic-bezier(.2, .9, .2, 1); display: flex; flex-direction: column; }
+  @keyframes schuif { from { transform: translateX(40px); opacity: 0; } }
+  .wd-doos > * { flex-shrink: 0; }
+  .wd-kop { position: relative; color: #fff; padding: 22px 24px 20px; background: linear-gradient(125deg, #0D1838, #1E3A80 65%, #2D58B8); overflow: hidden; }
+  .wd-kop::after { content: ""; position: absolute; width: 300px; height: 300px; right: -90px; top: -160px; border-radius: 50%; background: radial-gradient(closest-side, rgba(92, 200, 255, .35), transparent); }
+  .wd-kop > * { position: relative; z-index: 1; }
+  .wd-kop small { font-size: 11.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #A9C1FF; }
+  .wd-kop h2 { color: #fff; font-size: 24px; margin: 4px 0 6px; letter-spacing: -.02em; }
+  .wd-kop p { margin: 0; color: #C9D6F5; font-size: 14.5px; line-height: 1.5; }
+  .wd-kop .x { position: absolute; right: 16px; top: 16px; width: 36px; height: 36px; border-radius: 10px; border: 0; background: rgba(255, 255, 255, .12); color: #fff; font-size: 22px; cursor: pointer; z-index: 3; }
+  .wd-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .wd-meta span { font-size: 12.5px; color: #DCE6FF; background: rgba(255, 255, 255, .1); border-radius: 8px; padding: 4px 9px; }
+  .wd-voort { margin-top: 14px; height: 6px; border-radius: 4px; background: rgba(255, 255, 255, .15); overflow: hidden; }
+  .wd-voort i { display: block; height: 100%; background: linear-gradient(90deg, #B8F0FF, #5CC8FF); border-radius: 4px; transition: width .5s cubic-bezier(.2, .8, .2, 1); box-shadow: 0 0 12px #5CC8FF; }
+  .wd-body { padding: 18px 24px 24px; flex: 1; }
+  .stp { position: relative; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; padding: 0 0 18px; }
+  .stp::before { content: ""; position: absolute; left: 14px; top: 32px; bottom: 2px; width: 2px; background: var(--line); }
+  .stp:last-child::before { display: none; }
+  .stp .nr { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; color: var(--accent); background: var(--tint); border: 2px solid #fff; box-shadow: 0 0 0 1px var(--line); cursor: pointer; transition: all .2s; padding: 0; font-family: inherit; }
+  .stp.klaar .nr { background: linear-gradient(135deg, #34D399, #15803D); color: #fff; box-shadow: 0 6px 14px -6px rgba(21, 128, 61, .7); }
+  .stp.klaar h3 { color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(107, 115, 133, .5); }
+  .stp.nu .nr { box-shadow: 0 0 0 3px rgba(92, 200, 255, .35), 0 0 0 1px var(--accent-2); }
+  .stp h3 { font-size: 15px; margin: 4px 0 4px; color: var(--ink); }
+  .stp p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--text); }
+  .stp .door { font-size: 12px; color: var(--ok); margin-top: 4px; }
+  .stp .knoppen { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .stp .knoppen a, .stp .knoppen button { font: inherit; font-size: 12.5px; font-weight: 600; color: var(--accent); background: var(--tint); border: 0; border-radius: 8px; padding: 6px 10px; cursor: pointer; text-decoration: none; }
+  .stp .knoppen .ag-k { color: var(--accent); background: #fff; box-shadow: inset 0 0 0 1px #C9D6F2; }
+  .stp .knoppen .ag-k::before { content: "✦ "; color: #5CC8FF; }
+  .wd-voet { position: sticky; bottom: 0; background: rgba(255, 255, 255, .95); backdrop-filter: blur(8px); border-top: 1px solid var(--line); padding: 14px 24px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .wd-voet select { font: inherit; font-size: 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; min-width: 0; flex: 1; }
+  .wd-voet .weg { margin-left: auto; font: inherit; font-size: 13px; color: var(--muted); background: none; border: 0; cursor: pointer; }
+  .klaar-banner { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px; background: linear-gradient(90deg, var(--ok-bg), #fff); border: 1px solid #C9EBD3; margin-bottom: 16px; font-size: 14.5px; color: var(--ink); }
+  .klaar-banner::before { content: "✓"; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #22C55E; color: #fff; flex: none; }
+</style>
+</head>
+<body>
+<main class="db">
+  <div class="wk-kop">
+    <div><h1>Werkstromen</h1><p>Al onze vaste processen als stappenplan, van dagstart tot offboarding. Start er een, eventueel voor een klant, en vink de stappen af. De agent kent ze ook.</p></div>
+    <button class="ai-knop" type="button" data-agent="Welke werkstroom past nu het best bij wat er vandaag speelt?"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 5.6L19.5 9.5l-5.7 1.9L12 17l-1.8-5.6L4.5 9.5l5.7-1.9z"/></svg>Welke past nu?</button>
+  </div>
+  <div id="lopend-sectie" hidden><div class="sectie">Lopend</div><div class="lopend" id="lopend"></div></div>
+  <div id="groepen"><div class="skelet" style="width:40%;margin-top:30px"></div></div>
+  <div id="afgerond"></div>
+</main>
+
+<div class="wd" id="wd" role="dialog" aria-modal="true" aria-labelledby="wd-titel"><div class="wd-doos" id="wd-doos"></div></div>
+
+<script src="/intern/app.js?v=1"></script>
+<script>
+(function () {
+  function start() {
+    var AE = window.AE, esc = AE.esc, data = null, huidig = null;
+    var wd = document.getElementById('wd'), doos = document.getElementById('wd-doos');
+
+    function laad() {
+      return AE.api('/intern/api/werkstromen').then(function (r) { data = r; teken(); return r; });
+    }
+    function teken() {
+      var ls = document.getElementById('lopend-sectie');
+      ls.hidden = !data.lopend.length;
+      document.getElementById('lopend').innerHTML = data.lopend.map(function (w, i) {
+        var p = Math.round(w.klaar / w.totaal * 100);
+        return '<button type="button" class="db-kaart zweef lp in" style="animation-delay:' + (i * .04) + 's" data-run="' + w.id + '"><span class="ring" style="--p:' + p + '">' + p + '%</span><span><b>' + esc(w.titel) + '</b><small>' + (w.klantNaam ? esc(w.klantNaam) + ', ' : '') + w.klaar + ' van ' + w.totaal + ' stappen</small></span></button>';
+      }).join('');
+      document.getElementById('groepen').innerHTML = data.groepen.map(function (g) {
+        var lijst = data.processen.filter(function (p) { return p.groep === g[0]; });
+        return '<div class="sectie">' + esc(g[1]) + '</div><div class="procs">' + lijst.map(function (p, i) {
+          return '<button type="button" class="db-kaart zweef pk in" style="animation-delay:' + (i * .04) + 's" data-p="' + p.id + '"><h3>' + esc(p.titel) + '</h3><p>' + esc(p.wanneer) + '</p><div class="meta"><span>' + p.stappen.length + ' stappen</span><span>' + esc(p.duur) + '</span>' + (p.perKlant ? '<span class="pk-k">Per klant</span>' : '') + '</div></button>';
+        }).join('') + '</div>';
+      }).join('');
+      document.getElementById('afgerond').innerHTML = data.afgerond.length ? '<div class="sectie">Recent afgerond</div><p class="afg">' + data.afgerond.slice(0, 8).map(function (w) { return esc(w.titel) + (w.klantNaam ? ' (' + esc(w.klantNaam) + ')' : '') + ', ' + new Date(w.klaarOp).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }); }).join('<br>') + '</p>' : '';
+    }
+
+    function proc(id) { return data.processen.filter(function (p) { return p.id === id; })[0]; }
+    function openDetail(p, run) {
+      huidig = { p: p, run: run || null };
+      var klaar = run ? run.klaar : 0, eerste = -1;
+      if (run) p.stappen.some(function (_, i) { if (!run.stappen[i]) { eerste = i; return true; } });
+      doos.innerHTML = '<div class="wd-kop"><button class="x" type="button" data-sluit aria-label="Sluiten">&times;</button><small>' + (run ? 'Lopende werkstroom' : 'Werkstroom') + '</small><h2 id="wd-titel">' + esc(p.titel) + (run && run.klantNaam ? ': ' + esc(run.klantNaam) : '') + '</h2><p>' + esc(p.doel) + '</p>' +
+        '<div class="wd-meta"><span>' + esc(p.wanneer) + '</span><span>' + esc(p.duur) + '</span>' + (run ? '<span>' + klaar + ' van ' + p.stappen.length + ' klaar</span>' : '') + '</div>' +
+        (run ? '<div class="wd-voort"><i style="width:' + Math.round(klaar / p.stappen.length * 100) + '%"></i></div>' : '') + '</div>' +
+        '<div class="wd-body">' + (run && run.klaarOp ? '<div class="klaar-banner">Klaar. Alle stappen zijn afgerond.</div>' : '') +
+        p.stappen.map(function (s, i) {
+          var gedaan = run && run.stappen[i];
+          return '<div class="stp' + (gedaan ? ' klaar' : '') + (i === eerste ? ' nu' : '') + '"><button class="nr" type="button" ' + (run ? 'data-stap="' + i + '" aria-label="Stap ' + (i + 1) + (gedaan ? ' openzetten' : ' afvinken') + '"' : 'tabindex="-1" aria-hidden="true"') + '>' + (gedaan ? '✓' : i + 1) + '</button><div><h3>' + esc(s.t) + '</h3><p>' + esc(s.u) + '</p>' +
+            (gedaan ? '<div class="door">Afgevinkt door ' + (gedaan.door === 'daan' ? 'Daan' : 'Koen') + ' op ' + new Date(gedaan.op).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + '</div>' : '') +
+            '<div class="knoppen">' + (s.link ? '<a href="' + esc(s.link) + (run && run.klant && /klant/.test(s.link) === false && s.link === '/voorstel.html' ? '?klant=' + encodeURIComponent(run.klant) : '') + '">Openen</a>' : '') +
+            (s.actie === 'contact' ? '<button type="button" data-contact="' + (run && run.klant ? esc(run.klant) : '') + '">Contact vastleggen</button>' : '') +
+            '<button type="button" class="ag-k" data-agent="' + esc((s.vraag || 'Help me met de stap "' + s.t + '" uit de werkstroom ' + p.titel + '.') + (run && run.klantNaam ? ' Het gaat om ' + run.klantNaam + '.' : '')) + '">Vraag de agent</button></div></div></div>';
+        }).join('') + '</div>' +
+        '<div class="wd-voet">' + (run
+          ? (run.klant ? '<a class="ai-knop licht" href="/intern/klant.html?id=' + encodeURIComponent(run.klant) + '">Open klant</a>' : '') + '<button class="weg" type="button" id="wd-stop">Werkstroom verwijderen</button>'
+          : (p.perKlant ? '<select id="wd-klant" aria-label="Voor welke klant"><option value="">Zonder klant</option></select>' : '') + '<button class="ai-knop" type="button" id="wd-start">Start werkstroom</button>') + '</div>';
+      wd.classList.add('open');
+      history.replaceState(null, '', run ? '?run=' + run.id : '?p=' + p.id);
+      if (!run && p.perKlant) AE.herlaadKlanten().then(function (kl) {
+        var s = document.getElementById('wd-klant'); if (!s) return;
+        kl.filter(function (k) { return k.status === 'klant' || k.status === 'prospect'; }).sort(function (a, b) { return (a.bedrijf || a.naam).localeCompare(b.bedrijf || b.naam, 'nl'); })
+          .forEach(function (k) { var o = document.createElement('option'); o.value = k.id; o.textContent = (k.bedrijf || k.naam) + (k.status === 'prospect' ? ' (lead)' : ''); s.appendChild(o); });
+        var pre = new URLSearchParams(location.search).get('klant'); if (pre) s.value = pre;
+      });
+    }
+    function sluit() { wd.classList.remove('open'); history.replaceState(null, '', location.pathname); huidig = null; }
+
+    document.addEventListener('click', function (e) {
+      var r = e.target.closest('[data-run]'); if (r) { var w = data.lopend.filter(function (x) { return x.id === r.dataset.run; })[0]; if (w) openDetail(proc(w.proces), w); return; }
+      var p = e.target.closest('[data-p]'); if (p) { openDetail(proc(p.dataset.p)); return; }
+      if (e.target.closest('[data-sluit]') || e.target === wd) { sluit(); return; }
+      var st = e.target.closest('[data-stap]');
+      if (st && huidig && huidig.run) {
+        var i = +st.dataset.stap, aan = !huidig.run.stappen[i];
+        st.disabled = true;
+        AE.api('/intern/api/werkstroom', { method: 'PATCH', body: JSON.stringify({ id: huidig.run.id, stap: i, klaar: aan }) }).then(function (run) {
+          if (run.klaarOp && !huidig.run.klaarOp) AE.meld(run.titel + ' afgerond');
+          laad().then(function () { openDetail(huidig.p, run); });
+        });
+        return;
+      }
+      if (e.target.id === 'wd-start' && huidig) {
+        var ks = document.getElementById('wd-klant');
+        AE.api('/intern/api/werkstroom', { method: 'POST', body: JSON.stringify({ proces: huidig.p.id, klant: ks ? ks.value : '' }) }).then(function (run) {
+          AE.meld('Werkstroom gestart'); laad().then(function () { openDetail(huidig.p, run); });
+        });
+      }
+      if (e.target.id === 'wd-stop' && huidig && huidig.run) {
+        if (!e.target.dataset.zeker) { e.target.dataset.zeker = '1'; e.target.textContent = 'Klik nogmaals om te verwijderen'; return; }
+        AE.api('/intern/api/werkstroom?id=' + encodeURIComponent(huidig.run.id), { method: 'DELETE' }).then(function () { sluit(); laad(); });
+      }
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && wd.classList.contains('open') && !document.body.classList.contains('ag-open')) sluit(); });
+    document.addEventListener('ae:agent-actie', laad);
+
+    laad().then(function () {
+      var q = new URLSearchParams(location.search);
+      if (q.get('run')) { var w = data.lopend.concat(data.afgerond).filter(function (x) { return x.id === q.get('run'); })[0]; if (w) openDetail(proc(w.proces), w); }
+      else if (q.get('p') && proc(q.get('p'))) openDetail(proc(q.get('p')));
+    });
+  }
+  if (window.AE && window.AE.agent) start(); else document.addEventListener('ae:agent-klaar', start);
+})();
+</script>
+</body>
+</html>

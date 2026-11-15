@@ -2,6 +2,7 @@
 import { BASE, TYPES, AUTOMATISCH, HANDMATIG, gepland, maakMail, handmatigeData, verstuur, vandaag, actueelKwartaal, kwartalenRond, kwartaalInfo } from "./klant-mails.js";
 import { mails } from "./functions/lib/mails.js";
 import { overzicht, leadInfo } from "./overzicht.js";
+import { agentApi } from "./agent/agent.js";
 import { inzichten, KANALEN, ONDERWERPEN, SOORTEN, GEVOEL } from "./inzichten.js";
 // Los van Netlify gehouden zodat het lokaal te testen is; intern.js koppelt de opslag.
 
@@ -149,6 +150,15 @@ export async function verwerk(request, cookies, next, maakStore, env = () => und
     }
     await store.setJSON(SLEUTEL, taken);
     return json(taken);
+  }
+
+  if (pad.startsWith("/intern/api/agent") || pad.startsWith("/intern/api/werkstro") || pad === "/intern/api/kennis") {
+    const h = {
+      leesKlanten, leesTaken, bewaarTaken: (st, t) => st.setJSON(SLEUTEL, t),
+      overzicht: (k, t, v) => overzicht(k, t, v, vandaag(), env), inzichten: (k, v, d) => inzichten(k, v, d),
+      leadInfo: (k) => leadInfo(k), gepland: (k) => gepland(k, vandaag(), 8, env),
+    };
+    return agentApi(request, url, pad, wie, maakStore(), env, h);
   }
 
   if (pad.startsWith("/intern/api/klant") || pad.startsWith("/intern/api/voorstel") || pad === "/intern/api/kwartaalbord" || pad === "/intern/api/overzicht" || pad === "/intern/api/inzichten" || pad === "/intern/api/zoek") return klantenApi(request, url, pad, wie, maakStore(), env);

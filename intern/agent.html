@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent en kennisbank | Avezaat &amp; Evers intern</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css?v=126">
+<link rel="stylesheet" href="/intern/klanten.css?v=5">
+<link rel="stylesheet" href="/intern/app.css?v=1">
+<style>
+  .ap-kop { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 18px; }
+  .ap-kop .orb-plek { width: 64px; height: 64px; }
+  .ap-kop h1 { font-size: clamp(26px, 3.2vw, 38px); margin: 0; letter-spacing: -.03em; }
+  .ap-kop p { margin: 2px 0 0; color: var(--muted); font-size: 15px; }
+  .modi { margin-left: auto; display: inline-flex; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 4px; gap: 2px; flex-wrap: wrap; }
+  .modi button { font: inherit; font-size: 13.5px; font-weight: 600; padding: 8px 14px; border-radius: 10px; border: 0; background: none; color: var(--muted); cursor: pointer; transition: all .2s; }
+  .modi button.is-aan { background: linear-gradient(135deg, var(--navy), var(--accent)); color: #fff; box-shadow: 0 8px 18px -10px rgba(38, 69, 143, .8); }
+  .ap { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+  .ap-chat { height: calc(100vh - 170px); min-height: 520px; display: flex; flex-direction: column; overflow: hidden; padding: 0 !important; position: relative; }
+  .ap-chat::before { content: ""; position: absolute; inset: auto -120px -160px auto; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(closest-side, rgba(92, 200, 255, .14), transparent); pointer-events: none; }
+  .ap-chat .ag-stroom { padding: 26px clamp(16px, 4vw, 48px) 10px; }
+  .ap-chat .ag-invoer { padding: 10px clamp(16px, 4vw, 48px) 18px; }
+  .ap-chat .ag-welkom .orb { --m: 120px; }
+  .ap-chat .ag-welkom h2 { font-size: 28px; }
+  .ap-chat .ag-sug { max-width: 640px; }
+  .ap-chat .md { font-size: 15px; }
+  .ap-rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 20px; }
+  .ap-rail h2 { font-size: 16px; margin: 0 0 10px; }
+  .kz { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; background: #fff; }
+  .kz:focus-within { border-color: var(--accent-2); }
+  .kz svg { width: 16px; height: 16px; color: var(--muted); flex: none; }
+  .kz input { flex: 1; min-width: 0; border: 0; outline: 0; font: inherit; font-size: 14px; background: transparent; }
+  .kr { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; max-height: 46vh; overflow-y: auto; }
+  .kr details { border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+  .kr summary { list-style: none; cursor: pointer; padding: 9px 11px; font-size: 13.5px; font-weight: 600; color: var(--ink); line-height: 1.35; }
+  .kr summary::-webkit-details-marker { display: none; }
+  .kr summary small { display: block; font-weight: 500; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--accent-2); margin-bottom: 2px; }
+  .kr details[open] summary { border-bottom: 1px solid var(--line); }
+  .kr .kt { padding: 9px 11px; font-size: 13px; line-height: 1.55; color: var(--text); }
+  .kr .kt a, .kr .kt button { font: inherit; font-size: 12.5px; font-weight: 600; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; margin-right: 12px; text-decoration: none; }
+  .kr-leeg { font-size: 13px; color: var(--muted); padding: 6px 2px; }
+  .lw a { display: block; padding: 9px 0; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--ink); font-size: 14px; font-weight: 500; }
+  .lw a:last-child { border-bottom: 0; }
+  .lw small { display: block; color: var(--muted); font-size: 12.5px; font-weight: 400; }
+  .lw .balk { height: 5px; border-radius: 3px; background: var(--tint); margin-top: 6px; overflow: hidden; }
+  .lw .balk i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, #5CC8FF, var(--accent)); }
+  .st-kaart p { font-size: 13.5px; color: var(--text); margin: 0 0 8px; line-height: 1.55; }
+  .st-kaart code { font-size: 12.5px; background: var(--tint); color: var(--accent); padding: 1px 5px; border-radius: 5px; }
+  .st-kaart .st { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .st-kaart .st i { width: 8px; height: 8px; border-radius: 50%; background: #FBBF24; box-shadow: 0 0 8px #FBBF24; }
+  .st-kaart .st.aan i { background: #34D399; box-shadow: 0 0 8px #34D399; }
+  @media (max-width: 1180px) { .ap { grid-template-columns: 1fr; } .ap-rail { position: static; } .ap-chat { height: calc(100vh - 150px); } }
+  @media (max-width: 960px) { .ap-chat { height: calc(100dvh - 210px); min-height: 460px; } .modi { margin-left: 0; } }
+</style>
+</head>
+<body>
+<main class="db">
+  <div class="ap-kop">
+    <div class="orb-plek" id="kop-orb"></div>
+    <div><h1>Agent en kennisbank</h1><p>Je AI-collega. Kent jullie klanten, werkstromen en de kennisbank.</p></div>
+    <div class="modi" id="modi">
+      <button type="button" data-m="dag" class="is-aan">Dagcoach</button>
+      <button type="button" data-m="boek">Boekhoudvraag</button>
+      <button type="button" data-m="werk">Werkstromen</button>
+      <button type="button" id="nieuw-gesprek">Nieuw gesprek</button>
+    </div>
+  </div>
+
+  <div class="ap">
+    <section class="db-kaart ap-chat" id="grote-chat" aria-label="Chat met de agent"></section>
+    <aside class="ap-rail">
+      <div class="db-kaart">
+        <h2>Zelf zoeken in de kennisbank</h2>
+        <label class="kz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="kz" type="search" placeholder="Bijv. creditfactuur, KOR, ICP" aria-label="Zoek in de kennisbank"></label>
+        <div class="kr" id="kr"><div class="kr-leeg">Boekhouden, btw, inkomstenbelasting, onze tarieven en werkwijze, plus al onze kennisbankartikelen.</div></div>
+      </div>
+      <div class="db-kaart">
+        <div class="db-kop"><h2 style="margin:0">Lopende werkstromen</h2><a class="meer" href="/intern/werkstromen.html">Alle</a></div>
+        <div class="lw" id="lw"><div class="skelet" style="width:70%"></div></div>
+      </div>
+      <div class="db-kaart st-kaart" id="st"></div>
+    </aside>
+  </div>
+</main>
+
+<script src="/intern/app.js?v=1"></script>
+<script>
+(function () {
+  function start() {
+    var AE = window.AE, esc = AE.esc;
+    document.getElementById('kop-orb').innerHTML = AE.agent.orb();
+    document.querySelector('#kop-orb .orb').style.setProperty('--m', '64px');
+    var chat = AE.agent.maakChat(document.getElementById('grote-chat'), { placeholder: 'Stel je vraag, of vraag waar je moet beginnen…' });
+    window.AE_GROTE_CHAT = chat;
+    var q = new URLSearchParams(location.search).get('q'); if (q) chat.vraag(q);
+
+    document.getElementById('modi').addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      if (b.id === 'nieuw-gesprek') { chat.reset(); return; }
+      this.querySelectorAll('[data-m]').forEach(function (x) { x.classList.toggle('is-aan', x === b); });
+      chat.modus(b.dataset.m);
+    });
+
+    // Kennisbank zelf doorzoeken
+    var kz = document.getElementById('kz'), kr = document.getElementById('kr'), tm;
+    kz.addEventListener('input', function () {
+      clearTimeout(tm); var v = kz.value.trim();
+      if (v.length < 2) { kr.innerHTML = '<div class="kr-leeg">Typ minimaal twee letters.</div>'; return; }
+      tm = setTimeout(function () {
+        AE.api('/intern/api/kennis?q=' + encodeURIComponent(v)).then(function (r) {
+          kr.innerHTML = r.resultaten.length ? r.resultaten.map(function (x, i) {
+            return '<details' + (i === 0 ? ' open' : '') + '><summary><small>' + esc(x.groep) + '</small>' + esc(x.titel) + '</summary><div class="kt">' + esc(x.tekst) +
+              '<div style="margin-top:8px">' + (x.bron ? '<a href="' + esc(x.bron) + '" target="_blank" rel="noopener">Open artikel</a>' : '') + '<button type="button" data-v="' + esc(x.titel) + '">Vraag de agent hierover</button></div></div></details>';
+          }).join('') : '<div class="kr-leeg">Niets gevonden. Vraag het de agent, die zoekt breder.</div>';
+        });
+      }, 180);
+    });
+    kr.addEventListener('click', function (e) { var b = e.target.closest('[data-v]'); if (b) chat.vraag('Leg uit: ' + b.dataset.v + '. Wat moet ik hier in de praktijk mee bij een klant?'); });
+
+    // Lopende werkstromen
+    function laadWerk() {
+      AE.api('/intern/api/werkstromen').then(function (r) {
+        document.getElementById('lw').innerHTML = r.lopend.length ? r.lopend.slice(0, 6).map(function (w) {
+          return '<a href="/intern/werkstromen.html?run=' + encodeURIComponent(w.id) + '">' + esc(w.titel) + '<small>' + (w.klantNaam ? esc(w.klantNaam) + ', ' : '') + w.klaar + ' van ' + w.totaal + ' stappen</small><div class="balk"><i style="width:' + Math.round(w.klaar / w.totaal * 100) + '%"></i></div></a>';
+        }).join('') : '<p class="db-noot" style="margin:0">Geen lopende werkstromen. Vraag de agent er een te starten, of kies er een op de werkstromenpagina.</p>';
+      });
+    }
+    laadWerk(); document.addEventListener('ae:agent-actie', laadWerk);
+
+    AE.api('/intern/api/agent/status').then(function (s) {
+      document.getElementById('st').innerHTML = s.slim
+        ? '<div class="st aan"><i></i>Slimme modus aan</div><p>De agent denkt mee via Claude (<code>' + esc(s.model) + '</code>) en gebruikt jullie klanten, taken, werkstromen en kennisbank. Hij maakt alleen taken of werkstromen aan als je erom vraagt.</p>'
+        : '<div class="st"><i></i>Lokale modus</div><p>De agent zoekt nu zelf in de kennisbank, werkstromen en klanten, maar redeneert nog niet mee.</p><p>Zet in Netlify de variabele <code>ANTHROPIC_API_KEY</code> (een sleutel van console.anthropic.com) en de agent denkt echt mee. Optioneel <code>AGENT_MODEL</code>.</p>';
+    });
+  }
+  if (window.AE && window.AE.agent) start(); else document.addEventListener('ae:agent-klaar', start);
+})();
+</script>
+</body>
+</html>

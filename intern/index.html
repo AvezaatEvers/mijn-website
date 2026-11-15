@@ -196,6 +196,15 @@
   .bf-actie small { display: block; color: #A9B8DA; font-size: 12.5px; }
   .bf-actie b { font-size: 12.5px; color: #A9C1FF; white-space: nowrap; }
 
+  .wk-rij { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--ink); }
+  .wk-rij:last-of-type { border-bottom: 0; }
+  .wk-rij .ring { --p: 0; width: 38px; height: 38px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: var(--accent); background: radial-gradient(closest-side, #fff 74%, transparent 76%), conic-gradient(#3B63C4 calc(var(--p) * 1%), #E3E8F1 0); }
+  .wk-rij span { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; }
+  .wk-rij small { display: block; font-weight: 400; color: var(--muted); font-size: 12.5px; }
+  .wk-start { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .wk-start a { font-size: 12.5px; font-weight: 600; color: var(--accent); background: var(--tint); border-radius: 9px; padding: 6px 10px; text-decoration: none; }
+  .wk-start a:hover { background: #E1E8F5; }
+
   /* Cijfers */
   .kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
   .kpi { padding: 16px 18px; position: relative; overflow: hidden; }
@@ -262,6 +271,8 @@
       <div>
         <div class="bf-label"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 5.6L19.5 9.5l-5.7 1.9L12 17l-1.8-5.6L4.5 9.5l5.7-1.9zM19 15l.9 2.6 2.6.9-2.6.9L19 22l-.9-2.6-2.6-.9 2.6-.9zM5 15l.6 1.7 1.7.6-1.7.6L5 19.6l-.6-1.7-1.7-.6 1.7-.6z"/></svg>Slimme briefing</div>
         <div class="bf-tekst" id="briefing"><div class="skelet" style="width:90%;margin-bottom:12px;opacity:.15"></div><div class="skelet" style="width:70%;margin-bottom:12px;opacity:.15"></div><div class="skelet" style="width:80%;opacity:.15"></div></div>
+        <form class="bf-vraag" id="bf-vraag" autocomplete="off"><div class="orb mini"><i></i><i></i><i></i></div><input id="bf-in" type="text" placeholder="Vraag de agent iets…" aria-label="Vraag de agent"><button type="submit">Vraag</button></form>
+        <div class="bf-chips"><button type="button" data-agent="Waar moet ik vandaag mee beginnen?">Waar begin ik?</button><button type="button" data-agent="Welke leads moet ik als eerste bellen, en wat zeg ik?">Welke leads eerst?</button><button type="button" data-agent="Maak een planning voor mijn week.">Plan mijn week</button><button type="button" data-agent="Loop de werkstroom voor de dagstart met me door.">Dagstart</button></div>
       </div>
       <div class="bf-acties"><h3>Doe dit eerst</h3><div id="acties"></div></div>
     </div>
@@ -298,6 +309,10 @@
 
     </div>
     <div class="kol">
+      <div class="db-kaart zweef in" style="animation-delay:.12s">
+        <div class="db-kop"><h2>Werkstromen</h2><a class="meer" href="/intern/werkstromen.html">Alle</a></div>
+        <div id="werk"><div class="skelet" style="width:60%"></div></div>
+      </div>
       <div class="db-kaart zweef in" style="animation-delay:.15s">
         <div class="db-kop"><h2>Aandacht nodig</h2><span class="meer" id="n-aandacht" style="color:var(--muted)"></span></div>
         <div id="aandacht"></div>
@@ -327,6 +342,26 @@
   </div>
 </main>
 <script src="/intern/app.js?v=1"></script>
+<script>
+(function () {
+  document.getElementById('bf-vraag').addEventListener('submit', function (e) {
+    e.preventDefault(); var i = document.getElementById('bf-in'), v = i.value.trim(); if (!v || !window.AE.agent) return;
+    i.value = ''; window.AE.agent.open(v);
+  });
+  function werk() {
+    window.AE.api('/intern/api/werkstromen').then(function (r) {
+      var esc = window.AE.esc, u = new Date().getHours(), dow = new Date().getDay();
+      var tip = dow === 1 && u < 12 ? ['weekstart', 'Weekstart'] : u >= 16 ? ['dagafsluiting', 'Dagafsluiting'] : ['dagstart', 'Dagstart'];
+      document.getElementById('werk').innerHTML = (r.lopend.length ? r.lopend.slice(0, 4).map(function (w) {
+        var p = Math.round(w.klaar / w.totaal * 100);
+        return '<a class="wk-rij" href="/intern/werkstromen.html?run=' + encodeURIComponent(w.id) + '"><i class="ring" style="--p:' + p + '">' + p + '%</i><span>' + esc(w.titel) + '<small>' + (w.klantNaam ? esc(w.klantNaam) + ', ' : '') + w.klaar + ' van ' + w.totaal + ' stappen</small></span></a>';
+      }).join('') : '<p class="db-noot" style="margin:0">Geen lopende werkstromen.</p>') +
+        '<div class="wk-start"><a href="/intern/werkstromen.html?p=' + tip[0] + '">Start ' + tip[1].toLowerCase() + '</a><a href="/intern/werkstromen.html?p=nieuwe-lead">Nieuwe lead</a><a href="/intern/werkstromen.html?p=onboarding">Onboarding</a><a href="/intern/werkstromen.html?p=klantvraag">Klantvraag</a></div>';
+    }).catch(function () {});
+  }
+  werk(); document.addEventListener('ae:agent-actie', werk);
+})();
+</script>
 <script>
 (function () {
   var nu = new Date(), vandaag = new Date(nu.getFullYear(), nu.getMonth(), nu.getDate()), uur = nu.getHours();

@@ -13,13 +13,15 @@
     plus: '<path d="M12 5v14M5 12h14"/>',
     menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
     chat: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    flow: '<circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M9 6h5a4 4 0 0 1 4 4v5M6 9v9"/>',
+    agent: '<path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"/>',
     site: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'
   };
   function svg(n) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + I[n] + '</svg>'; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   var pad = location.pathname.replace(/index\.html$/, '');
   var NAV = [
-    ['Werk', [['/intern/', 'Vandaag', 'home'], ['/intern/klanten.html', 'Klanten en leads', 'klanten', 'tel-leads'], ['/intern/kwartaal.html', 'Kwartaalbord', 'kwartaal'], ['/intern/inzichten.html', 'Contact en NPS', 'inzicht']]],
+    ['Werk', [['/intern/', 'Vandaag', 'home'], ['/intern/klanten.html', 'Klanten en leads', 'klanten', 'tel-leads'], ['/intern/kwartaal.html', 'Kwartaalbord', 'kwartaal'], ['/intern/inzichten.html', 'Contact en NPS', 'inzicht'], ['/intern/werkstromen.html', 'Werkstromen', 'flow'], ['/intern/agent.html', 'Agent en kennisbank', 'agent']]],
     ['Maken', [['/voorstel.html', 'Voorstel', 'voorstel'], ['/intern/mails/', 'Mailsjablonen', 'mail'], ['/intern/tools.html', 'Presenteren en tools', 'tools']]]
   ];
 
@@ -75,7 +77,10 @@
     '<div class="ob-voet"><span><kbd>↑↓</kbd>kiezen</span><span><kbd>↵</kbd>openen</span><span><kbd>esc</kbd>sluiten</span></div></div>';
   document.body.appendChild(ob);
   var ACTIES = [
+    { t: 'Vraag de agent', s: 'Agent', doe: function () { if (window.AE.agent) window.AE.agent.open(); } },
+    { t: 'Waar moet ik vandaag mee beginnen?', s: 'Agent', doe: function () { if (window.AE.agent) window.AE.agent.open('Waar moet ik vandaag mee beginnen?'); } },
     { t: 'Contact vastleggen', s: 'Actie', doe: function () { openContact(); } },
+    { t: 'Werkstromen', s: 'Pagina', url: '/intern/werkstromen.html' },
     { t: 'Nieuwe klant of lead toevoegen', s: 'Actie', url: '/intern/klanten.html#nieuw' },
     { t: 'Voorstel maken', s: 'Actie', url: '/voorstel.html' },
     { t: 'Nieuwe taak', s: 'Actie', url: '/intern/#taken' },
@@ -106,6 +111,7 @@
         if (g !== groep) { html += '<div class="ob-kop">' + g + '</div>'; groep = g; }
         html += '<a class="ob-item' + (i === obIdx ? ' is-actief' : '') + '" data-i="' + i + '" href="' + (x.url || '#') + '"><i>' + esc((x.t || '?').slice(0, 1).toUpperCase()) + '</i><span>' + esc(x.t) + (x.sub ? ' <small style="margin-left:6px">' + esc(x.sub) + '</small>' : '') + '</span><small>' + esc(x.s) + '</small></a>';
       });
+      if (q.length > 2) { obItems.push({ t: 'Vraag de agent: ' + document.getElementById('ob-in').value.trim(), s: 'Agent', doe: (function (v) { return function () { window.AE.agent && window.AE.agent.open(v); }; })(document.getElementById('ob-in').value.trim()) }); html += '<div class="ob-kop">Agent</div><a class="ob-item' + (obItems.length - 1 === obIdx ? ' is-actief' : '') + '" data-i="' + (obItems.length - 1) + '" href="#"><i>✦</i><span>' + esc(obItems[obItems.length - 1].t) + '</span><small>Enter</small></a>'; }
       document.getElementById('ob-lijst').innerHTML = html || '<div class="ob-kop">Niets gevonden</div>';
     });
   }
@@ -210,6 +216,11 @@
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); ob.classList.contains('open') ? sluitOb() : openOb(); }
     if (e.key === 'Escape') { sluitOb(); sluitContact(); document.body.classList.remove('zij-open'); }
   });
+
+  // Agent laden (eigen bestand, zodat elke pagina hem krijgt)
+  var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/intern/agent.css?v=1'; document.head.appendChild(css);
+  var js = document.createElement('script'); js.src = '/intern/agent.js?v=1'; js.defer = true;
+  setTimeout(function () { document.body.appendChild(js); }, 0);
 
   window.AE = { api: api, ik: function () { return ikBelofte; }, meld: meld, openContact: openContact, esc: esc, svg: svg, herlaadKlanten: function () { KLANTEN = null; return laadKlanten(); } };
 })();

@@ -246,7 +246,7 @@ function berichtenVan(body) {
 // Optioneel GEMINI_MODEL. Binnen de EER gelden de dataregels van de betaalde dienst: prompts worden niet gebruikt om modellen te trainen.
 const GEMINI = "https://generativelanguage.googleapis.com/v1beta/models/";
 const MODELLEN = ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash"];
-const ZOEKMODELLEN = ["gemini-2.5-flash", "gemini-2.5-flash-lite"]; // Google Search-grounding is gratis op 2.5 (gedeeld daglimiet)
+const ZOEKMODELLEN = ["gemini-2.5-flash-lite", "gemini-2.5-flash"]; // Google Search-grounding is gratis op 2.5 (gedeeld daglimiet)
 
 function geminiSleutel(env) { return String(env("GEMINI_API_KEY") || "").trim().replace(/^["']|["']$/g, "").trim(); }
 
@@ -273,13 +273,24 @@ const GEMINI_TOOLS = [{ functionDeclarations: [...TOOLS, WEBTOOL].map((t) => {
 }) }];
 LABELS.web_zoeken = "Zoekt op het web";
 
+// Modellen die net een limiet of fout gaven, slaan we 10 minuten over (scheelt wachttijd bij elke vraag)
+const KAPOT = new Map();
+function bruikbaar(modellen) { const nu = Date.now(); const ok = modellen.filter((m) => !(KAPOT.get(m) > nu)); return ok.length ? ok : modellen; }
+const GEEN_DENK = new Set(); // modellen die de denkinstelling niet accepteren
+function denkConfig(model, body) {
+  if (!body.generationConfig || GEEN_DENK.has(model)) return body;
+  if (/^gemini-3/.test(model)) return { ...body, generationConfig: { ...body.generationConfig, thinkingConfig: { thinkingLevel: "minimal" } } };
+  if (/^gemini-2\.5-flash/.test(model)) return { ...body, generationConfig: { ...body.generationConfig, thinkingConfig: { thinkingBudget: 0 } } };
+  return body;
+}
+
+// Gewone aanroep (voor webzoeken)
 async function geminiPost(env, model, body) {
-  if (/^gemini-3/.test(model) && body.generationConfig) body = { ...body, generationConfig: { ...body.generationConfig, thinkingConfig: { thinkingLevel: "low" } } };
-  const stop = new AbortController(), klok = setTimeout(() => stop.abort(), 22000);
+  const stop = new AbortController(), klok = setTimeout(() => stop.abort(), 20000);
   let r;
   try {
     r = await fetch(GEMINI + model + ":generateContent", {
-      method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": geminiSleutel(env) }, body: JSON.stringify(body), signal: stop.signal,
+      method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": geminiSleutel(env) }, body: JSON.stringify(denkConfig(model, body)), signal: stop.signal,
     });
   } catch (e) { const f = new Error(e.name === "AbortError" ? "Gemini reageerde te traag" : "Gemini niet bereikbaar"); f.status = 504; throw f; }
   finally { clearTimeout(klok); }
@@ -288,21 +299,77 @@ async function geminiPost(env, model, body) {
   if (!r.ok) { const e = new Error((j && j.error && j.error.message) || ("Gemini " + r.status)); e.status = r.status; throw e; }
   return j;
 }
-// Probeer modellen op volgorde; bij limiet of storing door naar de volgende
 async function geminiMetTerugval(env, modellen, body) {
   let laatste;
-  for (const m of modellen) {
+  for (const m of bruikbaar(modellen)) {
     try { return { j: await geminiPost(env, m, body), model: m }; }
-    catch (e) { laatste = e; if (![429, 500, 502, 503, 504, 404].includes(e.status)) throw e; }
+    catch (e) {
+      laatste = e;
+      if (e.status === 400 && /think/i.test(e.message) && !GEEN_DENK.has(m)) { GEEN_DENK.add(m); try { return { j: await geminiPost(env, m, body), model: m }; } catch (e2) { laatste = e2; } }
+      if (![429, 500, 502, 503, 504, 404].includes(laatste.status)) throw laatste; KAPOT.set(m, Date.now() + 600000);
+    }
+  }
+  throw laatste;
+}
+
+// Streamende aanroep: tekst gaat direct door naar de browser, functieaanroepen verzamelen we
+async function geminiStroom(env, modellen, body, opTekst) {
+  let laatste;
+  const lijst = bruikbaar(modellen);
+  for (let mi = 0; mi < lijst.length; mi++) {
+    const model = lijst[mi];
+    const stop = new AbortController(), klok = setTimeout(() => stop.abort(), 25000);
+    try {
+      const r = await fetch(GEMINI + model + ":streamGenerateContent?alt=sse", {
+        method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": geminiSleutel(env) }, body: JSON.stringify(denkConfig(model, body)), signal: stop.signal,
+      });
+      if (!r.ok || !r.body) {
+        const t = await r.text().catch(() => ""); let j = null; try { j = JSON.parse(t); } catch {}
+        const e = new Error((j && j.error && j.error.message) || ("Gemini " + r.status)); e.status = r.status; throw e;
+      }
+      const reader = r.body.getReader(), dec = new TextDecoder();
+      let buf = "", tekst = "", tekstSig = null, geblokkeerd = null;
+      const calls = [];
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        let i;
+        while ((i = buf.indexOf("\n")) >= 0) {
+          const regel = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+          if (!regel.startsWith("data:")) continue;
+          let d; try { d = JSON.parse(regel.slice(5)); } catch { continue; }
+          if (d.promptFeedback && d.promptFeedback.blockReason) geblokkeerd = d.promptFeedback.blockReason;
+          const parts = (((d.candidates || [])[0] || {}).content || {}).parts || [];
+          for (const p of parts) {
+            if (p.functionCall) calls.push(p);
+            else if (p.text && !p.thought) { tekst += p.text; if (p.thoughtSignature) tekstSig = p.thoughtSignature; opTekst(p.text); }
+          }
+        }
+      }
+      clearTimeout(klok);
+      if (!tekst && !calls.length) throw Object.assign(new Error(geblokkeerd ? "Vraag geblokkeerd door Gemini" : "Leeg antwoord van Gemini"), { status: geblokkeerd ? 400 : 503 });
+      const parts = [];
+      if (tekst) parts.push(tekstSig ? { text: tekst, thoughtSignature: tekstSig } : { text: tekst });
+      parts.push(...calls);
+      return { model, parts, calls, tekst };
+    } catch (e) {
+      clearTimeout(klok);
+      laatste = e.name === "AbortError" ? Object.assign(new Error("Gemini reageerde te traag"), { status: 504 }) : e;
+      if (laatste.status === undefined) laatste.status = 503;
+      if (laatste.status === 400 && /think/i.test(laatste.message) && !GEEN_DENK.has(model)) { GEEN_DENK.add(model); mi--; continue; }
+      if (![429, 500, 502, 503, 504, 404].includes(laatste.status)) throw laatste;
+      KAPOT.set(model, Date.now() + 600000);
+    }
   }
   throw laatste;
 }
 
 async function webZoeken(env, vraag, stuur) {
   const { j } = await geminiMetTerugval(env, ZOEKMODELLEN, {
-    contents: [{ role: "user", parts: [{ text: `Zoek dit op voor een Nederlands boekhoudkantoor voor zzp'ers en vat het antwoord feitelijk samen in het Nederlands, met concrete bedragen, data en jaartallen. Geef de voorkeur aan officiële Nederlandse bronnen (belastingdienst.nl, kvk.nl, rijksoverheid.nl, ondernemersplein.kvk.nl) en voor MoneyMonk aan moneymonk.nl. Vraag: ${vraag}` }] }],
+    contents: [{ role: "user", parts: [{ text: `Zoek dit op voor een Nederlands boekhoudkantoor voor zzp'ers en vat het antwoord feitelijk en kort samen in het Nederlands, met concrete bedragen, data en jaartallen. Geef de voorkeur aan officiële Nederlandse bronnen (belastingdienst.nl, kvk.nl, rijksoverheid.nl, ondernemersplein.kvk.nl) en voor MoneyMonk aan moneymonk.nl. Vraag: ${vraag}` }] }],
     tools: [{ google_search: {} }],
-    generationConfig: { temperature: 0.2, maxOutputTokens: 1200 },
+    generationConfig: { temperature: 0.2, maxOutputTokens: 900 },
   });
   const cand = (j.candidates || [])[0] || {};
   const tekst = ((cand.content || {}).parts || []).filter((p) => p.text && !p.thought).map((p) => p.text).join("").trim();
@@ -312,36 +379,38 @@ async function webZoeken(env, vraag, stuur) {
   return { samenvatting: tekst || "Geen resultaat gevonden.", bronnen };
 }
 
+// Context vooraf meegeven, zodat het model voor veelgestelde vragen geen extra rondes nodig heeft
+async function vooraf(c, body) {
+  try {
+    const uit = { dag: await voerUit("dagoverzicht", {}, c) };
+    if (body.klant) { const k = (c.klanten || []).find((x) => x.id === body.klant); if (k) uit.openKlant = klantDetails(k, c.h, c.taken || [], c.runs || []); }
+    return JSON.stringify(uit).slice(0, 9000);
+  } catch { return ""; }
+}
+
 async function slim(c, body) {
   const { env, wie, stuur } = c;
-  const sys = systeem(wie, { pagina: schoon(body.pagina, 80), klant: schoon(body.klant, 40) });
+  const start = Date.now();
+  const context = await vooraf(c, body);
+  const sys = systeem(wie, { pagina: schoon(body.pagina, 80), klant: schoon(body.klant, 40) }) +
+    (context ? "\n\nActuele gegevens (al opgehaald, je hoeft hiervoor geen tool aan te roepen; gebruik tools alleen voor wat hier niet staat):\n" + context : "");
   const lijst = berichtenVan(body);
   if (!lijst.length) throw new Error("Geen vraag");
   const contents = lijst.map((b) => ({ role: b.role === "assistant" ? "model" : "user", parts: [{ text: b.content }] }));
   const voorkeur = env("GEMINI_MODEL") ? [env("GEMINI_MODEL"), ...MODELLEN] : MODELLEN;
-  let model = null;
-  const start = Date.now();
-  for (let ronde = 0; ronde < 6; ronde++) {
-    if (Date.now() - start > 38000) break; // binnen de tijdslimiet van de functie blijven
-    const { j, model: m } = await geminiMetTerugval(env, model ? [model, ...voorkeur.filter((x) => x !== model)] : voorkeur, {
+  let model = null, iets = false;
+  for (let ronde = 0; ronde < 5; ronde++) {
+    if (Date.now() - start > 40000) break; // binnen de tijdslimiet van de functie blijven
+    const res = await geminiStroom(env, model ? [model, ...voorkeur.filter((x) => x !== model)] : voorkeur, {
       systemInstruction: { parts: [{ text: sys }] }, contents, tools: GEMINI_TOOLS,
-      generationConfig: { temperature: 0.5, maxOutputTokens: 4096 },
-    });
-    model = m;
-    const cand = (j.candidates || [])[0];
-    if (!cand || !cand.content) throw new Error((j.promptFeedback && j.promptFeedback.blockReason) ? "Vraag geblokkeerd door Gemini" : "Leeg antwoord van Gemini");
-    const parts = cand.content.parts || [];
-    const calls = parts.filter((p) => p.functionCall);
-    if (!calls.length) {
-      const tekst = parts.filter((p) => p.text && !p.thought).map((p) => p.text).join("");
-      // Antwoord in stukjes doorgeven, zodat het rustig binnenkomt
-      const delen = tekst.match(/[\s\S]{1,24}/g) || [];
-      for (const d of delen) { stuur({ t: "tekst", v: d }); await new Promise((r) => setTimeout(r, 8)); }
-      return;
-    }
-    contents.push({ role: "model", parts }); // ongewijzigd terug, inclusief thought signatures
-    const antwoorden = [];
-    for (const p of calls) {
+      generationConfig: { temperature: 0.5, maxOutputTokens: 3000 },
+    }, (t) => { iets = true; stuur({ t: "tekst", v: t }); });
+    model = res.model;
+    if (!res.calls.length) { stuur({ t: "info", v: res.model.replace("gemini-", "Gemini ").replace(/-/g, " ") + ", " + ((Date.now() - start) / 1000).toFixed(1).replace(".", ",") + " s" }); return; }
+    if (res.tekst) stuur({ t: "tekst", v: "\n\n" });
+    contents.push({ role: "model", parts: res.parts }); // ongewijzigd terug, inclusief thought signatures
+    // Alle tools van deze ronde tegelijk uitvoeren
+    const antwoorden = await Promise.all(res.calls.map(async (p) => {
       const { name, args, id: callId } = p.functionCall;
       stuur({ t: "tool", naam: name, label: LABELS[name] || name });
       let uit;
@@ -349,11 +418,11 @@ async function slim(c, body) {
       catch (e) { uit = { fout: String(e.message || e) }; }
       const fr = { name, response: { resultaat: JSON.parse(JSON.stringify(uit ?? null)) } };
       if (callId) fr.id = callId;
-      antwoorden.push({ functionResponse: fr });
-    }
+      return { functionResponse: fr };
+    }));
     contents.push({ role: "user", parts: antwoorden });
   }
-  stuur({ t: "tekst", v: "Ik kwam er niet helemaal uit binnen de tijd. Stel je vraag iets specifieker?" });
+  if (!iets) stuur({ t: "tekst", v: "Ik kwam er niet helemaal uit binnen de tijd. Stel je vraag iets specifieker?" });
 }
 
 // ---------- Lokale modus (zonder API-sleutel) ----------
@@ -480,7 +549,8 @@ export async function agentGesprek(request, wie, store, env, h) {
   const { readable, writable } = new TransformStream();
   const w = writable.getWriter();
   let open = true;
-  const stuur = (d) => { if (open) w.write(sse(d)).catch(() => { open = false; }); };
+  let getoond = false;
+  const stuur = (d) => { if (d.t === "tekst" && d.v) getoond = true; if (open) w.write(sse(d)).catch(() => { open = false; }); };
   const c = { store, wie, env, h, stuur };
   (async () => {
     try {
@@ -488,7 +558,11 @@ export async function agentGesprek(request, wie, store, env, h) {
       if (geminiSleutel(env)) {
         let gelukt = false;
         try { await slim(c, body); gelukt = true; }
-        catch (e) { stuur({ t: "tool", naam: "lokaal", label: "Gemini even niet bereikbaar, ik zoek het zelf op" }); }
+        catch (e) {
+          console.log("Gemini-fout:", e.status, e.message);
+          if (getoond) { stuur({ t: "fout", v: "Gemini viel halverwege weg: " + String(e.message || e).slice(0, 160) }); gelukt = true; }
+          else stuur({ t: "tool", naam: "lokaal", label: "Gemini even niet bereikbaar (" + String(e.message || e).slice(0, 80) + "), ik zoek het zelf op" });
+        }
         if (!gelukt) await lokaal(c, body);
       } else await lokaal(c, body);
       stuur({ t: "klaar" });

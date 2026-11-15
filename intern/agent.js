@@ -113,7 +113,7 @@
       orbEl.classList.add('denkt'); document.querySelectorAll('.ag-kop .orb').forEach(function (o) { o.classList.add('denkt'); });
       mdEl.innerHTML = '<div class="ag-denkt"><span></span><span></span><span></span></div>';
       stroom.scrollTop = stroom.scrollHeight;
-      var antwoord = '', stappen = [], bronnen = [], acties = [], links = [], open = null, raf = 0;
+      var antwoord = '', stappen = [], bronnen = [], acties = [], links = [], open = null, raf = 0, info = '';
       function teken() {
         raf = 0;
         mdEl.innerHTML = antwoord ? md(antwoord) : '<div class="ag-denkt"><span></span><span></span><span></span></div>';
@@ -143,6 +143,7 @@
                 if (d.t === 'tekst') { if (d.v) { if (open) { open.classList.add('klaar'); open = null; } antwoord += d.v; if (!raf) raf = requestAnimationFrame(teken); } }
                 else if (d.t === 'tool') stap(d.label);
                 else if (d.t === 'bronnen') bronnen = bronnen.concat(d.v || []);
+                else if (d.t === 'info') info = d.v;
                 else if (d.t === 'actie') { acties.push(d); AE.meld(d.tekst); }
                 else if (d.t === 'klant') links.push(['Open ' + d.naam, '/intern/klant.html?id=' + encodeURIComponent(d.id)]);
                 else if (d.t === 'werkstroom') links.push(['Werkstroom: ' + d.titel, '/intern/werkstromen.html?p=' + encodeURIComponent(d.id)]);
@@ -162,6 +163,7 @@
           var extra = bronnenHtml(bronnen) +
             acties.map(function (a) { return '<a class="ag-actie" href="' + esc(a.link || '#') + '">' + esc(a.tekst) + '</a>'; }).join('') +
             (links.length ? '<div class="ag-kaartjes">' + links.filter(function (l) { if (gezien[l[1]]) return false; gezien[l[1]] = 1; return true; }).slice(0, 3).map(function (l) { return '<a href="' + esc(l[1]) + '">' + esc(l[0]) + '</a>'; }).join('') + '</div>' : '');
+          if (info) extra += '<div class="ag-info">' + esc(info) + '</div>';
           exEl.innerHTML = extra + exEl.innerHTML;
           orbEl.classList.remove('denkt'); document.querySelectorAll('.ag-kop .orb').forEach(function (o) { o.classList.remove('denkt'); });
           if (antwoord) { berichten.push({ rol: 'agent', tekst: antwoord, stappen: stappen, extra: extra }); bewaar(berichten); }

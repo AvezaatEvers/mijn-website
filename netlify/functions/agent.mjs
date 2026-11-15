@@ -12,6 +12,8 @@ function cookie(request, naam) {
 }
 
 export default async (request) => {
+  // Opwarmen: de browser pingt dit zodra de chat opent, zodat de eerste vraag geen koude start heeft
+  if (request.method === "GET") return new Response(null, { status: 204, headers: { "Cache-Control": "no-store" } });
   if (request.method !== "POST") return new Response(JSON.stringify({ fout: "Methode niet toegestaan" }), { status: 405, headers: { "Content-Type": "application/json" } });
   const wie = await ingelogd(cookie(request, COOKIE));
   if (!wie) return new Response(JSON.stringify({ fout: "Niet ingelogd" }), { status: 401, headers: { "Content-Type": "application/json" } });
@@ -19,4 +21,5 @@ export default async (request) => {
   return agentGesprek(request, wie, getStore({ name: "intern", consistency: "strong" }), env, agentHulp(env));
 };
 
-export const config = { path: "/intern/api/agent" };
+// /agent-api gaat rechtstreeks naar deze functie (geen extra stap via de edge function); de inlog controleren we hierboven zelf.
+export const config = { path: ["/intern/api/agent", "/agent-api"] };

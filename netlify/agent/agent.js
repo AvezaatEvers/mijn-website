@@ -562,7 +562,7 @@ async function vooraf(c, body) {
     if (body.klant) { const k = (c.klanten || []).find((x) => x.id === body.klant); if (k) uit.openKlant = klantDetails(k, c.h, c.taken || [], c.runs || []); }
     // De kennisbank alvast doorzoeken op de vraag: scheelt vaak een hele ronde naar Gemini
     const vraag = ((berichtenVan(body).filter((b) => b.role === "user").pop()) || {}).content || "";
-    const geheugen = await leesGeheugen(c.store);
+    const geheugen = c.geheugen || await leesGeheugen(c.store);
     c.feiten = geheugen.feiten;
     const geleerd = geleerdVoor(geheugen, vraag);
     if (geleerd.length) {
@@ -581,6 +581,9 @@ async function vooraf(c, body) {
 async function slim(c, body) {
   const { env, wie, stuur } = c;
   const start = Date.now();
+  // Alles wat we nodig hebben in één keer en tegelijk ophalen
+  [c.klanten, c.taken, c.runs] = await Promise.all([c.h.leesKlanten(c.store), c.h.leesTaken(c.store), leesRuns(c.store)]);
+  c.geheugen = await leesGeheugen(c.store);
   const context = await vooraf(c, body);
   const sys = systeem(wie, { pagina: schoon(body.pagina, 80), klant: schoon(body.klant, 40) }) +
     ((c.feiten || []).length ? "\n\nVaste regels en feiten die Koen en Daan je hebben geleerd (altijd toepassen):\n" + c.feiten.map((f) => "- " + f.tekst).join("\n") : "") +
@@ -588,7 +591,9 @@ async function slim(c, body) {
   const lijst = berichtenVan(body);
   if (!lijst.length) throw new Error("Geen vraag");
   const contents = lijst.map((b) => ({ role: b.role === "assistant" ? "model" : "user", parts: [{ text: b.content }] }));
-  const voorkeur = env("GEMINI_MODEL") ? [env("GEMINI_MODEL"), ...MODELLEN] : MODELLEN;
+  // Snel: Flash-Lite eerst (begint sneller met antwoorden). Slim: Flash eerst (denkt beter na).
+  const basis = body.modus === "slim" ? MODELLEN : ["gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-3.6-flash"];
+  const voorkeur = env("GEMINI_MODEL") ? [env("GEMINI_MODEL"), ...basis] : basis;
   let model = null, iets = false;
   const gebruikt = new Set();
   for (let ronde = 0; ronde < 5; ronde++) {

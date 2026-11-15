@@ -353,7 +353,6 @@
       <p class="vd-samen" id="samenvatting">&nbsp;</p>
       <div class="vd-knoppen">
         <button class="dag-knop" type="button" data-dagmodus id="dag-knop"><span id="dag-knop-tekst">Start je dag</span></button>
-        <button class="tekst-knop" type="button" data-agent>Vraag de agent</button>
       </div>
     </div>
     <div class="vd-orb" aria-hidden="true"><div class="orb" id="hero-orb"><i></i><i></i><i></i></div></div>
@@ -431,7 +430,7 @@
     </div>
   </div>
 </main>
-<script src="/intern/app.js?v=5"></script>
+<script src="/intern/app.js?v=6"></script>
 <script>
 (function () {
   var alles = false, laatste = null;
@@ -461,10 +460,6 @@
 </script>
 <script>
 (function () {
-  var bfv = document.getElementById('bf-vraag'); if (bfv) bfv.addEventListener('submit', function (e) {
-    e.preventDefault(); var i = document.getElementById('bf-in'), v = i.value.trim(); if (!v || !window.AE.agent) return;
-    i.value = ''; window.AE.agent.open(v);
-  });
   function werk() {
     window.AE.api('/intern/api/werkstromen').then(function (r) {
       var esc = window.AE.esc, u = new Date().getHours(), dow = new Date().getDay();

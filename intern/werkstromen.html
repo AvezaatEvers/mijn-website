@@ -86,7 +86,7 @@
 
 <div class="wd" id="wd" role="dialog" aria-modal="true" aria-labelledby="wd-titel"><div class="wd-doos" id="wd-doos"></div></div>
 
-<script src="/intern/app.js?v=5"></script>
+<script src="/intern/app.js?v=6"></script>
 <script>
 (function () {
   function start() {
@@ -127,7 +127,7 @@
             (gedaan ? '<div class="door">Afgevinkt door ' + (gedaan.door === 'daan' ? 'Daan' : 'Koen') + ' op ' + new Date(gedaan.op).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + '</div>' : '') +
             '<div class="knoppen">' + (s.link ? '<a href="' + esc(s.link) + (run && run.klant && /klant/.test(s.link) === false && s.link === '/voorstel.html' ? '?klant=' + encodeURIComponent(run.klant) : '') + '">Openen</a>' : '') +
             (s.actie === 'contact' ? '<button type="button" data-contact="' + (run && run.klant ? esc(run.klant) : '') + '">Contact vastleggen</button>' : '') +
-            '<button type="button" class="ag-k" data-agent="' + esc((s.vraag || 'Help me met de stap "' + s.t + '" uit de werkstroom ' + p.titel + '.') + (run && run.klantNaam ? ' Het gaat om ' + run.klantNaam + '.' : '')) + '">Vraag de agent</button></div></div></div>';
+            '</div></div></div>';
         }).join('') + '</div>' +
         '<div class="wd-voet">' + (run
           ? (run.klant ? '<a class="ai-knop licht" href="/intern/klant.html?id=' + encodeURIComponent(run.klant) + '">Open klant</a>' : '') + '<button class="weg" type="button" id="wd-stop">Werkstroom verwijderen</button>'

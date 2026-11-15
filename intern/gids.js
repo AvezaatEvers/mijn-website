@@ -14,8 +14,7 @@
   function bouw() {
     if (orbEl) return;
     document.body.classList.add('dagmodus');
-    orbEl = document.createElement('div'); orbEl.className = 'gids-orb'; orbEl.title = 'Vraag de agent'; orbEl.innerHTML = AE.agent.orb();
-    orbEl.addEventListener('click', function () { AE.agent.open(huidig ? 'Help me met: ' + huidig.titel + (huidig.klant ? ' voor ' + huidig.klant.naam : '') + '.' : ''); });
+    orbEl = document.createElement('div'); orbEl.className = 'gids-orb'; orbEl.innerHTML = AE.agent.orb();
     spot = document.createElement('div'); spot.className = 'gids-spot';
     straal = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); straal.setAttribute('class', 'gids-straal');
     straal.innerHTML = '<defs><linearGradient id="gids-kleur" x1="0" x2="1"><stop offset="0" stop-color="#B8F0FF"/><stop offset="1" stop-color="#7FA4FF"/></linearGradient></defs><path d=""/><circle r="4" cx="-10" cy="-10"/>';
@@ -204,7 +203,6 @@
         if (a === 'web' && k) acties.push('<a href="https://www.google.com/search?q=' + encodeURIComponent((k.naam || '') + ' ' + (k.contact || '')) + '" target="_blank" rel="noopener">Googelen</a>');
         if (a === 'contact') acties.push('<button type="button" data-contact="' + esc(k ? k.id : '') + '">Contact vastleggen</button>');
       });
-      acties.push('<button type="button" data-g="agent">Vraag de agent</button>');
       acties.push('<button type="button" class="stil" data-g="later" title="Zet deze missie op morgen">Morgen</button>');
       acties.push('<button type="button" class="stil" data-g="sla">Overslaan</button>');
       acties.push('<button type="button" class="klaar" data-g="klaar">' + (m.soort === 'checklist' ? 'Alles klaar' : 'Klaar') + '</button>');
@@ -307,7 +305,6 @@
     }
     if (!m) return;
     if (g === 'ga') return reis(m.url);
-    if (g === 'agent') return AE.agent.open((m.vraag || 'Help me met de missie "' + m.titel + '" (' + m.proces.titel + ').') + (m.klant ? ' Het gaat om ' + m.klant.naam + '.' : ''));
     if (g === 'sla') { var ss = lees() || {}; ss.sla = (ss.sla || []).concat(m.id); schrijf(ss); return toon(kies()); }
     if (g === 'klaar' || g === 'later') {
       b.disabled = true;

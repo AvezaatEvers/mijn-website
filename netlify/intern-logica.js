@@ -245,7 +245,9 @@ async function klantenApi(request, url, pad, wie, store, env) {
     if (!k || !TYPES[body.type]) return json({ fout: "Niet gevonden" }, 404);
     const data = body.sleutel ? (gepland(k).find((m) => m.sleutel === body.sleutel) || {}).data : handmatigeData(body.type);
     const m = maakMail(k, body.type, data || {}, env);
-    return json({ onderwerp: m.subject, html: m.html, aan: k.email });
+    // In het voorbeeld de afbeeldingen van deze site laden (ook als ze nog niet live staan)
+    const html = m.html.split("https://avezaatenevers.nl/assets/").join(url.origin + "/assets/");
+    return json({ onderwerp: m.subject, html, aan: k.email });
   }
 
   if (pad === "/intern/api/klant/stuur" && request.method === "POST") {

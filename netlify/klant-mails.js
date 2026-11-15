@@ -17,6 +17,7 @@ export const TYPES = {
   review: { label: "Google-review vragen", wanneer: "Handmatig. Promoters krijgen de reviewvraag al na hun NPS-cijfer" },
   aanbevelen: { label: "Aanbevelen", wanneer: "Automatisch, 2 weken na de eerste ingediende IB-aangifte, alleen bij tevreden klanten" },
   jubileum: { label: "Een jaar klant", wanneer: "Automatisch, 1 jaar na de startdatum" },
+  bericht: { label: "Eigen bericht", wanneer: "Handmatig, bijvoorbeeld opgesteld door de agent" },
 };
 export const AUTOMATISCH = ["voorstelHerinnering", "checkIn", "kwartaal", "kwartaalTweede", "jaareinde", "inkomstenbelasting", "nps", "aanbevelen", "jubileum"];
 export const HANDMATIG = ["welkom", "voorstelHerinnering", "checkIn", "nps", "kwartaal", "kwartaalTweede", "jaareinde", "inkomstenbelasting", "review", "aanbevelen", "jubileum"];

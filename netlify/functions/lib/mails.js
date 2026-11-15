@@ -478,6 +478,19 @@ ${rij(0, 5)}${rij(6, 10)}
     };
   },
 
+  // Eigen bericht in huisstijl (opgesteld door Koen of Daan, bijvoorbeeld via de agent)
+  bericht(d, base = '') {
+    const alineas = String(d.tekst || '').split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean);
+    const inhoud = p(hoi(d.naam)) +
+      alineas.map((a, i) => p(esc(a).replace(/\n/g, '<br>'), i === alineas.length - 1 ? 'margin-bottom:22px' : '')).join('') +
+      groet(base, d.wie);
+    return {
+      subject: String(d.onderwerp || 'Bericht van Avezaat & Evers').slice(0, 140),
+      html: omhulsel(base, { preheader: String(alineas[0] || '').slice(0, 110), inhoud, wie: d.wie }),
+      text: `${hoiTekst(d.naam)}\n\n${alineas.join('\n\n')}${voet(d.wie)}`,
+    };
+  },
+
 };
 
 export { mails, voornaam };

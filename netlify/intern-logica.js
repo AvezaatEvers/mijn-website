@@ -147,6 +147,13 @@ form.addEventListener('submit',function(e){
 
 export function agentHulp(env) {
   return {
+    api: async (method, pad, body, wie, store) => {
+      const u = new URL("https://intern.local" + pad + (method === "GET" || method === "DELETE" ? "?" + new URLSearchParams(body || {}) : ""));
+      const req = new Request(u, { method, headers: { "Content-Type": "application/json" }, body: method === "GET" || method === "DELETE" ? undefined : JSON.stringify(body || {}) });
+      const r = await klantenApi(req, u, pad, wie, store, env);
+      const j = await r.json().catch(() => ({}));
+      return r.ok ? j : { fout: j.fout || "Mislukt (" + r.status + ")" };
+    },
     leesKlanten, leesTaken, bewaarTaken: (st, t) => st.setJSON(SLEUTEL, t),
     overzicht: (k, t, v) => overzicht(k, t, v, vandaag(), env), inzichten: (k, v, d) => inzichten(k, v, d),
     leadInfo: (k) => leadInfo(k), gepland: (k) => gepland(k, vandaag(), 8, env), vandaag,
@@ -301,6 +308,10 @@ function sleutelVoor(type, data, k = {}) {
   return null;
 }
 
+function berichtData(body) {
+  return { onderwerp: String(body.onderwerp || "").replace(/[<>]/g, "").trim().slice(0, 140), tekst: String(body.tekst || "").replace(/[<>]/g, "").trim().slice(0, 4000) };
+}
+
 function metPlanning(k, env) { return { ...k, gepland: gepland(k, vandaag(), 8, env), leadInfo: k.status === "prospect" ? leadInfo(k) : null }; }
 
 async function klantenApi(request, url, pad, wie, store, env) {
@@ -348,7 +359,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
   if (pad === "/intern/api/klant/voorbeeld") {
     const k = vind(body.id);
     if (!k || !TYPES[body.type]) return json({ fout: "Niet gevonden" }, 404);
-    const data = body.sleutel ? (gepland(k).find((m) => m.sleutel === body.sleutel) || {}).data : handmatigeData(body.type);
+    const data = body.type === "bericht" ? berichtData(body) : body.sleutel ? (gepland(k).find((m) => m.sleutel === body.sleutel) || {}).data : handmatigeData(body.type);
     const m = maakMail(k, body.type, data || {}, env);
     // In het voorbeeld de afbeeldingen van deze site laden (ook als ze nog niet live staan)
     const html = m.html.split("https://avezaatenevers.nl/assets/").join(url.origin + "/assets/");
@@ -360,7 +371,8 @@ async function klantenApi(request, url, pad, wie, store, env) {
     if (!k || !TYPES[body.type]) return json({ fout: "Niet gevonden" }, 404);
     const test = body.test === true;
     const aan = test ? (String(env("MAIL_TO") || "info@avezaatenevers.nl").split(",")[0].trim()) : k.email;
-    const data = handmatigeData(body.type);
+    if (body.type === "bericht" && !String(body.tekst || "").trim()) return json({ fout: "Het bericht is leeg" }, 400);
+    const data = body.type === "bericht" ? berichtData(body) : handmatigeData(body.type);
     const m = maakMail(k, body.type, data, env);
     if (test) m.subject = "[TEST] " + m.subject;
     const r = await verstuur(env, { aan, mail: m });

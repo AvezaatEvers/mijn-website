@@ -4,6 +4,8 @@
 import { zoekKennis } from "./kennis.js";
 import { PROCESSEN, GROEPEN, proces } from "./processen.js";
 import { synchroniseer, dagplan, verwerkMissie, GIDS } from "./dagplan.js";
+import { TYPES, HANDMATIG } from "../klant-mails.js";
+import { KANALEN, ONDERWERPEN, SOORTEN, GEVOEL } from "../inzichten.js";
 
 const WERK = "werkstromen";
 const NAMEN = { koen: "Koen", daan: "Daan" };
@@ -130,12 +132,33 @@ const TOOLS = [
     input_schema: { type: "object", properties: { titel: { type: "string" }, deadline: { type: "string", description: "JJJJ-MM-DD" }, voor: { type: "string", enum: ["koen", "daan", "samen"] }, klant_id: { type: "string" } }, required: ["titel"] } },
   { name: "contact_inzichten", description: "Inzichten uit vastgelegd klantcontact en NPS: aantallen, % opgelost, % vermijdbaar, NPS, onderwerpen en automatische adviezen.",
     input_schema: { type: "object", properties: { dagen: { type: "number", enum: [30, 90, 365] } } } },
+  // ---- Acties (wijzigingen) ----
+  { name: "klant_toevoegen", description: "Stel voor een nieuwe klant of lead toe te voegen. Wordt pas opgeslagen als de gebruiker op Bevestigen klikt. Naam en e-mailadres zijn verplicht; vraag ze na als ze ontbreken.",
+    input_schema: { type: "object", properties: { naam: { type: "string", description: "Naam contactpersoon" }, bedrijf: { type: "string" }, email: { type: "string" }, telefoon: { type: "string" },
+      status: { type: "string", enum: ["klant", "prospect"], description: "prospect = lead" }, boekhouder: { type: "string", enum: ["koen", "daan"] }, start: { type: "string", description: "Startdatum JJJJ-MM-DD" },
+      notitie: { type: "string" }, branche: { type: "string" }, kor: { type: "boolean" }, icp: { type: "boolean" }, partner: { type: "boolean" } }, required: ["naam", "email"] } },
+  { name: "klant_bijwerken", description: "Stel een wijziging voor aan een bestaande klant of lead: status (klant, prospect, gestopt, verloren), contactgegevens, boekhouder, startdatum, notitie of fiscaal profiel. Wordt pas opgeslagen na Bevestigen.",
+    input_schema: { type: "object", properties: { klant_id: { type: "string" }, naam: { type: "string" }, bedrijf: { type: "string" }, email: { type: "string" }, telefoon: { type: "string" },
+      status: { type: "string", enum: ["klant", "prospect", "gestopt", "verloren"] }, boekhouder: { type: "string", enum: ["koen", "daan"] }, start: { type: "string", description: "JJJJ-MM-DD" },
+      notitie: { type: "string", description: "Vervangt de vaste notitie" }, branche: { type: "string" }, kor: { type: "boolean" }, icp: { type: "boolean" }, partner: { type: "boolean" }, urencriterium: { type: "boolean" }, tevreden: { type: "boolean" } }, required: ["klant_id"] } },
+  { name: "mail_versturen", description: "Stel voor een mail naar een klant te sturen: een vast sjabloon (welkom, checkIn, nps, kwartaal, kwartaalTweede, jaareinde, inkomstenbelasting, review, aanbevelen, jubileum, voorstelHerinnering) of type 'bericht' met een eigen onderwerp en tekst in onze huisstijl. De mail gaat pas na Bevestigen; de gebruiker kan eerst een voorbeeld zien. Schrijf bij 'bericht' in je-vorm, kort, zonder aanhef en zonder afsluiting (die voegt het sjabloon toe).",
+    input_schema: { type: "object", properties: { klant_id: { type: "string" }, type: { type: "string", enum: [...HANDMATIG, "bericht"] }, onderwerp: { type: "string" }, tekst: { type: "string", description: "Alleen bij type bericht. Alinea's scheiden met een lege regel." } }, required: ["klant_id", "type"] } },
+  { name: "contact_vastleggen", description: "Leg direct een contactmoment met een klant vast (telt mee voor de inzichten en NPS-adviezen).",
+    input_schema: { type: "object", properties: { klant_id: { type: "string" }, kanaal: { type: "string", enum: Object.keys(KANALEN) }, richting: { type: "string", enum: ["klant", "wij"], description: "klant = de klant nam contact op" },
+      onderwerp: { type: "string", enum: Object.keys(ONDERWERPEN) }, soort: { type: "string", enum: Object.keys(SOORTEN) }, opgelost: { type: "boolean" }, gevoel: { type: "string", enum: Object.keys(GEVOEL) },
+      vermijdbaar: { type: "boolean" }, notitie: { type: "string" } }, required: ["klant_id"] } },
+  { name: "notitie_toevoegen", description: "Zet direct een notitie op de tijdlijn van een klant.",
+    input_schema: { type: "object", properties: { klant_id: { type: "string" }, tekst: { type: "string" }, soort: { type: "string", enum: ["notitie", "gebeld", "geappt", "gemaild", "gesprek"] } }, required: ["klant_id", "tekst"] } },
+  { name: "taak_afvinken", description: "Vink direct een open taak af. Geef (een deel van) de titel.",
+    input_schema: { type: "object", properties: { titel: { type: "string" } }, required: ["titel"] } },
 ];
 
 const LABELS = {
   dagoverzicht: "Bekijkt je dag", zoek_klanten: "Zoekt klanten", klant_details: "Opent klantdossier", kennis_zoeken: "Zoekt in de kennisbank",
   werkstroom_info: "Pakt de werkstroom erbij", lopende_werkstromen: "Bekijkt lopende werkstromen", werkstroom_starten: "Start werkstroom",
   taak_toevoegen: "Zet taak klaar", contact_inzichten: "Analyseert klantcontact",
+  klant_toevoegen: "Bereidt nieuwe klant voor", klant_bijwerken: "Bereidt wijziging voor", mail_versturen: "Stelt mail op",
+  contact_vastleggen: "Legt contact vast", notitie_toevoegen: "Zet notitie op de tijdlijn", taak_afvinken: "Vinkt taak af",
 };
 
 async function voerUit(naam, input, c) {
@@ -193,6 +216,87 @@ async function voerUit(naam, input, c) {
       stuur({ t: "actie", soort: "taak", tekst: "Taak toegevoegd: " + titel + (t.deadline ? " (" + t.deadline + ")" : ""), link: "/intern/" });
       return { ok: true, taak: t };
     }
+    case "klant_toevoegen": {
+      const email = String(input.email || "").trim().toLowerCase();
+      if (!input.naam || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { fout: "Naam en een geldig e-mailadres zijn nodig. Vraag ze na." };
+      const dubbel = klanten.find((k) => (k.email || "").toLowerCase() === email);
+      if (dubbel) return { fout: "Er bestaat al een klant met dit e-mailadres", klant: kortKlant(dubbel) };
+      const body = { naam: schoon(input.naam), bedrijf: schoon(input.bedrijf || ""), email, telefoon: schoon(input.telefoon || "", 30), status: input.status === "prospect" ? "prospect" : "klant",
+        boekhouder: ["koen", "daan"].includes(input.boekhouder) ? input.boekhouder : wie, start: datumOk(input.start), notitie: schoon(input.notitie || "", 2000) };
+      const pr = {}; ["kor", "icp", "partner"].forEach((x) => { if (typeof input[x] === "boolean") pr[x] = input[x]; }); if (input.branche) pr.branche = schoon(input.branche, 60);
+      if (Object.keys(pr).length) body.profiel = pr;
+      const regels = [["Naam", body.naam], ["Bedrijf", body.bedrijf], ["E-mail", body.email], ["Telefoon", body.telefoon], ["Status", body.status === "prospect" ? "Lead" : "Klant"], ["Boekhouder", NAMEN[body.boekhouder]], ["Start", body.start], ["Branche", pr.branche], ["Notitie", body.notitie]].filter((r) => r[1]);
+      stuur({ t: "bevestig", id: id(), titel: body.status === "prospect" ? "Nieuwe lead toevoegen" : "Nieuwe klant toevoegen", regels, knop: "Toevoegen", klaar: "Toegevoegd",
+        verzoek: { method: "POST", url: "/intern/api/klanten", body } });
+      return { status: "Wacht op bevestiging van de gebruiker (knop Toevoegen in de kaart). Nog niet opgeslagen." };
+    }
+    case "klant_bijwerken": {
+      const k = klanten.find((x) => x.id === input.klant_id);
+      if (!k) return { fout: "Klant niet gevonden. Gebruik eerst zoek_klanten." };
+      const body = { id: k.id }, regels = [];
+      const LBL = { naam: "Naam", bedrijf: "Bedrijf", email: "E-mail", telefoon: "Telefoon", status: "Status", boekhouder: "Boekhouder", start: "Startdatum", notitie: "Notitie", tevreden: "Tevreden klant" };
+      for (const v of Object.keys(LBL)) if (input[v] !== undefined && input[v] !== "") {
+        body[v] = v === "start" ? datumOk(input[v]) : typeof input[v] === "boolean" ? input[v] : schoon(input[v], v === "notitie" ? 2000 : 200);
+        const oud = k[v], nieuw = body[v];
+        regels.push([LBL[v], (oud !== undefined && oud !== "" && oud !== nieuw ? String(oud === true ? "ja" : oud === false ? "nee" : oud) + " → " : "") + String(nieuw === true ? "ja" : nieuw === false ? "nee" : v === "boekhouder" ? NAMEN[nieuw] : nieuw)]);
+      }
+      const pr = {}; ["kor", "icp", "partner", "urencriterium"].forEach((x) => { if (typeof input[x] === "boolean") { pr[x] = input[x]; regels.push([x.toUpperCase() === "KOR" || x === "icp" ? x.toUpperCase() : x.charAt(0).toUpperCase() + x.slice(1), input[x] ? "ja" : "nee"]); } });
+      if (input.branche) { pr.branche = schoon(input.branche, 60); regels.push(["Branche", pr.branche]); }
+      if (Object.keys(pr).length) body.profiel = pr;
+      if (regels.length === 0) return { fout: "Geen wijziging opgegeven" };
+      stuur({ t: "bevestig", id: id(), titel: "Wijzigen: " + (k.bedrijf || k.naam), regels, knop: "Opslaan", klaar: "Opgeslagen", link: "/intern/klant.html?id=" + k.id,
+        verzoek: { method: "PATCH", url: "/intern/api/klant", body } });
+      return { status: "Wacht op bevestiging van de gebruiker (knop Opslaan). Nog niet opgeslagen." };
+    }
+    case "mail_versturen": {
+      const k = klanten.find((x) => x.id === input.klant_id);
+      if (!k) return { fout: "Klant niet gevonden. Gebruik eerst zoek_klanten." };
+      if (!k.email) return { fout: "Deze klant heeft geen e-mailadres" };
+      const type = input.type;
+      if (!TYPES[type] || (type !== "bericht" && !HANDMATIG.includes(type))) return { fout: "Onbekend mailtype", types: [...HANDMATIG, "bericht"] };
+      const body = { id: k.id, type };
+      if (type === "bericht") {
+        body.onderwerp = schoon(input.onderwerp || "", 140); body.tekst = String(input.tekst || "").replace(/[<>]/g, "").trim().slice(0, 4000);
+        if (!body.onderwerp || !body.tekst) return { fout: "Bij een eigen bericht zijn onderwerp en tekst nodig" };
+      }
+      const al = (k.log || []).find((l) => l.type === type && l.ok && !l.test && type !== "bericht");
+      const regels = [["Aan", (k.naam || "") + " <" + k.email + ">"], ["Mail", type === "bericht" ? "Eigen bericht" : TYPES[type].label]];
+      if (type === "bericht") { regels.push(["Onderwerp", body.onderwerp]); regels.push(["Tekst", body.tekst]); }
+      if (al) regels.push(["Let op", "Deze mail is al eens verstuurd op " + al.op.slice(0, 10)]);
+      stuur({ t: "bevestig", id: id(), titel: "Mail versturen", regels, knop: "Versturen", klaar: "Verstuurd", link: "/intern/klant.html?id=" + k.id,
+        verzoek: { method: "POST", url: "/intern/api/klant/stuur", body },
+        test: { method: "POST", url: "/intern/api/klant/stuur", body: { ...body, test: true } },
+        voorbeeld: "/intern/api/klant/voorbeeld?" + new URLSearchParams(type === "bericht" ? { id: k.id, type, onderwerp: body.onderwerp, tekst: body.tekst } : { id: k.id, type }) });
+      return { status: "Mail staat klaar; de gebruiker kan een voorbeeld bekijken en moet op Versturen klikken. Nog niet verstuurd." };
+    }
+    case "contact_vastleggen": {
+      const k = klanten.find((x) => x.id === input.klant_id);
+      if (!k) return { fout: "Klant niet gevonden" };
+      const r = await h.api("POST", "/intern/api/klant/contact", { id: k.id, kanaal: input.kanaal, richting: input.richting, onderwerp: input.onderwerp, soort: input.soort, opgelost: input.opgelost, gevoel: input.gevoel, vermijdbaar: input.vermijdbaar, notitie: input.notitie }, wie, store);
+      if (r.fout) return r;
+      c.klanten = null;
+      stuur({ t: "actie", soort: "contact", tekst: "Contact vastgelegd bij " + (k.bedrijf || k.naam), link: "/intern/klant.html?id=" + k.id });
+      return { ok: true };
+    }
+    case "notitie_toevoegen": {
+      const k = klanten.find((x) => x.id === input.klant_id);
+      if (!k) return { fout: "Klant niet gevonden" };
+      const r = await h.api("POST", "/intern/api/klant/notitie", { id: k.id, tekst: input.tekst, soort: input.soort }, wie, store);
+      if (r.fout) return r;
+      c.klanten = null;
+      stuur({ t: "actie", soort: "notitie", tekst: "Notitie gezet bij " + (k.bedrijf || k.naam), link: "/intern/klant.html?id=" + k.id });
+      return { ok: true };
+    }
+    case "taak_afvinken": {
+      const q = String(input.titel || "").toLowerCase().trim();
+      const open = taken.filter((t) => !t.klaar && q && t.titel.toLowerCase().includes(q));
+      if (!open.length) return { fout: "Geen open taak gevonden met die titel", open: taken.filter((t) => !t.klaar).map((t) => t.titel) };
+      if (open.length > 1) return { fout: "Meerdere taken passen, wees specifieker", opties: open.map((t) => t.titel) };
+      open[0].klaar = true; open[0].klaarDoor = wie; open[0].klaarOp = new Date().toISOString();
+      await h.bewaarTaken(store, taken);
+      stuur({ t: "actie", soort: "taak", tekst: "Taak afgevinkt: " + open[0].titel, link: "/intern/" });
+      return { ok: true };
+    }
     case "contact_inzichten": {
       const z = h.inzichten(klanten, wie, [30, 90, 365].includes(input.dagen) ? input.dagen : 90);
       return { cijfers: z.cijfers, onderwerpen: z.onderwerpen, kanalen: z.kanalen, adviezen: z.adviezen, npsReacties: (z.npsReacties || []).slice(0, 5) };
@@ -219,6 +323,8 @@ Werkwijze:
 - Vraagt hij wat hij moet doen of waar te beginnen: gebruik dagoverzicht en geef een geordende lijst van maximaal 5 acties, belangrijkste eerst, elk met de reden en een link.
 - Bij een proces ("hoe pak ik X aan", "nieuwe klant", "btw-kwartaal"): gebruik werkstroom_info en vat de stappen samen. Werkstromen starten vanzelf en staan in het dagplan; start er alleen zelf een als hij daar expliciet om vraagt.
 - Taken en werkstromen maak je alleen aan als hij dat vraagt of bevestigt.
+- Je kunt ook acties uitvoeren: klanten toevoegen of wijzigen, mails sturen (vaste sjablonen of een eigen bericht), contact vastleggen, notities zetten en taken afvinken. Klant toevoegen, klant wijzigen en mails sturen worden pas uitgevoerd als hij in de kaart op de knop klikt: zeg dat in één zin ('Staat klaar, klik op Versturen'). Vraag ontbrekende gegevens (zoals e-mailadres) na in plaats van te gokken. Zoek bij een klantnaam eerst het id op met zoek_klanten.
+- Een eigen bericht schrijf je in onze toon: je-vorm, persoonlijk, kort, zonder aanhef of afsluiting (die zitten in het sjabloon).
 
 Stijl:
 - Nederlands, je-vorm, kort en direct, in steekzinnen waar dat kan. Geen inleiding of herhaling van de vraag.

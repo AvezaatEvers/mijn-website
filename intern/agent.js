@@ -53,6 +53,58 @@
     return [S.dag[0], S.boek[0], S.werk[1], S.dag[1]];
   }
 
+  // ---------- Bevestigkaarten: acties die pas na een klik gebeuren ----------
+  var BEV = 'ae-bevestigd';
+  function bevStatus(id, v) { try { var m = JSON.parse(localStorage.getItem(BEV) || '{}'); if (v === undefined) return m[id]; m[id] = v; localStorage.setItem(BEV, JSON.stringify(m)); } catch (e) { return null; } }
+  function kaartHtml(d) {
+    var data = esc(JSON.stringify({ verzoek: d.verzoek, test: d.test || null, voorbeeld: d.voorbeeld || null, klaar: d.klaar || 'Gedaan', link: d.link || null }));
+    return '<div class="ag-bev" data-id="' + esc(d.id) + '" data-bev-data="' + data + '"><div class="ag-bev-titel">' + esc(d.titel) + '</div><dl>' +
+      (d.regels || []).map(function (r) { return '<div><dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]).replace(/\n/g, '<br>') + '</dd></div>'; }).join('') + '</dl>' +
+      '<div class="ag-bev-knoppen"><button type="button" class="ja" data-bev="ja">' + esc(d.knop || 'Bevestigen') + '</button>' +
+      (d.voorbeeld ? '<button type="button" data-bev="voorbeeld">Voorbeeld</button>' : '') + (d.test ? '<button type="button" data-bev="test">Test naar info@</button>' : '') +
+      '<button type="button" class="stil" data-bev="nee">Annuleren</button></div><div class="ag-bev-status" aria-live="polite"></div></div>';
+  }
+  function zetKaart(k, staat, tekst, link) {
+    k.classList.remove('is-klaar', 'is-weg', 'is-fout');
+    if (staat) k.classList.add('is-' + staat);
+    var st = k.querySelector('.ag-bev-status');
+    st.innerHTML = tekst ? esc(tekst) + (link ? ' <a href="' + esc(link) + '">Openen</a>' : '') : '';
+    k.querySelectorAll('[data-bev]').forEach(function (b) { b.disabled = staat === 'klaar' || staat === 'weg'; });
+  }
+  function herstelKaarten(el) {
+    el.querySelectorAll('.ag-bev').forEach(function (k) {
+      var s = bevStatus(k.dataset.id);
+      if (s && s.staat === 'klaar') zetKaart(k, 'klaar', s.tekst, s.link);
+      else if (s && s.staat === 'weg') zetKaart(k, 'weg', 'Geannuleerd');
+    });
+  }
+  function kaartKlik(e) {
+    var b = e.target.closest('[data-bev]'); if (!b) return;
+    var k = b.closest('.ag-bev'), d = JSON.parse(k.getAttribute('data-bev-data')), wat = b.dataset.bev;
+    if (wat === 'nee') { bevStatus(k.dataset.id, { staat: 'weg' }); return zetKaart(k, 'weg', 'Geannuleerd'); }
+    if (wat === 'voorbeeld') return AE.api(d.voorbeeld).then(toonVoorbeeld).catch(function (err) { zetKaart(k, 'fout', err.message); });
+    var v = wat === 'test' ? d.test : d.verzoek;
+    if (!v || String(v.url).indexOf('/intern/api/') !== 0) return;
+    b.disabled = true; zetKaart(k, null, wat === 'test' ? 'Testmail versturen…' : 'Bezig…');
+    AE.api(v.url, { method: v.method, body: JSON.stringify(v.body) }).then(function (r) {
+      if (wat === 'test') { b.disabled = false; return zetKaart(k, null, 'Testmail verstuurd naar info@. Klopt alles? Klik dan op ' + k.querySelector('.ja').textContent + '.'); }
+      var link = d.link || (r && r.id ? '/intern/klant.html?id=' + encodeURIComponent(r.id) : null);
+      bevStatus(k.dataset.id, { staat: 'klaar', tekst: d.klaar, link: link });
+      zetKaart(k, 'klaar', d.klaar, link);
+      AE.meld(d.klaar);
+      if (AE.herlaadKlanten) AE.herlaadKlanten();
+      document.dispatchEvent(new CustomEvent('ae:agent-actie'));
+    }).catch(function (err) { b.disabled = false; zetKaart(k, 'fout', err.message || 'Mislukt'); });
+  }
+  function toonVoorbeeld(r) {
+    var o = document.createElement('div'); o.className = 'ag-vb';
+    o.innerHTML = '<div class="ag-vb-doos" role="dialog" aria-label="Voorbeeld mail"><div class="ag-vb-kop"><div><small>Onderwerp</small><b>' + esc(r.onderwerp) + '</b></div><button type="button" aria-label="Sluiten">&times;</button></div><iframe title="Voorbeeld"></iframe></div>';
+    document.body.appendChild(o);
+    o.querySelector('iframe').srcdoc = r.html;
+    function weg() { o.remove(); }
+    o.addEventListener('click', function (e) { if (e.target === o || e.target.closest('.ag-vb-kop button')) weg(); });
+  }
+
   // ---------- Herbruikbare chat ----------
   var GESCHIEDENIS = 'ae-agent-v1';
   function laad() { try { return JSON.parse(localStorage.getItem(GESCHIEDENIS) || '[]'); } catch (e) { return []; } }
@@ -87,7 +139,7 @@
         el.innerHTML = orb('mini') + '<div><div class="ag-stappen"></div><div class="md"></div><div class="ag-extra"></div></div>';
         el.querySelector('.md').innerHTML = md(b.tekst);
         if (b.stappen) el.querySelector('.ag-stappen').innerHTML = b.stappen.map(function (s) { return '<span class="ag-stap klaar">' + esc(s) + '</span>'; }).join('');
-        if (b.extra) el.querySelector('.ag-extra').innerHTML = b.extra;
+        if (b.extra) { el.querySelector('.ag-extra').innerHTML = b.extra; herstelKaarten(el); }
       }
       stroom.appendChild(el);
       return el;
@@ -113,7 +165,7 @@
       orbEl.classList.add('denkt'); document.querySelectorAll('.ag-kop .orb').forEach(function (o) { o.classList.add('denkt'); });
       mdEl.innerHTML = '<div class="ag-denkt"><span></span><span></span><span></span></div>';
       stroom.scrollTop = stroom.scrollHeight;
-      var antwoord = '', stappen = [], bronnen = [], acties = [], links = [], open = null, raf = 0, info = '';
+      var antwoord = '', stappen = [], bronnen = [], acties = [], links = [], open = null, raf = 0, info = '', kaarten = [];
       function teken() {
         raf = 0;
         mdEl.innerHTML = antwoord ? md(antwoord) : '<div class="ag-denkt"><span></span><span></span><span></span></div>';
@@ -144,6 +196,7 @@
                 else if (d.t === 'tool') stap(d.label);
                 else if (d.t === 'bronnen') bronnen = bronnen.concat(d.v || []);
                 else if (d.t === 'info') info = d.v;
+                else if (d.t === 'bevestig') kaarten.push(d);
                 else if (d.t === 'actie') { acties.push(d); AE.meld(d.tekst); }
                 else if (d.t === 'klant') links.push(['Open ' + d.naam, '/intern/klant.html?id=' + encodeURIComponent(d.id)]);
                 else if (d.t === 'werkstroom') links.push(['Werkstroom: ' + d.titel, '/intern/werkstromen.html?p=' + encodeURIComponent(d.id)]);
@@ -163,6 +216,7 @@
           var extra = bronnenHtml(bronnen) +
             acties.map(function (a) { return '<a class="ag-actie" href="' + esc(a.link || '#') + '">' + esc(a.tekst) + '</a>'; }).join('') +
             (links.length ? '<div class="ag-kaartjes">' + links.filter(function (l) { if (gezien[l[1]]) return false; gezien[l[1]] = 1; return true; }).slice(0, 3).map(function (l) { return '<a href="' + esc(l[1]) + '">' + esc(l[0]) + '</a>'; }).join('') + '</div>' : '');
+          extra = kaarten.map(kaartHtml).join('') + extra;
           if (info) extra += '<div class="ag-info">' + esc(info) + '</div>';
           exEl.innerHTML = extra + exEl.innerHTML;
           orbEl.classList.remove('denkt'); document.querySelectorAll('.ag-kop .orb').forEach(function (o) { o.classList.remove('denkt'); });
@@ -178,6 +232,7 @@
     ta.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); vraag(ta.value); } });
     form.addEventListener('submit', function (e) { e.preventDefault(); vraag(ta.value); });
     stroom.addEventListener('click', function (e) { var b = e.target.closest('[data-vraag]'); if (b) vraag(b.getAttribute('data-vraag')); });
+    stroom.addEventListener('click', kaartKlik);
     tekenAlles();
     return {
       vraag: vraag,

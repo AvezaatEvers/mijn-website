@@ -249,3 +249,33 @@ body.app .ag-actie { background: #E9F7EE; border-color: #BFE5CB; color: var(--in
 body.app .ag-veld:focus-within { box-shadow: 0 0 0 3px rgba(45, 91, 211, .2); background: #fff; }
 body.app .ag-zweef .tip { background: rgba(29, 29, 31, .92); }
 .ag-info { margin-top: 8px; font-size: 11.5px; color: var(--muted); }
+
+/* Bevestigkaarten: acties die pas na een klik gebeuren */
+.ag-bev { margin-top: 10px; border-radius: 14px; padding: 14px 14px 12px; background: var(--vlak, #fff); box-shadow: 0 0 0 1px var(--line), 0 6px 18px -12px rgba(0, 0, 0, .25); }
+.ag-bev-titel { font-weight: 600; font-size: 14.5px; color: var(--ink); margin-bottom: 8px; }
+.ag-bev dl { margin: 0; display: grid; gap: 4px; }
+.ag-bev dl > div { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; font-size: 13.5px; }
+.ag-bev dt { color: var(--muted); }
+.ag-bev dd { margin: 0; color: var(--ink); overflow-wrap: anywhere; max-height: 220px; overflow-y: auto; }
+.ag-bev-knoppen { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.ag-bev-knoppen button { font: inherit; font-size: 13px; font-weight: 500; border: 0; border-radius: 9px; padding: 7px 12px; cursor: pointer; background: rgba(0, 0, 0, .05); color: var(--ink); }
+.ag-bev-knoppen button:hover:not(:disabled) { background: rgba(0, 0, 0, .09); }
+.ag-bev-knoppen .ja { background: #2D5BD3; color: #fff; font-weight: 600; }
+.ag-bev-knoppen .ja:hover:not(:disabled) { background: #26458F; }
+.ag-bev-knoppen .stil { background: none; color: var(--muted); }
+.ag-bev-knoppen button:disabled { opacity: .45; cursor: default; }
+.ag-bev-status { font-size: 13px; margin-top: 8px; color: var(--muted); }
+.ag-bev-status:empty { display: none; }
+.ag-bev.is-klaar { box-shadow: 0 0 0 1px #BFE5CB; }
+.ag-bev.is-klaar .ag-bev-status { color: #248A3D; font-weight: 600; }
+.ag-bev.is-klaar .ag-bev-status::before { content: "✓ "; }
+.ag-bev.is-weg { opacity: .55; }
+.ag-bev.is-fout .ag-bev-status { color: #D70015; }
+.ag-vb { position: fixed; inset: 0; z-index: 120; background: rgba(0, 0, 0, .3); display: grid; place-items: center; padding: 20px; animation: vervaag .2s; }
+.ag-vb-doos { width: min(700px, 100%); height: min(86vh, 900px); background: #fff; border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .35); }
+.ag-vb-kop { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid rgba(0, 0, 0, .08); }
+.ag-vb-kop small { display: block; font-size: 11.5px; color: #6E6E73; }
+.ag-vb-kop b { font-size: 14.5px; color: #1D1D1F; }
+.ag-vb-kop button { width: 32px; height: 32px; border-radius: 9px; border: 0; background: rgba(0, 0, 0, .05); font-size: 20px; cursor: pointer; }
+.ag-vb iframe { flex: 1; border: 0; width: 100%; background: #F3F5F9; }
+.ag-bev.is-klaar .ag-bev-knoppen, .ag-bev.is-weg .ag-bev-knoppen { display: none; }

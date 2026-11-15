@@ -212,14 +212,6 @@
 
   // Zijbalkknop en zwevende orb
   var zij = document.querySelector('.zij');
-  if (zij) {
-    var b = document.createElement('button'); b.type = 'button'; b.className = 'zij-agent'; b.setAttribute('data-agent', '');
-    b.innerHTML = orb('klein') + '<span>Vraag de agent<small>Je AI-collega</small></span><kbd>' + (/Mac|iPhone|iPad/.test(navigator.platform) ? '⌘J' : 'Ctrl J') + '</kbd>';
-    zij.insertBefore(b, zij.querySelector('.zij-zoek'));
-    var dm = document.createElement('a'); dm.className = 'zn zij-dag'; dm.href = '#'; dm.setAttribute('data-dagmodus', '');
-    dm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span>Dagmodus</span>';
-    var eerste = zij.querySelector('.zij-groep'); if (eerste) eerste.parentNode.insertBefore(dm, eerste.nextSibling);
-  }
   if (pad !== '/intern/agent.html') {
     var z = document.createElement('button'); z.type = 'button'; z.className = 'ag-zweef'; z.setAttribute('data-agent', ''); z.setAttribute('aria-label', 'Vraag de agent');
     z.innerHTML = orb() + '<span class="tip">Vraag de agent</span>';
@@ -376,7 +368,7 @@
 
   AE.agent = { open: open, sluit: sluit, maakChat: maakChat, md: md, orb: orb };
   // Dagmodus (de orb als gids) laden
-  var gc = document.createElement('link'); gc.rel = 'stylesheet'; gc.href = '/intern/gids.css?v=2'; document.head.appendChild(gc);
+  var gc = document.createElement('link'); gc.rel = 'stylesheet'; gc.href = '/intern/gids.css?v=3'; document.head.appendChild(gc);
   var gs = document.createElement('script'); gs.src = '/intern/gids.js?v=3'; document.body.appendChild(gs);
   document.dispatchEvent(new CustomEvent('ae:agent-klaar'));
   intro();

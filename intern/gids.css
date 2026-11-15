@@ -91,3 +91,36 @@ body.dagmodus main.db { padding-bottom: 240px; }
 .gd-gedaan small { display: block; font-size: 12px; color: #8C9AC0; }
 .gd-gedaan button { font: inherit; font-size: 12.5px; font-weight: 600; color: #B8CCFF; background: rgba(255, 255, 255, .05); border: 1px solid rgba(127, 164, 255, .3); border-radius: 9px; padding: 6px 10px; cursor: pointer; white-space: nowrap; }
 .gd-gedaan button:hover { background: rgba(127, 164, 255, .16); color: #fff; }
+
+/* ---------- Rust: dagmodus ---------- */
+.gids-straal { display: none; }
+.gids-spoor, .gids-vonk { display: none; }
+.gids-spot { border-radius: 14px; box-shadow: 0 0 0 2px rgba(138, 180, 255, .9), 0 0 0 200vmax rgba(5, 8, 18, .38); }
+.gids-spot.nav { box-shadow: 0 0 0 2px rgba(138, 180, 255, .9), 0 0 0 200vmax rgba(5, 8, 18, .12); }
+.gids-spot::after { display: none; }
+.gids-ring { border-color: rgba(138, 180, 255, .8); }
+.gids-orb .orb { --m: 44px; } .gids-orb { width: 44px; height: 44px; }
+.gids-dok { background: rgba(28, 33, 48, .86); backdrop-filter: blur(30px) saturate(1.5); -webkit-backdrop-filter: blur(30px) saturate(1.5); border-radius: 22px; padding: 18px 20px; box-shadow: 0 24px 60px -16px rgba(0, 0, 0, .7), 0 0 0 1px rgba(255, 255, 255, .08); transition: transform .55s var(--veer, cubic-bezier(.32,.72,0,1)), opacity .35s; }
+.gd-seg { gap: 0; height: 3px; border-radius: 3px; overflow: hidden; background: rgba(255, 255, 255, .08); }
+.gd-seg i { height: 3px; border-radius: 0; background: transparent; }
+.gd-seg i.k { background: #8AB4FF; }
+.gd-seg i.n { background: rgba(138, 180, 255, .35); box-shadow: none; animation: none; }
+.gd-teller { color: #8B93A7; }
+.gd-knop { background: none; color: #8B93A7; width: 26px; height: 26px; }
+.gd-knop:hover { background: rgba(255, 255, 255, .08); }
+.gd-tag { letter-spacing: 0; text-transform: none; font-size: 13px; font-weight: 500; color: #8B93A7; gap: 4px 8px; }
+.gd-tag b { color: #C5CBD8; font-weight: 600; }
+.gd-tag > * + *::before { content: "·"; margin-right: 8px; color: #5A6278; }
+.gd-titel { font-size: 22px; font-weight: 600; letter-spacing: -.02em; margin: 6px 0 6px; }
+.gd-uitleg { color: #A9B0C1; font-size: 15px; }
+.gd-acties { gap: 8px; margin-top: 18px; }
+.gd-acties a, .gd-acties button { border: 0; background: rgba(255, 255, 255, .08); color: #F5F7FB; font-weight: 500; border-radius: 10px; padding: 9px 14px; }
+.gd-acties a:hover, .gd-acties button:hover { background: rgba(255, 255, 255, .14); border: 0; }
+.gd-acties .klaar { background: #3A6FE6; color: #fff; box-shadow: none; padding: 9px 20px; font-weight: 600; }
+.gd-acties .klaar:hover { background: #4A7CF0; color: #fff; transform: none; }
+.gd-acties .ga { background: rgba(138, 180, 255, .16); color: #CFE0FF; }
+.gd-acties .stil { background: none; color: #8B93A7; }
+.gd-acties .stil:hover { background: rgba(255, 255, 255, .06); color: #fff; }
+.gd-inhoud { animation: gd-in .5s cubic-bezier(.32, .72, 0, 1); }
+.gids-warp { background: #090D1A; }
+.gids-warp .orb { --m: 70px; }

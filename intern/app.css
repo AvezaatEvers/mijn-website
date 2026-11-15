@@ -234,3 +234,130 @@ body.app * { scrollbar-color: rgba(127, 164, 255, .35) transparent; }
 body.app .zij-logo b { background: linear-gradient(135deg, #5CC8FF, #2A4BA0); color: #fff; }
 body.app .zij-logo { color: #fff; }
 .zij-agent kbd { display: none; }
+
+/* =====================================================================
+   Rust: Apple-achtig. Eén laag die alles kalmer maakt.
+   Weinig kleur, geen gloed, haarlijnen, veel ruimte, zachte veer-animaties.
+   ===================================================================== */
+[hidden] { display: none !important; }
+body.app {
+  --veer: cubic-bezier(.32, .72, 0, 1);
+  --sys: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Inter, system-ui, sans-serif;
+  --ink: #F5F7FB; --text: #C5CBD8; --muted: #8B93A7; --line: rgba(255, 255, 255, .07);
+  --accent: #8AB4FF; --accent-2: #8AB4FF; --tint: rgba(138, 180, 255, .1);
+  --vlak: rgba(255, 255, 255, .04); --vlak-2: rgba(255, 255, 255, .05);
+  --glas: rgba(255, 255, 255, .035);
+  --knop: #3A6FE6; --knop-schaduw: none;
+  --schaduw: none;
+  font-family: var(--sys); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; letter-spacing: -.003em;
+  background: radial-gradient(1400px 700px at 65% -25%, rgba(58, 111, 230, .16), transparent 70%), #090D1A;
+  background-attachment: fixed;
+}
+body.app::before { display: none; }
+body.app::after { display: none; }
+body.app.zij-open::after { display: block; content: ""; position: fixed; inset: 0; background: rgba(0, 0, 0, .5); z-index: 25; animation: none; opacity: 1; }
+body.app h1 { font-family: "Poppins", var(--sys); background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--ink); font-weight: 700; letter-spacing: -.035em; }
+body.app h2, body.app h3 { font-family: var(--sys); font-weight: 600; letter-spacing: -.015em; }
+body.app main.db { padding-top: 40px; }
+body.app main.db > * { max-width: 1180px; }
+body.app .db-sub { color: var(--muted); font-size: 16px; }
+
+/* zijbalk zoals macOS */
+body.app .zij { background: rgba(255, 255, 255, .025); border-right: 1px solid var(--line); backdrop-filter: blur(30px) saturate(1.4); -webkit-backdrop-filter: blur(30px) saturate(1.4); padding: 20px 12px 16px; gap: 2px; }
+body.app .zij::after { display: none; }
+body.app .zij-logo { font-family: "Poppins", var(--sys); font-size: 16px; padding: 0 10px 18px; }
+body.app .zij-logo b { width: 30px; height: 30px; border-radius: 9px; background: #3A6FE6; box-shadow: none; font-size: 11.5px; }
+body.app .zij-logo span span { color: var(--accent); }
+body.app .zij-zoek { background: rgba(255, 255, 255, .05); border: 0; border-radius: 10px; padding: 8px 10px; font-size: 13.5px; color: var(--muted); margin-bottom: 8px; }
+body.app .zij-zoek:hover { background: rgba(255, 255, 255, .08); }
+body.app .zij-zoek kbd { border: 0; color: #6C7489; }
+body.app .zij-groep { font-size: 11.5px; font-weight: 600; letter-spacing: 0; text-transform: none; color: #6C7489; padding: 18px 10px 6px; }
+body.app .zij a.zn { padding: 7px 10px; border-radius: 9px; font-size: 14px; font-weight: 500; color: #B9C0CF; gap: 10px; }
+body.app .zij a.zn svg { width: 17px; height: 17px; opacity: .7; }
+body.app .zij a.zn:hover { background: rgba(255, 255, 255, .05); color: #fff; }
+body.app .zij a.zn.is-aan { background: rgba(255, 255, 255, .09); color: #fff; }
+body.app .zij a.zn.is-aan svg { opacity: 1; color: var(--accent); }
+body.app .zij a.zn.is-aan::before { display: none; }
+body.app .zij a.zn .tel { background: rgba(255, 255, 255, .1); color: #C5CBD8; font-weight: 600; }
+.zn-kbd { margin-left: auto; font: inherit; font-size: 11px; color: #6C7489; }
+body.app .zij-voet { border-top: 1px solid var(--line); }
+body.app .zij-voet img { border: 0; width: 32px; height: 32px; }
+
+/* kaarten: zacht vlak, haarlijn, geen gloed */
+body.app .db-kaart { background: var(--glas); border: 1px solid var(--line); border-radius: 20px; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; transition: background .3s; }
+body.app .db-kaart::before { display: none; }
+body.app .db-kaart.zweef:hover { transform: none; box-shadow: none; background: rgba(255, 255, 255, .045); }
+body.app .db-kaart h2 { font-size: 17px; }
+
+/* knoppen */
+body.app .db-knop, body.app .ai-knop { background: var(--knop); box-shadow: none; border-radius: 10px; font-weight: 600; transition: filter .2s, transform .3s var(--veer); }
+body.app .db-knop:hover, body.app .ai-knop:hover { filter: brightness(1.12); transform: none; box-shadow: none; }
+body.app .db-knop:active, body.app .ai-knop:active { transform: scale(.97); }
+body.app .db-knop.is-licht, body.app .ai-knop.licht, body.app .db-knop.is-rand { background: rgba(255, 255, 255, .08); color: var(--ink); box-shadow: none; }
+body.app .db-knop.is-licht:hover, body.app .ai-knop.licht:hover, body.app .db-knop.is-rand:hover { background: rgba(255, 255, 255, .13); }
+body.app .db-knop.is-rood { background: rgba(255, 99, 99, .12); color: #FF8A8A; box-shadow: none; }
+
+/* gesegmenteerde filters */
+body.app .filters { background: rgba(255, 255, 255, .06); padding: 3px; border-radius: 10px; gap: 2px; display: inline-flex; flex-wrap: wrap; }
+body.app .filters button, body.app .tk-filters button { background: none; border: 0; border-radius: 8px; color: var(--text); font-size: 13px; padding: 6px 12px; }
+body.app .filters button.is-aan, body.app .wissel button.is-aan, body.app .tk-filters button.is-aan, body.app .chips-kies button.is-aan, body.app .modi button.is-aan {
+  background: rgba(255, 255, 255, .16); color: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .3); }
+body.app .wissel, body.app .modi { background: rgba(255, 255, 255, .06); border: 0; }
+body.app .chips-kies button { border: 0; background: rgba(255, 255, 255, .06); }
+
+/* velden */
+body.app input:not([type=checkbox]):not([type=radio]):not([type=range]), body.app select, body.app textarea {
+  background: rgba(255, 255, 255, .06) !important; border: 1px solid transparent !important; border-radius: 10px; }
+body.app input:focus, body.app select:focus, body.app textarea:focus { outline: 0 !important; box-shadow: 0 0 0 3px rgba(138, 180, 255, .35) !important; }
+body.app input[type=checkbox], body.app input[type=radio] { accent-color: #3A6FE6; }
+
+/* rust in de beweging: geen permanente pulsen of glanzen */
+body.app .orb i { display: none; }
+body.app .orb::before { animation-duration: 14s; }
+body.app .orb::after { box-shadow: inset 0 0 calc(var(--m) * .12) rgba(138, 180, 255, .55), 0 0 calc(var(--m) * .3) rgba(92, 160, 255, .25); }
+body.app .in { animation: rust-in .6s var(--veer) both; }
+@keyframes rust-in { from { opacity: 0; transform: translateY(8px); } }
+body.app .skelet { background: linear-gradient(90deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .08), rgba(255, 255, 255, .04)); background-size: 200% 100%; }
+
+/* cijfers: alleen het getal */
+body.app .kpi svg.spark, body.app .kpi .ring, body.app .kpi .delta { display: none !important; }
+body.app .kpi b { font-family: var(--sys); font-weight: 600; font-size: 30px; letter-spacing: -.03em; }
+body.app .kpi small[style] { padding-right: 0 !important; }
+body.app .kpis { gap: 12px; }
+
+/* statussen */
+body.app .kl-status { background: rgba(255, 255, 255, .08); color: var(--text); }
+body.app .kl-status.is-prospect { background: rgba(255, 196, 0, .12); color: #FFD466; }
+body.app .bord-tellers > div { background: var(--glas); border: 1px solid var(--line); box-shadow: none; }
+body.app .balk i { background: var(--accent); box-shadow: none; }
+
+/* panelen en dialogen */
+body.app dialog.voorbeeld, body.app .cm-doos, body.app .ob-doos, body.app .wd-doos { background: #161B2A; box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .7), 0 0 0 1px rgba(255, 255, 255, .08); }
+body.app .cm-kop { background: #161B2A; border-bottom: 1px solid var(--line); }
+body.app .cm-voet, body.app .ob-voet { background: #161B2A; }
+body.app .ob, body.app .cm { background: rgba(0, 0, 0, .45); backdrop-filter: blur(6px); }
+body.app .ob-item.is-actief { background: rgba(255, 255, 255, .08); }
+body.app .toast { background: rgba(40, 46, 62, .92); backdrop-filter: blur(20px); box-shadow: 0 12px 30px -10px rgba(0, 0, 0, .6); border-radius: 999px; }
+body.app .toast i { background: #34C759; }
+
+/* Vandaag: rustige details */
+body.app .plan::before { display: none; }
+body.app .plan > li.pm { margin: 0; padding: 12px 16px; }
+body.app .mini-acties a, body.app .mini-acties button { border: 0; background: rgba(255, 255, 255, .07); color: var(--ink); font-weight: 500; }
+body.app .mini-acties a:hover, body.app .mini-acties button:hover { background: rgba(255, 255, 255, .13); }
+body.app .lead .st.u { color: #FF8A80; font-weight: 500; }
+body.app .kal-raster button { background: transparent; border: 0; color: var(--text); border-radius: 50%; aspect-ratio: 1; min-height: 0; width: 38px; justify-self: center; justify-content: center; padding: 0; }
+body.app .kal-raster button.is-anders { color: #4E566B; }
+body.app .kal-raster button.is-vandaag { color: #fff; background: #3A6FE6; }
+body.app .kal-raster button.is-gekozen { background: rgba(255, 255, 255, .14); color: #fff; }
+body.app .kal-raster button.is-vandaag.is-gekozen { background: #3A6FE6; }
+body.app .kal-raster button:hover { background: rgba(255, 255, 255, .07); }
+body.app .kal-raster button i { position: absolute; bottom: 3px; }
+body.app .kal-raster { gap: 2px 4px; }
+body.app .kal-nav button { border: 0 !important; background: rgba(255, 255, 255, .06) !important; color: var(--ink) !important; }
+body.app .lead:hover { background: rgba(255, 255, 255, .04); }
+body.app .sc { border-radius: 50%; width: 38px; height: 38px; font-size: 14px; font-weight: 600; }
+body.app .s-heet { background: rgba(255, 105, 97, .14); color: #FF8A80; }
+body.app .s-warm { background: rgba(255, 179, 64, .14); color: #FFC266; }
+body.app .s-lauw { background: rgba(138, 180, 255, .14); color: #8AB4FF; }
+body.app .s-koud { background: rgba(255, 255, 255, .07); color: #8B93A7; }

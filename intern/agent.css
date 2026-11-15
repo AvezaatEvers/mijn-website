@@ -210,3 +210,21 @@ body.ae-onthul .hero-orb .baan { animation: baan-in 1.4s 2.9s cubic-bezier(.2, .
 @keyframes baan-in { from { opacity: 0; transform: scale(.6) rotate(-90deg); } }
 body.ae-onthul main.db > .hero { animation: onthul-op 1s 1.3s ease both; }
 @keyframes onthul-op { from { opacity: 0; } }
+
+/* ---------- Rust ---------- */
+body.app .ag-zweef { width: 52px; height: 52px; }
+body.app .ag-zweef .orb { --m: 52px; }
+body.app .ag-zweef .tip { background: rgba(40, 46, 62, .95); }
+body.app .ag-paneel { background: rgba(22, 27, 42, .92); backdrop-filter: blur(30px) saturate(1.4); box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .7), 0 0 0 1px rgba(255, 255, 255, .08); border-radius: 22px; }
+body.app .ag-kop { background: none; border-bottom: 1px solid var(--line); }
+body.app .ag-kop::after { display: none; }
+body.app .ag-sug button { border: 0; background: rgba(255, 255, 255, .05); }
+body.app .ag-sug button:hover { transform: none; box-shadow: none; background: rgba(255, 255, 255, .08); }
+body.app .ag-sug button small { color: var(--muted); letter-spacing: 0; text-transform: none; font-size: 12px; font-weight: 500; }
+body.app .ag-msg.mens div { background: #3A6FE6; box-shadow: none; }
+body.app .ag-veld { border: 0; background: rgba(255, 255, 255, .06); box-shadow: none; }
+body.app .ag-veld button { background: #3A6FE6; }
+body.app .ag-stap { background: rgba(255, 255, 255, .06); color: var(--text); }
+body.app .ag-veld textarea, body.app .ag-veld textarea:focus { background: transparent !important; box-shadow: none !important; border: 0 !important; }
+body.app .ag-veld:focus-within { box-shadow: 0 0 0 3px rgba(138, 180, 255, .3); }
+body.app .bf-vraag input, body.app .bf-vraag input:focus, body.app .kz input, body.app .kz input:focus, body.app .ob-invoer input, body.app .ob-invoer input:focus { background: transparent !important; box-shadow: none !important; border: 0 !important; }

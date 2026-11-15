@@ -21,7 +21,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   var pad = location.pathname.replace(/index\.html$/, '');
   var NAV = [
-    ['Werk', [['/intern/', 'Vandaag', 'home'], ['/intern/klanten.html', 'Klanten en leads', 'klanten', 'tel-leads'], ['/intern/kwartaal.html', 'Kwartaalbord', 'kwartaal'], ['/intern/inzichten.html', 'Contact en NPS', 'inzicht'], ['/intern/werkstromen.html', 'Werkstromen', 'flow'], ['/intern/agent.html', 'Agent en kennisbank', 'agent']]],
+    ['Werk', [['/intern/', 'Vandaag', 'home'], ['/intern/klanten.html', 'Klanten en leads', 'klanten', 'tel-leads'], ['/intern/kwartaal.html', 'Kwartaalbord', 'kwartaal'], ['/intern/inzichten.html', 'Contact en NPS', 'inzicht'], ['/intern/werkstromen.html', 'Werkstromen', 'flow'], ['/intern/agent.html', 'Kennisbank', 'agent']]],
     ['Maken', [['/voorstel.html', 'Voorstel', 'voorstel'], ['/intern/mails/', 'Mailsjablonen', 'mail'], ['/intern/tools.html', 'Presenteren en tools', 'tools']]]
   ];
 
@@ -29,14 +29,14 @@
   var zij = document.createElement('aside'); zij.className = 'zij'; zij.setAttribute('aria-label', 'Navigatie');
   zij.innerHTML = '<a class="zij-logo" href="/intern/"><b>A&amp;E</b><span>Avezaat <span>&amp;</span> Evers</span></a>' +
     '<button class="zij-zoek" type="button" data-ob>' + svg('zoek') + '<span>Zoek of doe iets…</span><kbd>' + (/Mac|iPhone|iPad/.test(navigator.platform) ? '⌘K' : 'Ctrl K') + '</kbd></button>' +
-    '<button class="ai-knop" type="button" data-contact style="justify-content:center;margin-bottom:6px">' + svg('plus') + 'Contact vastleggen</button>' +
+
     NAV.map(function (g) {
       return '<div class="zij-groep">' + g[0] + '</div>' + g[1].map(function (n) {
         var aan = pad === n[0] || (n[0] === '/intern/klanten.html' && /\/intern\/klant\.html/.test(pad)) || (n[0] === '/intern/' && /overzicht/.test(pad));
         return '<a class="zn' + (aan ? ' is-aan' : '') + '" href="' + n[0] + '"' + (aan ? ' aria-current="page"' : '') + '>' + svg(n[2]) + '<span>' + n[1] + '</span>' + (n[3] ? '<span class="tel" id="' + n[3] + '" hidden></span>' : '') + '</a>';
       }).join('');
     }).join('') +
-    '<div class="zij-groep">Snel</div><a class="zn" href="/" target="_blank" rel="noopener">' + svg('site') + '<span>Website</span></a>' +
+    '<div class="zij-groep">Snel</div><a class="zn" href="#" data-contact>' + svg('plus') + '<span>Contact vastleggen</span></a><a class="zn" href="#" data-agent>' + svg('agent') + '<span>Vraag de agent</span><kbd class="zn-kbd">' + (/Mac|iPhone|iPad/.test(navigator.platform) ? '⌘J' : 'Ctrl J') + '</kbd></a>' +
     '<div class="zij-voet"><img id="zij-foto" src="/assets/img/mail/koen.jpg" alt="" width="36" height="36"><div><strong id="zij-naam">Ingelogd</strong><a href="/intern/logout">Uitloggen</a></div></div>';
   document.body.insertBefore(zij, document.body.firstChild);
 
@@ -218,8 +218,8 @@
   });
 
   // Agent laden (eigen bestand, zodat elke pagina hem krijgt)
-  var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/intern/agent.css?v=4'; document.head.appendChild(css);
-  var js = document.createElement('script'); js.src = '/intern/agent.js?v=6'; js.defer = true;
+  var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/intern/agent.css?v=6'; document.head.appendChild(css);
+  var js = document.createElement('script'); js.src = '/intern/agent.js?v=7'; js.defer = true;
   setTimeout(function () { document.body.appendChild(js); }, 0);
 
   window.AE = { api: api, ik: function () { return ikBelofte; }, meld: meld, openContact: openContact, esc: esc, svg: svg, herlaadKlanten: function () { KLANTEN = null; return laadKlanten(); } };

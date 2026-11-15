@@ -164,7 +164,7 @@
   }
   .db-kaart form .db-knop { white-space: normal; text-align: left; }
 </style>
-<link rel="stylesheet" href="/intern/app.css?v=2">
+<link rel="stylesheet" href="/intern/app.css?v=3">
 <style>
   .hk { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
   .hk h1 { font-size: clamp(28px, 3.6vw, 42px); margin: 0; letter-spacing: -.03em; }
@@ -256,6 +256,43 @@
   @media (max-width: 1100px) { .hero { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 600px) { .hero-orb { width: 200px; height: 200px; } .hero-orb .orb { --m: 128px; } .dag-knop { width: 100%; } }
 
+
+  /* ---------- Vandaag, rustig ---------- */
+  .vd { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 32px; padding: 28px 4px 36px; }
+  .vd-datum { margin: 0 0 6px; font-size: 15px; font-weight: 500; color: var(--muted); }
+  .vd h1 { font-size: clamp(36px, 4.6vw, 56px); line-height: 1.05; margin: 0 0 14px; letter-spacing: -.035em; }
+  .vd-samen { margin: 0; font-size: 19px; line-height: 1.5; color: var(--text); max-width: 620px; }
+  .vd-samen b { color: var(--ink); font-weight: 600; }
+  .vd-knoppen { display: flex; gap: 18px; align-items: center; margin-top: 26px; flex-wrap: wrap; }
+  .dag-knop { font: inherit; font-size: 15px; font-weight: 600; color: #0A0F1F; background: #F5F7FF; border: 0; border-radius: 999px; padding: 13px 26px; cursor: pointer; transition: transform .35s var(--veer), background .2s; }
+  .dag-knop:hover { background: #fff; transform: scale(1.03); }
+  .dag-knop:active { transform: scale(.97); }
+  .tekst-knop { font: inherit; font-size: 15px; font-weight: 500; color: var(--accent); background: none; border: 0; padding: 6px 2px; cursor: pointer; }
+  .tekst-knop:hover { color: #fff; }
+  .vd-orb { width: 180px; height: 180px; display: grid; place-items: center; }
+  .vd-orb .orb { --m: 150px; }
+  .vd-plan { padding: 22px 8px 10px !important; margin-bottom: 28px; }
+  .vp-kop { display: flex; justify-content: space-between; align-items: baseline; padding: 0 16px; }
+  .vp-kop h2 { margin: 0; font-size: 22px; }
+  .vp-meta { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .vp-balk { height: 3px; border-radius: 3px; background: rgba(255, 255, 255, .07); margin: 14px 16px 6px; overflow: hidden; }
+  .vp-balk i { display: block; height: 100%; width: 0; border-radius: 3px; background: var(--accent); transition: width .8s var(--veer); }
+  .plan { list-style: none; margin: 0; padding: 0; }
+  .pm { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto 14px; gap: 14px; align-items: center; padding: 13px 16px; border-radius: 14px; cursor: pointer; transition: background .2s; animation: in .5s var(--veer) both; }
+  .pm + .pm { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05); }
+  .pm:hover { background: rgba(255, 255, 255, .05); box-shadow: none; }
+  .pm:hover + .pm { box-shadow: none; }
+  .pm-nr { font-size: 13px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; text-align: center; }
+  .pm:first-child .pm-nr { color: #0A0F1F; background: var(--accent); border-radius: 50%; width: 24px; height: 24px; line-height: 24px; justify-self: center; }
+  .pm b { display: block; font-size: 15.5px; font-weight: 600; color: var(--ink); }
+  .pm small { display: block; font-size: 13.5px; color: var(--muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pm-min { font-size: 13px; color: var(--muted); }
+  .pm-pijl { font-size: 20px; color: rgba(255, 255, 255, .25); transition: transform .3s var(--veer), color .2s; }
+  .pm:hover .pm-pijl { transform: translateX(3px); color: var(--ink); }
+  .vp-meer { margin: 4px 16px 6px; font-size: 14px; }
+  .plan-leeg { padding: 22px 16px; color: var(--muted); }
+  @media (max-width: 760px) { .vd { grid-template-columns: 1fr; padding-top: 8px; } .vd-orb { display: none; } .vd-samen { font-size: 17px; } .pm-min { display: none; } .pm { grid-template-columns: 24px minmax(0, 1fr) 12px; } }
+
   /* Cijfers */
   .kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
   .kpi { padding: 16px 18px; position: relative; overflow: hidden; }
@@ -309,28 +346,26 @@
 </head>
 <body>
 <main class="db">
-  <section class="hero in" aria-label="Je dag">
-    <div class="hero-links">
-      <div class="hero-orb" aria-hidden="true">
-        <svg class="baan" viewBox="0 0 300 300"><circle cx="150" cy="150" r="128"/><circle cx="150" cy="150" r="146" class="b2"/><circle cx="150" cy="22" r="3.5" class="sat"/><circle cx="150" cy="296" r="2.5" class="sat s2"/></svg>
-        <div class="orb" id="hero-orb"><i></i><i></i><i></i></div>
-      </div>
-      <p class="hero-datum" id="datum"></p>
+  <section class="vd" aria-label="Je dag">
+    <div class="vd-tekst">
+      <p class="vd-datum" id="datum"></p>
       <h1 id="groet">Welkom</h1>
-      <div class="bf-tekst" id="briefing"><div class="skelet" style="width:90%;margin:10px auto;opacity:.4"></div><div class="skelet" style="width:70%;margin:10px auto;opacity:.4"></div></div>
-      <div class="hero-knoppen">
-        <button class="dag-knop" type="button" data-dagmodus id="dag-knop"><span class="glans"></span><span id="dag-knop-tekst">Leid me door mijn dag</span></button>
-        <div class="wissel" id="wissel"><button type="button" data-v="ik" class="is-aan">Mijn werk</button><button type="button" data-v="alle">Alles</button></div>
-        <button class="ai-knop licht" type="button" data-contact><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Contact</button>
+      <p class="vd-samen" id="samenvatting">&nbsp;</p>
+      <div class="vd-knoppen">
+        <button class="dag-knop" type="button" data-dagmodus id="dag-knop"><span id="dag-knop-tekst">Start je dag</span></button>
+        <button class="tekst-knop" type="button" data-agent>Vraag de agent</button>
       </div>
-      <form class="bf-vraag" id="bf-vraag" autocomplete="off"><div class="orb mini"><i></i><i></i><i></i></div><input id="bf-in" type="text" placeholder="Vraag de agent iets…" aria-label="Vraag de agent"><button type="submit">Vraag</button></form>
     </div>
-    <div class="hero-plan">
-      <div class="hp-kop"><div><span class="hp-label">Dagplan</span><h2 id="plan-titel">Je missies van vandaag</h2></div><div class="hp-ring" id="plan-ring"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="19"/><circle cx="22" cy="22" r="19" class="v" id="plan-ring-v"/></svg><b id="plan-pct">0%</b></div></div>
-      <ol class="plan" id="plan"><li class="skelet" style="height:52px;opacity:.4"></li><li class="skelet" style="height:52px;opacity:.4"></li><li class="skelet" style="height:52px;opacity:.4"></li></ol>
-      <p class="hp-voet" id="plan-voet"></p>
-      <div id="acties" hidden></div>
-    </div>
+    <div class="vd-orb" aria-hidden="true"><div class="orb" id="hero-orb"><i></i><i></i><i></i></div></div>
+    <div id="briefing" hidden></div><div id="acties" hidden></div>
+    <div class="wissel" id="wissel" hidden><button type="button" data-v="ik" class="is-aan">Mijn werk</button><button type="button" data-v="alle">Alles</button></div>
+  </section>
+
+  <section class="vd-plan db-kaart" aria-labelledby="plan-titel">
+    <div class="vp-kop"><h2 id="plan-titel">Vandaag</h2><span class="vp-meta" id="plan-meta"></span></div>
+    <div class="vp-balk"><i id="plan-balk"></i></div>
+    <ol class="plan" id="plan"></ol>
+    <button class="tekst-knop vp-meer" type="button" id="plan-meer" hidden></button>
   </section>
 
   <div class="kpis" id="kpis">
@@ -364,15 +399,15 @@
 
     </div>
     <div class="kol">
-      <div class="db-kaart zweef in" style="animation-delay:.12s">
+      <div hidden class="db-kaart zweef in" style="animation-delay:.12s">
         <div class="db-kop"><h2>Werkstromen</h2><a class="meer" href="/intern/werkstromen.html">Alle</a></div>
         <div id="werk"><div class="skelet" style="width:60%"></div></div>
       </div>
-      <div class="db-kaart zweef in" style="animation-delay:.15s">
+      <div hidden class="db-kaart zweef in" style="animation-delay:.15s">
         <div class="db-kop"><h2>Aandacht nodig</h2><span class="meer" id="n-aandacht" style="color:var(--muted)"></span></div>
         <div id="aandacht"></div>
       </div>
-      <div class="db-kaart in" style="animation-delay:.2s">
+      <div hidden class="db-kaart in" style="animation-delay:.2s">
         <div class="aftellers">
           <div class="afteller"><b id="t-btw">–</b><small id="t-btw-tekst">tot de btw-deadline</small></div>
           <div class="afteller"><b id="t-overstap">–</b><small>tot de overstapactie afloopt</small></div>
@@ -396,33 +431,37 @@
     </div>
   </div>
 </main>
-<script src="/intern/app.js?v=2"></script>
+<script src="/intern/app.js?v=3"></script>
 <script>
 (function () {
-  function plan() {
-    var AE = window.AE; if (!AE) return;
-    AE.api('/intern/api/dagplan').then(teken).catch(function (e) { document.getElementById('plan').innerHTML = '<li class="plan-leeg">' + AE.esc(e.message) + '</li>'; });
-  }
+  var alles = false, laatste = null;
+  function plan() { var AE = window.AE; if (!AE) return; AE.api('/intern/api/dagplan').then(teken).catch(function () {}); }
+  function tijd(min) { return min >= 60 ? Math.floor(min / 60) + ' uur' + (min % 60 >= 10 ? ' en ' + (min % 60) + ' min' : '') : min + ' minuten'; }
   function teken(p) {
-    var esc = window.AE.esc, ol = document.getElementById('plan'), totaal = p.klaarVandaag + p.missies.length, pct = totaal ? Math.round(p.klaarVandaag / totaal * 100) : 100;
-    document.getElementById('plan-pct').textContent = pct + '%';
-    document.getElementById('plan-ring-v').style.strokeDashoffset = 119.4 * (1 - pct / 100);
-    var min = p.minuten, tijd = min >= 60 ? Math.floor(min / 60) + 'u' + (min % 60 ? String(min % 60).padStart(2, '0') : '') : min + ' min';
-    document.getElementById('plan-titel').textContent = p.missies.length ? p.missies.length + (p.missies.length === 1 ? ' missie' : ' missies') + ', ±' + tijd : 'Alles gedaan';
-    document.getElementById('dag-knop-tekst').textContent = !p.missies.length ? 'Dag rond' : p.klaarVandaag ? 'Ga verder met je dag' : 'Leid me door mijn dag';
-    ol.innerHTML = p.missies.length ? p.missies.map(function (m, i) {
-      var u = m.prio >= 90;
-      return '<li class="pm' + (i === 0 ? ' eerst' : '') + (u ? ' u' : '') + '" data-dagmodus="' + esc(m.id) + '" style="animation-delay:' + (i * .04) + 's" title="Start hier"><span class="knoop">' + (i + 1) + '</span><span><b>' + esc(m.titel) + '</b><small>' + esc(m.proces.titel) + (m.klant ? ', ' + esc(m.klant.naam) : '') + '</small></span><em>' + m.minuten + ' min</em></li>';
-    }).join('') : '<li class="plan-leeg">Alles gedaan voor vandaag. ' + p.klaarVandaag + ' missies afgerond.</li>';
-    document.getElementById('plan-voet').textContent = (p.klaarVandaag ? p.klaarVandaag + ' al afgerond vandaag. ' : '') + 'Werkstromen starten en sluiten vanzelf: nieuwe leads, onboarding, klachten, het kwartaal en het jaareinde.' + (p.doorgeschoven ? ' ' + p.doorgeschoven + ' maandverwerkingen schuiven door naar morgen.' : '');
+    laatste = p;
+    var esc = window.AE.esc, n = p.missies.length, totaal = p.klaarVandaag + n, pct = totaal ? Math.round(p.klaarVandaag / totaal * 100) : 100;
+    var eerste = p.missies[0];
+    document.getElementById('samenvatting').innerHTML = n
+      ? esc(n + (n === 1 ? ' missie' : ' missies') + ', ongeveer ' + tijd(p.minuten) + '.') + (eerste ? ' Eerst: <b>' + esc(eerste.titel.charAt(0).toLowerCase() + eerste.titel.slice(1)) + (eerste.klant ? '</b> bij ' + esc(eerste.klant.naam) : '</b>') + '.' : '')
+      : 'Alles gedaan voor vandaag.';
+    document.getElementById('dag-knop-tekst').textContent = !n ? 'Bekijk je dag' : p.klaarVandaag ? 'Ga verder' : 'Start je dag';
+    document.getElementById('plan-meta').textContent = totaal ? p.klaarVandaag + ' van ' + totaal + ' klaar' : '';
+    document.getElementById('plan-balk').style.width = pct + '%';
+    var lijst = alles ? p.missies : p.missies.slice(0, 5);
+    document.getElementById('plan').innerHTML = n ? lijst.map(function (m, i) {
+      return '<li class="pm" data-dagmodus="' + esc(m.id) + '" style="animation-delay:' + (i * .03) + 's"><span class="pm-nr">' + (i + 1) + '</span><span class="pm-tekst"><b>' + esc(m.titel) + '</b><small>' + (m.klant ? esc(m.klant.naam) + ' · ' : '') + esc(m.proces.titel) + '</small></span><span class="pm-min">' + m.minuten + ' min</span><span class="pm-pijl" aria-hidden="true">›</span></li>';
+    }).join('') : '<li class="plan-leeg">Niets meer te doen. Mooi werk.</li>';
+    var meer = document.getElementById('plan-meer');
+    meer.hidden = n <= 5; meer.textContent = alles ? 'Toon minder' : 'Toon alle ' + n;
   }
+  document.getElementById('plan-meer').addEventListener('click', function () { alles = !alles; if (laatste) teken(laatste); });
   document.addEventListener('ae:dagplan', function (e) { teken(e.detail); });
-  if (window.AE) plan(); else document.addEventListener('DOMContentLoaded', plan);
+  plan();
 })();
 </script>
 <script>
 (function () {
-  document.getElementById('bf-vraag').addEventListener('submit', function (e) {
+  var bfv = document.getElementById('bf-vraag'); if (bfv) bfv.addEventListener('submit', function (e) {
     e.preventDefault(); var i = document.getElementById('bf-in'), v = i.value.trim(); if (!v || !window.AE.agent) return;
     i.value = ''; window.AE.agent.open(v);
   });

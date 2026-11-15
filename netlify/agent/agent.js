@@ -1,6 +1,6 @@
 // De A&E-agent: een assistent die Koen en Daan door hun werk leidt.
-// Draait volledig gratis op eigen data: kennisbank, werkstromen, klanten, taken en de dagbriefing.
-// De functie slim() (Claude API) wordt bewust niet aangeroepen, zodat er nooit kosten ontstaan.
+// Gratis: denkt mee via Google Gemini (gratis tier, env GEMINI_API_KEY) met jullie data en het web.
+// Zonder sleutel of bij een storing antwoordt de lokale agent (kennisbank, werkstromen, klanten, dagbriefing).
 import { zoekKennis } from "./kennis.js";
 import { PROCESSEN, GROEPEN, proces } from "./processen.js";
 import { synchroniseer, dagplan, verwerkMissie, GIDS } from "./dagplan.js";
@@ -212,10 +212,12 @@ Je rol: hem door al het dagelijkse werk leiden. Sales, onboarding, boekhouding, 
 
 Werkwijze:
 - Haal eerst feiten op met je tools, gok nooit over klanten of cijfers.
-- Bij elke inhoudelijke boekhoud- of belastingvraag: eerst kennis_zoeken. Antwoord dan concreet, met stappen. Bedragen, percentages en grenzen veranderen jaarlijks: noem het jaar en zeg erbij dat hij het actuele bedrag even checkt bij de Belastingdienst als hij het aan een klant doorgeeft. Weet je iets niet zeker, zeg dat eerlijk.
-- Over MoneyMonk weet je de grote lijnen (bankkoppeling, bonnetjes in de app, facturen, uren en ritten). Voor exacte knoppen of menu's: verwijs naar de helpomgeving van MoneyMonk in plaats van te gokken.
+- Bij een inhoudelijke boekhoud- of belastingvraag: eerst kennis_zoeken (onze eigen kennisbank). Gaat het om actuele bedragen, percentages, grenzen, deadlines, nieuwe regels, of staat het antwoord niet (volledig) in de kennisbank: gebruik ook web_zoeken. Combineer beide en antwoord concreet, met stappen en het jaar waar het om gaat.
+- Bij vragen over MoneyMonk (knoppen, menu's, functies): web_zoeken met 'MoneyMonk' in de vraag, in plaats van te gokken.
+- Noem bij informatie van het web de bron als link. Spreken bronnen elkaar tegen of ben je niet zeker: zeg dat eerlijk en verwijs naar de officiële bron (Belastingdienst, KVK, Rijksoverheid).
+- Je mag ook algemene vragen beantwoorden (een mail of WhatsApp opstellen, iets uitrekenen, een tekst verbeteren, een klantvraag beantwoorden).
 - Vraagt hij wat hij moet doen of waar te beginnen: gebruik dagoverzicht en geef een geordende lijst van maximaal 5 acties, belangrijkste eerst, elk met de reden en een link.
-- Bij een proces ("hoe pak ik X aan", "nieuwe klant", "btw-kwartaal"): gebruik werkstroom_info, vat de stappen samen en bied aan de werkstroom te starten (voor een klant als dat past).
+- Bij een proces ("hoe pak ik X aan", "nieuwe klant", "btw-kwartaal"): gebruik werkstroom_info en vat de stappen samen. Werkstromen starten vanzelf en staan in het dagplan; start er alleen zelf een als hij daar expliciet om vraagt.
 - Taken en werkstromen maak je alleen aan als hij dat vraagt of bevestigt.
 
 Stijl:
@@ -239,78 +241,111 @@ function berichtenVan(body) {
   return uit;
 }
 
-// Sleutel opschonen: spaties, regeleinden of aanhalingstekens bij het plakken in Netlify
-function sleutel(env) { return String(env("ANTHROPIC_API_KEY") || "").trim().replace(/^["']|["']$/g, "").trim(); }
+// ---------- Slimme modus: Google Gemini (gratis tier) ----------
+// Env: GEMINI_API_KEY (Google AI Studio, project zónder betaalgegevens = gratis tier).
+// Optioneel GEMINI_MODEL. Binnen de EER gelden de dataregels van de betaalde dienst: prompts worden niet gebruikt om modellen te trainen.
+const GEMINI = "https://generativelanguage.googleapis.com/v1beta/models/";
+const MODELLEN = ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash"];
+const ZOEKMODELLEN = ["gemini-2.5-flash", "gemini-2.5-flash-lite"]; // Google Search-grounding is gratis op 2.5 (gedeeld daglimiet)
 
-// Eén Claude-ronde, streamend. Geeft { blokken, stop } terug en stuurt tekst direct door.
-async function claudeRonde(env, model, sys, berichten, stuur) {
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "x-api-key": sleutel(env), "anthropic-version": "2023-06-01", "content-type": "application/json" },
-    body: JSON.stringify({ model, max_tokens: 2000, stream: true, system: [{ type: "text", text: sys, cache_control: { type: "ephemeral" } }], tools: TOOLS, messages: berichten }),
+function geminiSleutel(env) { return String(env("GEMINI_API_KEY") || "").trim().replace(/^["']|["']$/g, "").trim(); }
+
+// Tools omzetten naar het formaat van Gemini (hoofdletter-types, enums alleen op strings)
+function schema(x) {
+  if (!x || typeof x !== "object") return x;
+  const uit = {};
+  for (const [k, v] of Object.entries(x)) {
+    if (k === "type") uit.type = String(v).toUpperCase();
+    else if (k === "properties") { uit.properties = {}; for (const [pk, pv] of Object.entries(v)) uit.properties[pk] = schema(pv); }
+    else if (k === "items") uit.items = schema(v);
+    else if (k === "enum") { if (v.every((e) => typeof e === "string")) uit.enum = v; }
+    else uit[k] = v;
+  }
+  if (uit.type === "OBJECT" && uit.properties && !Object.keys(uit.properties).length) delete uit.properties;
+  return uit;
+}
+const WEBTOOL = { name: "web_zoeken", description: "Zoek actuele informatie op het web via Google: actuele belastingbedragen en -regels, deadlines, nieuws, KVK- en Belastingdienst-informatie, uitleg over MoneyMonk-functies, of alles wat niet in onze kennisbank staat. Geeft een samenvatting met bronnen.",
+  input_schema: { type: "object", properties: { vraag: { type: "string", description: "De zoekvraag, zo specifiek mogelijk, in het Nederlands" } }, required: ["vraag"] } };
+const GEMINI_TOOLS = [{ functionDeclarations: [...TOOLS, WEBTOOL].map((t) => {
+  const par = schema(t.input_schema), d = { name: t.name, description: t.description };
+  if (par && par.properties) d.parameters = par; // zonder parameters: veld weglaten
+  return d;
+}) }];
+LABELS.web_zoeken = "Zoekt op het web";
+
+async function geminiPost(env, model, body) {
+  const r = await fetch(GEMINI + model + ":generateContent", {
+    method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": geminiSleutel(env) }, body: JSON.stringify(body),
   });
-  if (!r.ok || !r.body) {
-    const t = await r.text().catch(() => "");
-    if (r.status === 401) {
-      const k = sleutel(env);
-      throw new Error("De Claude API-sleutel wordt geweigerd. Controleer ANTHROPIC_API_KEY in Netlify: hij hoort te beginnen met sk-ant-api03- (deze begint met " + k.slice(0, 10) + "…, " + k.length + " tekens).");
-    }
-    throw new Error("Claude API " + r.status + ": " + t.slice(0, 200));
+  const t = await r.text();
+  let j = null; try { j = JSON.parse(t); } catch {}
+  if (!r.ok) { const e = new Error((j && j.error && j.error.message) || ("Gemini " + r.status)); e.status = r.status; throw e; }
+  return j;
+}
+// Probeer modellen op volgorde; bij limiet of storing door naar de volgende
+async function geminiMetTerugval(env, modellen, body) {
+  let laatste;
+  for (const m of modellen) {
+    try { return { j: await geminiPost(env, m, body), model: m }; }
+    catch (e) { laatste = e; if (![429, 500, 502, 503, 504, 404].includes(e.status)) throw e; }
   }
-  const reader = r.body.getReader(), dec = new TextDecoder();
-  let buf = "", stop = null;
-  const blokken = [];
-  for (;;) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    buf += dec.decode(value, { stream: true });
-    let i;
-    while ((i = buf.indexOf("\n\n")) >= 0) {
-      const ev = buf.slice(0, i); buf = buf.slice(i + 2);
-      const regel = ev.split("\n").find((l) => l.startsWith("data:"));
-      if (!regel) continue;
-      let d; try { d = JSON.parse(regel.slice(5)); } catch { continue; }
-      if (d.type === "content_block_start") {
-        const b = d.content_block;
-        blokken[d.index] = b.type === "tool_use" ? { type: "tool_use", id: b.id, name: b.name, json: "" } : { type: "text", text: "" };
-        if (b.type === "tool_use") stuur({ t: "tool", naam: b.name, label: LABELS[b.name] || b.name });
-      } else if (d.type === "content_block_delta") {
-        const b = blokken[d.index]; if (!b) continue;
-        if (d.delta.type === "text_delta") { b.text += d.delta.text; stuur({ t: "tekst", v: d.delta.text }); }
-        else if (d.delta.type === "input_json_delta") b.json += d.delta.partial_json;
-      } else if (d.type === "message_delta") {
-        stop = d.delta.stop_reason || stop;
-      } else if (d.type === "error") {
-        throw new Error((d.error && d.error.message) || "Claude API-fout");
-      }
-    }
-  }
-  return {
-    stop,
-    blokken: blokken.filter(Boolean).map((b) => b.type === "text" ? { type: "text", text: b.text } : { type: "tool_use", id: b.id, name: b.name, input: (() => { try { return b.json ? JSON.parse(b.json) : {}; } catch { return {}; } })() })
-      .filter((b) => b.type !== "text" || b.text),
-  };
+  throw laatste;
+}
+
+async function webZoeken(env, vraag, stuur) {
+  const { j } = await geminiMetTerugval(env, ZOEKMODELLEN, {
+    contents: [{ role: "user", parts: [{ text: `Zoek dit op voor een Nederlands boekhoudkantoor voor zzp'ers en vat het antwoord feitelijk samen in het Nederlands, met concrete bedragen, data en jaartallen. Geef de voorkeur aan officiële Nederlandse bronnen (belastingdienst.nl, kvk.nl, rijksoverheid.nl, ondernemersplein.kvk.nl) en voor MoneyMonk aan moneymonk.nl. Vraag: ${vraag}` }] }],
+    tools: [{ google_search: {} }],
+    generationConfig: { temperature: 0.2, maxOutputTokens: 1200 },
+  });
+  const cand = (j.candidates || [])[0] || {};
+  const tekst = ((cand.content || {}).parts || []).filter((p) => p.text && !p.thought).map((p) => p.text).join("").trim();
+  const gm = cand.groundingMetadata || {};
+  const bronnen = (gm.groundingChunks || []).map((c) => c.web).filter(Boolean).slice(0, 6).map((w) => ({ titel: w.title || "Webbron", url: w.uri }));
+  stuur({ t: "bronnen", v: bronnen.map((b) => ({ titel: b.titel, bron: b.url, groep: "Web" })) });
+  return { samenvatting: tekst || "Geen resultaat gevonden.", bronnen };
 }
 
 async function slim(c, body) {
   const { env, wie, stuur } = c;
-  const model = env("AGENT_MODEL") || "claude-sonnet-5-5";
   const sys = systeem(wie, { pagina: schoon(body.pagina, 80), klant: schoon(body.klant, 40) });
-  const berichten = berichtenVan(body);
-  if (!berichten.length) throw new Error("Geen vraag");
+  const lijst = berichtenVan(body);
+  if (!lijst.length) throw new Error("Geen vraag");
+  const contents = lijst.map((b) => ({ role: b.role === "assistant" ? "model" : "user", parts: [{ text: b.content }] }));
+  const voorkeur = env("GEMINI_MODEL") ? [env("GEMINI_MODEL"), ...MODELLEN] : MODELLEN;
+  let model = null;
   for (let ronde = 0; ronde < 8; ronde++) {
-    const { blokken, stop } = await claudeRonde(env, model, sys, berichten, stuur);
-    if (stop !== "tool_use") return;
-    berichten.push({ role: "assistant", content: blokken });
-    const resultaten = [];
-    for (const b of blokken.filter((x) => x.type === "tool_use")) {
-      let uit;
-      try { uit = await voerUit(b.name, b.input, c); } catch (e) { uit = { fout: String(e.message || e) }; }
-      resultaten.push({ type: "tool_result", tool_use_id: b.id, content: JSON.stringify(uit).slice(0, 14000) });
+    const { j, model: m } = await geminiMetTerugval(env, model ? [model, ...voorkeur.filter((x) => x !== model)] : voorkeur, {
+      systemInstruction: { parts: [{ text: sys }] }, contents, tools: GEMINI_TOOLS,
+      generationConfig: { temperature: 0.5, maxOutputTokens: 4096 },
+    });
+    model = m;
+    const cand = (j.candidates || [])[0];
+    if (!cand || !cand.content) throw new Error((j.promptFeedback && j.promptFeedback.blockReason) ? "Vraag geblokkeerd door Gemini" : "Leeg antwoord van Gemini");
+    const parts = cand.content.parts || [];
+    const calls = parts.filter((p) => p.functionCall);
+    if (!calls.length) {
+      const tekst = parts.filter((p) => p.text && !p.thought).map((p) => p.text).join("");
+      // Antwoord in stukjes doorgeven, zodat het rustig binnenkomt
+      const delen = tekst.match(/[\s\S]{1,24}/g) || [];
+      for (const d of delen) { stuur({ t: "tekst", v: d }); await new Promise((r) => setTimeout(r, 8)); }
+      return;
     }
-    berichten.push({ role: "user", content: resultaten });
-    stuur({ t: "tekst", v: "" });
+    contents.push({ role: "model", parts }); // ongewijzigd terug, inclusief thought signatures
+    const antwoorden = [];
+    for (const p of calls) {
+      const { name, args, id: callId } = p.functionCall;
+      stuur({ t: "tool", naam: name, label: LABELS[name] || name });
+      let uit;
+      try { uit = name === "web_zoeken" ? await webZoeken(env, (args || {}).vraag || "", stuur) : await voerUit(name, args || {}, c); }
+      catch (e) { uit = { fout: String(e.message || e) }; }
+      const fr = { name, response: { resultaat: JSON.parse(JSON.stringify(uit ?? null)) } };
+      if (callId) fr.id = callId;
+      antwoorden.push({ functionResponse: fr });
+    }
+    contents.push({ role: "user", parts: antwoorden });
   }
+  stuur({ t: "tekst", v: "Ik kwam er niet helemaal uit binnen de tijd. Stel je vraag iets specifieker?" });
 }
 
 // ---------- Lokale modus (zonder API-sleutel) ----------
@@ -425,7 +460,7 @@ export async function agentApi(request, url, pad, wie, store, env, h) {
     if (takenVeranderd) await h.bewaarTaken(store, taken);
     return json(dagplan(klanten, taken, runs, voor, nu));
   }
-  if (pad === "/intern/api/agent/status") return json({ slim: false, gratis: true });
+  if (pad === "/intern/api/agent/status") return json({ slim: !!geminiSleutel(env), gratis: true, motor: geminiSleutel(env) ? "Gemini" : "lokaal" });
   if (pad === "/intern/api/kennis") return json({ resultaten: zoekKennis(url.searchParams.get("q") || "", 8) });
   if (pad !== "/intern/api/agent" || request.method !== "POST") return json({ fout: "Onbekende route" }, 404);
 
@@ -437,7 +472,13 @@ export async function agentApi(request, url, pad, wie, store, env, h) {
   const c = { store, wie, env, h, stuur };
   (async () => {
     try {
-      await lokaal(c, body); // Altijd gratis: geen betaalde API-aanroepen
+      // Gratis: Gemini (gratis tier) als er een sleutel is, anders of bij een storing de lokale agent
+      if (geminiSleutel(env)) {
+        let gelukt = false;
+        try { await slim(c, body); gelukt = true; }
+        catch (e) { stuur({ t: "tool", naam: "lokaal", label: "Gemini even niet bereikbaar, ik zoek het zelf op" }); }
+        if (!gelukt) await lokaal(c, body);
+      } else await lokaal(c, body);
       stuur({ t: "klaar" });
     } catch (e) {
       stuur({ t: "fout", v: String(e.message || e).slice(0, 300) });

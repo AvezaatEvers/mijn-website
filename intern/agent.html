@@ -131,7 +131,9 @@
     laadWerk(); document.addEventListener('ae:agent-actie', laadWerk);
 
     AE.api('/intern/api/agent/status').then(function (s) {
-      document.getElementById('st').innerHTML = '<div class="st aan"><i></i>Gratis, zonder API</div><p>De agent draait volledig op jullie eigen data: de kennisbank, werkstromen, klanten, taken en het contact. Er gaat niets naar een externe AI-dienst en het kost niets.</p><p>Hij werkt het best met korte, concrete vragen: "creditfactuur boeken", "wat eerst vandaag", "Visser Webshop", "nieuwe klant".</p>';
+      document.getElementById('st').innerHTML = s.slim
+        ? '<div class="st aan"><i></i>Slim, en gratis</div><p>De agent denkt mee via Google Gemini (gratis versie) en zoekt waar nodig actuele informatie op het web, zoals bedragen van de Belastingdienst of uitleg over MoneyMonk. Hij gebruikt daarnaast jullie klanten, taken, werkstromen en kennisbank.</p><p>Binnen de EU gebruikt Google je vragen niet om zijn AI te trainen. Is de daglimiet op, dan valt hij terug op de lokale modus.</p>'
+        : '<div class="st"><i></i>Lokale modus</div><p>De agent zoekt nu alleen in de kennisbank, werkstromen en klanten. Zet in Netlify <code>GEMINI_API_KEY</code> (gratis via aistudio.google.com) en hij denkt echt mee en zoekt op het web.</p>';
     });
   }
   if (window.AE && window.AE.agent) start(); else document.addEventListener('ae:agent-klaar', start);

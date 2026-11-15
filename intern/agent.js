@@ -64,7 +64,7 @@
     root.classList.add('ag-chat');
     root.innerHTML = '<div class="ag-stroom" aria-live="polite"></div><form class="ag-invoer"><div class="ag-veld"><textarea rows="1" placeholder="' + (opt.placeholder || 'Vraag het de agent…') + '" aria-label="Bericht aan de agent"></textarea><button type="submit" aria-label="Versturen" disabled>' + PIJL + '</button></div><div class="ag-hint"><span>Enter om te versturen, Shift+Enter voor een nieuwe regel</span><span class="ag-modus"></span></div></form>';
     var stroom = root.querySelector('.ag-stroom'), form = root.querySelector('form'), ta = root.querySelector('textarea'), knop = root.querySelector('button[type=submit]');
-    STATUS.then(function (s) { root.querySelector('.ag-modus').textContent = 'Gratis, op jullie eigen data'; });
+    STATUS.then(function (s) { root.querySelector('.ag-modus').textContent = s.slim ? 'Gemini, met jullie data en het web' : 'Lokale modus'; });
 
     function welkom() {
       return AE.ik().then(function (ik) {
@@ -197,7 +197,7 @@
       '<button type="button" id="ag-sluit" title="Sluiten" aria-label="Sluiten">&times;</button></div></div><div id="ag-chat"></div></div>';
     document.body.appendChild(paneel);
     chat = maakChat(paneel.querySelector('#ag-chat'));
-    STATUS.then(function (s) { var st = document.getElementById('ag-st'); st.textContent = 'Online, kent jullie klanten en kennisbank'; });
+    STATUS.then(function (s) { var st = document.getElementById('ag-st'); st.textContent = s.slim ? 'Kent jullie klanten, kennisbank en het web' : 'Lokale modus, zonder AI-sleutel'; st.classList.toggle('lokaal', !s.slim); });
     paneel.addEventListener('click', function (e) { if (e.target === paneel) sluit(); });
     document.getElementById('ag-sluit').addEventListener('click', sluit);
     document.getElementById('ag-nieuw').addEventListener('click', function () { chat.reset(); });

@@ -78,7 +78,7 @@
     '<div class="ob-voet"><span><kbd>↑↓</kbd>kiezen</span><span><kbd>↵</kbd>openen</span><span><kbd>esc</kbd>sluiten</span></div></div>';
   document.body.appendChild(ob);
   var ACTIES = [
-    { t: 'Start je dag', s: 'Actie', doe: function () { if (window.AE.gids) window.AE.gids.start(); else location.href = '/intern/'; } },
+    { t: 'Vandaag', s: 'Pagina', url: '/intern/' },
     { t: 'Activiteit: wie deed wat', s: 'Pagina', url: '/intern/activiteit.html' },
     { t: 'Claude koppelen', s: 'Pagina', url: '/intern/claude.html' },
     { t: 'Contact vastleggen', s: 'Actie', doe: function () { openContact(); } },
@@ -221,7 +221,7 @@
 
   // Agent laden (eigen bestand, zodat elke pagina hem krijgt)
   var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/intern/agent.css?v=12'; document.head.appendChild(css);
-  var js = document.createElement('script'); js.src = '/intern/agent.js?v=20'; js.defer = true;
+  var js = document.createElement('script'); js.src = '/intern/agent.js?v=21'; js.defer = true;
   setTimeout(function () { document.body.appendChild(js); }, 0);
 
   window.AE = { api: api, ik: function () { return ikBelofte; }, meld: meld, openContact: openContact, esc: esc, svg: svg, herlaadKlanten: function () { KLANTEN = null; return laadKlanten(); } };

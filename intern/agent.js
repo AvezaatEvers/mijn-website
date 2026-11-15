@@ -1,4 +1,4 @@
-// Orb-intro bij openen van het dashboard en het laden van de dagmodus (de orb als gids).
+// Orb-intro bij openen van het dashboard.
 // De chat-agent is weggehaald: vragen stel je nu in Claude via de koppeling (/intern/claude.html).
 (function () {
   var AE = window.AE; if (!AE) return;
@@ -12,7 +12,7 @@
     var el = document.createElement('div'); el.className = 'intro' + (vanLogin ? ' van-login' : ''); el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Welkom');
     el.innerHTML = '<canvas aria-hidden="true"></canvas><div class="intro-in"><div class="intro-label">Avezaat &amp; Evers, intern</div>' + orb() +
       '<h1><span id="in-groet"></span><span class="cursor"></span></h1><div class="intro-regels" id="in-regels"></div>' +
-      '<div class="intro-knoppen" id="in-knoppen"><button type="button" class="hoofd" data-in="dag">Leid me door mijn dag</button><button type="button" data-in="weg">Naar het dashboard</button></div></div><div class="intro-skip">Klik of druk op Esc om over te slaan</div>';
+      '<div class="intro-knoppen" id="in-knoppen"><button type="button" class="hoofd" data-in="weg">Naar mijn dag</button></div></div><div class="intro-skip">Klik of druk op Esc om over te slaan</div>';
     document.body.appendChild(el);
     document.body.style.overflow = 'hidden';
     sterren(el.querySelector('canvas'));
@@ -28,7 +28,6 @@
     }
     el.addEventListener('click', function (e) {
       var k = e.target.closest('[data-in]');
-      if (k && k.dataset.in === 'dag') return weg(function () { if (AE.gids) AE.gids.start(); });
       if (!k || k.dataset.in === 'weg') weg();
     });
     document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' || e.key === 'Enter') { document.removeEventListener('keydown', esc); weg(); } });
@@ -145,9 +144,6 @@
   }
 
   AE.agent = { orb: orb, open: function () {}, sluit: function () {} };
-  // Dagmodus (de orb als gids) laden
-  var gc = document.createElement('link'); gc.rel = 'stylesheet'; gc.href = '/intern/gids.css?v=4'; document.head.appendChild(gc);
-  var gs = document.createElement('script'); gs.src = '/intern/gids.js?v=5'; document.body.appendChild(gs);
   document.dispatchEvent(new CustomEvent('ae:agent-klaar'));
   intro();
 })();

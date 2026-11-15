@@ -77,7 +77,6 @@
 <main class="db">
   <div class="wk-kop">
     <div><h1>Werkstromen</h1><p>Al onze vaste processen, van eerste lead tot offboarding. Ze starten en sluiten vanzelf zodra er iets speelt, en komen als missies in je dagplan. Hier zie je wat er loopt en hoe elk proces werkt.</p></div>
-    <button class="ai-knop" type="button" data-dagmodus><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 5.6L19.5 9.5l-5.7 1.9L12 17l-1.8-5.6L4.5 9.5l5.7-1.9z"/></svg>Leid me door mijn dag</button>
   </div>
   <div id="lopend-sectie" hidden><div class="sectie">Loopt nu, vanzelf gestart</div><div class="lopend" id="lopend"></div></div>
   <div id="groepen"><div class="skelet" style="width:40%;margin-top:30px"></div></div>
@@ -86,7 +85,7 @@
 
 <div class="wd" id="wd" role="dialog" aria-modal="true" aria-labelledby="wd-titel"><div class="wd-doos" id="wd-doos"></div></div>
 
-<script src="/intern/app.js?v=6"></script>
+<script src="/intern/app.js?v=7"></script>
 <script>
 (function () {
   function start() {
@@ -131,7 +130,7 @@
         }).join('') + '</div>' +
         '<div class="wd-voet">' + (run
           ? (run.klant ? '<a class="ai-knop licht" href="/intern/klant.html?id=' + encodeURIComponent(run.klant) + '">Open klant</a>' : '') + '<button class="weg" type="button" id="wd-stop">Werkstroom verwijderen</button>'
-          : '<span class="db-noot" style="margin:0">Start vanzelf (' + esc(p.wanneer.charAt(0).toLowerCase() + p.wanneer.slice(1)) + ') en verschijnt dan als missies in je dagplan.</span><button class="ai-knop" type="button" data-dagmodus style="margin-left:auto">Naar mijn dagplan</button>') + '</div>';
+          : '<span class="db-noot" style="margin:0">Start vanzelf (' + esc(p.wanneer.charAt(0).toLowerCase() + p.wanneer.slice(1)) + ') en verschijnt dan als missies in je dagplan.</span><a class="ai-knop" href="/intern/" style="margin-left:auto">Naar mijn dagplan</a>') + '</div>';
       wd.classList.add('open');
       history.replaceState(null, '', run ? '?run=' + run.id : '?p=' + p.id);
       if (!run && p.perKlant) AE.herlaadKlanten().then(function (kl) {

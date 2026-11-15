@@ -237,15 +237,22 @@ function berichtenVan(body) {
   return uit;
 }
 
+// Sleutel opschonen: spaties, regeleinden of aanhalingstekens bij het plakken in Netlify
+function sleutel(env) { return String(env("ANTHROPIC_API_KEY") || "").trim().replace(/^["']|["']$/g, "").trim(); }
+
 // Eén Claude-ronde, streamend. Geeft { blokken, stop } terug en stuurt tekst direct door.
 async function claudeRonde(env, model, sys, berichten, stuur) {
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
-    headers: { "x-api-key": env("ANTHROPIC_API_KEY"), "anthropic-version": "2023-06-01", "content-type": "application/json" },
+    headers: { "x-api-key": sleutel(env), "anthropic-version": "2023-06-01", "content-type": "application/json" },
     body: JSON.stringify({ model, max_tokens: 2000, stream: true, system: [{ type: "text", text: sys, cache_control: { type: "ephemeral" } }], tools: TOOLS, messages: berichten }),
   });
   if (!r.ok || !r.body) {
     const t = await r.text().catch(() => "");
+    if (r.status === 401) {
+      const k = sleutel(env);
+      throw new Error("De Claude API-sleutel wordt geweigerd. Controleer ANTHROPIC_API_KEY in Netlify: hij hoort te beginnen met sk-ant-api03- (deze begint met " + k.slice(0, 10) + "…, " + k.length + " tekens).");
+    }
     throw new Error("Claude API " + r.status + ": " + t.slice(0, 200));
   }
   const reader = r.body.getReader(), dec = new TextDecoder();

@@ -1,6 +1,7 @@
 // Logica van de interne omgeving (inloggen per persoon, gedeelde takenlijst en klanten met hun mails).
 import { BASE, TYPES, AUTOMATISCH, HANDMATIG, gepland, maakMail, handmatigeData, verstuur, vandaag, actueelKwartaal, kwartalenRond, kwartaalInfo } from "./klant-mails.js";
 import { mails } from "./functions/lib/mails.js";
+import { overzicht, leadInfo } from "./overzicht.js";
 // Los van Netlify gehouden zodat het lokaal te testen is; intern.js koppelt de opslag.
 
 export const GEBRUIKERS = {
@@ -149,14 +150,14 @@ export async function verwerk(request, cookies, next, maakStore, env = () => und
     return json(taken);
   }
 
-  if (pad.startsWith("/intern/api/klant") || pad.startsWith("/intern/api/voorstel") || pad === "/intern/api/kwartaalbord") return klantenApi(request, url, pad, wie, maakStore(), env);
+  if (pad.startsWith("/intern/api/klant") || pad.startsWith("/intern/api/voorstel") || pad === "/intern/api/kwartaalbord" || pad === "/intern/api/overzicht") return klantenApi(request, url, pad, wie, maakStore(), env);
 
   return next();
 }
 
 // ---------- Klanten ----------
 const KLANTEN = "klanten";
-const STATUS = ["prospect", "klant", "gestopt"];
+const STATUS = ["prospect", "klant", "gestopt", "verloren"];
 
 async function leesKlanten(store) {
   const k = await store.get(KLANTEN, { type: "json" });
@@ -164,7 +165,7 @@ async function leesKlanten(store) {
 }
 function mailadres(e) { const v = String(e || "").trim().toLowerCase(); return /^[^\s@<>]+@[^\s@<>]+\.[a-z]{2,}$/.test(v) ? v : ""; }
 function link(l) { const v = String(l || "").trim(); return /^https:\/\/[^\s<>"]+$/.test(v) ? v.slice(0, 500) : ""; }
-function boekhouder(b) { return b === "daan" ? "daan" : "koen"; }
+function boekhouder(b) { return b === "daan" ? "daan" : b === "koen" ? "koen" : ""; }
 
 function velden(body, k) {
   if ("naam" in body) k.naam = schoon(body.naam);
@@ -172,7 +173,11 @@ function velden(body, k) {
   if ("email" in body) k.email = mailadres(body.email);
   if ("telefoon" in body) k.telefoon = schoon(body.telefoon).slice(0, 30);
   if ("boekhouder" in body) k.boekhouder = boekhouder(body.boekhouder);
-  if ("status" in body && STATUS.includes(body.status)) k.status = body.status;
+  if ("status" in body && STATUS.includes(body.status)) {
+    if (body.status === "klant" && k.status !== "klant") k.klantOp = new Date().toISOString();
+    if (body.status === "verloren" && k.status !== "verloren") k.verlorenOp = new Date().toISOString();
+    k.status = body.status;
+  }
   if ("start" in body) k.start = datum(body.start);
   if ("voorstelLink" in body) k.voorstelLink = link(body.voorstelLink);
   if ("notitie" in body) k.notitie = String(body.notitie || "").replace(/[<>]/g, "").trim().slice(0, 2000);
@@ -200,7 +205,7 @@ function sleutelVoor(type, data, k = {}) {
   return null;
 }
 
-function metPlanning(k, env) { return { ...k, gepland: gepland(k, vandaag(), 8, env) }; }
+function metPlanning(k, env) { return { ...k, gepland: gepland(k, vandaag(), 8, env), leadInfo: k.status === "prospect" ? leadInfo(k) : null }; }
 
 async function klantenApi(request, url, pad, wie, store, env) {
   const klanten = await leesKlanten(store);
@@ -214,6 +219,8 @@ async function klantenApi(request, url, pad, wie, store, env) {
     if (request.method === "POST") {
       const k = { id: nieuweId(), naam: "", bedrijf: "", email: "", telefoon: "", boekhouder: wie, status: "klant", start: "", voorstelLink: "", notitie: "", uit: [], verstuurd: {}, log: [], door: wie, aangemaakt: nu };
       velden(body, k);
+      if (k.status === "prospect") k.lead = { bron: "handmatig", op: nu };
+      if (k.status === "klant") k.klantOp = nu;
       if (!k.naam) return json({ fout: "Naam ontbreekt" }, 400);
       if (!k.email) return json({ fout: "Geen geldig e-mailadres" }, 400);
       klanten.push(k);
@@ -346,6 +353,13 @@ async function klantenApi(request, url, pad, wie, store, env) {
       await bewaar();
       return json({ ok: true, klantId: k.id, status: k.status });
     }
+  }
+
+  // Werkoverzicht
+  if (pad === "/intern/api/overzicht") {
+    const taken = await leesTaken(store);
+    const voor = ["koen", "daan", "alle"].includes(body.wie) ? body.wie : wie;
+    return json(overzicht(klanten, taken, voor, vandaag(), env));
   }
 
   // Kwartaalbord

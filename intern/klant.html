@@ -8,13 +8,13 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/style.css?v=126">
-<link rel="stylesheet" href="/intern/klanten.css?v=3">
+<link rel="stylesheet" href="/intern/klanten.css?v=5">
 </head>
 <body>
 <main class="db">
   <div class="db-top">
     <div><a class="logo" href="/intern/">Avezaat <span>&amp;</span> Evers</a><span class="db-tag">Intern</span></div>
-    <div class="db-wie"><span id="db-ik">Ingelogd</span><a href="/intern/">Dashboard</a><a href="/intern/logout">Uitloggen</a></div>
+    <div class="db-wie"><span id="db-ik">Ingelogd</span><a href="/intern/">Dashboard</a><a href="/intern/overzicht.html">Overzicht</a><a href="/intern/klanten.html">Klanten</a><a href="/intern/logout">Uitloggen</a></div>
   </div>
 
   <a class="db-terug" href="/intern/klanten.html">Alle klanten</a>
@@ -23,6 +23,11 @@
   <div class="snel" id="snel" hidden></div>
 
   <div class="raster" id="inhoud" hidden>
+    <div class="db-kaart breed" id="lead-kaart" hidden>
+      <div class="db-kop"><h2>Lead</h2><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="db-knop is-klein" type="button" data-status="klant">Klant geworden</button><button class="db-knop is-rand is-klein" type="button" data-status="verloren">Verloren</button></div></div>
+      <div id="lead"></div>
+    </div>
+
     <div class="db-kaart">
       <div class="db-kop"><h2>Geplande mails</h2></div>
       <div id="gepland"></div>
@@ -87,8 +92,8 @@
         <label>Bedrijfsnaam<input name="bedrijf" maxlength="200"></label>
         <label>E-mailadres<input name="email" type="email" required></label>
         <label>Telefoon<input name="telefoon" type="tel" maxlength="30"></label>
-        <label>Vaste boekhouder<select name="boekhouder"><option value="koen">Koen</option><option value="daan">Daan</option></select></label>
-        <label>Status<select name="status"><option value="klant">Klant</option><option value="prospect">Prospect</option><option value="gestopt">Gestopt</option></select></label>
+        <label>Vaste boekhouder<select name="boekhouder"><option value="">Nog niet toegewezen</option><option value="koen">Koen</option><option value="daan">Daan</option></select></label>
+        <label>Status<select name="status"><option value="klant">Klant</option><option value="prospect">Lead</option><option value="gestopt">Gestopt</option><option value="verloren">Verloren (lead)</option></select></label>
         <label>Startdatum<input name="start" type="date"></label>
         <label>Link naar voorstel<input name="voorstelLink" type="url" placeholder="https://"></label>
         <label class="breed">Notitie<textarea name="notitie" maxlength="2000" placeholder="Alleen intern zichtbaar"></textarea></label>
@@ -135,7 +140,7 @@
     var k = klant;
     document.title = (k.bedrijf || k.naam) + ' | Avezaat & Evers intern';
     document.getElementById('titel').textContent = k.bedrijf || k.naam;
-    document.getElementById('sub').textContent = (k.bedrijf ? k.naam + ', ' : '') + k.email + '. Vaste boekhouder: ' + naamVan(k.boekhouder) + '.';
+    document.getElementById('sub').textContent = (k.bedrijf ? k.naam + ', ' : '') + k.email + '. ' + (k.boekhouder ? 'Vaste boekhouder: ' + naamVan(k.boekhouder) + '.' : 'Nog geen boekhouder toegewezen.');
     document.getElementById('inhoud').hidden = false;
 
     // Gepland
@@ -150,11 +155,26 @@
     }).join('');
 
     // Handmatig
-    document.getElementById('typen').innerHTML = HANDMATIG.map(function (t) {
+    document.getElementById('typen').innerHTML = HANDMATIG.filter(function (t) { return k.status !== 'prospect' || t === 'voorstelHerinnering' || t === 'welkom'; }).map(function (t) {
       var verstuurd = (k.log || []).filter(function (l) { return l.type === t && l.ok && !l.test; })[0];
       return '<div class="type"><strong>' + esc(types[t].label) + '</strong><small>' + esc(types[t].wanneer) + (verstuurd ? '<br>Laatst verstuurd: ' + dt(verstuurd.op) : '') + '</small>' +
         '<div><button class="db-knop is-licht is-klein" type="button" data-bekijk="' + t + '">Bekijk en verstuur</button></div></div>';
     }).join('');
+
+    // Lead
+    var lk = document.getElementById('lead-kaart'), li = k.leadInfo;
+    lk.hidden = !li;
+    if (li) {
+      var cls = { Heet: '#B42318', Warm: '#9A5B13', Lauw: 'var(--accent)', Koud: '#6B7280' }[li.label];
+      var ld = k.lead || {};
+      var feiten = [ld.situatieTekst && !/overstap|gestart/i.test(ld.situatieTekst) ? ld.situatieTekst : '', ld.transacties ? ld.transacties + ' transacties p/m' : '', ld.branche || ''].filter(Boolean);
+      document.getElementById('lead').innerHTML = '<div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">' +
+        '<div style="font-size:34px;font-weight:700;color:' + cls + ';letter-spacing:-.02em;font-variant-numeric:tabular-nums">' + li.score + '<span style="font-size:14px;font-weight:600;margin-left:6px">' + li.label + '</span></div>' +
+        '<div style="min-width:0;flex:1"><div style="font-weight:600;color:' + (li.urgent ? '#B42318' : 'var(--ink)') + '">Volgende stap: ' + esc(li.actie) + '</div>' +
+        '<div style="font-size:13px;color:var(--muted);margin-top:4px">' + esc(li.redenen.concat(feiten).join(', ')) + '</div>' +
+        (ld.bericht ? '<div style="font-size:14px;margin-top:8px;color:var(--text)">\u201C' + esc(ld.bericht) + '\u201D</div>' : '') + '</div></div>' +
+        '<p class="db-noot">Noteer contact in de tijdlijn (gebeld, geappt, gesprek). Daarmee schuift de lead vanzelf door en verandert de warmte.</p>';
+    }
 
     // Snelknoppen
     var tel = (k.telefoon || '').replace(/[^\d+]/g, ''), wa = tel.replace(/^\+/, '').replace(/^0/, '31');
@@ -314,6 +334,13 @@
   document.getElementById('taken').addEventListener('change', function (e) {
     var i = e.target; if (!i.dataset.tid) return;
     api('/intern/api/taken', { method: 'PATCH', body: JSON.stringify({ id: i.dataset.tid, klaar: i.checked }) }).then(function (r) { taken = r; tekenTaken(); });
+  });
+
+  document.getElementById('lead-kaart').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-status]'); if (!b) return;
+    var data = { status: b.dataset.status };
+    if (b.dataset.status === 'klant' && !klant.start) data.start = new Date().toISOString().slice(0, 10);
+    patch('/intern/api/klant', data);
   });
 
   api('/intern/api/ik').then(function (r) {

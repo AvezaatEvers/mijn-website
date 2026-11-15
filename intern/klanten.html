@@ -8,13 +8,13 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/style.css?v=126">
-<link rel="stylesheet" href="/intern/klanten.css?v=3">
+<link rel="stylesheet" href="/intern/klanten.css?v=5">
 </head>
 <body>
 <main class="db">
   <div class="db-top">
     <div><a class="logo" href="/intern/">Avezaat <span>&amp;</span> Evers</a><span class="db-tag">Intern</span></div>
-    <div class="db-wie"><span id="db-ik">Ingelogd</span><a href="/intern/">Dashboard</a><a href="/intern/kwartaal.html">Kwartaalbord</a><a href="/intern/logout">Uitloggen</a></div>
+    <div class="db-wie"><span id="db-ik">Ingelogd</span><a href="/intern/">Dashboard</a><a href="/intern/overzicht.html">Overzicht</a><a href="/intern/kwartaal.html">Kwartaalbord</a><a href="/intern/logout">Uitloggen</a></div>
   </div>
 
   <a class="db-terug" href="/intern/">Terug naar dashboard</a>
@@ -32,8 +32,9 @@
         </div>
         <div class="filters" id="f-status">
           <button type="button" data-v="klant" class="is-aan">Klanten</button>
-          <button type="button" data-v="prospect">Prospects</button>
+          <button type="button" data-v="prospect">Leads</button>
           <button type="button" data-v="gestopt">Gestopt</button>
+          <button type="button" data-v="verloren">Verloren</button>
         </div>
         <input class="zoek" id="zoek" type="search" placeholder="Zoek op naam of bedrijf" aria-label="Zoek klant">
       </div>
@@ -48,7 +49,7 @@
         <label>E-mailadres<input name="email" type="email" required placeholder="sanne@voorbeeld.nl"></label>
         <label>Telefoon<input name="telefoon" type="tel" maxlength="30"></label>
         <label>Vaste boekhouder<select name="boekhouder"><option value="koen">Koen</option><option value="daan">Daan</option></select></label>
-        <label>Status<select name="status"><option value="klant">Klant</option><option value="prospect">Prospect (voorstel verstuurd)</option></select></label>
+        <label>Status<select name="status"><option value="klant">Klant</option><option value="prospect">Lead</option></select></label>
         <label>Startdatum<input name="start" type="date"></label>
         <label>Link naar voorstel (optioneel)<input name="voorstelLink" type="url" placeholder="https://"></label>
         <div class="breed" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -76,19 +77,19 @@
   function teken() {
     var wie = fWie === 'ik' ? ik : fWie;
     var lijst = klanten.filter(function (k) {
-      return (fWie === 'alle' || k.boekhouder === wie) && k.status === fStatus &&
+      return (fWie === 'alle' || k.boekhouder === wie || !k.boekhouder) && k.status === fStatus &&
         (!q || (k.naam + ' ' + k.bedrijf + ' ' + k.email).toLowerCase().indexOf(q) > -1);
     }).sort(function (a, b) { return (a.bedrijf || a.naam).localeCompare(b.bedrijf || b.naam, 'nl'); });
     var ul = document.getElementById('lijst');
     if (!lijst.length) { ul.innerHTML = '<li class="kl-leeg">' + (klanten.length ? 'Geen klanten in deze selectie.' : 'Nog geen klanten. Voeg je eerste klant hieronder toe.') + '</li>'; return; }
     ul.innerHTML = lijst.map(function (k) {
       var v = (k.gepland || []).filter(function (m) { return m.aan; })[0];
-      var volg = k.status !== 'klant' ? '<span>Geen geplande mails</span>' : v ? d(v.datum) + '<span>' + esc(v.label) + '</span>' : '<span>Niets gepland</span>';
+      var volg = k.leadInfo ? '<b>' + k.leadInfo.score + '</b> ' + k.leadInfo.label + '<span>' + k.leadInfo.actie + '</span>' : k.status !== 'klant' ? '<span>Geen geplande mails</span>' : v ? d(v.datum) + '<span>' + esc(v.label) + '</span>' : '<span>Niets gepland</span>';
       return '<li><a href="/intern/klant.html?id=' + encodeURIComponent(k.id) + '">' +
-        '<img class="kl-foto" src="/assets/img/mail/' + k.boekhouder + '.jpg" alt="' + (k.boekhouder === 'daan' ? 'Daan' : 'Koen') + '" width="40" height="40">' +
+        (k.boekhouder ? '<img class="kl-foto" src="/assets/img/mail/' + k.boekhouder + '.jpg" alt="' + (k.boekhouder === 'daan' ? 'Daan' : 'Koen') + '" width="40" height="40">' : '<span class="kl-foto" style="display:grid;place-items:center;background:var(--tint);color:var(--accent);font-weight:700;font-size:13px">?</span>') +
         '<div class="kl-naam"><strong>' + esc(k.bedrijf || k.naam) + '</strong><span>' + esc(k.bedrijf ? k.naam : k.email) + '</span></div>' +
-        '<span class="kl-status is-' + k.status + '">' + ({ klant: 'Klant', prospect: 'Prospect', gestopt: 'Gestopt' })[k.status] + '</span>' +
-        '<div class="kl-volg">' + (k.status === 'klant' ? '<span>Volgende mail</span>' : '') + volg + '</div></a></li>';
+        '<span class="kl-status is-' + k.status + '">' + ({ klant: 'Klant', prospect: 'Lead', gestopt: 'Gestopt', verloren: 'Verloren' })[k.status] + '</span>' +
+        '<div class="kl-volg">' + (k.status === 'klant' ? '<span>Volgende mail</span>' : k.leadInfo ? '<span>Warmte</span>' : '') + volg + '</div></a></li>';
     }).join('');
   }
 

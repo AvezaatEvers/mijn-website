@@ -92,7 +92,7 @@
     var v = wat === 'test' ? d.test : d.verzoek;
     if (!v || String(v.url).indexOf('/intern/api/') !== 0) return;
     b.disabled = true; zetKaart(k, null, wat === 'test' ? 'Testmail versturen…' : 'Bezig…');
-    AE.api(v.url, { method: v.method, body: JSON.stringify(v.body) }).then(function (r) {
+    AE.api(v.url, { method: v.method, headers: { 'Content-Type': 'application/json', 'x-via': 'agent' }, body: JSON.stringify(v.body) }).then(function (r) {
       if (wat === 'test') { b.disabled = false; return zetKaart(k, null, 'Testmail verstuurd naar info@. Klopt alles? Klik dan op ' + k.querySelector('.ja').textContent + '.'); }
       var link = d.link || (r && r.id ? '/intern/klant.html?id=' + encodeURIComponent(r.id) : null);
       bevStatus(k.dataset.id, { staat: 'klaar', tekst: d.klaar, link: link });

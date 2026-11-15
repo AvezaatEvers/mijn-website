@@ -147,9 +147,9 @@ form.addEventListener('submit',function(e){
 
 export function agentHulp(env) {
   return {
-    api: async (method, pad, body, wie, store) => {
+    api: async (method, pad, body, wie, store, via) => {
       const u = new URL("https://intern.local" + pad + (method === "GET" || method === "DELETE" ? "?" + new URLSearchParams(body || {}) : ""));
-      const req = new Request(u, { method, headers: { "Content-Type": "application/json" }, body: method === "GET" || method === "DELETE" ? undefined : JSON.stringify(body || {}) });
+      const req = new Request(u, { method, headers: { "Content-Type": "application/json", "x-via": via || "" }, body: method === "GET" || method === "DELETE" ? undefined : JSON.stringify(body || {}) });
       const r = await klantenApi(req, u, pad, wie, store, env);
       const j = await r.json().catch(() => ({}));
       return r.ok ? j : { fout: j.fout || "Mislukt (" + r.status + ")" };
@@ -245,7 +245,7 @@ export async function verwerk(request, cookies, next, maakStore, env = () => und
     return json(taken);
   }
 
-  if (pad.startsWith("/intern/api/agent") || pad.startsWith("/intern/api/werkstro") || pad === "/intern/api/kennis" || pad === "/intern/api/dagplan" || pad.startsWith("/intern/api/gesprek") || pad.startsWith("/intern/api/geheugen")) {
+  if (pad.startsWith("/intern/api/agent") || pad.startsWith("/intern/api/werkstro") || pad === "/intern/api/kennis" || pad === "/intern/api/dagplan" || pad.startsWith("/intern/api/gesprek") || pad.startsWith("/intern/api/geheugen") || pad === "/intern/api/activiteit" || pad === "/intern/api/claude-sleutel") {
     // Het agentgesprek zelf draait in een gewone Netlify Function (netlify/functions/agent.mjs):
     // edge functions mogen maar 50 ms rekenen, te weinig voor een AI-gesprek met tools.
     if (pad === "/intern/api/agent" && request.method === "POST") return next();
@@ -320,11 +320,14 @@ async function klantenApi(request, url, pad, wie, store, env) {
   const body = ["POST", "PATCH"].includes(request.method) ? await request.json().catch(() => ({})) : Object.fromEntries(url.searchParams);
   const bewaar = () => store.setJSON(KLANTEN, klanten);
   const vind = (id) => klanten.find((x) => x.id === id);
+  // Via welke weg de wijziging kwam (Claude-koppeling of de agent op de site). Alleen een label voor de activiteitenlijst.
+  const viaKop = request.headers.get("x-via");
+  const via = viaKop === "claude" || viaKop === "agent" ? viaKop : undefined;
 
   if (pad === "/intern/api/klanten") {
     if (request.method === "GET") return json({ klanten: klanten.map((k) => metPlanning(k, env)), types: TYPES, handmatig: HANDMATIG, reviewLink: !!env("REVIEW_LINK") });
     if (request.method === "POST") {
-      const k = { id: nieuweId(), naam: "", bedrijf: "", email: "", telefoon: "", boekhouder: wie, status: "klant", start: "", voorstelLink: "", notitie: "", uit: [], verstuurd: {}, log: [], door: wie, aangemaakt: nu };
+      const k = { id: nieuweId(), naam: "", bedrijf: "", email: "", telefoon: "", boekhouder: wie, status: "klant", start: "", voorstelLink: "", notitie: "", uit: [], verstuurd: {}, log: [], door: wie, aangemaakt: nu, via };
       velden(body, k);
       if (k.status === "prospect") k.lead = { bron: "handmatig", op: nu };
       if (k.status === "klant") k.klantOp = nu;
@@ -344,7 +347,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
     if (request.method === "PATCH") {
       velden(body, k);
       if (!k.naam || !k.email) return json({ fout: "Naam en e-mailadres zijn verplicht" }, 400);
-      k.gewijzigd = nu; k.gewijzigdDoor = wie;
+      k.gewijzigd = nu; k.gewijzigdDoor = wie; k.gewijzigdVia = via;
       await bewaar();
       return json({ klant: metPlanning(k, env), types: TYPES, handmatig: HANDMATIG, reviewLink: !!env("REVIEW_LINK"), kwartalen: kwartalenRond().slice(0, 4).map(kwartaalInfo) });
     }
@@ -377,7 +380,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
     if (test) m.subject = "[TEST] " + m.subject;
     const r = await verstuur(env, { aan, mail: m });
     k.log = k.log || [];
-    k.log.unshift({ type: body.type, onderwerp: m.subject, aan, op: nu, door: wie, test, ok: r.ok, fout: r.fout || null, handmatig: true });
+    k.log.unshift({ type: body.type, onderwerp: m.subject, aan, op: nu, door: wie, via, test, ok: r.ok, fout: r.fout || null, handmatig: true });
     k.log = k.log.slice(0, 100);
     const sl = sleutelVoor(body.type, data, k);
     if (r.ok && !test && sl) k.verstuurd = { ...(k.verstuurd || {}), [sl]: nu };
@@ -401,7 +404,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
     const r = await verstuur(env, { aan, mail: m });
     if (k) {
       k.log = k.log || [];
-      k.log.unshift({ type: "ontwerp", onderwerp: m.subject, aan, op: nu, door: wie, test, ok: r.ok, fout: r.fout || null, handmatig: true });
+      k.log.unshift({ type: "ontwerp", onderwerp: m.subject, aan, op: nu, door: wie, via, test, ok: r.ok, fout: r.fout || null, handmatig: true });
       k.log = k.log.slice(0, 100);
       await bewaar();
     }
@@ -416,6 +419,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
     const kw = (k.kwartalen[body.kw] = k.kwartalen[body.kw] || {});
     kw[body.veld] = body.aan ? nu : null;
     kw[body.veld + "Door"] = body.aan ? wie : null;
+    kw[body.veld + "Via"] = body.aan ? via || null : null;
     await bewaar();
     return json({ klant: metPlanning(k, env) });
   }
@@ -425,7 +429,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
     const k = vind(body.id);
     if (!k || !/^\d{4}$/.test(String(body.jaar || ""))) return json({ fout: "Ongeldig" }, 400);
     k.ibIngediend = k.ibIngediend || {};
-    if (body.aan) k.ibIngediend[body.jaar] = nu; else delete k.ibIngediend[body.jaar];
+    if (body.aan) { k.ibIngediend[body.jaar] = nu; k.ibDoor = { ...(k.ibDoor || {}), [body.jaar]: wie }; } else delete k.ibIngediend[body.jaar];
     await bewaar();
     return json({ klant: metPlanning(k, env) });
   }
@@ -439,7 +443,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
       const tekst = String(body.tekst || "").replace(/[<>]/g, "").trim().slice(0, 1000);
       if (!tekst) return json({ fout: "Leeg" }, 400);
       const soort = ["notitie", "gebeld", "geappt", "gemaild", "gesprek"].includes(body.soort) ? body.soort : "notitie";
-      k.tijdlijn.unshift({ id: nieuweId(), tekst, soort, op: nu, door: wie });
+      k.tijdlijn.unshift({ id: nieuweId(), tekst, soort, op: nu, door: wie, via });
       k.tijdlijn = k.tijdlijn.slice(0, 300);
     } else if (request.method === "DELETE") {
       k.tijdlijn = k.tijdlijn.filter((x) => x.id !== body.nid);
@@ -497,7 +501,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
         kanaal: KANALEN[body.kanaal] ? body.kanaal : "whatsapp", richting: body.richting === "wij" ? "wij" : "klant",
         onderwerp: ONDERWERPEN[body.onderwerp] ? body.onderwerp : "overig", soort: SOORTEN[body.soort] ? body.soort : "vraag",
         opgelost: body.opgelost === true ? true : body.opgelost === false ? false : null, gevoel: GEVOEL[body.gevoel] ? body.gevoel : null,
-        vermijdbaar: body.vermijdbaar === true, notitie: String(body.notitie || "").replace(/[<>]/g, "").trim().slice(0, 1000), door: wie,
+        vermijdbaar: body.vermijdbaar === true, notitie: String(body.notitie || "").replace(/[<>]/g, "").trim().slice(0, 1000), door: wie, via,
       };
       k.contacten.unshift(c);
       k.contacten = k.contacten.slice(0, 1000);

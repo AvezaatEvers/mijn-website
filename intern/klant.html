@@ -162,7 +162,7 @@
   </div>
 </dialog>
 
-<script src="/intern/app.js?v=4"></script>
+<script src="/intern/app.js?v=5"></script>
 <script>
 (function () {
   var id = new URLSearchParams(location.search).get('id'); window.AE_KLANT = id;
@@ -262,11 +262,11 @@
     // Tijdlijn
     var KAN = { whatsapp: 'WhatsApp', gebeld: 'Gebeld', mail: 'Mail', gesprek: 'Gesprek' }, OND = { app: 'App en MoneyMonk', bonnetjes: 'Bonnetjes', facturen: 'Facturen', btw: 'Btw', ib: 'IB-aangifte', belastingdienst: 'Belastingdienst', prijs: 'Prijs en factuur', overig: 'Overig' }, GEV = { blij: 'tevreden', neutraal: 'neutraal', boos: 'ontevreden' };
     var tl = (k.tijdlijn || []).concat((k.contacten || []).map(function (c) {
-      return { id: 'c:' + c.id, soort: KAN[c.kanaal] + (c.richting === 'klant' ? ' (klant)' : ''), tekst: (OND[c.onderwerp] || '') + ', ' + c.soort + (c.opgelost === false ? ', nog niet opgelost' : '') + (c.gevoel ? ', ' + GEV[c.gevoel] : '') + (c.vermijdbaar ? ', te voorkomen' : '') + (c.notitie ? ': ' + c.notitie : ''), op: c.op, door: c.door };
+      return { id: 'c:' + c.id, soort: KAN[c.kanaal] + (c.richting === 'klant' ? ' (klant)' : ''), tekst: (OND[c.onderwerp] || '') + ', ' + c.soort + (c.opgelost === false ? ', nog niet opgelost' : '') + (c.gevoel ? ', ' + GEV[c.gevoel] : '') + (c.vermijdbaar ? ', te voorkomen' : '') + (c.notitie ? ': ' + c.notitie : ''), op: c.op, door: c.door, via: c.via };
     })).concat((k.nps || []).map(function (n) { return { id: 'n:' + n.ronde, soort: 'NPS ' + n.score, tekst: n.reden || 'Cijfer gegeven, zonder toelichting', op: n.op, door: 'klant' }; }))
       .sort(function (a, b) { return b.op.localeCompare(a.op); });
     document.getElementById('tijdlijn').innerHTML = tl.length ? tl.map(function (n) {
-      return '<li><div><span class="soort">' + esc(n.soort) + '</span>' + esc(n.tekst) + '<small>' + dt(n.op) + ', ' + naamVan(n.door) + '</small></div>' + (String(n.id).indexOf('n:') === 0 ? '<span></span>' : '<button class="weg" type="button" data-nid="' + n.id + '" aria-label="Verwijderen">&times;</button>') + '</li>';
+      return '<li><div><span class="soort">' + esc(n.soort) + '</span>' + esc(n.tekst) + '<small>' + dt(n.op) + ', ' + naamVan(n.door) + (n.via === 'claude' ? ' via Claude' : n.via === 'agent' ? ' via de agent' : '') + '</small></div>' + (String(n.id).indexOf('n:') === 0 ? '<span></span>' : '<button class="weg" type="button" data-nid="' + n.id + '" aria-label="Verwijderen">&times;</button>') + '</li>';
     }).join('') : '<li class="kl-leeg" style="display:block">Nog niets genoteerd. Leg het eerste contact vast met de knop bovenaan.</li>';
 
     tekenTaken();

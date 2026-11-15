@@ -67,13 +67,13 @@ async function werkstromenApi(request, url, pad, wie, store, h) {
   return json({ fout: "Methode niet toegestaan" }, 405);
 }
 
-function startRun(runs, procesId, klantId, wie, klanten) {
+function startRun(runs, procesId, klantId, wie, klanten, viaVan) {
   const p = proces(procesId);
   if (!p) return { fout: "Onbekende werkstroom" };
   const klant = klantId && klanten.find((k) => k.id === klantId) ? klantId : null;
   const dubbel = runs.find((r) => !r.klaarOp && r.proces === p.id && r.klant === klant && (klant || r.wie === wie));
   if (dubbel) return dubbel;
-  const r = { id: id(), proces: p.id, klant, wie, gestart: new Date().toISOString(), stappen: {}, klaarOp: null };
+  const r = { id: id(), proces: p.id, klant, wie, gestart: new Date().toISOString(), stappen: {}, klaarOp: null, via: viaVan || undefined };
   runs.push(r);
   return r;
 }
@@ -155,6 +155,8 @@ const TOOLS = [
     input_schema: { type: "object", properties: { zoek: { type: "string", description: "Zoekwoorden. Leeg = de meest recente gesprekken." } } } },
   { name: "gesprek_lezen", description: "Lees een eerder gesprek helemaal terug (id uit gesprekken_zoeken).",
     input_schema: { type: "object", properties: { id: { type: "string" } }, required: ["id"] } },
+  { name: "activiteit", description: "Wie heeft wat gedaan: een tijdlijn van recente acties van Koen en Daan (klanten toegevoegd of gewijzigd, contact, notities, mails, voorstellen, btw-kwartalen, taken, werkstroomstappen), inclusief of het via Claude of de agent ging. Gebruik voor vragen als 'wat heeft Daan vandaag gedaan?' of 'wie heeft Jansen gebeld?'.",
+    input_schema: { type: "object", properties: { wie: { type: "string", enum: ["koen", "daan", "alle"] }, dagen: { type: "number", description: "Hoeveel dagen terug, standaard 7" }, klant_id: { type: "string" } } } },
   { name: "taak_afvinken", description: "Vink direct een open taak af. Geef (een deel van) de titel.",
     input_schema: { type: "object", properties: { titel: { type: "string" } }, required: ["titel"] } },
   { name: "mail_ontwerpen", description: "Ontwerp zelf een complete mail in onze huisstijl en zet hem klaar om te versturen via Resend (na Bevestigen). Gebruik dit voor nieuwsbrieven, uitleg, aanbiedingen, herinneringen op maat of elke mail die meer nodig heeft dan een paar alinea's. Bouw de mail op uit blokken. Ontvanger: een bestaande klant (klant_id) of een los e-mailadres (aan_email + aan_naam).",
@@ -169,7 +171,7 @@ const TOOLS = [
 ];
 
 const LABELS = {
-  dagoverzicht: "Bekijkt je dag", zoek_klanten: "Zoekt klanten", klant_details: "Opent klantdossier", kennis_zoeken: "Zoekt in de kennisbank",
+  dagoverzicht: "Bekijkt je dag", activiteit: "Bekijkt wie wat deed", zoek_klanten: "Zoekt klanten", klant_details: "Opent klantdossier", kennis_zoeken: "Zoekt in de kennisbank",
   werkstroom_info: "Pakt de werkstroom erbij", lopende_werkstromen: "Bekijkt lopende werkstromen", werkstroom_starten: "Start werkstroom",
   taak_toevoegen: "Zet taak klaar", contact_inzichten: "Analyseert klantcontact",
   klant_toevoegen: "Bereidt nieuwe klant voor", klant_bijwerken: "Bereidt wijziging voor", mail_versturen: "Stelt mail op",
@@ -213,7 +215,7 @@ async function voerUit(naam, input, c) {
     case "lopende_werkstromen":
       return runs.filter((r) => !r.klaarOp).map((r) => { const v = voortgang(r); const k = klanten.find((x) => x.id === r.klant); return v && { id: r.id, titel: v.titel, klant: k ? (k.bedrijf || k.naam) : null, klaar: v.klaar, totaal: v.totaal, gestart: r.gestart.slice(0, 10), door: NAMEN[r.wie] }; }).filter(Boolean);
     case "werkstroom_starten": {
-      const r = startRun(runs, input.proces, input.klant_id, wie, klanten);
+      const r = startRun(runs, input.proces, input.klant_id, wie, klanten, c.via || "agent");
       if (r.fout) return r;
       await store.setJSON(WERK, runs);
       const v = voortgang(r);
@@ -225,7 +227,7 @@ async function voerUit(naam, input, c) {
       if (!titel) return { fout: "Titel ontbreekt" };
       const klant = input.klant_id && klanten.find((k) => k.id === input.klant_id) ? input.klant_id : null;
       const t = { id: id(), titel, notitie: "", deadline: datumOk(input.deadline), voor: ["koen", "daan", "samen"].includes(input.voor) ? input.voor : wie,
-        klaar: false, klaarDoor: null, klaarOp: null, door: wie, aangemaakt: new Date().toISOString(), klant, viaAgent: true };
+        klaar: false, klaarDoor: null, klaarOp: null, door: wie, aangemaakt: new Date().toISOString(), klant, viaAgent: true, via: c.via || "agent" };
       taken.push(t);
       await h.bewaarTaken(store, taken);
       stuur({ t: "actie", soort: "taak", tekst: "Taak toegevoegd: " + titel + (t.deadline ? " (" + t.deadline + ")" : ""), link: "/intern/" });
@@ -301,7 +303,7 @@ async function voerUit(naam, input, c) {
     case "contact_vastleggen": {
       const k = klanten.find((x) => x.id === input.klant_id);
       if (!k) return { fout: "Klant niet gevonden" };
-      const r = await h.api("POST", "/intern/api/klant/contact", { id: k.id, kanaal: input.kanaal, richting: input.richting, onderwerp: input.onderwerp, soort: input.soort, opgelost: input.opgelost, gevoel: input.gevoel, vermijdbaar: input.vermijdbaar, notitie: input.notitie }, wie, store);
+      const r = await h.api("POST", "/intern/api/klant/contact", { id: k.id, kanaal: input.kanaal, richting: input.richting, onderwerp: input.onderwerp, soort: input.soort, opgelost: input.opgelost, gevoel: input.gevoel, vermijdbaar: input.vermijdbaar, notitie: input.notitie }, wie, store, c.via || "agent");
       if (r.fout) return r;
       c.klanten = null;
       stuur({ t: "actie", soort: "contact", tekst: "Contact vastgelegd bij " + (k.bedrijf || k.naam), link: "/intern/klant.html?id=" + k.id });
@@ -310,7 +312,7 @@ async function voerUit(naam, input, c) {
     case "notitie_toevoegen": {
       const k = klanten.find((x) => x.id === input.klant_id);
       if (!k) return { fout: "Klant niet gevonden" };
-      const r = await h.api("POST", "/intern/api/klant/notitie", { id: k.id, tekst: input.tekst, soort: input.soort }, wie, store);
+      const r = await h.api("POST", "/intern/api/klant/notitie", { id: k.id, tekst: input.tekst, soort: input.soort }, wie, store, c.via || "agent");
       if (r.fout) return r;
       c.klanten = null;
       stuur({ t: "actie", soort: "notitie", tekst: "Notitie gezet bij " + (k.bedrijf || k.naam), link: "/intern/klant.html?id=" + k.id });
@@ -348,10 +350,14 @@ async function voerUit(naam, input, c) {
       const open = taken.filter((t) => !t.klaar && q && t.titel.toLowerCase().includes(q));
       if (!open.length) return { fout: "Geen open taak gevonden met die titel", open: taken.filter((t) => !t.klaar).map((t) => t.titel) };
       if (open.length > 1) return { fout: "Meerdere taken passen, wees specifieker", opties: open.map((t) => t.titel) };
-      open[0].klaar = true; open[0].klaarDoor = wie; open[0].klaarOp = new Date().toISOString();
+      open[0].klaar = true; open[0].klaarDoor = wie; open[0].klaarOp = new Date().toISOString(); open[0].klaarVia = c.via || "agent";
       await h.bewaarTaken(store, taken);
       stuur({ t: "actie", soort: "taak", tekst: "Taak afgevinkt: " + open[0].titel, link: "/intern/" });
       return { ok: true };
+    }
+    case "activiteit": {
+      const lijst = activiteit(klanten, taken, runs, { wie: input.wie, dagen: Number(input.dagen) || 7, klant: input.klant_id, max: 60 });
+      return lijst.length ? lijst.map((a) => ({ op: a.op, wie: NAMEN[a.wie] || a.wie, via: a.via || "dashboard", wat: a.tekst, klant: a.klant ? a.klant.naam : undefined })) : { resultaat: "Niets gevonden in deze periode" };
     }
     case "contact_inzichten": {
       const z = h.inzichten(klanten, wie, [30, 90, 365].includes(input.dagen) ? input.dagen : 90);
@@ -882,7 +888,103 @@ async function gesprekkenApi(request, url, pad, wie, store) {
 }
 
 // ---------- Ingang ----------
+// ---------- Activiteit: wie deed wat ----------
+// Opgebouwd uit wat er al wordt vastgelegd (door, op, via), dus het werkt voor het dashboard, de agent en Claude tegelijk.
+const SOORT_TL = { notitie: "Notitie", gebeld: "Gebeld", geappt: "Geappt", gemaild: "Gemaild", gesprek: "Gesprek" };
+export function activiteit(klanten, taken, runs, opt = {}) {
+  const uit = [], sinds = new Date(Date.now() - (opt.dagen || 14) * 864e5).toISOString();
+  const naam = (k) => ({ id: k.id, naam: k.bedrijf || k.naam });
+  const zet = (op, wie, via, tekst, k, soort) => { if (op && op >= sinds && wie) uit.push({ op, wie, via: via || null, tekst, klant: k ? naam(k) : null, soort }); };
+  for (const k of klanten) {
+    if (opt.klant && k.id !== opt.klant) continue;
+    zet(k.aangemaakt, k.door, k.via, (k.lead && k.status === "prospect" ? "Lead toegevoegd" : "Klant toegevoegd"), k, "klant");
+    zet(k.gewijzigd, k.gewijzigdDoor, k.gewijzigdVia, "Gegevens bijgewerkt", k, "klant");
+    for (const t of k.tijdlijn || []) zet(t.op, t.door, t.via, (SOORT_TL[t.soort] || "Notitie") + ": " + String(t.tekst || "").slice(0, 140), k, "contact");
+    for (const c of k.contacten || []) zet(c.op, c.door, c.via, "Contact vastgelegd (" + (KANALEN[c.kanaal] || c.kanaal) + ", " + (ONDERWERPEN[c.onderwerp] || c.onderwerp) + ")" + (c.notitie ? ": " + c.notitie.slice(0, 100) : ""), k, "contact");
+    for (const l of k.log || []) if (l.handmatig && !l.test && l.type !== "voorstel") zet(l.op, l.door, l.via, (l.ok ? "Mail verstuurd: " : "Mail mislukt: ") + l.onderwerp, k, "mail");
+    if (k.voorstel) zet(k.voorstel.op, k.voorstel.door, k.voorstel.via, "Voorstel verstuurd", k, "mail");
+    for (const [kw, st] of Object.entries(k.kwartalen || {})) for (const [veld, lbl] of [["binnen", "stukken binnen"], ["ingediend", "aangifte ingediend"], ["betaald", "btw betaald"]])
+      if (st && st[veld]) zet(st[veld], st[veld + "Door"], st[veld + "Via"], "Btw " + kw.replace("-", " ") + ": " + lbl, k, "btw");
+    for (const [jaar, op] of Object.entries(k.ibIngediend || {})) zet(op, (k.ibDoor || {})[jaar], null, "IB-aangifte " + jaar + " ingediend", k, "btw");
+  }
+  const kl = (id) => klanten.find((x) => x.id === id);
+  for (const t of taken) {
+    if (opt.klant && t.klant !== opt.klant) continue;
+    const titel = String(t.titel || "").slice(0, 120);
+    zet(t.aangemaakt, t.door, t.via || (t.viaAgent ? "agent" : null), "Taak aangemaakt: " + titel, kl(t.klant), "taak");
+    if (t.klaar) zet(t.klaarOp, t.klaarDoor, t.klaarVia, "Taak afgerond: " + titel, kl(t.klant), "taak");
+  }
+  for (const r of runs) {
+    if (opt.klant && r.klant !== opt.klant) continue;
+    const p = proces(r.proces); if (!p) continue;
+    zet(r.gestart, r.wie, r.via, "Werkstroom gestart: " + p.titel, kl(r.klant), "werkstroom");
+    for (const [i, st] of Object.entries(r.stappen || {})) if (st && st.door) zet(st.op, st.door, st.via, p.titel + ": " + String((p.stappen[i] || {}).t || "stap " + (Number(i) + 1)).slice(0, 100), kl(r.klant), "werkstroom");
+  }
+  return uit.filter((a) => !opt.wie || opt.wie === "alle" || a.wie === opt.wie).sort((a, b) => b.op.localeCompare(a.op)).slice(0, opt.max || 150);
+}
+
+// ---------- Claude-koppeling (MCP) ----------
+const SLEUTELS = "claude-sleutels";
+async function hashHex(t) { const b = await crypto.subtle.digest("SHA-256", enc.encode(t)); return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join(""); }
+export async function wieBijSleutel(store, sleutel) {
+  if (!/^ae_[a-f0-9]{48}$/.test(sleutel || "")) return null;
+  const h = await hashHex(sleutel), alle = (await store.get(SLEUTELS, { type: "json" })) || {};
+  for (const [wie, s] of Object.entries(alle)) if (s && s.hash === h) return wie;
+  return null;
+}
+async function claudeSleutelApi(request, url, wie, store) {
+  const alle = (await store.get(SLEUTELS, { type: "json" })) || {};
+  if (request.method === "GET") return json({ heeft: !!alle[wie], sinds: alle[wie] ? alle[wie].op : null, laatst: alle[wie] ? alle[wie].laatst || null : null });
+  if (request.method === "POST") {
+    const ruw = crypto.getRandomValues(new Uint8Array(24)), sleutel = "ae_" + [...ruw].map((x) => x.toString(16).padStart(2, "0")).join("");
+    alle[wie] = { hash: await hashHex(sleutel), op: new Date().toISOString() };
+    await store.setJSON(SLEUTELS, alle);
+    return json({ sleutel, url: url.origin + "/mcp/" + sleutel });
+  }
+  if (request.method === "DELETE") { delete alle[wie]; await store.setJSON(SLEUTELS, alle); return json({ ok: true }); }
+  return json({ fout: "Methode niet toegestaan" }, 405);
+}
+export async function sleutelGebruikt(store, wie) {
+  const alle = (await store.get(SLEUTELS, { type: "json" })) || {};
+  if (alle[wie] && (!alle[wie].laatst || Date.now() - new Date(alle[wie].laatst) > 36e5)) { alle[wie].laatst = new Date().toISOString(); await store.setJSON(SLEUTELS, alle); }
+}
+
+// Tools voor Claude: dezelfde als de agent, behalve wat Claude zelf al kan (gesprekken, onthouden)
+const MCP_WEG = new Set(["onthouden", "gesprekken_zoeken", "gesprek_lezen"]);
+const MCP_LEZEN = new Set(["dagoverzicht", "zoek_klanten", "klant_details", "kennis_zoeken", "werkstroom_info", "lopende_werkstromen", "contact_inzichten", "activiteit"]);
+const MCP_TEST = new Set(["mail_versturen", "mail_ontwerpen"]);
+export function mcpTools() {
+  return TOOLS.filter((t) => !MCP_WEG.has(t.name)).map((t) => {
+    const schema = JSON.parse(JSON.stringify(t.input_schema));
+    let description = t.description.replace(/Wordt pas opgeslagen (als de gebruiker op Bevestigen klikt|na Bevestigen)\.?/g, "Wordt direct opgeslagen.").replace(/De mail gaat pas na Bevestigen; de gebruiker kan eerst een voorbeeld zien\./, "De mail gaat direct. Vat ontvanger, onderwerp en inhoud eerst samen voor de gebruiker; met test=true gaat hij eerst naar info@ als test.").replace(/klaar om te versturen via Resend \(na Bevestigen\)/, "en verstuurt hem via Resend (met test=true eerst als test naar info@)");
+    if (MCP_TEST.has(t.name)) schema.properties.test = { type: "boolean", description: "true = stuur als test naar info@avezaatenevers.nl in plaats van naar de klant" };
+    return { name: t.name, title: LABELS[t.name] || t.name, description, inputSchema: schema,
+      annotations: { readOnlyHint: MCP_LEZEN.has(t.name), destructiveHint: false, openWorldHint: MCP_TEST.has(t.name) } };
+  });
+}
+// Een tool uitvoeren voor Claude. Acties die op de site een Bevestigen-kaart tonen, voeren we hier direct uit:
+// Claude vraagt de gebruiker zelf om toestemming voordat een tool iets wijzigt.
+export async function mcpUitvoeren(naam, input, wie, store, env, h) {
+  if (MCP_WEG.has(naam) || !TOOLS.some((t) => t.name === naam)) return { fout: "Onbekende tool" };
+  let kaart = null;
+  const c = { store, wie, env, h, via: "claude", stuur: (d) => { if (d.t === "bevestig") kaart = d; } };
+  const uit = await voerUit(naam, input || {}, c);
+  if (!kaart) return uit;
+  const v = input && input.test === true && kaart.test ? kaart.test : kaart.verzoek;
+  const r = await h.api(v.method, v.url, v.body, wie, store, "claude");
+  if (r.fout) return { fout: r.fout };
+  if (r.ok === false) return { fout: r.fout || "Versturen mislukt" };
+  const k = r.klant || (r.id && !r.klant ? null : r);
+  return { ok: true, gedaan: kaart.klaar + (v === kaart.test ? " (test naar info@)" : ""), details: Object.fromEntries(kaart.regels || []), link: kaart.link ? "https://avezaatenevers.nl" + kaart.link : (r.klantId || (k && k.id) ? "https://avezaatenevers.nl/intern/klant.html?id=" + (r.klantId || k.id) : undefined) };
+}
+
 export async function agentApi(request, url, pad, wie, store, env, h) {
+  if (pad === "/intern/api/activiteit") {
+    const [klanten, taken, runs] = await Promise.all([h.leesKlanten(store), h.leesTaken(store), leesRuns(store)]);
+    const p = url.searchParams;
+    return json({ items: activiteit(klanten, taken, runs, { wie: p.get("wie") || "alle", dagen: Math.min(90, Number(p.get("dagen")) || 14), klant: p.get("klant") || null, max: 200 }) });
+  }
+  if (pad === "/intern/api/claude-sleutel") return claudeSleutelApi(request, url, wie, store);
   if (pad === "/intern/api/werkstromen" || pad === "/intern/api/werkstroom") return werkstromenApi(request, url, pad, wie, store, h);
   if (pad === "/intern/api/gesprekken" || pad === "/intern/api/gesprek") return gesprekkenApi(request, url, pad, wie, store);
   if (pad === "/intern/api/geheugen" || pad.startsWith("/intern/api/geheugen/")) return geheugenApi(request, url, pad, wie, store);

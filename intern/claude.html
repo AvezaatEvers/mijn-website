@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude koppelen | Avezaat &amp; Evers intern</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css?v=126">
+<link rel="stylesheet" href="/intern/klanten.css?v=7">
+<link rel="stylesheet" href="/intern/app.css?v=5">
+<style>
+  .db.smal { max-width: 820px; }
+  .smal h1 { font-size: clamp(28px, 3.6vw, 40px); margin: 0 0 6px; letter-spacing: -.03em; }
+  .smal > p.db-sub { margin-bottom: 22px; }
+  .stap { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .stap:last-child { border-bottom: 0; padding-bottom: 0; }
+  .stap:first-child { padding-top: 0; }
+  .stap > b { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--tint); color: var(--accent); font-size: 14px; }
+  .stap h3 { font-size: 15.5px; margin: 4px 0 4px; }
+  .stap p { margin: 0; font-size: 14px; color: var(--text); line-height: 1.55; }
+  .sleutel { display: flex; gap: 8px; margin-top: 12px; }
+  .sleutel input { flex: 1; min-width: 0; font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #FAFAFC; color: var(--ink); }
+  .waarschuw { margin-top: 10px; font-size: 13px; color: #B45309; }
+  .status { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; }
+  .stip { width: 9px; height: 9px; border-radius: 50%; background: #9CA3AF; }
+  .stip.aan { background: #22A355; }
+  .voorbeelden { margin: 8px 0 0; padding-left: 18px; font-size: 14px; color: var(--text); line-height: 1.7; }
+</style>
+</head>
+<body>
+<main class="db smal">
+  <h1>Claude koppelen</h1>
+  <p class="db-sub">Gebruik je eigen Claude (Pro of gratis) met jullie klanten, taken en kennisbank. Alles wat Claude doet, komt op jouw naam in <a href="/intern/activiteit.html">Activiteit</a>, met het label "via Claude".</p>
+
+  <div class="db-kaart" style="margin-bottom:16px">
+    <div class="status" id="status"><span class="stip"></span><span>Laden…</span></div>
+  </div>
+
+  <div class="db-kaart">
+    <div class="stap"><b>1</b><div>
+      <h3>Maak jouw persoonlijke koppeling</h3>
+      <p>Iedereen maakt zijn eigen koppeling, ingelogd als zichzelf. Zo weet het dashboard of Koen of Daan iets deed. De link werkt als een wachtwoord: deel hem met niemand.</p>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="db-knop" type="button" id="maak">Maak koppeling</button><button class="db-knop is-rood" type="button" id="trek" hidden>Intrekken</button></div>
+      <div id="nieuw" hidden>
+        <div class="sleutel"><input id="url" readonly aria-label="Koppelingslink"><button class="db-knop is-rand" type="button" id="kopieer">Kopieer</button></div>
+        <p class="waarschuw">Deze link zie je maar één keer. Kwijt? Maak gewoon een nieuwe; de oude werkt dan niet meer.</p>
+      </div>
+    </div></div>
+    <div class="stap"><b>2</b><div>
+      <h3>Voeg hem toe in Claude</h3>
+      <p>Open Claude (web of desktop) en ga naar <strong>Customize</strong>, dan <strong>Connectors</strong>, dan <strong>+ Add</strong> en <strong>Add custom connector</strong>. Naam: <em>Avezaat &amp; Evers</em>. Plak bij de server-URL de link uit stap 1. Kies bij inloggen <strong>No sign in</strong>, want de sleutel zit al in de link.</p>
+    </div></div>
+    <div class="stap"><b>3</b><div>
+      <h3>Zet hem aan in een gesprek en vraag maar raak</h3>
+      <ul class="voorbeelden">
+        <li>Wat moet ik vandaag doen, en waarom in die volgorde?</li>
+        <li>Welke leads lopen af? Schrijf voor de warmste een appje.</li>
+        <li>Leg vast dat ik Jansen heb gebeld over de btw, opgelost.</li>
+        <li>Wat heeft Daan deze week gedaan?</li>
+      </ul>
+      <p style="margin-top:10px">Claude vraagt toestemming voordat hij iets wijzigt of een mail stuurt. Zet in Claude bij Privacy uit dat je chats gebruikt mogen worden om modellen te verbeteren, want er gaan klantgegevens mee.</p>
+    </div></div>
+  </div>
+</main>
+<script src="/intern/app.js?v=5"></script>
+<script>
+(function () {
+  function api(m) { return fetch('/intern/api/claude-sleutel', { method: m || 'GET', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' } }).then(function (r) { return r.json(); }); }
+  function d(s) { return new Date(s).toLocaleString('nl-NL', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }); }
+  function status(r) {
+    document.getElementById('status').innerHTML = r.heeft
+      ? '<span class="stip aan"></span><span><strong>Gekoppeld</strong> sinds ' + d(r.sinds) + (r.laatst ? '. Laatst gebruikt: ' + d(r.laatst) : '. Nog niet gebruikt vanuit Claude') + '.</span>'
+      : '<span class="stip"></span><span>Nog geen koppeling voor jou.</span>';
+    document.getElementById('maak').textContent = r.heeft ? 'Nieuwe link maken' : 'Maak koppeling';
+    document.getElementById('trek').hidden = !r.heeft;
+  }
+  var zeker = false;
+  document.getElementById('maak').onclick = function () {
+    var b = this;
+    if (b.textContent === 'Nieuwe link maken' && !zeker) { zeker = true; b.textContent = 'De oude link stopt. Zeker?'; return; }
+    zeker = false; b.disabled = true;
+    api('POST').then(function (r) {
+      document.getElementById('url').value = r.url; document.getElementById('nieuw').hidden = false; b.disabled = false;
+      return api().then(status);
+    });
+  };
+  document.getElementById('trek').onclick = function () {
+    var b = this; if (b.textContent !== 'Zeker?') { b.textContent = 'Zeker?'; return; }
+    api('DELETE').then(function () { b.textContent = 'Intrekken'; document.getElementById('nieuw').hidden = true; return api().then(status); });
+  };
+  document.getElementById('kopieer').onclick = function () {
+    var i = document.getElementById('url'), b = this; i.select();
+    (navigator.clipboard ? navigator.clipboard.writeText(i.value) : Promise.reject()).then(function () { b.textContent = 'Gekopieerd'; }, function () { document.execCommand('copy'); b.textContent = 'Gekopieerd'; });
+  };
+  api().then(status);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Activiteit | Avezaat &amp; Evers intern</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css?v=126">
+<link rel="stylesheet" href="/intern/klanten.css?v=7">
+<link rel="stylesheet" href="/intern/app.css?v=5">
+<style>
+  .hk { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .hk h1 { font-size: clamp(28px, 3.6vw, 40px); margin: 0; letter-spacing: -.03em; }
+  .hk p { margin: 4px 0 0; color: var(--muted); }
+  .bal { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
+  .seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 12px; background: #E8E8ED; }
+  .seg button { font: inherit; font-size: 14px; font-weight: 500; padding: 7px 14px; border: 0; border-radius: 9px; background: none; color: var(--ink); cursor: pointer; }
+  .seg button.is-aan { background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .12); font-weight: 600; }
+  .tellers { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .tellers div { background: var(--vlak, #fff); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
+  .tellers span { font-size: 12.5px; color: var(--muted); }
+  .tellers b { display: block; font-size: 24px; font-weight: 600; letter-spacing: -.02em; }
+  .dag { font-size: 13px; font-weight: 600; color: var(--muted); margin: 18px 4px 6px; }
+  .dag:first-child { margin-top: 0; }
+  .rij { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 11px 4px; border-bottom: 1px solid var(--line); }
+  .rij:last-child { border-bottom: 0; }
+  .rij img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
+  .rij .wat { font-size: 14.5px; color: var(--ink); line-height: 1.4; overflow-wrap: anywhere; }
+  .rij .wat a { color: var(--ink); font-weight: 600; text-decoration: none; }
+  .rij .wat a:hover { color: var(--accent); }
+  .rij small { display: block; font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .rij time { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .via { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 6px; margin-left: 6px; vertical-align: 1px; }
+  .via.claude { background: #F6EEE6; color: #A0522D; }
+  .via.agent { background: var(--tint); color: var(--accent); }
+</style>
+</head>
+<body>
+<main class="db">
+  <div class="hk">
+    <div><h1>Activiteit</h1><p>Wie deed wat, in het dashboard, via de agent of via Claude.</p></div>
+    <a class="db-knop is-rand" href="/intern/claude.html">Claude koppelen</a>
+  </div>
+  <div class="bal">
+    <div class="seg" id="wie"><button type="button" data-w="alle" class="is-aan">Iedereen</button><button type="button" data-w="koen">Koen</button><button type="button" data-w="daan">Daan</button></div>
+    <div class="seg" id="dagen"><button type="button" data-d="1">Vandaag</button><button type="button" data-d="7" class="is-aan">Week</button><button type="button" data-d="30">Maand</button></div>
+  </div>
+  <div class="tellers" id="tellers"></div>
+  <div class="db-kaart"><div id="lijst"><p class="kl-leeg">Laden…</p></div></div>
+</main>
+<script src="/intern/app.js?v=5"></script>
+<script>
+(function () {
+  var wie = 'alle', dagen = 7, items = [];
+  var NAAM = { koen: 'Koen', daan: 'Daan', auto: 'Automatisch', formulier: 'Websiteformulier', klant: 'Klant', gepland: 'Automatisch' };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function dagLabel(d) {
+    var v = new Date(); v.setHours(0, 0, 0, 0); var x = new Date(d); x.setHours(0, 0, 0, 0);
+    var n = Math.round((v - x) / 864e5);
+    return n === 0 ? 'Vandaag' : n === 1 ? 'Gisteren' : x.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+  function teken() {
+    var vanafDag = new Date(); vanafDag.setHours(0, 0, 0, 0);
+    var lijst = dagen === 1 ? items.filter(function (a) { return new Date(a.op) >= vanafDag; }) : items;
+    var tel = function (w) { return lijst.filter(function (a) { return a.wie === w; }).length; };
+    document.getElementById('tellers').innerHTML =
+      '<div><span>Acties</span><b>' + lijst.length + '</b></div>' +
+      (wie === 'alle' ? '<div><span>Koen</span><b>' + tel('koen') + '</b></div><div><span>Daan</span><b>' + tel('daan') + '</b></div>' : '') +
+      '<div><span>Via Claude</span><b>' + lijst.filter(function (a) { return a.via === 'claude'; }).length + '</b></div>';
+    if (!lijst.length) { document.getElementById('lijst').innerHTML = '<p class="kl-leeg">Nog niets in deze periode.</p>'; return; }
+    var html = '', vorige = '';
+    lijst.forEach(function (a) {
+      var dl = dagLabel(a.op);
+      if (dl !== vorige) { html += (vorige ? '</div>' : '') + '<p class="dag">' + esc(dl.charAt(0).toUpperCase() + dl.slice(1)) + '</p><div>'; vorige = dl; }
+      var foto = a.wie === 'koen' || a.wie === 'daan' ? '/assets/img/mail/' + a.wie + '.jpg' : '/assets/favicon.svg';
+      html += '<div class="rij"><img src="' + foto + '" alt=""><div class="wat"><strong>' + esc(NAAM[a.wie] || a.wie) + '</strong>' +
+        (a.via ? '<span class="via ' + a.via + '">via ' + (a.via === 'claude' ? 'Claude' : 'agent') + '</span>' : '') +
+        '<small style="color:var(--ink);font-size:14px;margin-top:3px">' + esc(a.tekst) + (a.klant ? ' · <a href="/intern/klant.html?id=' + encodeURIComponent(a.klant.id) + '">' + esc(a.klant.naam) + '</a>' : '') + '</small></div>' +
+        '<time>' + new Date(a.op).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }) + '</time></div>';
+    });
+    document.getElementById('lijst').innerHTML = html + '</div>';
+  }
+  function laad() {
+    fetch('/intern/api/activiteit?wie=' + wie + '&dagen=' + Math.max(dagen, 1), { credentials: 'same-origin' }).then(function (r) { return r.json(); })
+      .then(function (r) { items = r.items || []; teken(); })
+      .catch(function () { document.getElementById('lijst').innerHTML = '<p class="kl-leeg">Laden mislukt.</p>'; });
+  }
+  document.getElementById('wie').addEventListener('click', function (e) { var b = e.target.closest('[data-w]'); if (!b) return; wie = b.dataset.w; this.querySelectorAll('button').forEach(function (x) { x.classList.toggle('is-aan', x === b); }); laad(); });
+  document.getElementById('dagen').addEventListener('click', function (e) { var b = e.target.closest('[data-d]'); if (!b) return; dagen = +b.dataset.d; this.querySelectorAll('button').forEach(function (x) { x.classList.toggle('is-aan', x === b); }); laad(); });
+  laad();
+})();
+</script>
+</body>
+</html>

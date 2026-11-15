@@ -15,13 +15,14 @@
     chat: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
     flow: '<circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M9 6h5a4 4 0 0 1 4 4v5M6 9v9"/>',
     agent: '<path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"/>',
+    act: '<path d="M3 12h4l3-8 4 16 3-8h4"/>',
     site: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'
   };
   function svg(n) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + I[n] + '</svg>'; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   var pad = location.pathname.replace(/index\.html$/, '');
   var NAV = [
-    ['Werk', [['/intern/', 'Vandaag', 'home'], ['/intern/klanten.html', 'Klanten en leads', 'klanten', 'tel-leads'], ['/intern/kwartaal.html', 'Kwartaalbord', 'kwartaal'], ['/intern/inzichten.html', 'Contact en NPS', 'inzicht'], ['/intern/werkstromen.html', 'Werkstromen', 'flow']]],
+    ['Werk', [['/intern/', 'Vandaag', 'home'], ['/intern/klanten.html', 'Klanten en leads', 'klanten', 'tel-leads'], ['/intern/kwartaal.html', 'Kwartaalbord', 'kwartaal'], ['/intern/inzichten.html', 'Contact en NPS', 'inzicht'], ['/intern/werkstromen.html', 'Werkstromen', 'flow'], ['/intern/activiteit.html', 'Activiteit', 'act']]],
     ['Maken', [['/voorstel.html', 'Voorstel', 'voorstel'], ['/intern/mails/', 'Mailsjablonen', 'mail'], ['/intern/tools.html', 'Presenteren en tools', 'tools']]]
   ];
 
@@ -219,7 +220,7 @@
 
   // Agent laden (eigen bestand, zodat elke pagina hem krijgt)
   var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/intern/agent.css?v=12'; document.head.appendChild(css);
-  var js = document.createElement('script'); js.src = '/intern/agent.js?v=18'; js.defer = true;
+  var js = document.createElement('script'); js.src = '/intern/agent.js?v=19'; js.defer = true;
   setTimeout(function () { document.body.appendChild(js); }, 0);
 
   window.AE = { api: api, ik: function () { return ikBelofte; }, meld: meld, openContact: openContact, esc: esc, svg: svg, herlaadKlanten: function () { KLANTEN = null; return laadKlanten(); } };

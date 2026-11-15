@@ -469,3 +469,6 @@ body.app .pm:first-child .pm-nr { background: #2D5BD3; color: #fff; }
 body.app .pm-pijl { color: #C7C7CC; }
 body.app .pm:hover .pm-pijl { color: var(--ink); }
 body.app .orb::after { box-shadow: inset 0 0 calc(var(--m) * .12) rgba(138, 180, 255, .55), 0 calc(var(--m) * .12) calc(var(--m) * .3) rgba(45, 91, 211, .25); }
+
+/* Donkere koppen (werkstroom-lade, modals) houden witte tekst */
+body.app .wd-kop h2, body.app .wd-kop strong, body.app .cm-kop h2, body.app .cm-kop strong { color: #fff; }

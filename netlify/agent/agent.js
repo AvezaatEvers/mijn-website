@@ -341,6 +341,7 @@ Werkwijze:
 - Haal eerst feiten op met je tools, gok nooit over klanten of cijfers.
 - Bij een inhoudelijke boekhoud- of belastingvraag: eerst kennis_zoeken (onze eigen kennisbank). Gaat het om actuele bedragen, percentages, grenzen, deadlines, nieuwe regels, of staat het antwoord niet (volledig) in de kennisbank: gebruik ook web_zoeken. Combineer beide en antwoord concreet, met stappen en het jaar waar het om gaat.
 - Bij vragen over MoneyMonk (knoppen, menu's, functies): web_zoeken met 'MoneyMonk' in de vraag, in plaats van te gokken.
+- Met pagina_lezen kun je een bron of een link van de gebruiker helemaal lezen. Doe dat bij twijfel of als de zoekresultaten te kort zijn.
 - Noem bij informatie van het web de bron als link. Spreken bronnen elkaar tegen of ben je niet zeker: zeg dat eerlijk en verwijs naar de officiële bron (Belastingdienst, KVK, Rijksoverheid).
 - Je mag ook algemene vragen beantwoorden (een mail of WhatsApp opstellen, iets uitrekenen, een tekst verbeteren, een klantvraag beantwoorden).
 - Vraagt hij wat hij moet doen of waar te beginnen: gebruik dagoverzicht en geef een geordende lijst van maximaal 5 acties, belangrijkste eerst, elk met de reden en een link.
@@ -375,8 +376,7 @@ function berichtenVan(body) {
 // Env: GEMINI_API_KEY (Google AI Studio, project zónder betaalgegevens = gratis tier).
 // Optioneel GEMINI_MODEL. Binnen de EER gelden de dataregels van de betaalde dienst: prompts worden niet gebruikt om modellen te trainen.
 const GEMINI = "https://generativelanguage.googleapis.com/v1beta/models/";
-const MODELLEN = ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash"];
-const ZOEKMODELLEN = ["gemini-2.5-flash-lite", "gemini-2.5-flash"]; // Google Search-grounding is gratis op 2.5 (gedeeld daglimiet)
+const MODELLEN = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash-lite"];
 
 function geminiSleutel(env) { return String(env("GEMINI_API_KEY") || "").trim().replace(/^["']|["']$/g, "").trim(); }
 
@@ -394,14 +394,17 @@ function schema(x) {
   if (uit.type === "OBJECT" && uit.properties && !Object.keys(uit.properties).length) delete uit.properties;
   return uit;
 }
-const WEBTOOL = { name: "web_zoeken", description: "Zoek actuele informatie op het web via Google: actuele belastingbedragen en -regels, deadlines, nieuws, KVK- en Belastingdienst-informatie, uitleg over MoneyMonk-functies, of alles wat niet in onze kennisbank staat. Geeft een samenvatting met bronnen.",
+const LEESTOOL = { name: "pagina_lezen", description: "Open een openbare webpagina (https) en lees de tekst. Gebruik na web_zoeken om een bron helemaal te lezen, of als de gebruiker een link geeft.",
+  input_schema: { type: "object", properties: { url: { type: "string" } }, required: ["url"] } };
+const WEBTOOL = { name: "web_zoeken", description: "Zoek actuele informatie op het web: actuele belastingbedragen en -regels, deadlines, nieuws, KVK- en Belastingdienst-informatie, uitleg over MoneyMonk-functies, of alles wat niet in onze kennisbank staat. Geeft een samenvatting met bronnen.",
   input_schema: { type: "object", properties: { vraag: { type: "string", description: "De zoekvraag, zo specifiek mogelijk, in het Nederlands" } }, required: ["vraag"] } };
-const GEMINI_TOOLS = [{ functionDeclarations: [...TOOLS, WEBTOOL].map((t) => {
+const GEMINI_TOOLS = [{ functionDeclarations: [...TOOLS, WEBTOOL, LEESTOOL].map((t) => {
   const par = schema(t.input_schema), d = { name: t.name, description: t.description };
   if (par && par.properties) d.parameters = par; // zonder parameters: veld weglaten
   return d;
 }) }];
 LABELS.web_zoeken = "Zoekt op het web";
+LABELS.pagina_lezen = "Leest webpagina";
 
 // Modellen die net een limiet of fout gaven, slaan we 10 minuten over (scheelt wachttijd bij elke vraag)
 const KAPOT = new Map();
@@ -495,19 +498,49 @@ async function geminiStroom(env, modellen, body, opTekst) {
   throw laatste;
 }
 
+// Webzoeken via Tavily (gratis: 1.000 zoekopdrachten per maand, env TAVILY_API_KEY).
+// Google Search via Gemini zit niet (meer) in de gratis versie.
 async function webZoeken(env, vraag, stuur) {
-  ZOEKMODELLEN.forEach((m) => GEEN_DENK.add(m)); // zoekmodellen zonder denkinstelling aanroepen
-  const { j } = await geminiMetTerugval(env, ZOEKMODELLEN, {
-    contents: [{ role: "user", parts: [{ text: `Zoek dit op voor een Nederlands boekhoudkantoor voor zzp'ers en vat het antwoord feitelijk en kort samen in het Nederlands, met concrete bedragen, data en jaartallen. Geef de voorkeur aan officiële Nederlandse bronnen (belastingdienst.nl, kvk.nl, rijksoverheid.nl, ondernemersplein.kvk.nl) en voor MoneyMonk aan moneymonk.nl. Vraag: ${vraag}` }] }],
-    tools: [{ google_search: {} }],
-    generationConfig: { temperature: 0.2, maxOutputTokens: 900 },
-  });
-  const cand = (j.candidates || [])[0] || {};
-  const tekst = ((cand.content || {}).parts || []).filter((p) => p.text && !p.thought).map((p) => p.text).join("").trim();
-  const gm = cand.groundingMetadata || {};
-  const bronnen = (gm.groundingChunks || []).map((c) => c.web).filter(Boolean).slice(0, 6).map((w) => ({ titel: w.title || "Webbron", url: w.uri }));
-  stuur({ t: "bronnen", v: bronnen.map((b) => ({ titel: b.titel, bron: b.url, groep: "Web" })) });
-  return { samenvatting: tekst || "Geen resultaat gevonden.", bronnen };
+  const sleutel = String(env("TAVILY_API_KEY") || "").trim();
+  if (!sleutel) { const e = new Error("webzoeken staat uit: zet een gratis TAVILY_API_KEY in Netlify"); e.status = 503; throw e; }
+  const stop = new AbortController(), klok = setTimeout(() => stop.abort(), 15000);
+  let r;
+  try {
+    r = await fetch("https://api.tavily.com/search", {
+      method: "POST", headers: { "content-type": "application/json", Authorization: "Bearer " + sleutel }, signal: stop.signal,
+      body: JSON.stringify({ query: vraag, search_depth: "basic", max_results: 6, chunks_per_source: 3, topic: "general", include_answer: false }),
+    });
+  } catch (e) { throw Object.assign(new Error(e.name === "AbortError" ? "zoekmachine reageerde te traag" : "zoekmachine niet bereikbaar"), { status: 504 }); }
+  finally { clearTimeout(klok); }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    const uitleg = { 401: "ongeldige Tavily-sleutel", 429: "te veel zoekopdrachten tegelijk", 432: "gratis maandlimiet van Tavily bereikt" }[r.status];
+    throw Object.assign(new Error(uitleg || (j.detail && (j.detail.error || j.detail)) || ("Tavily " + r.status)), { status: r.status });
+  }
+  const res = (j.results || []).slice(0, 6).map((x) => ({ titel: x.title || x.url, url: x.url, tekst: String(x.content || "").slice(0, 1400), datum: x.published_date || null }));
+  stuur({ t: "bronnen", v: res.map((b) => ({ titel: b.titel, bron: b.url, groep: "Web" })) });
+  return res.length ? { resultaten: res, tip: "Lees een bron in zijn geheel met pagina_lezen als de samenvatting niet genoeg is." } : { resultaten: [], melding: "Niets gevonden. Probeer andere zoekwoorden." };
+}
+
+// Een webpagina zelf openen en als tekst teruggeven (gratis, geen sleutel nodig)
+async function paginaLezen(url, stuur) {
+  let u; try { u = new URL(String(url || "")); } catch { throw Object.assign(new Error("ongeldige link"), { status: 400 }); }
+  if (u.protocol !== "https:" || /^(localhost|127\.|10\.|192\.168\.|169\.254\.|0\.)/.test(u.hostname) || u.hostname.endsWith(".local") || u.hostname.endsWith(".internal")) throw Object.assign(new Error("alleen openbare https-pagina's"), { status: 400 });
+  const stop = new AbortController(), klok = setTimeout(() => stop.abort(), 12000);
+  let r;
+  try { r = await fetch(u.href, { headers: { "User-Agent": "Mozilla/5.0 (AE-agent; +https://avezaatenevers.nl)", Accept: "text/html,application/xhtml+xml" }, redirect: "follow", signal: stop.signal }); }
+  catch (e) { throw Object.assign(new Error(e.name === "AbortError" ? "pagina laadde te traag" : "pagina niet bereikbaar"), { status: 504 }); }
+  finally { clearTimeout(klok); }
+  if (!r.ok) throw Object.assign(new Error("pagina gaf " + r.status), { status: r.status });
+  const html = (await r.text()).slice(0, 600000);
+  const titel = ((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || u.hostname).replace(/\s+/g, " ").trim();
+  const hoofd = (html.match(/<main[\s\S]*?<\/main>/i) || html.match(/<article[\s\S]*?<\/article>/i) || html.match(/<body[\s\S]*<\/body>/i) || [html])[0];
+  const tekst = hoofd.replace(/<(script|style|nav|footer|header|noscript|svg|form)[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<\/(p|div|li|h[1-6]|tr|br|section)>/gi, "\n").replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&euro;/g, "€").replace(/&#39;|&rsquo;/g, "’").replace(/&quot;/g, '"').replace(/&[a-z#0-9]+;/gi, " ")
+    .replace(/[ \t]+/g, " ").replace(/\n\s*\n+/g, "\n").trim().slice(0, 9000);
+  stuur({ t: "bronnen", v: [{ titel, bron: u.href, groep: "Web" }] });
+  return { titel, url: u.href, tekst };
 }
 
 // Context vooraf meegeven, zodat het model voor veelgestelde vragen geen extra rondes nodig heeft
@@ -551,11 +584,12 @@ async function slim(c, body) {
       stuur({ t: "tool", naam: name, label: LABELS[name] || name });
       let uit;
       gebruikt.add(name === "web_zoeken" ? "web" : name === "kennis_zoeken" ? "kennisbank" : "jullie gegevens");
-      try { uit = name === "web_zoeken" ? await webZoeken(env, (args || {}).vraag || "", stuur) : await voerUit(name, args || {}, c); }
+      if (name === "pagina_lezen") gebruikt.add("web");
+      try { uit = name === "web_zoeken" ? await webZoeken(env, (args || {}).vraag || "", stuur) : name === "pagina_lezen" ? await paginaLezen((args || {}).url, stuur) : await voerUit(name, args || {}, c); }
       catch (e) {
         uit = { fout: String(e.message || e) };
         console.log("Tool-fout", name, e.status, e.message);
-        stuur({ t: "waarschuwing", v: (name === "web_zoeken" ? "Webzoeken mislukt" : (LABELS[name] || name) + " mislukt") + ": " + String(e.message || e).slice(0, 200) });
+        stuur({ t: "waarschuwing", v: (name === "web_zoeken" ? "Webzoeken mislukt" : name === "pagina_lezen" ? "Pagina lezen mislukt" : (LABELS[name] || name) + " mislukt") + ": " + String(e.message || e).slice(0, 200) });
         if (name === "web_zoeken") gebruikt.delete("web");
       }
       const fr = { name, response: { resultaat: JSON.parse(JSON.stringify(uit ?? null)) } };
@@ -706,7 +740,7 @@ export async function agentApi(request, url, pad, wie, store, env, h) {
     if (takenVeranderd) await h.bewaarTaken(store, taken);
     return json(dagplan(klanten, taken, runs, voor, nu));
   }
-  if (pad === "/intern/api/agent/status") return json({ slim: !!geminiSleutel(env), gratis: true, motor: geminiSleutel(env) ? "Gemini" : "lokaal" });
+  if (pad === "/intern/api/agent/status") return json({ slim: !!geminiSleutel(env), web: !!String(env("TAVILY_API_KEY") || "").trim(), gratis: true, motor: geminiSleutel(env) ? "Gemini" : "lokaal" });
   if (pad === "/intern/api/kennis") return json({ resultaten: zoekKennis(url.searchParams.get("q") || "", 8) });
   if (pad !== "/intern/api/agent" || request.method !== "POST") return json({ fout: "Onbekende route" }, 404);
   return agentGesprek(request, wie, store, env, h);

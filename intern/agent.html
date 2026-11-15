@@ -132,7 +132,7 @@
 
     AE.api('/intern/api/agent/status').then(function (s) {
       document.getElementById('gs-voet').innerHTML = s.slim
-        ? '<i></i><b>Gemini</b>, gratis. Kent jullie klanten, kennisbank en het web, en kan mails opstellen en klanten bijwerken na jouw bevestiging.'
+        ? '<i></i><b>Gemini</b>, gratis. Kent jullie klanten en kennisbank, kan mails opstellen en klanten bijwerken na jouw bevestiging.' + (s.web ? ' Zoekt op het web via Tavily.' : ' <br><b>Webzoeken staat uit:</b> zet een gratis <code>TAVILY_API_KEY</code> in Netlify.')
         : '<i class="uit"></i><b>Lokale modus.</b> Zet <code>GEMINI_API_KEY</code> in Netlify voor de slimme agent.';
     });
   }

@@ -1,6 +1,6 @@
 // De A&E-agent: een assistent die Koen en Daan door hun werk leidt.
-// Slimme modus via de Claude API (env ANTHROPIC_API_KEY, optioneel AGENT_MODEL).
-// Zonder sleutel antwoordt hij lokaal: kennisbank, werkstromen, klanten en de dagbriefing.
+// Draait volledig gratis op eigen data: kennisbank, werkstromen, klanten, taken en de dagbriefing.
+// De functie slim() (Claude API) wordt bewust niet aangeroepen, zodat er nooit kosten ontstaan.
 import { zoekKennis } from "./kennis.js";
 import { PROCESSEN, GROEPEN, proces } from "./processen.js";
 
@@ -322,11 +322,41 @@ async function lokaal(c, body) {
   let tekst = "";
   const klanten = await c.h.leesKlanten(c.store);
 
+  const vorige = (lijst.filter((b) => b.role === "user").slice(-2, -1)[0] || {}).content || "";
   const p = PROCESSEN.find((x) => l.includes(x.titel.toLowerCase()) || l.includes(x.id.replace("-", " ")))
-    || (/werkstroom|proces|stappenplan|hoe pak ik/.test(l) && PROCESSEN.map((x) => ({ x, s: x.titel.toLowerCase().split(/\s+/).filter((w) => w.length > 3 && l.includes(w)).length })).sort((a, b) => b.s - a.s).filter((y) => y.s)[0]?.x);
-  const k = klanten.find((x) => [x.bedrijf, x.naam].some((n) => n && n.length > 3 && l.includes(n.toLowerCase())));
+    || (/klacht|ontevreden|lage (nps|score)|gaf een [0-6]\b/.test(l) && proces("klacht")) || (/btw.?kwartaal|kwartaalaangifte/.test(l) && proces("btw-kwartaal"))
+    || (/nieuwe klant|onboard/.test(l) && proces("onboarding")) || (/nieuwe lead|aanvraag binnen/.test(l) && proces("nieuwe-lead"))
+    || (/stopt|opzeg/.test(l) && proces("offboarding")) || (/overstap/.test(l) && /stappen|hoe|regelen/.test(l) && proces("overstap"))
+    || (/werkstroom|proces|stappenplan|hoe pak ik|wat moet ik allemaal|stappen/.test(l) && PROCESSEN.map((x) => ({ x, s: x.titel.toLowerCase().split(/[\s,]+/).filter((w) => w.length > 4 && l.includes(w)).length })).sort((a, b) => b.s - a.s).filter((y) => y.s)[0]?.x);
+  const k = klanten.find((x) => [x.bedrijf, x.naam].some((n) => n && n.length > 3 && l.includes(n.toLowerCase())))
+    || (body.klant && /deze klant|deze lead|hem|haar|samen|volgende stap|bericht|whatsapp|klant/.test(l) && klanten.find((x) => x.id === body.klant));
+  const lijstje = (a) => a.map((x, i) => `${i + 1}. ${x}`).join("\n");
 
-  if (/\b(dag|vandaag|briefing|beginnen|begin ik|eerst|prioriteit|planning|wat moet ik)\b/.test(l) && !p) {
+  if (k && /bericht|whatsapp|app(je)?|mail/.test(l)) {
+    stuur({ t: "tool", naam: "klant_details", label: LABELS.klant_details });
+    const d = await voerUit("klant_details", { id: k.id }, c);
+    const voornaam = (d.naam || "").split(" ")[0] || "daar", ik = NAMEN[wie];
+    const lc = d.contacten[0];
+    const kern = d.lead ? (d.voorstel ? "Ik ben benieuwd wat je van het voorstel vond. Heb je nog vragen, of zal ik je even bellen?" : "Je had interesse in onze boekhouding. Zullen we even 20 minuten kennismaken? Zeg maar wanneer het je uitkomt.")
+      : d.nps.length && d.nps[d.nps.length - 1].score <= 6 ? "Bedankt voor je eerlijke cijfer. Ik wil graag horen wat er beter kan. Kan ik je vandaag of morgen even bellen?"
+      : lc && lc.opgelost === false ? `Ik kom nog even terug op je vraag over ${lc.onderwerp.toLowerCase()}. Ik pak het nu op en laat je vandaag weten hoe het zit.`
+      : "Even een check-in: gaat alles goed met de app en je administratie? Laat het weten als ik ergens mee kan helpen.";
+    tekst = `### Voorstel voor ${d.bedrijf || d.naam}\nHoi ${voornaam},\n\n${kern}\n\nGroet, ${ik}\n\n_Pas het gerust aan; ik baseer het op de laatste stand in het dossier._`;
+  } else if (/\blead(s)?\b|bellen|warm/.test(l) && !p && !k) {
+    stuur({ t: "tool", naam: "dagoverzicht", label: LABELS.dagoverzicht });
+    const o = await voerUit("dagoverzicht", {}, c);
+    tekst = o.leads.length ? `### Leads op warmte\n${lijstje(o.leads.slice(0, 6).map((x) => `**[${x.naam}](/intern/klant.html?id=${x.id})**, warmte ${x.score} (${x.label}): ${x.actie}`))}\n\nTip bij bellen: vraag eerst wat hem nu tijd of zorgen kost, en plan meteen een kennismaking van 20 minuten. Geen gehoor? Direct een WhatsApp met twee voorstellen voor een moment.`
+      : "Er staan geen open leads. Mooi moment voor een [kennisbankartikel](/intern/werkstromen.html?p=kennisbank-artikel) dat nieuwe leads oplevert.";
+  } else if (/nps|tevreden|verbeter|voorkomen|klantcontact|inzicht/.test(l) && !p && !k) {
+    stuur({ t: "tool", naam: "contact_inzichten", label: LABELS.contact_inzichten });
+    const z = await voerUit("contact_inzichten", { dagen: 90 }, c);
+    const ci = z.cijfers || {};
+    tekst = `### Contact en NPS, laatste 90 dagen\n- ${ci.contacten ?? 0} contactmomenten, ${ci.opgelost ?? "–"}% meteen opgelost, ${ci.vermijdbaar ?? "–"}% was te voorkomen\n- NPS: ${ci.nps && ci.nps.score != null ? ci.nps.score : "nog te weinig antwoorden"}\n\n### Adviezen\n${(z.adviezen || []).length ? lijstje(z.adviezen.slice(0, 5).map((a) => `**${a.titel}**: ${a.tekst}`)) : "Nog geen adviezen. Leg meer contact vast, dan worden ze scherper."}\n\n[Bekijk Contact en NPS](/intern/inzichten.html)`;
+  } else if (/lopen|lopende/.test(l) && /werkstro/.test(l)) {
+    stuur({ t: "tool", naam: "lopende_werkstromen", label: LABELS.lopende_werkstromen });
+    const r = await voerUit("lopende_werkstromen", {}, c);
+    tekst = r.length ? `### Lopende werkstromen\n${lijstje(r.map((w) => `[${w.titel}](/intern/werkstromen.html?run=${w.id})${w.klant ? " voor " + w.klant : ""}: ${w.klaar} van ${w.totaal} stappen`))}` : "Er lopen nu geen werkstromen. [Kies er een](/intern/werkstromen.html).";
+  } else if (/\b(dag|vandaag|briefing|beginnen|begin ik|eerst|prioriteit|planning|plan|week|wat moet ik)\b/.test(l) && !p && !k) {
     stuur({ t: "tool", naam: "dagoverzicht", label: LABELS.dagoverzicht });
     const o = await voerUit("dagoverzicht", {}, c);
     const acties = [
@@ -336,25 +366,40 @@ async function lokaal(c, body) {
       ...o.taken.vandaag.map((t) => `Taak voor vandaag: ${t}`),
       ...o.aandacht.filter((a) => a.ernst < 3).map((a) => `**${a.naam}**: ${a.tekst}. ${a.actie}`),
     ].slice(0, 5);
-    tekst = `### Zo ziet je dag eruit\n${acties.length ? acties.map((a, i) => `${i + 1}. ${a}`).join("\n") : "Niets urgents. Mooi moment voor de [maandverwerking](/intern/werkstromen.html?p=maandverwerking)."}\n\n${o.cijfers.klanten} actieve klanten, ${o.cijfers.prospects} open leads, ${o.mailsKomendeWeek.length} automatische mails deze week.`;
+    const week = /week|plan/.test(l);
+    tekst = `### ${week ? "Je week" : "Zo ziet je dag eruit"}\n${acties.length ? lijstje(acties) : "Niets urgents. Mooi moment voor de [maandverwerking](/intern/werkstromen.html?p=maandverwerking)."}` +
+      (week && o.taken.dezeWeek.length ? `\n\n**Later deze week**\n${o.taken.dezeWeek.map((t) => "- " + t).join("\n")}` : "") +
+      (week && o.mailsKomendeWeek.length ? `\n\n**Gaat vanzelf**\n${o.mailsKomendeWeek.slice(0, 5).map((m) => "- " + m).join("\n")}` : "") +
+      `\n\n${o.cijfers.klanten} actieve klanten, ${o.cijfers.prospects} open leads. Start met de [dagstart](/intern/werkstromen.html?p=dagstart).`;
   } else if (p) {
     stuur({ t: "tool", naam: "werkstroom_info", label: LABELS.werkstroom_info });
     stuur({ t: "werkstroom", id: p.id, titel: p.titel });
-    tekst = `### ${p.titel}\n${p.doel}\n\n${p.stappen.map((s, i) => `${i + 1}. **${s.t}**: ${s.u}`).join("\n")}\n\n[Open de werkstroom](/intern/werkstromen.html?p=${p.id})${p.perKlant ? " om hem voor een klant te starten." : "."}`;
+    const extra = p.stappen.filter((s) => s.vraag).slice(0, 1).map((s) => zoekKennis(s.vraag, 1)[0]).filter(Boolean)[0];
+    tekst = `### ${p.titel}\n${p.doel}\n\n${p.stappen.map((s, i) => `${i + 1}. **${s.t}**: ${s.u}`).join("\n")}` +
+      (extra ? `\n\n**Achtergrond: ${extra.titel}**\n${extra.tekst.length > 400 ? extra.tekst.slice(0, extra.tekst.lastIndexOf(". ", 400) + 1) : extra.tekst}` : "") +
+      `\n\n[Open de werkstroom](/intern/werkstromen.html?p=${p.id}${k ? "&klant=" + k.id : ""})${p.perKlant ? " om hem voor een klant te starten en af te vinken." : " om af te vinken."}`;
   } else if (k) {
     stuur({ t: "tool", naam: "klant_details", label: LABELS.klant_details });
     const d = await voerUit("klant_details", { id: k.id }, c);
     const lc = d.contacten[0];
-    tekst = `### [${d.bedrijf || d.naam}](${d.link})\n- Status: ${d.status}, boekhouder ${d.boekhouder}\n${d.lead ? `- Warmte ${d.lead.score} (${d.lead.label}): ${d.lead.actie}\n` : ""}- Laatste contact: ${lc ? `${lc.datum.slice(0, 10)} via ${lc.kanaal}, ${lc.onderwerp}` : "nog niets vastgelegd"}\n${d.nps.length ? `- Laatste NPS: ${d.nps[d.nps.length - 1].score}\n` : ""}${d.geplandeMails[0] ? `- Volgende mail: ${d.geplandeMails[0].mail} op ${d.geplandeMails[0].datum}\n` : ""}${d.openTaken.length ? `- Open taken: ${d.openTaken.map((t) => t.titel).join(", ")}\n` : ""}`;
+    const volgende = d.lead ? d.lead.actie
+      : d.nps.length && d.nps[d.nps.length - 1].score <= 6 ? "Bel binnen 48 uur over de lage NPS ([werkstroom](/intern/werkstromen.html?p=klacht))"
+      : d.contacten.some((x) => x.opgelost === false) ? "Er staat nog een open vraag: rond die eerst af"
+      : d.openTaken.length ? "Open taak: " + d.openTaken[0].titel
+      : d.geplandeMails[0] ? `Niets urgents. Volgende mail gaat vanzelf op ${d.geplandeMails[0].datum}` : "Niets urgents";
+    tekst = `### [${d.bedrijf || d.naam}](${d.link})\n- Status: ${d.status}, boekhouder ${d.boekhouder}\n${d.lead ? `- Warmte ${d.lead.score} (${d.lead.label})\n` : ""}- Laatste contact: ${lc ? `${lc.datum.slice(0, 10)} via ${lc.kanaal}, ${lc.onderwerp}${lc.opgelost === false ? " (nog niet opgelost)" : ""}` : "nog niets vastgelegd"}\n${d.nps.length ? `- Laatste NPS: ${d.nps[d.nps.length - 1].score}${d.nps[d.nps.length - 1].reden ? `, "${d.nps[d.nps.length - 1].reden}"` : ""}\n` : ""}${d.geplandeMails[0] ? `- Volgende mail: ${d.geplandeMails[0].mail} op ${d.geplandeMails[0].datum}\n` : ""}${d.openTaken.length ? `- Open taken: ${d.openTaken.map((t) => t.titel).join(", ")}\n` : ""}${d.lopendeWerkstromen.length ? `- Werkstroom: ${d.lopendeWerkstromen.map((w) => `${w.titel} (${w.klaar}/${w.totaal})`).join(", ")}\n` : ""}\n**Volgende stap:** ${volgende}.`;
   } else {
     stuur({ t: "tool", naam: "kennis_zoeken", label: LABELS.kennis_zoeken });
-    const r = zoekKennis(vraag, 3);
+    let r = zoekKennis(vraag, 3);
+    if (!r.length && vorige) r = zoekKennis(vorige + " " + vraag, 3); // vervolgvraag
     stuur({ t: "bronnen", v: r.map((x) => ({ titel: x.titel, bron: x.bron, groep: x.groep })) });
+    const kort = (t, n) => (t.length > n ? t.slice(0, t.lastIndexOf(". ", n) + 1) + " …" : t);
     tekst = r.length
-      ? `Dit vond ik in de kennisbank:\n\n${r.map((x) => `### ${x.bron ? `[${x.titel}](${x.bron})` : x.titel}\n${x.tekst.length > 700 ? x.tekst.slice(0, x.tekst.lastIndexOf(". ", 700) + 1) + " …" : x.tekst}`).join("\n\n")}`
-      : "Daar vond ik niets over in de kennisbank. Probeer het met andere woorden, of vraag het aan " + (wie === "koen" ? "Daan" : "Koen") + ".";
+      ? `### ${r[0].bron ? `[${r[0].titel}](${r[0].bron})` : r[0].titel}\n${kort(r[0].tekst, 900)}` +
+        (r.length > 1 ? `\n\n**Ook relevant**\n${r.slice(1).map((x) => `- ${x.bron ? `[${x.titel}](${x.bron})` : `**${x.titel}**`}: ${kort(x.tekst, 220)}`).join("\n")}` : "") +
+        (/[0-9]{3,}|%|€/.test(r[0].tekst) ? "\n\n_Bedragen en percentages veranderen jaarlijks: check het actuele bedrag voordat je het aan een klant doorgeeft._" : "")
+      : "Daar vond ik niets over in de kennisbank. Probeer het met andere woorden (bijvoorbeeld creditfactuur, KOR, ICP, urencriterium), of vraag het aan " + (wie === "koen" ? "Daan" : "Koen") + ".";
   }
-  tekst += "\n\n_Lokale modus: de agent zoekt nu zelf in kennisbank, klanten en werkstromen. Met een Claude API-sleutel in Netlify (ANTHROPIC_API_KEY) denkt hij echt mee._";
   await pauze(350);
   const delen = tekst.match(/\S+\s*/g) || [];
   for (let i = 0; i < delen.length; i += 3) { stuur({ t: "tekst", v: delen.slice(i, i + 3).join("") }); await pauze(14); }
@@ -363,7 +408,7 @@ async function lokaal(c, body) {
 // ---------- Ingang ----------
 export async function agentApi(request, url, pad, wie, store, env, h) {
   if (pad === "/intern/api/werkstromen" || pad === "/intern/api/werkstroom") return werkstromenApi(request, url, pad, wie, store, h);
-  if (pad === "/intern/api/agent/status") return json({ slim: !!env("ANTHROPIC_API_KEY"), model: env("AGENT_MODEL") || "claude-sonnet-5-5" });
+  if (pad === "/intern/api/agent/status") return json({ slim: false, gratis: true });
   if (pad === "/intern/api/kennis") return json({ resultaten: zoekKennis(url.searchParams.get("q") || "", 8) });
   if (pad !== "/intern/api/agent" || request.method !== "POST") return json({ fout: "Onbekende route" }, 404);
 
@@ -375,7 +420,7 @@ export async function agentApi(request, url, pad, wie, store, env, h) {
   const c = { store, wie, env, h, stuur };
   (async () => {
     try {
-      if (env("ANTHROPIC_API_KEY")) await slim(c, body); else await lokaal(c, body);
+      await lokaal(c, body); // Altijd gratis: geen betaalde API-aanroepen
       stuur({ t: "klaar" });
     } catch (e) {
       stuur({ t: "fout", v: String(e.message || e).slice(0, 300) });

@@ -131,9 +131,7 @@
     laadWerk(); document.addEventListener('ae:agent-actie', laadWerk);
 
     AE.api('/intern/api/agent/status').then(function (s) {
-      document.getElementById('st').innerHTML = s.slim
-        ? '<div class="st aan"><i></i>Slimme modus aan</div><p>De agent denkt mee via Claude (<code>' + esc(s.model) + '</code>) en gebruikt jullie klanten, taken, werkstromen en kennisbank. Hij maakt alleen taken of werkstromen aan als je erom vraagt.</p>'
-        : '<div class="st"><i></i>Lokale modus</div><p>De agent zoekt nu zelf in de kennisbank, werkstromen en klanten, maar redeneert nog niet mee.</p><p>Zet in Netlify de variabele <code>ANTHROPIC_API_KEY</code> (een sleutel van console.anthropic.com) en de agent denkt echt mee. Optioneel <code>AGENT_MODEL</code>.</p>';
+      document.getElementById('st').innerHTML = '<div class="st aan"><i></i>Gratis, zonder API</div><p>De agent draait volledig op jullie eigen data: de kennisbank, werkstromen, klanten, taken en het contact. Er gaat niets naar een externe AI-dienst en het kost niets.</p><p>Hij werkt het best met korte, concrete vragen: "creditfactuur boeken", "wat eerst vandaag", "Visser Webshop", "nieuwe klant".</p>';
     });
   }
   if (window.AE && window.AE.agent) start(); else document.addEventListener('ae:agent-klaar', start);

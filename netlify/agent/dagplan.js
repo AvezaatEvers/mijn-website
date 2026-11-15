@@ -191,13 +191,34 @@ export function dagplan(klanten, taken, runs, wie, nu) {
       prio: t.deadline < nu ? 85 : 62, minuten: 10, url: k ? PAGINA.klant(k.id) : "/intern/", doel: k ? "#taken" : "#taken-kaart", extern: false, acties: k ? ["bel", "app"] : [] });
   }
 
+  // Wat er vandaag al gedaan is (om terug te kunnen)
+  const gedaan = [];
+  for (const r of runs) {
+    const p = proces(r.proces); if (!p) continue;
+    const k = r.klant ? kVan(r.klant) : null;
+    const kl = k ? { id: k.id, naam: k.bedrijf || k.naam } : null;
+    if (COMPACT.has(r.proces)) {
+      const st = Object.values(r.stappen || {}).filter((x) => x.door === wie && (x.op || "").slice(0, 10) === nu);
+      if (r.klaarOp && r.klaarOp.slice(0, 10) === nu && st.length) gedaan.push({ id: "r:" + r.id + ":*", titel: p.titel, proces: p.titel, klant: kl, op: st.map((x) => x.op).sort().pop() });
+      continue;
+    }
+    Object.entries(r.stappen || {}).forEach(([i, x]) => {
+      if (x.door === wie && (x.op || "").slice(0, 10) === nu) gedaan.push({ id: "r:" + r.id + ":" + i, titel: p.stappen[i] ? p.stappen[i].t : p.titel, proces: p.titel, klant: kl, op: x.op });
+    });
+  }
+  for (const t of taken || []) if (t.klaar && t.klaarDoor === wie && (t.klaarOp || "").slice(0, 10) === nu) {
+    const k = t.klant ? kVan(t.klant) : null;
+    gedaan.push({ id: "t:" + t.id, titel: t.titel, proces: "Taak", klant: k ? { id: k.id, naam: k.bedrijf || k.naam } : null, op: t.klaarOp });
+  }
+  gedaan.sort((a, b) => a.op.localeCompare(b.op));
+
   missies.sort((a, b) => b.prio - a.prio);
   // Maximaal 3 maandverwerkingen per dag, zodat de dag behapbaar blijft; de rest schuift door
   let mv = 0;
   const plan = missies.filter((m) => m.proces.id !== "maandverwerking" || ++mv <= 3);
   const afsl = plan.findIndex((m) => m.proces.id === "dagafsluiting");
   if (afsl >= 0) plan.push(plan.splice(afsl, 1)[0]);
-  return { datum: nu, wie, missies: plan, klaarVandaag, minuten: plan.reduce((s, m) => s + m.minuten, 0), doorgeschoven: Math.max(0, mv - 3) };
+  return { datum: nu, wie, missies: plan, gedaan, klaarVandaag: Math.max(klaarVandaag, gedaan.length), minuten: plan.reduce((s, m) => s + m.minuten, 0), doorgeschoven: Math.max(0, mv - 3) };
 }
 
 // Een missie afvinken of uitstellen
@@ -206,12 +227,19 @@ export function verwerkMissie(runs, taken, missieId, wie, nu, actie = "klaar") {
   if (soort === "t") {
     const t = (taken || []).find((x) => x.id === rid); if (!t) return { fout: "Taak niet gevonden" };
     if (actie === "later") t.deadline = plus(nu, 1);
+    else if (actie === "terug") { t.klaar = false; t.klaarDoor = null; t.klaarOp = null; if (t.deadline && t.deadline > nu) t.deadline = nu; }
     else { t.klaar = true; t.klaarDoor = wie; t.klaarOp = new Date().toISOString(); }
     return { ok: true, taken: true };
   }
   const r = runs.find((x) => x.id === rid); if (!r) return { fout: "Werkstroom niet gevonden" };
   const p = proces(r.proces);
   if (actie === "later") { r.later = plus(nu, 1); return { ok: true }; }
+  if (actie === "terug") {
+    r.later = null; r.klaarOp = null; r.gesloten = null;
+    if (stap === "*") Object.keys(r.stappen).forEach((i) => { if ((r.stappen[i].op || "").slice(0, 10) === nu && r.stappen[i].door !== "auto") delete r.stappen[i]; });
+    else delete r.stappen[Number(stap)];
+    return { ok: true };
+  }
   const op = new Date().toISOString();
   if (stap === "*") p.stappen.forEach((_, i) => { if (!r.stappen[i]) r.stappen[i] = { door: wie, op }; });
   else r.stappen[Number(stap)] = { door: wie, op };

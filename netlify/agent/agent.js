@@ -417,7 +417,7 @@ export async function agentApi(request, url, pad, wie, store, env, h) {
     const voor = ["koen", "daan"].includes(url.searchParams.get("wie")) ? url.searchParams.get("wie") : wie;
     if (request.method === "POST") {
       const body = await request.json().catch(() => ({}));
-      const r = verwerkMissie(runs, taken, body.missie, wie, nu, body.actie === "later" ? "later" : "klaar");
+      const r = verwerkMissie(runs, taken, body.missie, wie, nu, ["later", "terug"].includes(body.actie) ? body.actie : "klaar");
       if (r.fout) return json(r, 404);
       if (r.taken) takenVeranderd = true; else runsVeranderd = true;
     }

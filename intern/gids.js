@@ -2,7 +2,7 @@
 (function () {
   var AE = window.AE; if (!AE || !AE.agent) return;
   var esc = AE.esc, SLEUTEL = 'ae-dagmodus', vandaag = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Amsterdam' });
-  var plan = null, huidig = null, orbEl = null, spot = null, straal = null, dok = null, doelEl = null, loop = 0, pos = null, overgeslagen = [];
+  var plan = null, huidig = null, orbEl = null, spot = null, straal = null, dok = null, doelEl = null, loop = 0, pos = null;
 
   function lees() { try { var s = JSON.parse(localStorage.getItem(SLEUTEL) || 'null'); return s && s.datum === vandaag ? s : null; } catch (e) { return null; } }
   function schrijf(s) { try { if (s) localStorage.setItem(SLEUTEL, JSON.stringify(Object.assign({ datum: vandaag }, s))); else localStorage.removeItem(SLEUTEL); } catch (e) {} }
@@ -143,16 +143,21 @@
   }
 
   function laad() { return AE.api('/intern/api/dagplan').then(function (p) { plan = p; return p; }); }
+  function sla() { return (lees() || {}).sla || []; }
   function kies(voorkeur) {
+    var overgeslagen = sla();
     var lijst = plan.missies.filter(function (m) { return overgeslagen.indexOf(m.id) < 0; });
-    if (!lijst.length && overgeslagen.length) { overgeslagen = []; lijst = plan.missies; }
+    if (!lijst.length && overgeslagen.length) { var st = lees() || {}; st.sla = []; schrijf(st); lijst = plan.missies; }
     return lijst.filter(function (m) { return m.id === voorkeur; })[0] || lijst[0] || null;
   }
 
   function toon(m, opt) {
     opt = opt || {};
-    huidig = m; doelEl = null;
-    var s = lees() || {}; s.aan = true; s.huidig = m ? m.id : null; schrijf(s);
+    huidig = m; doelEl = null; terugIdx = 0;
+    var s = lees() || {}; s.aan = true; s.huidig = m ? m.id : null;
+    s.hist = s.hist || [];
+    if (m && !opt.terug && s.hist[s.hist.length - 1] !== m.id) { s.hist.push(m.id); s.hist = s.hist.slice(-60); }
+    schrijf(s);
     tekenDok(m, opt);
     if (!m) { var r = rustPlek(); vlieg(r.x, r.y).then(function () { ring(); vonken(28); }); return; }
     if (m.url && !m.extern && !opPagina(m.url)) {
@@ -181,10 +186,12 @@
     for (var i = 0; i < Math.min(totaal, 24); i++) seg += '<i class="' + (i < plan.klaarVandaag ? 'k' : i === plan.klaarVandaag && m ? 'n' : '') + '"></i>';
     var min = plan.minuten, tijd = min >= 60 ? Math.floor(min / 60) + 'u' + (min % 60 ? String(min % 60).padStart(2, '0') : '') : min + ' min';
     var boven = '<div class="gd-boven"><div class="gd-seg">' + seg + '</div><span class="gd-teller">' + (m ? 'Missie ' + nr + ' van ' + totaal + ', nog ±' + tijd : totaal + ' van ' + totaal + ' klaar') + '</span>' +
+      '<button class="gd-knop" type="button" data-g="vorige" title="Vorige missie" aria-label="Vorige missie"' + (kanTerug() ? '' : ' disabled') + '>‹</button>' +
+      '<button class="gd-knop" type="button" data-g="opnieuw" title="Dag opnieuw beginnen" aria-label="Dag opnieuw beginnen">↺</button>' +
       '<button class="gd-knop" type="button" data-g="klein" title="In- of uitklappen" aria-label="In- of uitklappen">–</button><button class="gd-knop" type="button" data-g="stop" title="Dagmodus stoppen" aria-label="Dagmodus stoppen">&times;</button></div>';
     var inhoud;
     if (!m) {
-      inhoud = '<div class="gd-inhoud gd-klaar"><div class="gd-tag" style="justify-content:center">Dag rond</div><h3>Alles gedaan voor vandaag.</h3><p>' + plan.klaarVandaag + ' missies afgerond' + (plan.doorgeschoven ? ', ' + plan.doorgeschoven + ' maandverwerkingen schuiven door naar morgen' : '') + '. Lekker gewerkt.</p><div class="gd-acties" style="justify-content:center"><button type="button" class="klaar" style="margin:0" data-g="stop">Dagmodus afsluiten</button></div></div>';
+      inhoud = '<div class="gd-inhoud gd-klaar"><div class="gd-tag" style="justify-content:center">Dag rond</div><h3>Alles gedaan voor vandaag.</h3><p>' + plan.klaarVandaag + ' missies afgerond' + (plan.doorgeschoven ? ', ' + plan.doorgeschoven + ' maandverwerkingen schuiven door naar morgen' : '') + '. Lekker gewerkt.</p>' + gedaanLijst() + '<div class="gd-acties" style="justify-content:center"><button type="button" data-g="opnieuw">Begin opnieuw</button><button type="button" class="klaar" style="margin:0" data-g="stop">Dagmodus afsluiten</button></div></div>';
     } else {
       var k = m.klant, acties = [];
       var opDezePagina = !m.url || m.extern || opPagina(m.url);
@@ -210,6 +217,50 @@
     requestAnimationFrame(function () { dok.classList.remove('weg'); });
   }
 
+  var terugIdx = 0;
+  function kanTerug() { var h = (lees() || {}).hist || []; return h.length > 1 || (plan && plan.gedaan && plan.gedaan.length > 0); }
+  function tijdVan(iso) { return new Date(iso).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Amsterdam' }); }
+  function gedaanLijst() {
+    var g = (plan.gedaan || []).slice(-8).reverse();
+    if (!g.length) return '';
+    return '<ul class="gd-gedaan">' + g.map(function (x) { return '<li><span><b>' + esc(x.titel) + '</b><small>' + esc(x.proces) + (x.klant ? ', ' + esc(x.klant.naam) : '') + ', ' + tijdVan(x.op) + '</small></span><button type="button" data-g="terugzetten" data-id="' + esc(x.id) + '">Terugzetten</button></li>'; }).join('') + '</ul>';
+  }
+  function toonGedaan(g) {
+    huidig = null; doelEl = null;
+    var r = rustPlek(); vlieg(r.x, r.y);
+    tekenDok(null);
+    dok.querySelector('.gd-teller').textContent = 'Terugblik, nog ' + plan.missies.length + ' open';
+    dok.innerHTML = dok.querySelector('.gd-boven').outerHTML + '<div class="gd-inhoud"><div class="gd-tag"><span>Al gedaan vandaag, ' + tijdVan(g.op) + '</span><span>' + esc(g.proces) + '</span>' + (g.klant ? '<b>' + esc(g.klant.naam) + '</b>' : '') + '</div>' +
+      '<div class="gd-titel">' + esc(g.titel) + '</div><p class="gd-uitleg">Per ongeluk afgevinkt, of wil je het toch nog doen? Zet hem terug, dan komt hij weer in je dagplan.</p>' +
+      '<div class="gd-acties"><button type="button" data-g="terugzetten" data-id="' + esc(g.id) + '" data-open="1">Toch niet klaar, terugzetten</button><button type="button" class="klaar" data-g="verder">Verder</button></div></div>';
+    dok._gedaan = g;
+  }
+  function vorige() {
+    var s = lees() || {}, h = s.hist || [];
+    // huidige van de stapel af en de vorige pakken die nog bestaat
+    if (huidig && h[h.length - 1] === huidig.id) h.pop();
+    while (h.length) {
+      var id = h.pop();
+      var open = plan.missies.filter(function (m) { return m.id === id; })[0];
+      if (open) { s.hist = h; schrijf(s); return toon(open, { terug: true }); }
+      var klaar = (plan.gedaan || []).filter(function (g) { return g.id === id; })[0];
+      if (klaar) { s.hist = h; schrijf(s); return toonGedaan(klaar); }
+    }
+    s.hist = h; schrijf(s);
+    var g = (plan.gedaan || []).slice().reverse();
+    if (dok._gedaan) terugIdx = g.indexOf(g.filter(function (x) { return x.id === dok._gedaan.id; })[0]) + 1;
+    if (g[terugIdx]) return toonGedaan(g[terugIdx]);
+    AE.meld('Je bent bij het begin van je dag');
+  }
+  function zetTerug(id, open) {
+    return AE.api('/intern/api/dagplan', { method: 'POST', body: JSON.stringify({ missie: id, actie: 'terug' }) }).then(function (p) {
+      plan = p; document.dispatchEvent(new CustomEvent('ae:dagplan', { detail: p }));
+      var m = p.missies.filter(function (x) { return x.id === id; })[0];
+      AE.meld('Teruggezet' + (m ? ': ' + m.titel : ''));
+      if (open && m) toon(m); else toon(kies());
+    });
+  }
+
   function reis(url) {
     var r = orbEl.getBoundingClientRect(), w = document.createElement('div'); w.className = 'gids-warp';
     w.style.setProperty('--x', (r.left + r.width / 2) + 'px'); w.style.setProperty('--y', (r.top + r.height / 2) + 'px');
@@ -232,10 +283,31 @@
     var ga = dok.querySelector('.ga'); if (ga && ga._t && g !== 'ga') { clearTimeout(ga._t); ga.classList.remove('telt'); }
     if (g === 'stop') return stop();
     if (g === 'klein') { var s = lees() || {}; s.klein = !s.klein; schrijf(s); dok.classList.toggle('klein', s.klein); return; }
+    if (g === 'vorige') return vorige();
+    if (g === 'verder') { dok._gedaan = null; return toon(kies()); }
+    if (g === 'terugzetten') { b.disabled = true; dok._gedaan = null; return zetTerug(b.dataset.id, !!b.dataset.open); }
+    if (g === 'opnieuw') {
+      var inh = dok.querySelector('.gd-inhoud');
+      inh.innerHTML = '<div class="gd-tag">Dag opnieuw beginnen</div><div class="gd-titel">Waar wil je opnieuw beginnen?</div><p class="gd-uitleg">Opnieuw starten brengt je terug naar de eerste missie, ook overgeslagen missies komen weer mee. Je kunt ook alles wat je vandaag hebt afgevinkt terugzetten.</p>' +
+        '<div class="gd-acties"><button type="button" data-g="annuleer">Annuleren</button>' + ((plan.gedaan || []).length ? '<button type="button" data-g="opnieuw-alles">Ook afgevinkte terugzetten (' + plan.gedaan.length + ')</button>' : '') + '<button type="button" class="klaar" data-g="opnieuw-start">Vanaf de eerste missie</button></div>';
+      return;
+    }
+    if (g === 'annuleer') { dok._gedaan = null; return huidig ? tekenDok(huidig, {}) : toon(kies()); }
+    if (g === 'opnieuw-start' || g === 'opnieuw-alles') {
+      var st = lees() || {}; st.sla = []; st.hist = []; schrijf(st); dok._gedaan = null;
+      var ids = g === 'opnieuw-alles' ? (plan.gedaan || []).map(function (x) { return x.id; }).reverse() : [];
+      b.disabled = true;
+      return ids.reduce(function (pr, id) { return pr.then(function () { return AE.api('/intern/api/dagplan', { method: 'POST', body: JSON.stringify({ missie: id, actie: 'terug' }) }); }); }, Promise.resolve())
+        .then(laad).then(function (p) {
+          document.dispatchEvent(new CustomEvent('ae:dagplan', { detail: p }));
+          AE.meld(ids.length ? 'Dag opnieuw gestart, ' + ids.length + ' missies teruggezet' : 'Terug naar de eerste missie');
+          ring(); vonken(14); toon(kies());
+        });
+    }
     if (!m) return;
     if (g === 'ga') return reis(m.url);
     if (g === 'agent') return AE.agent.open((m.vraag || 'Help me met de missie "' + m.titel + '" (' + m.proces.titel + ').') + (m.klant ? ' Het gaat om ' + m.klant.naam + '.' : ''));
-    if (g === 'sla') { overgeslagen.push(m.id); return toon(kies()); }
+    if (g === 'sla') { var ss = lees() || {}; ss.sla = (ss.sla || []).concat(m.id); schrijf(ss); return toon(kies()); }
     if (g === 'klaar' || g === 'later') {
       b.disabled = true;
       if (g === 'klaar') { ring(); vonken(); }

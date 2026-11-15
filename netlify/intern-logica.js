@@ -152,11 +152,11 @@ export async function verwerk(request, cookies, next, maakStore, env = () => und
     return json(taken);
   }
 
-  if (pad.startsWith("/intern/api/agent") || pad.startsWith("/intern/api/werkstro") || pad === "/intern/api/kennis") {
+  if (pad.startsWith("/intern/api/agent") || pad.startsWith("/intern/api/werkstro") || pad === "/intern/api/kennis" || pad === "/intern/api/dagplan") {
     const h = {
       leesKlanten, leesTaken, bewaarTaken: (st, t) => st.setJSON(SLEUTEL, t),
       overzicht: (k, t, v) => overzicht(k, t, v, vandaag(), env), inzichten: (k, v, d) => inzichten(k, v, d),
-      leadInfo: (k) => leadInfo(k), gepland: (k) => gepland(k, vandaag(), 8, env),
+      leadInfo: (k) => leadInfo(k), gepland: (k) => gepland(k, vandaag(), 8, env), vandaag,
     };
     return agentApi(request, url, pad, wie, maakStore(), env, h);
   }
@@ -187,6 +187,7 @@ function velden(body, k) {
   if ("status" in body && STATUS.includes(body.status)) {
     if (body.status === "klant" && k.status !== "klant") k.klantOp = new Date().toISOString();
     if (body.status === "verloren" && k.status !== "verloren") k.verlorenOp = new Date().toISOString();
+    if (body.status === "gestopt" && k.status !== "gestopt") k.gestoptOp = new Date().toISOString();
     k.status = body.status;
   }
   if ("start" in body) k.start = datum(body.start);

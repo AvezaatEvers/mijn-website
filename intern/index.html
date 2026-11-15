@@ -24,7 +24,7 @@
   .db h2 { font-size: 18px; margin: 0 0 14px; letter-spacing: -.01em; }
   .db-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
   .db-grid > * { min-width: 0; }
-  .db-kaart { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+  .db-kaart { background: var(--vlak, #fff); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
   .s3 { grid-column: span 3; } .s4 { grid-column: span 4; } .s5 { grid-column: span 5; } .s6 { grid-column: span 6; } .s7 { grid-column: span 7; } .s8 { grid-column: span 8; } .s12 { grid-column: span 12; }
 
   /* Tellers */
@@ -39,14 +39,14 @@
   .db-tegels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .db-tegel > div { min-width: 0; }
   .db-tegel { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px; border: 1px solid var(--line); text-decoration: none; color: var(--ink); transition: border-color .2s, background .2s; }
-  .db-tegel:hover { border-color: var(--tint-border); background: #FAFBFF; }
+  .db-tegel:hover { border-color: var(--tint-border); background: var(--vlak-2, #FAFBFF); }
   .db-tegel i { width: 38px; height: 38px; flex: none; border-radius: 10px; background: var(--tint); color: var(--accent); display: grid; place-items: center; font-style: normal; }
   .db-tegel strong { display: block; font-size: 15px; }
   .db-tegel span { display: block; font-size: 13px; color: var(--muted); line-height: 1.35; }
 
   /* Welkomstlink */
   .db-form { display: grid; grid-template-columns: 1fr 140px; gap: 10px; }
-  .db-form input, .db-form select { font: inherit; font-size: 15px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; width: 100%; }
+  .db-form input, .db-form select { font: inherit; font-size: 15px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--vlak, #fff); width: 100%; }
   .db-uit { display: flex; gap: 8px; margin-top: 10px; }
   .db-uit input { flex: 1; font: inherit; font-size: 13px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--soft); color: var(--text); min-width: 0; }
   .db-knop { font: inherit; font-size: 14px; font-weight: 600; padding: 10px 14px; border-radius: 10px; border: 0; background: var(--accent); color: #fff; cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; }
@@ -71,7 +71,7 @@
   .db-pres p { font-size: 14px; color: #CAD4E8; margin: 0; }
   .db-pres form { display: flex; gap: 8px; flex: 1; max-width: 460px; min-width: 0; }
   .db-pres input { flex: 1; min-width: 0; font: inherit; font-size: 15px; padding: 10px 12px; border-radius: 10px; border: 0; }
-  .db-pres .db-knop { background: #fff; color: var(--accent); }
+  .db-pres .db-knop { background: var(--vlak, #fff); color: var(--accent); }
   @media (max-width: 600px) { .db-pres form { max-width: none; flex-basis: 100%; } }
 
   /* Pagina's */
@@ -98,9 +98,9 @@
 
   /* Taken */
   .tk-nieuw { display: grid; grid-template-columns: 1fr 150px 100px auto; gap: 8px; margin-bottom: 12px; }
-  .tk-nieuw input, .tk-nieuw select { font: inherit; font-size: 14px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff; min-width: 0; }
+  .tk-nieuw input, .tk-nieuw select { font: inherit; font-size: 14px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--vlak, #fff); min-width: 0; }
   .tk-filters { display: flex; gap: 6px; margin-bottom: 6px; }
-  .tk-filters button { font: inherit; font-size: 13px; font-weight: 500; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--text); cursor: pointer; }
+  .tk-filters button { font: inherit; font-size: 13px; font-weight: 500; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--vlak, #fff); color: var(--text); cursor: pointer; }
   .tk-filters button.is-aan { background: var(--ink); border-color: var(--ink); color: #fff; }
   .tk-lijst { list-style: none; margin: 0; padding: 0; max-height: 520px; overflow-y: auto; }
   .tk-lijst li { display: grid; grid-template-columns: 22px 1fr auto; gap: 12px; align-items: start; padding: 11px 2px; border-bottom: 1px solid var(--line); }
@@ -120,7 +120,7 @@
 
   /* Kalender */
   .kal-nav { display: flex; gap: 6px; }
-  .kal-nav button { font: inherit; font-size: 14px; min-width: 34px; height: 34px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line); background: #fff; cursor: pointer; color: var(--ink); }
+  .kal-nav button { font: inherit; font-size: 14px; min-width: 34px; height: 34px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--vlak, #fff); cursor: pointer; color: var(--ink); }
   .kal-nav button:hover { border-color: var(--accent); }
   .kal-raster { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
   .kal-raster .kal-wd { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); text-align: center; padding-bottom: 4px; }
@@ -132,7 +132,7 @@
   .kal-stip { display: flex; gap: 3px; margin-top: auto; }
   .kal-stip i, .kal-legenda i { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
   .k-vast { background: #B45309; } .k-taak { background: var(--accent); } .k-klaar { background: #9CA3AF; }
-  .kal-raster button.is-gekozen .k-taak { background: #fff; }
+  .kal-raster button.is-gekozen .k-taak { background: var(--vlak, #fff); }
   .kal-legenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin: 12px 0 0; }
   .kal-legenda span { display: inline-flex; align-items: center; gap: 6px; }
   .kal-dag { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px; }
@@ -164,13 +164,13 @@
   }
   .db-kaart form .db-knop { white-space: normal; text-align: left; }
 </style>
-<link rel="stylesheet" href="/intern/app.css?v=1">
+<link rel="stylesheet" href="/intern/app.css?v=2">
 <style>
   .hk { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
   .hk h1 { font-size: clamp(28px, 3.6vw, 42px); margin: 0; letter-spacing: -.03em; }
   .hk p { margin: 4px 0 0; color: var(--muted); font-size: 15px; }
   .hk .rechts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .wissel { display: inline-flex; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 3px; }
+  .wissel { display: inline-flex; background: var(--vlak, #fff); border: 1px solid var(--line); border-radius: 12px; padding: 3px; }
   .wissel button { font: inherit; font-size: 13.5px; font-weight: 600; padding: 7px 14px; border-radius: 9px; border: 0; background: none; color: var(--muted); cursor: pointer; }
   .wissel button.is-aan { background: var(--navy); color: #fff; }
 
@@ -198,12 +198,63 @@
 
   .wk-rij { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--ink); }
   .wk-rij:last-of-type { border-bottom: 0; }
-  .wk-rij .ring { --p: 0; width: 38px; height: 38px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: var(--accent); background: radial-gradient(closest-side, #fff 74%, transparent 76%), conic-gradient(#3B63C4 calc(var(--p) * 1%), #E3E8F1 0); }
+  .wk-rij .ring { --p: 0; width: 38px; height: 38px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: var(--accent); background: radial-gradient(closest-side, #0E1A42 74%, transparent 76%), conic-gradient(#5CC8FF calc(var(--p) * 1%), rgba(255,255,255,.1) 0); }
   .wk-rij span { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; }
   .wk-rij small { display: block; font-weight: 400; color: var(--muted); font-size: 12.5px; }
   .wk-start { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
   .wk-start a { font-size: 12.5px; font-weight: 600; color: var(--accent); background: var(--tint); border-radius: 9px; padding: 6px 10px; text-decoration: none; }
   .wk-start a:hover { background: #E1E8F5; }
+
+
+  /* ---------- Hero met grote orb en dagplan ---------- */
+  .hero { position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 28px; align-items: stretch; margin-bottom: 18px; }
+  .hero-links { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 8px 10px 4px; }
+  .hero-orb { position: relative; width: 260px; height: 260px; display: grid; place-items: center; margin-bottom: 8px; }
+  .hero-orb .orb { --m: 168px; }
+  .hero-orb .baan { position: absolute; inset: -20px; width: calc(100% + 40px); height: calc(100% + 40px); animation: draai-baan 40s linear infinite; }
+  .hero-orb .baan circle { fill: none; stroke: rgba(127, 164, 255, .22); stroke-width: 1; stroke-dasharray: 2 6; }
+  .hero-orb .baan .b2 { stroke: rgba(92, 200, 255, .12); stroke-dasharray: none; }
+  .hero-orb .baan .sat { fill: #B8F0FF; stroke: none; filter: drop-shadow(0 0 6px #5CC8FF); }
+  .hero-orb .baan .s2 { fill: #7FA4FF; }
+  @keyframes draai-baan { to { transform: rotate(360deg); } }
+  .hero-datum { margin: 0; font-size: 12.5px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: #8FB0FF; }
+  .hero h1 { font-size: clamp(32px, 4vw, 50px); margin: 6px 0 10px; letter-spacing: -.035em; }
+  .hero .bf-tekst { font-size: 16px; line-height: 1.65; color: #C6D1EC; max-width: 560px; }
+  .hero .bf-tekst p { margin: 0 0 6px; }
+  .hero .bf-tekst strong { color: #fff; }
+  .hero-knoppen { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; margin: 18px 0 14px; }
+  .dag-knop { position: relative; overflow: hidden; font: inherit; font-size: 16px; font-weight: 700; color: #04122E; border: 0; border-radius: 16px; padding: 15px 26px; cursor: pointer;
+    background: linear-gradient(135deg, #B8F0FF, #5CC8FF 45%, #7FA4FF); box-shadow: 0 18px 44px -14px rgba(92, 200, 255, .85), inset 0 1px 0 rgba(255, 255, 255, .6); transition: transform .2s, box-shadow .2s; }
+  .dag-knop:hover { transform: translateY(-2px); box-shadow: 0 24px 54px -14px rgba(92, 200, 255, 1), inset 0 1px 0 rgba(255, 255, 255, .6); }
+  .dag-knop .glans { position: absolute; inset: 0; background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, .6) 50%, transparent 70%); transform: translateX(-100%); animation: glim 3.6s ease-in-out infinite; }
+  .dag-knop span { position: relative; }
+  .hero .bf-vraag { width: min(520px, 100%); }
+  .hero-plan { position: relative; border-radius: 24px; padding: 20px 20px 16px; background: linear-gradient(160deg, rgba(25, 42, 94, .7), rgba(10, 19, 48, .72)); border: 1px solid rgba(127, 164, 255, .2); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 40px 80px -40px rgba(0, 0, 0, .9); overflow: hidden; display: flex; flex-direction: column; }
+  .hero-plan::before { content: ""; position: absolute; width: 360px; height: 360px; right: -140px; top: -180px; border-radius: 50%; background: radial-gradient(closest-side, rgba(92, 200, 255, .22), transparent); pointer-events: none; }
+  .hp-kop { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; position: relative; }
+  .hp-label { font-size: 11.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #8FB0FF; }
+  .hp-kop h2 { margin: 2px 0 0; font-size: 20px; }
+  .hp-ring { position: relative; width: 54px; height: 54px; flex: none; }
+  .hp-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .hp-ring circle { fill: none; stroke: rgba(255, 255, 255, .1); stroke-width: 4; }
+  .hp-ring circle.v { stroke: #5CC8FF; stroke-linecap: round; stroke-dasharray: 119.4; stroke-dashoffset: 119.4; transition: stroke-dashoffset 1s cubic-bezier(.2, .8, .2, 1); filter: drop-shadow(0 0 4px #5CC8FF); }
+  .hp-ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 12px; color: #fff; }
+  .plan { list-style: none; margin: 0; padding: 0 0 0 6px; position: relative; flex: 1; overflow-y: auto; max-height: 470px; background: none; border: 0; }
+  .plan > li { margin: 0 0 2px; }
+  .plan::before { content: ""; position: absolute; left: 17px; top: 14px; bottom: 14px; width: 2px; background: linear-gradient(#5CC8FF, rgba(127, 164, 255, .1)); }
+  .plan li.skelet { margin: 0 0 8px 34px; }
+  .pm { position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 9px 10px 9px 0; border-radius: 14px; cursor: pointer; transition: background .2s, transform .2s; animation: in .5s cubic-bezier(.2, .8, .2, 1) both; }
+  .pm:hover { background: rgba(127, 164, 255, .09); transform: translateX(3px); }
+  .pm .knoop { position: relative; z-index: 1; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #B8CCFF; background: #0E1A42; box-shadow: 0 0 0 2px rgba(127, 164, 255, .35); }
+  .pm.eerst .knoop { color: #04122E; background: #5CC8FF; box-shadow: 0 0 0 4px rgba(92, 200, 255, .25), 0 0 16px #5CC8FF; }
+  .pm.u .knoop { box-shadow: 0 0 0 2px rgba(251, 113, 133, .7), 0 0 12px rgba(251, 113, 133, .5); }
+  .pm b { display: block; font-size: 14.5px; color: #fff; line-height: 1.3; }
+  .pm small { display: block; font-size: 12.5px; color: #8C9BC4; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pm em { font-style: normal; font-size: 11.5px; color: #8FB0FF; white-space: nowrap; }
+  .hp-voet { margin: 10px 0 0; font-size: 12.5px; color: #8C9BC4; position: relative; }
+  .plan-leeg { padding: 26px 10px; text-align: center; color: #C6D1EC; }
+  @media (max-width: 1100px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 600px) { .hero-orb { width: 200px; height: 200px; } .hero-orb .orb { --m: 128px; } .dag-knop { width: 100%; } }
 
   /* Cijfers */
   .kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
@@ -232,7 +283,7 @@
   .lead a.n { font-weight: 600; color: var(--ink); text-decoration: none; font-size: 15px; } .lead a.n:hover { color: var(--accent); }
   .lead .st { font-size: 13px; color: var(--muted); margin-top: 1px; } .lead .st.u { color: var(--bad); font-weight: 600; }
   .mini-acties { display: flex; gap: 5px; }
-  .mini-acties a, .mini-acties button { font: inherit; font-size: 12.5px; font-weight: 600; padding: 6px 9px; border-radius: 9px; border: 1px solid var(--line); background: #fff; color: var(--ink); text-decoration: none; cursor: pointer; }
+  .mini-acties a, .mini-acties button { font: inherit; font-size: 12.5px; font-weight: 600; padding: 6px 9px; border-radius: 9px; border: 1px solid var(--line); background: var(--vlak, #fff); color: var(--ink); text-decoration: none; cursor: pointer; }
   .mini-acties a:hover, .mini-acties button:hover { border-color: var(--accent-2); color: var(--accent); }
   .rij { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 10px 4px; font-size: 14px; }
   .rij + .rij { border-top: 1px solid var(--line); }
@@ -258,23 +309,27 @@
 </head>
 <body>
 <main class="db">
-  <div class="hk">
-    <div><h1 id="groet">Welkom</h1><p id="datum"></p></div>
-    <div class="rechts">
-      <div class="wissel" id="wissel"><button type="button" data-v="ik" class="is-aan">Mijn werk</button><button type="button" data-v="alle">Alles</button></div>
-      <button class="ai-knop" type="button" data-contact><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Contact vastleggen</button>
-    </div>
-  </div>
-
-  <section class="briefing in" aria-label="Slimme briefing">
-    <div class="briefing-in">
-      <div>
-        <div class="bf-label"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 5.6L19.5 9.5l-5.7 1.9L12 17l-1.8-5.6L4.5 9.5l5.7-1.9zM19 15l.9 2.6 2.6.9-2.6.9L19 22l-.9-2.6-2.6-.9 2.6-.9zM5 15l.6 1.7 1.7.6-1.7.6L5 19.6l-.6-1.7-1.7-.6 1.7-.6z"/></svg>Slimme briefing</div>
-        <div class="bf-tekst" id="briefing"><div class="skelet" style="width:90%;margin-bottom:12px;opacity:.15"></div><div class="skelet" style="width:70%;margin-bottom:12px;opacity:.15"></div><div class="skelet" style="width:80%;opacity:.15"></div></div>
-        <form class="bf-vraag" id="bf-vraag" autocomplete="off"><div class="orb mini"><i></i><i></i><i></i></div><input id="bf-in" type="text" placeholder="Vraag de agent iets…" aria-label="Vraag de agent"><button type="submit">Vraag</button></form>
-        <div class="bf-chips"><button type="button" data-agent="Waar moet ik vandaag mee beginnen?">Waar begin ik?</button><button type="button" data-agent="Welke leads moet ik als eerste bellen, en wat zeg ik?">Welke leads eerst?</button><button type="button" data-agent="Maak een planning voor mijn week.">Plan mijn week</button><button type="button" data-agent="Loop de werkstroom voor de dagstart met me door.">Dagstart</button></div>
+  <section class="hero in" aria-label="Je dag">
+    <div class="hero-links">
+      <div class="hero-orb" aria-hidden="true">
+        <svg class="baan" viewBox="0 0 300 300"><circle cx="150" cy="150" r="128"/><circle cx="150" cy="150" r="146" class="b2"/><circle cx="150" cy="22" r="3.5" class="sat"/><circle cx="150" cy="296" r="2.5" class="sat s2"/></svg>
+        <div class="orb" id="hero-orb"><i></i><i></i><i></i></div>
       </div>
-      <div class="bf-acties"><h3>Doe dit eerst</h3><div id="acties"></div></div>
+      <p class="hero-datum" id="datum"></p>
+      <h1 id="groet">Welkom</h1>
+      <div class="bf-tekst" id="briefing"><div class="skelet" style="width:90%;margin:10px auto;opacity:.4"></div><div class="skelet" style="width:70%;margin:10px auto;opacity:.4"></div></div>
+      <div class="hero-knoppen">
+        <button class="dag-knop" type="button" data-dagmodus id="dag-knop"><span class="glans"></span><span id="dag-knop-tekst">Leid me door mijn dag</span></button>
+        <div class="wissel" id="wissel"><button type="button" data-v="ik" class="is-aan">Mijn werk</button><button type="button" data-v="alle">Alles</button></div>
+        <button class="ai-knop licht" type="button" data-contact><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Contact</button>
+      </div>
+      <form class="bf-vraag" id="bf-vraag" autocomplete="off"><div class="orb mini"><i></i><i></i><i></i></div><input id="bf-in" type="text" placeholder="Vraag de agent iets…" aria-label="Vraag de agent"><button type="submit">Vraag</button></form>
+    </div>
+    <div class="hero-plan">
+      <div class="hp-kop"><div><span class="hp-label">Dagplan</span><h2 id="plan-titel">Je missies van vandaag</h2></div><div class="hp-ring" id="plan-ring"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="19"/><circle cx="22" cy="22" r="19" class="v" id="plan-ring-v"/></svg><b id="plan-pct">0%</b></div></div>
+      <ol class="plan" id="plan"><li class="skelet" style="height:52px;opacity:.4"></li><li class="skelet" style="height:52px;opacity:.4"></li><li class="skelet" style="height:52px;opacity:.4"></li></ol>
+      <p class="hp-voet" id="plan-voet"></p>
+      <div id="acties" hidden></div>
     </div>
   </section>
 
@@ -341,7 +396,30 @@
     </div>
   </div>
 </main>
-<script src="/intern/app.js?v=1"></script>
+<script src="/intern/app.js?v=2"></script>
+<script>
+(function () {
+  function plan() {
+    var AE = window.AE; if (!AE) return;
+    AE.api('/intern/api/dagplan').then(teken).catch(function (e) { document.getElementById('plan').innerHTML = '<li class="plan-leeg">' + AE.esc(e.message) + '</li>'; });
+  }
+  function teken(p) {
+    var esc = window.AE.esc, ol = document.getElementById('plan'), totaal = p.klaarVandaag + p.missies.length, pct = totaal ? Math.round(p.klaarVandaag / totaal * 100) : 100;
+    document.getElementById('plan-pct').textContent = pct + '%';
+    document.getElementById('plan-ring-v').style.strokeDashoffset = 119.4 * (1 - pct / 100);
+    var min = p.minuten, tijd = min >= 60 ? Math.floor(min / 60) + 'u' + (min % 60 ? String(min % 60).padStart(2, '0') : '') : min + ' min';
+    document.getElementById('plan-titel').textContent = p.missies.length ? p.missies.length + (p.missies.length === 1 ? ' missie' : ' missies') + ', ±' + tijd : 'Alles gedaan';
+    document.getElementById('dag-knop-tekst').textContent = !p.missies.length ? 'Dag rond' : p.klaarVandaag ? 'Ga verder met je dag' : 'Leid me door mijn dag';
+    ol.innerHTML = p.missies.length ? p.missies.map(function (m, i) {
+      var u = m.prio >= 90;
+      return '<li class="pm' + (i === 0 ? ' eerst' : '') + (u ? ' u' : '') + '" data-dagmodus="' + esc(m.id) + '" style="animation-delay:' + (i * .04) + 's" title="Start hier"><span class="knoop">' + (i + 1) + '</span><span><b>' + esc(m.titel) + '</b><small>' + esc(m.proces.titel) + (m.klant ? ', ' + esc(m.klant.naam) : '') + '</small></span><em>' + m.minuten + ' min</em></li>';
+    }).join('') : '<li class="plan-leeg">Alles gedaan voor vandaag. ' + p.klaarVandaag + ' missies afgerond.</li>';
+    document.getElementById('plan-voet').textContent = (p.klaarVandaag ? p.klaarVandaag + ' al afgerond vandaag. ' : '') + 'Werkstromen starten en sluiten vanzelf: nieuwe leads, onboarding, klachten, het kwartaal en het jaareinde.' + (p.doorgeschoven ? ' ' + p.doorgeschoven + ' maandverwerkingen schuiven door naar morgen.' : '');
+  }
+  document.addEventListener('ae:dagplan', function (e) { teken(e.detail); });
+  if (window.AE) plan(); else document.addEventListener('DOMContentLoaded', plan);
+})();
+</script>
 <script>
 (function () {
   document.getElementById('bf-vraag').addEventListener('submit', function (e) {
@@ -355,8 +433,7 @@
       document.getElementById('werk').innerHTML = (r.lopend.length ? r.lopend.slice(0, 4).map(function (w) {
         var p = Math.round(w.klaar / w.totaal * 100);
         return '<a class="wk-rij" href="/intern/werkstromen.html?run=' + encodeURIComponent(w.id) + '"><i class="ring" style="--p:' + p + '">' + p + '%</i><span>' + esc(w.titel) + '<small>' + (w.klantNaam ? esc(w.klantNaam) + ', ' : '') + w.klaar + ' van ' + w.totaal + ' stappen</small></span></a>';
-      }).join('') : '<p class="db-noot" style="margin:0">Geen lopende werkstromen.</p>') +
-        '<div class="wk-start"><a href="/intern/werkstromen.html?p=' + tip[0] + '">Start ' + tip[1].toLowerCase() + '</a><a href="/intern/werkstromen.html?p=nieuwe-lead">Nieuwe lead</a><a href="/intern/werkstromen.html?p=onboarding">Onboarding</a><a href="/intern/werkstromen.html?p=klantvraag">Klantvraag</a></div>';
+      }).join('') : '<p class="db-noot" style="margin:0">Er loopt nu niets. Werkstromen starten vanzelf zodra er iets speelt.</p>');
     }).catch(function () {});
   }
   werk(); document.addEventListener('ae:agent-actie', werk);

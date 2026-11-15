@@ -8,14 +8,14 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/style.css?v=126">
-<link rel="stylesheet" href="/intern/klanten.css?v=5">
-<link rel="stylesheet" href="/intern/app.css?v=1">
+<link rel="stylesheet" href="/intern/klanten.css?v=6">
+<link rel="stylesheet" href="/intern/app.css?v=2">
 <style>
   .hk { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
   .hk h1 { font-size: clamp(28px, 3.6vw, 40px); margin: 0; letter-spacing: -.03em; }
   .hk p { margin: 4px 0 0; color: var(--muted); }
   .hk .rechts { display: flex; gap: 8px; flex-wrap: wrap; }
-  .wissel { display: inline-flex; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 3px; }
+  .wissel { display: inline-flex; background: var(--vlak, #fff); border: 1px solid var(--line); border-radius: 12px; padding: 3px; }
   .wissel button { font: inherit; font-size: 13.5px; font-weight: 600; padding: 7px 13px; border-radius: 9px; border: 0; background: none; color: var(--muted); cursor: pointer; }
   .wissel button.is-aan { background: var(--navy); color: #fff; }
   .raster-i { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
@@ -51,7 +51,7 @@
   .balk-rij .b em { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: repeating-linear-gradient(45deg, rgba(229, 72, 77, .55) 0 4px, rgba(229, 72, 77, .3) 4px 8px); }
   .balk-rij b { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
   .mini-kpi { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-  .mini-kpi div { padding: 14px 16px; border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+  .mini-kpi div { padding: 14px 16px; border-radius: 14px; background: var(--vlak, #fff); border: 1px solid var(--line); }
   .mini-kpi span { display: block; font-size: 12.5px; color: var(--muted); }
   .mini-kpi b { display: block; font-size: 26px; letter-spacing: -.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
   .weken { display: flex; align-items: flex-end; gap: 6px; height: 130px; padding-top: 10px; }
@@ -133,7 +133,7 @@
     </div>
   </div>
 </main>
-<script src="/intern/app.js?v=1"></script>
+<script src="/intern/app.js?v=2"></script>
 <script>
 (function () {
   var esc = AE.esc, IK = null, wie = 'ik', dagen = 90;

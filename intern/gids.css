@@ -1,0 +1,84 @@
+/* Dagmodus: de orb leidt je per missie naar de juiste plek. */
+.gids-orb { position: fixed; left: 0; top: 0; z-index: 90; width: 56px; height: 56px; cursor: pointer; will-change: transform; pointer-events: auto; }
+.gids-orb .orb { --m: 56px; }
+.gids-orb .orb i { inset: -14%; }
+.gids-orb.vliegt .orb::before { animation-duration: 1.2s; }
+.gids-orb.knal .orb { animation: knal .7s cubic-bezier(.2, .8, .2, 1); }
+@keyframes knal { 30% { transform: scale(1.35); filter: brightness(1.6); } }
+.gids-ring { position: fixed; z-index: 89; border-radius: 50%; border: 2px solid #5CC8FF; pointer-events: none; animation: ringuit .9s ease-out forwards; }
+@keyframes ringuit { from { transform: scale(.4); opacity: 1; } to { transform: scale(3.2); opacity: 0; } }
+.gids-spoor { position: fixed; z-index: 88; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, #B8F0FF, rgba(92, 200, 255, 0)); animation: spoor .7s ease-out forwards; }
+@keyframes spoor { to { transform: scale(.2); opacity: 0; } }
+.gids-vonk { position: fixed; z-index: 91; width: 6px; height: 6px; border-radius: 50%; pointer-events: none; background: #B8F0FF; box-shadow: 0 0 10px #5CC8FF; }
+
+.gids-spot { position: fixed; z-index: 86; pointer-events: none; border-radius: 16px; opacity: 0;
+  box-shadow: 0 0 0 2px rgba(127, 164, 255, .95), 0 0 34px 4px rgba(92, 200, 255, .55), 0 0 0 200vmax rgba(3, 8, 24, .45);
+  transition: left .55s cubic-bezier(.2, .8, .2, 1), top .55s cubic-bezier(.2, .8, .2, 1), width .55s cubic-bezier(.2, .8, .2, 1), height .55s cubic-bezier(.2, .8, .2, 1), opacity .4s; }
+.gids-spot.zicht { opacity: 1; }
+.gids-spot::after { content: ""; position: absolute; inset: -6px; border-radius: 20px; border: 1px solid rgba(127, 164, 255, .5); animation: puls 2s ease-out infinite; }
+@keyframes puls { from { transform: scale(1); opacity: .9; } to { transform: scale(1.06); opacity: 0; } }
+.gids-straal { position: fixed; inset: 0; z-index: 87; pointer-events: none; width: 100vw; height: 100vh; overflow: visible; }
+.gids-straal path { fill: none; stroke: url(#gids-kleur); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 6 9; animation: stroom-lijn 1s linear infinite; filter: drop-shadow(0 0 6px rgba(92, 200, 255, .8)); }
+@keyframes stroom-lijn { to { stroke-dashoffset: -30; } }
+.gids-straal circle { fill: #B8F0FF; filter: drop-shadow(0 0 8px #5CC8FF); }
+
+/* Missiekaart onderaan */
+.gids-dok { position: fixed; z-index: 92; left: calc(var(--zij, 0px) + (100vw - var(--zij, 0px)) / 2); bottom: 18px; transform: translate(-50%, 0); width: min(640px, calc(100vw - var(--zij, 0px) - 32px));
+  color: #E7EDFC; border-radius: 22px; padding: 16px 18px 16px; background: linear-gradient(140deg, rgba(16, 29, 70, .92), rgba(10, 19, 48, .94));
+  backdrop-filter: blur(18px) saturate(1.3); -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: 0 30px 80px -24px rgba(0, 0, 0, .7), 0 0 0 1px rgba(127, 164, 255, .28), inset 0 1px 0 rgba(255, 255, 255, .06);
+  transition: transform .5s cubic-bezier(.2, .9, .2, 1), opacity .4s; }
+.gids-dok.weg { transform: translate(-50%, 140%); opacity: 0; }
+.gids-dok.klein .gd-inhoud { display: none; }
+.gd-boven { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.gd-seg { flex: 1; display: flex; gap: 3px; }
+.gd-seg i { flex: 1; height: 4px; border-radius: 3px; background: rgba(255, 255, 255, .12); transition: background .4s; }
+.gd-seg i.k { background: linear-gradient(90deg, #34D399, #5CC8FF); }
+.gd-seg i.n { background: #7FA4FF; box-shadow: 0 0 10px #7FA4FF; animation: knipper-seg 1.6s ease-in-out infinite; }
+@keyframes knipper-seg { 50% { opacity: .5; } }
+.gd-teller { font-size: 12px; color: #9FB3E0; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.gd-knop { width: 28px; height: 28px; border-radius: 8px; border: 0; background: rgba(255, 255, 255, .08); color: #C9D6F5; cursor: pointer; font: inherit; font-size: 16px; line-height: 1; display: grid; place-items: center; flex: none; }
+.gd-knop:hover { background: rgba(255, 255, 255, .16); color: #fff; }
+.gd-inhoud { animation: gd-in .45s cubic-bezier(.2, .8, .2, 1); }
+@keyframes gd-in { from { opacity: 0; transform: translateY(10px); } }
+.gd-tag { font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #8FB0FF; display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.gd-tag b { color: #B8F0FF; font-weight: 600; }
+.gd-titel { font-size: 21px; font-weight: 700; color: #fff; letter-spacing: -.02em; margin: 4px 0 4px; line-height: 1.25; }
+.gd-uitleg { font-size: 14.5px; line-height: 1.55; color: #C3CEEA; margin: 0; }
+.gd-check { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 4px; max-height: 30vh; overflow-y: auto; }
+.gd-check label { display: flex; gap: 10px; align-items: flex-start; padding: 7px 9px; border-radius: 10px; cursor: pointer; font-size: 14px; color: #DCE5FA; transition: background .2s; }
+.gd-check label:hover { background: rgba(255, 255, 255, .05); }
+.gd-check input { margin-top: 3px; accent-color: #34D399; width: 16px; height: 16px; flex: none; }
+.gd-check small { display: block; color: #8C9AC0; font-size: 12.5px; }
+.gd-check input:checked + span { text-decoration: line-through; color: #8C9AC0; }
+.gd-acties { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; align-items: center; }
+.gd-acties a, .gd-acties button { font: inherit; font-size: 13.5px; font-weight: 600; text-decoration: none; padding: 9px 13px; border-radius: 11px; cursor: pointer; border: 1px solid rgba(127, 164, 255, .3); background: rgba(255, 255, 255, .05); color: #DCE6FF; transition: all .2s; display: inline-flex; align-items: center; gap: 6px; }
+.gd-acties a:hover, .gd-acties button:hover { background: rgba(127, 164, 255, .16); border-color: rgba(127, 164, 255, .7); color: #fff; }
+.gd-acties .klaar { margin-left: auto; border: 0; color: #04122E; background: linear-gradient(135deg, #B8F0FF, #5CC8FF 45%, #7FA4FF); box-shadow: 0 10px 26px -10px rgba(92, 200, 255, .9); padding: 10px 18px; }
+.gd-acties .klaar:hover { color: #04122E; transform: translateY(-1px); background: linear-gradient(135deg, #D4F6FF, #7AD4FF 45%, #9AB8FF); }
+.gd-acties .ga { position: relative; overflow: hidden; border: 0; color: #fff; background: linear-gradient(135deg, #3B63C4, #26458F); }
+.gd-acties .ga i { position: absolute; left: 0; bottom: 0; height: 3px; background: #B8F0FF; width: 0; }
+.gd-acties .ga.telt i { animation: tel 1.6s linear forwards; }
+@keyframes tel { to { width: 100%; } }
+.gd-acties .stil { border-color: transparent; background: none; color: #8FA2D0; padding-left: 6px; padding-right: 6px; }
+.gd-klaar { text-align: center; padding: 6px 4px 4px; }
+.gd-klaar h3 { color: #fff; font-size: 22px; margin: 4px 0 6px; }
+.gd-klaar p { margin: 0 0 12px; color: #C3CEEA; font-size: 14.5px; }
+
+/* Overgang tussen pagina's: de orb neemt je mee */
+.gids-warp { position: fixed; inset: 0; z-index: 120; pointer-events: none; background: radial-gradient(900px 600px at var(--x, 50%) var(--y, 50%), #1C3577, #0A1330 60%, #050B1E);
+  clip-path: circle(0 at var(--x, 50%) var(--y, 50%)); transition: clip-path .6s cubic-bezier(.7, 0, .3, 1); }
+.gids-warp.vol { clip-path: circle(150vmax at var(--x, 50%) var(--y, 50%)); }
+.gids-warp .orb { position: absolute; left: var(--x, 50%); top: var(--y, 50%); --m: 90px; transform: translate(-50%, -50%); }
+
+body.dagmodus .ag-zweef { display: none; }
+body.dagmodus main.db { padding-bottom: 240px; }
+@media (max-width: 960px) {
+  .gids-dok { left: 50%; width: calc(100vw - 20px); bottom: 10px; padding: 14px; }
+  .gd-titel { font-size: 18px; }
+  .gids-orb, .gids-orb .orb { --m: 46px; width: 46px; height: 46px; }
+}
+@media (prefers-reduced-motion: reduce) { .gids-straal path { animation: none; } }
+
+.gids-spot.nav { box-shadow: 0 0 0 2px rgba(127, 164, 255, .95), 0 0 34px 4px rgba(92, 200, 255, .55), 0 0 0 200vmax rgba(3, 8, 24, .18); }

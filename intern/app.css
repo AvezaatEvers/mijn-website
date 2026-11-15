@@ -62,7 +62,7 @@ body.app .db-terug { display: none; }
 .ai-knop { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 14px; font-weight: 600; padding: 10px 16px; border-radius: 12px; border: 0; cursor: pointer; color: #fff;
   background: linear-gradient(135deg, var(--accent-2), var(--accent)); box-shadow: 0 8px 20px -10px rgba(38, 69, 143, .8), inset 0 1px 0 rgba(255, 255, 255, .2); transition: transform .15s, box-shadow .2s; text-decoration: none; white-space: nowrap; }
 .ai-knop:hover { transform: translateY(-1px); box-shadow: 0 12px 26px -10px rgba(38, 69, 143, .9), inset 0 1px 0 rgba(255, 255, 255, .2); }
-.ai-knop.licht { background: #fff; color: var(--accent); box-shadow: inset 0 0 0 1px var(--line); }
+.ai-knop.licht { background: var(--vlak, #fff); color: var(--accent); box-shadow: inset 0 0 0 1px var(--line); }
 .ai-knop.licht:hover { box-shadow: inset 0 0 0 1px var(--accent-2), 0 8px 18px -12px rgba(38, 69, 143, .5); }
 .ai-knop svg { width: 16px; height: 16px; }
 body.app .db-kaart { background: var(--glas); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2); border: 1px solid rgba(227, 232, 241, .9); border-radius: var(--r); box-shadow: var(--schaduw); transition: transform .25s, box-shadow .25s; }
@@ -78,7 +78,7 @@ body.app .db-kaart.zweef:hover { transform: translateY(-2px); box-shadow: 0 1px 
 .ob, .cm { position: fixed; inset: 0; z-index: 60; display: none; align-items: flex-start; justify-content: center; padding: 10vh 16px 16px; background: rgba(13, 24, 56, .35); backdrop-filter: blur(4px); }
 .ob.open, .cm.open { display: flex; animation: vervaag .18s ease-out; }
 @keyframes vervaag { from { opacity: 0; } }
-.ob-doos { width: min(640px, 100%); background: #fff; border-radius: 20px; box-shadow: 0 40px 100px -30px rgba(13, 24, 56, .55); overflow: hidden; animation: op .22s cubic-bezier(.2, .8, .2, 1); }
+.ob-doos { width: min(640px, 100%); background: var(--vlak, #fff); border-radius: 20px; box-shadow: 0 40px 100px -30px rgba(13, 24, 56, .55); overflow: hidden; animation: op .22s cubic-bezier(.2, .8, .2, 1); }
 @keyframes op { from { transform: translateY(10px) scale(.98); opacity: 0; } }
 .ob-invoer { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
 .ob-invoer svg { width: 20px; height: 20px; color: var(--accent); flex: none; }
@@ -94,7 +94,7 @@ body.app .db-kaart.zweef:hover { transform: translateY(-2px); box-shadow: 0 1px 
 
 /* ---------- Contact vastleggen ---------- */
 .cm { padding-top: 6vh; }
-.cm-doos { width: min(620px, 100%); max-height: 88vh; overflow-y: auto; background: #fff; border-radius: 22px; box-shadow: 0 40px 100px -30px rgba(13, 24, 56, .55); animation: op .22s cubic-bezier(.2, .8, .2, 1); }
+.cm-doos { width: min(620px, 100%); max-height: 88vh; overflow-y: auto; background: var(--vlak, #fff); border-radius: 22px; box-shadow: 0 40px 100px -30px rgba(13, 24, 56, .55); animation: op .22s cubic-bezier(.2, .8, .2, 1); }
 .cm-kop { position: sticky; top: 0; z-index: 2; background: linear-gradient(135deg, var(--navy), var(--accent)); color: #fff; padding: 18px 22px; display: flex; align-items: center; gap: 12px; }
 .cm-kop h2 { color: #fff; font-size: 18px; margin: 0; }
 .cm-kop p { margin: 2px 0 0; font-size: 13px; color: #C9D6F5; }
@@ -102,24 +102,24 @@ body.app .db-kaart.zweef:hover { transform: translateY(-2px); box-shadow: 0 1px 
 .cm-body { padding: 18px 22px 8px; display: flex; flex-direction: column; gap: 16px; }
 .cm-veld > span { display: block; font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
 .chips-kies { display: flex; flex-wrap: wrap; gap: 6px; }
-.chips-kies button { font: inherit; font-size: 13.5px; font-weight: 500; padding: 7px 12px; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: var(--text); cursor: pointer; transition: all .15s; }
+.chips-kies button { font: inherit; font-size: 13.5px; font-weight: 500; padding: 7px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--vlak, #fff); color: var(--text); cursor: pointer; transition: all .15s; }
 .chips-kies button:hover { border-color: var(--accent-2); }
 .chips-kies button.is-aan { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 6px 14px -8px rgba(38, 69, 143, .8); }
 .chips-kies.gevoel button { font-size: 20px; padding: 4px 14px; }
 .chips-kies.gevoel button span { font-size: 12.5px; margin-left: 6px; vertical-align: middle; }
 .cm-klant { position: relative; }
-.cm-klant input, .cm-body textarea, .cm-body input[type=date] { width: 100%; font: inherit; font-size: 15px; padding: 11px 13px; border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink); box-sizing: border-box; }
+.cm-klant input, .cm-body textarea, .cm-body input[type=date] { width: 100%; font: inherit; font-size: 15px; padding: 11px 13px; border: 1px solid var(--line); border-radius: 12px; background: var(--vlak, #fff); color: var(--ink); box-sizing: border-box; }
 .cm-klant input:focus, .cm-body textarea:focus, .cm-body input[type=date]:focus { outline: 2px solid var(--accent-2); border-color: var(--accent-2); }
-.cm-sug { position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--schaduw); max-height: 220px; overflow-y: auto; z-index: 3; }
+.cm-sug { position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: var(--vlak, #fff); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--schaduw); max-height: 220px; overflow-y: auto; z-index: 3; }
 .cm-sug button { display: block; width: 100%; text-align: left; font: inherit; font-size: 14px; padding: 9px 12px; border: 0; background: none; cursor: pointer; color: var(--ink); }
 .cm-sug button:hover, .cm-sug button.is-actief { background: var(--tint); }
 .cm-sug small { color: var(--muted); margin-left: 6px; }
 .cm-rij { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .schuif { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text); cursor: pointer; }
 .schuif input { appearance: none; width: 40px; height: 24px; border-radius: 999px; background: #D7DDE8; position: relative; cursor: pointer; transition: background .2s; flex: none; margin: 0; }
-.schuif input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .2); transition: transform .2s; }
+.schuif input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--vlak, #fff); box-shadow: 0 1px 3px rgba(0, 0, 0, .2); transition: transform .2s; }
 .schuif input:checked { background: var(--accent); } .schuif input:checked::after { transform: translateX(16px); }
-.cm-voet { position: sticky; bottom: 0; background: #fff; border-top: 1px solid var(--line); padding: 14px 22px; display: flex; gap: 10px; align-items: center; }
+.cm-voet { position: sticky; bottom: 0; background: var(--vlak, #fff); border-top: 1px solid var(--line); padding: 14px 22px; display: flex; gap: 10px; align-items: center; }
 .cm-voet .fout { color: var(--bad); font-size: 13.5px; margin-right: auto; }
 @media (max-width: 560px) { .cm-rij { grid-template-columns: 1fr; } .cm { padding: 0; align-items: stretch; } .cm-doos { max-height: 100vh; border-radius: 0; } }
 
@@ -140,3 +140,97 @@ body.app .db-kaart.zweef:hover { transform: translateY(-2px); box-shadow: 0 1px 
 .zij-zoek svg { width: 18px; height: 18px; flex: none; }
 .zij a.zn span { text-align: left; }
 .zij .ai-knop svg { width: 16px; height: 16px; }
+
+/* =====================================================================
+   Futuristisch thema: donker, sterrenhemel, gloeiende accenten.
+   Alle interne pagina's met de app-schil krijgen dit automatisch.
+   ===================================================================== */
+body.app {
+  color-scheme: dark;
+  --ink: #F1F5FF; --text: #C6D1EC; --muted: #8C9BC4; --line: rgba(148, 170, 235, .14);
+  --tint: rgba(127, 164, 255, .13); --tint-border: rgba(127, 164, 255, .3); --soft: #060D24; --white: #0B1533;
+  --vlak: rgba(255, 255, 255, .045); --vlak-2: rgba(127, 164, 255, .07);
+  --accent: #8FB0FF; --accent-dark: #C3D3FF; --accent-2: #A9C1FF;
+  --knop: linear-gradient(135deg, #4C78E0, #2A4BA0); --knop-schaduw: 0 10px 24px -12px rgba(76, 120, 224, .9), inset 0 1px 0 rgba(255, 255, 255, .18);
+  --glas: linear-gradient(160deg, rgba(25, 42, 94, .62), rgba(13, 24, 60, .55));
+  --ok: #4ADE80; --ok-bg: rgba(74, 222, 128, .13); --warn: #FBBF24; --warn-bg: rgba(251, 191, 36, .13); --bad: #FB7185; --bad-bg: rgba(251, 113, 133, .13);
+  --schaduw: inset 0 1px 0 rgba(255, 255, 255, .05), 0 24px 50px -30px rgba(0, 0, 0, .85);
+  color: var(--text);
+  background: radial-gradient(1100px 760px at 78% -12%, #183372 0%, transparent 62%), radial-gradient(900px 700px at -5% 105%, #10245C 0%, transparent 58%), #050B20;
+  background-attachment: fixed;
+}
+body.app::before { background: radial-gradient(closest-side, rgba(92, 200, 255, .16), transparent 70%), radial-gradient(closest-side at 30% 60%, rgba(127, 164, 255, .14), transparent 70%); }
+/* sterren */
+body.app::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .55;
+  background-image: radial-gradient(1px 1px at 12% 18%, #fff, transparent), radial-gradient(1px 1px at 72% 12%, #cfe0ff, transparent), radial-gradient(1.5px 1.5px at 38% 66%, #fff, transparent),
+    radial-gradient(1px 1px at 86% 54%, #B8F0FF, transparent), radial-gradient(1px 1px at 22% 82%, #fff, transparent), radial-gradient(1.5px 1.5px at 58% 34%, #cfe0ff, transparent),
+    radial-gradient(1px 1px at 93% 88%, #fff, transparent), radial-gradient(1px 1px at 5% 48%, #B8F0FF, transparent), radial-gradient(1px 1px at 48% 92%, #fff, transparent), radial-gradient(1px 1px at 66% 74%, #fff, transparent);
+  background-size: 640px 640px; animation: twinkel-veld 7s ease-in-out infinite alternate; }
+@keyframes twinkel-veld { from { opacity: .35; } to { opacity: .7; } }
+body.app.zij-open::after { background: rgba(3, 8, 24, .65); z-index: 25; animation: none; opacity: 1; }
+body.app h1, body.app h2, body.app h3, body.app strong, body.app b { color: var(--ink); }
+body.app h1 { background: linear-gradient(100deg, #FFFFFF 30%, #B8CCFF 70%, #7FDBFF); -webkit-background-clip: text; background-clip: text; color: transparent; }
+body.app a { color: var(--accent); }
+body.app a:hover { color: #fff; }
+body.app .zij { background: linear-gradient(180deg, rgba(7, 14, 38, .92), rgba(10, 20, 52, .92)); border-right: 1px solid rgba(127, 164, 255, .12); backdrop-filter: blur(12px); }
+body.app .zij a.zn { color: #B4C2E4; }
+body.app .zij a.zn:hover, body.app .zij a.zn.is-aan { color: #fff; }
+
+/* kaarten: donker glas met een dunne lichtrand */
+body.app .db-kaart { background: var(--glas); border: 1px solid rgba(127, 164, 255, .16); box-shadow: var(--schaduw); position: relative; }
+body.app .db-kaart::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; padding: 1px;
+  background: linear-gradient(140deg, rgba(184, 240, 255, .35), transparent 35%, transparent 70%, rgba(127, 164, 255, .25));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+body.app .db-kaart.zweef:hover { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 30px 60px -30px rgba(0, 0, 0, .9), 0 0 0 1px rgba(127, 164, 255, .35), 0 0 40px -10px rgba(92, 200, 255, .25); }
+
+/* knoppen */
+body.app .db-knop, body.app .ai-knop { background: var(--knop); color: #fff; box-shadow: var(--knop-schaduw); border: 0; }
+body.app .db-knop.is-licht, body.app .ai-knop.licht, body.app .db-knop.is-rand { background: rgba(255, 255, 255, .06); color: #DCE6FF; box-shadow: inset 0 0 0 1px rgba(127, 164, 255, .3); }
+body.app .db-knop.is-licht:hover, body.app .ai-knop.licht:hover, body.app .db-knop.is-rand:hover { background: rgba(127, 164, 255, .16); color: #fff; }
+body.app .db-knop.is-rood { background: rgba(251, 113, 133, .12); color: #FDA4AF; box-shadow: inset 0 0 0 1px rgba(251, 113, 133, .3); }
+body.app .filters button, body.app .wissel, body.app .tk-filters button, body.app .modi { background: rgba(255, 255, 255, .04); border-color: rgba(127, 164, 255, .2); color: var(--text); }
+body.app .filters button.is-aan, body.app .wissel button.is-aan, body.app .tk-filters button.is-aan, body.app .chips-kies button.is-aan { background: var(--knop); border-color: transparent; color: #fff; box-shadow: var(--knop-schaduw); }
+body.app .chips-kies button { background: rgba(255, 255, 255, .04); color: var(--text); border-color: rgba(127, 164, 255, .2); }
+
+/* velden */
+body.app input:not([type=checkbox]):not([type=radio]):not([type=range]), body.app select, body.app textarea {
+  background: rgba(255, 255, 255, .045) !important; color: var(--ink) !important; border-color: rgba(127, 164, 255, .22) !important; }
+body.app input::placeholder, body.app textarea::placeholder { color: #6F7FA8; }
+body.app input:focus, body.app select:focus, body.app textarea:focus { outline: 2px solid rgba(127, 164, 255, .6) !important; border-color: transparent !important; }
+body.app option { background: #0B1533; color: #F1F5FF; }
+body.app input[type=checkbox], body.app input[type=radio] { accent-color: #5CC8FF; }
+body.app ::-webkit-calendar-picker-indicator { filter: invert(.8); }
+
+/* statussen en labels */
+body.app .kl-status { background: rgba(127, 164, 255, .16); color: #B8CCFF; }
+body.app .kl-status.is-prospect { background: rgba(251, 191, 36, .14); color: #FCD34D; }
+body.app .kl-status.is-gestopt, body.app .kl-status.is-verloren { background: rgba(255, 255, 255, .06); color: #8C9BC4; }
+body.app .bord-tabel tr.is-klaar td { background: rgba(74, 222, 128, .07); }
+body.app .bord-tellers > div { background: var(--glas); border-color: rgba(127, 164, 255, .16); }
+body.app .log .label { background: rgba(255, 255, 255, .07); color: #8C9BC4; }
+body.app .weg:hover { background: rgba(251, 113, 133, .12); color: #FDA4AF; }
+body.app .db-melding.is-ok { color: var(--ok); } body.app .db-melding.is-fout { color: var(--bad); }
+body.app .skelet { background: linear-gradient(90deg, rgba(255, 255, 255, .05) 0%, rgba(255, 255, 255, .12) 50%, rgba(255, 255, 255, .05) 100%); background-size: 200% 100%; }
+body.app .balk, body.app .wd-voort { background: rgba(255, 255, 255, .08); }
+body.app .balk i { background: linear-gradient(90deg, #5CC8FF, #7FA4FF); box-shadow: 0 0 10px rgba(92, 200, 255, .6); }
+body.app hr { border-color: var(--line); }
+body.app dialog.voorbeeld, body.app .cm-doos, body.app .ob-doos, body.app .wd-doos { background: #0C1738; color: var(--text); box-shadow: 0 40px 100px -30px rgba(0, 0, 0, .8), 0 0 0 1px rgba(127, 164, 255, .25); }
+body.app .cm-voet, body.app .ob-voet { background: #0C1738; }
+body.app .cm-sug { background: #0F1C45; }
+body.app .ob-item.is-actief, body.app .cm-sug button:hover, body.app .cm-sug button.is-actief { background: rgba(127, 164, 255, .14); }
+body.app .ob-item i { background: rgba(127, 164, 255, .16); color: #B8CCFF; }
+body.app .toast { background: #13224D; box-shadow: 0 20px 40px -16px rgba(0, 0, 0, .8), 0 0 0 1px rgba(127, 164, 255, .3); }
+
+/* agentpaneel donker */
+body.app .ag-paneel { background: rgba(9, 18, 46, .9); box-shadow: 0 50px 120px -40px rgba(0, 0, 0, .9), 0 0 0 1px rgba(127, 164, 255, .3); }
+body.app .ag-sug button, body.app .ag-veld, body.app .ag-bronnen a, body.app .ag-bronnen span, body.app .ag-vervolg button { background: rgba(255, 255, 255, .05); border-color: rgba(127, 164, 255, .22); color: var(--text); }
+body.app .ag-sug button { color: var(--ink); }
+body.app .md code { background: rgba(127, 164, 255, .15); color: #B8CCFF; }
+body.app .ag-actie { background: rgba(74, 222, 128, .1); border-color: rgba(74, 222, 128, .3); }
+
+/* selectie en scrollbalk */
+body.app ::selection { background: rgba(92, 200, 255, .35); color: #fff; }
+body.app * { scrollbar-color: rgba(127, 164, 255, .35) transparent; }
+body.app .zij-logo b { background: linear-gradient(135deg, #5CC8FF, #2A4BA0); color: #fff; }
+body.app .zij-logo { color: #fff; }
+.zij-agent kbd { display: none; }

@@ -216,6 +216,9 @@
     var b = document.createElement('button'); b.type = 'button'; b.className = 'zij-agent'; b.setAttribute('data-agent', '');
     b.innerHTML = orb('klein') + '<span>Vraag de agent<small>Je AI-collega</small></span><kbd>' + (/Mac|iPhone|iPad/.test(navigator.platform) ? '⌘J' : 'Ctrl J') + '</kbd>';
     zij.insertBefore(b, zij.querySelector('.zij-zoek'));
+    var dm = document.createElement('a'); dm.className = 'zn zij-dag'; dm.href = '#'; dm.setAttribute('data-dagmodus', '');
+    dm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span>Dagmodus</span>';
+    var eerste = zij.querySelector('.zij-groep'); if (eerste) eerste.parentNode.insertBefore(dm, eerste.nextSibling);
   }
   if (pad !== '/intern/agent.html') {
     var z = document.createElement('button'); z.type = 'button'; z.className = 'ag-zweef'; z.setAttribute('data-agent', ''); z.setAttribute('aria-label', 'Vraag de agent');
@@ -238,7 +241,7 @@
     var el = document.createElement('div'); el.className = 'intro'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Welkom');
     el.innerHTML = '<canvas aria-hidden="true"></canvas><div class="intro-in"><div class="intro-label">Avezaat &amp; Evers, intern</div>' + orb() +
       '<h1><span id="in-groet"></span><span class="cursor"></span></h1><div class="intro-regels" id="in-regels"></div>' +
-      '<div class="intro-knoppen" id="in-knoppen"><button type="button" class="hoofd" data-in="dag">Start mijn dag met de agent</button><button type="button" data-in="weg">Naar het dashboard</button></div></div><div class="intro-skip">Klik of druk op Esc om over te slaan</div>';
+      '<div class="intro-knoppen" id="in-knoppen"><button type="button" class="hoofd" data-in="dag">Leid me door mijn dag</button><button type="button" data-in="weg">Naar het dashboard</button></div></div><div class="intro-skip">Klik of druk op Esc om over te slaan</div>';
     document.body.appendChild(el);
     document.body.style.overflow = 'hidden';
     sterren(el.querySelector('canvas'));
@@ -250,15 +253,15 @@
     }
     el.addEventListener('click', function (e) {
       var k = e.target.closest('[data-in]');
-      if (k && k.dataset.in === 'dag') return weg(function () { open('Waar moet ik vandaag mee beginnen?'); });
+      if (k && k.dataset.in === 'dag') return weg(function () { if (AE.gids) AE.gids.start(); else open('Waar moet ik vandaag mee beginnen?'); });
       if (!k || k.dataset.in === 'weg') weg();
     });
     document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape' || e.key === 'Enter') { document.removeEventListener('keydown', esc); weg(); } });
 
-    var data = Promise.all([AE.ik(), AE.api('/intern/api/overzicht?wie=ik').catch(function () { return null; })]);
+    var data = Promise.all([AE.ik(), AE.api('/intern/api/overzicht?wie=ik').catch(function () { return null; }), AE.api('/intern/api/dagplan').catch(function () { return null; })]);
     var u = new Date().getHours(), groet = u < 6 ? 'Goedenacht' : u < 12 ? 'Goedemorgen' : u < 18 ? 'Goedemiddag' : 'Goedenavond';
     data.then(function (r) {
-      var ik = r[0], o = r[1];
+      var ik = r[0], o = r[1], dp = r[2];
       typ(document.getElementById('in-groet'), groet + ', ' + ik.naam + '.', 46, function () {
         var regels = ['Ik heb je dag klaargezet.'];
         if (o) {
@@ -269,6 +272,7 @@
           if (aandacht) deel.push('<b>' + aandacht + (aandacht === 1 ? ' klant' : ' klanten') + '</b> met aandacht');
           if (taken) deel.push('<b>' + taken + (taken === 1 ? ' taak' : ' taken') + '</b> voor vandaag');
           if (deel.length) regels.push(deel.join(', ') + '.');
+          if (dp && dp.missies.length) regels.push('Je dagplan: <b>' + dp.missies.length + ' missies</b>, ongeveer ' + (dp.minuten >= 60 ? Math.floor(dp.minuten / 60) + ' uur' + (dp.minuten % 60 >= 15 ? ' en ' + (dp.minuten % 60) + ' minuten' : '') : dp.minuten + ' minuten') + '. Ik leid je erdoorheen.');
           if (o.mailsDezeWeek.length) regels.push(o.mailsDezeWeek.length + ' automatische ' + (o.mailsDezeWeek.length === 1 ? 'mail gaat' : 'mails gaan') + ' deze week vanzelf de deur uit.');
         }
         var box = document.getElementById('in-regels');
@@ -303,6 +307,9 @@
   }
 
   AE.agent = { open: open, sluit: sluit, maakChat: maakChat, md: md, orb: orb };
+  // Dagmodus (de orb als gids) laden
+  var gc = document.createElement('link'); gc.rel = 'stylesheet'; gc.href = '/intern/gids.css?v=1'; document.head.appendChild(gc);
+  var gs = document.createElement('script'); gs.src = '/intern/gids.js?v=1'; document.body.appendChild(gs);
   document.dispatchEvent(new CustomEvent('ae:agent-klaar'));
   intro();
 })();

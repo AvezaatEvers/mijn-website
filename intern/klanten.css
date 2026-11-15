@@ -9,12 +9,12 @@ body { background: var(--soft); }
 .db-sub { margin: 0 0 24px; color: var(--muted); }
 .db h2 { font-size: 18px; margin: 0 0 14px; letter-spacing: -.01em; }
 .db-terug { display: inline-block; font-size: 14px; font-weight: 600; color: var(--accent); text-decoration: none; margin-bottom: 14px; }
-.db-kaart { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 22px; min-width: 0; }
+.db-kaart { background: var(--vlak, #fff); border: 1px solid var(--line); border-radius: 18px; padding: 22px; min-width: 0; }
 .db-kop { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
 .db-kop h2 { margin: 0; }
 .db-knop { font: inherit; font-size: 14px; font-weight: 600; padding: 10px 14px; border-radius: 10px; border: 0; background: var(--accent); color: #fff; cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .db-knop.is-licht { background: var(--tint); color: var(--accent); }
-.db-knop.is-rand { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+.db-knop.is-rand { background: var(--vlak, #fff); color: var(--ink); border: 1px solid var(--line); }
 .db-knop.is-rood { background: #FEF2F2; color: #B91C1C; }
 .db-knop:disabled { opacity: .55; cursor: default; }
 .db-knop.is-klein { font-size: 13px; padding: 7px 11px; border-radius: 8px; }
@@ -25,12 +25,12 @@ body { background: var(--soft); }
 .velden { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .velden label { display: flex; flex-direction: column; gap: 5px; font-size: 13px; font-weight: 600; color: var(--text); min-width: 0; }
 .velden .breed { grid-column: 1 / -1; }
-.velden input, .velden select, .velden textarea { font: inherit; font-size: 15px; font-weight: 400; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); width: 100%; min-width: 0; }
+.velden input, .velden select, .velden textarea { font: inherit; font-size: 15px; font-weight: 400; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--vlak, #fff); color: var(--ink); width: 100%; min-width: 0; }
 .velden textarea { resize: vertical; min-height: 80px; }
 .velden input:focus, .velden select:focus, .velden textarea:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
 
 .filters { display: flex; flex-wrap: wrap; gap: 6px; }
-.filters button { font: inherit; font-size: 13px; font-weight: 500; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--text); cursor: pointer; }
+.filters button { font: inherit; font-size: 13px; font-weight: 500; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--line); background: var(--vlak, #fff); color: var(--text); cursor: pointer; }
 .filters button.is-aan { background: var(--ink); border-color: var(--ink); color: #fff; }
 .zoek { font: inherit; font-size: 14px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; min-width: 0; width: 220px; }
 
@@ -38,7 +38,7 @@ body { background: var(--soft); }
 .kl-lijst li { border-bottom: 1px solid var(--line); display: block; margin: 0; padding: 0; }
 .kl-lijst li:last-child { border-bottom: 0; }
 .kl-lijst a { width: 100%; box-sizing: border-box; display: grid; grid-template-columns: 44px minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1.2fr); gap: 14px; align-items: center; padding: 12px 6px; text-decoration: none; color: var(--ink); border-radius: 12px; }
-.kl-lijst a:hover { background: #FAFBFF; }
+.kl-lijst a:hover { background: var(--vlak-2, #FAFBFF); }
 .kl-foto { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
 .kl-naam strong { display: block; font-size: 15px; overflow-wrap: anywhere; }
 .kl-naam span, .kl-volg span { display: block; font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
@@ -112,7 +112,7 @@ dialog.voorbeeld iframe { display: block; width: 100%; height: 56vh; border: 0; 
 .sectie { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 18px 0 10px; }
 .sectie:first-child { margin-top: 0; }
 .rij-inline { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.rij-inline input, .rij-inline select { font: inherit; font-size: 14px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: #fff; min-width: 0; }
+.rij-inline input, .rij-inline select { font: inherit; font-size: 14px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: var(--vlak, #fff); min-width: 0; }
 .rij-inline input[type=text] { flex: 1 1 200px; }
 .mail-rij.is-vervalt strong { color: var(--muted); }
 .mail-rij .vervalt { color: #B45309; }
@@ -141,7 +141,7 @@ dialog.voorbeeld iframe { display: block; width: 100%; height: 56vh; border: 0; 
 .bord-tabel small { display: block; color: var(--muted); font-size: 12.5px; font-weight: 400; }
 .bord-tabel tr.is-klaar td { background: #F0FDF4; }
 .bord-tellers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
-.bord-tellers > div { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.bord-tellers > div { background: var(--vlak, #fff); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
 .bord-tellers b { display: block; font-size: 26px; letter-spacing: -.02em; }
 .bord-tellers span { font-size: 13px; color: var(--muted); }
 .balk { height: 6px; border-radius: 3px; background: var(--tint); overflow: hidden; margin-top: 8px; }

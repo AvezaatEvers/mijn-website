@@ -8,8 +8,8 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/style.css?v=126">
-<link rel="stylesheet" href="/intern/klanten.css?v=5">
-<link rel="stylesheet" href="/intern/app.css?v=1">
+<link rel="stylesheet" href="/intern/klanten.css?v=6">
+<link rel="stylesheet" href="/intern/app.css?v=2">
 <style>
   .wk-kop { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
   .wk-kop h1 { font-size: clamp(28px, 3.6vw, 42px); margin: 0; letter-spacing: -.03em; }
@@ -19,7 +19,7 @@
   .lopend { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
   .lp { display: flex; align-items: center; gap: 14px; padding: 14px 16px; cursor: pointer; text-align: left; font: inherit; color: inherit; width: 100%; }
   .ring { --p: 0; width: 46px; height: 46px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: var(--accent);
-    background: radial-gradient(closest-side, #fff 76%, transparent 78%), conic-gradient(#3B63C4 calc(var(--p) * 1%), #E3E8F1 0); }
+    background: radial-gradient(closest-side, #0E1A42 76%, transparent 78%), conic-gradient(#5CC8FF calc(var(--p) * 1%), rgba(255,255,255,.1) 0); }
   .lp b { display: block; font-size: 14.5px; color: var(--ink); }
   .lp small { color: var(--muted); font-size: 12.5px; }
   .procs { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
@@ -37,7 +37,7 @@
   /* Detail */
   .wd { position: fixed; inset: 0; z-index: 65; display: none; justify-content: flex-end; background: rgba(13, 24, 56, .3); backdrop-filter: blur(3px); }
   .wd.open { display: flex; animation: vervaag .2s ease-out; }
-  .wd-doos { width: min(620px, 100%); height: 100%; background: #fff; overflow-y: auto; box-shadow: -40px 0 100px -40px rgba(13, 24, 56, .55); animation: schuif .35s cubic-bezier(.2, .9, .2, 1); display: flex; flex-direction: column; }
+  .wd-doos { width: min(620px, 100%); height: 100%; background: var(--vlak, #fff); overflow-y: auto; box-shadow: -40px 0 100px -40px rgba(13, 24, 56, .55); animation: schuif .35s cubic-bezier(.2, .9, .2, 1); display: flex; flex-direction: column; }
   @keyframes schuif { from { transform: translateX(40px); opacity: 0; } }
   .wd-doos > * { flex-shrink: 0; }
   .wd-kop { position: relative; color: #fff; padding: 22px 24px 20px; background: linear-gradient(125deg, #0D1838, #1E3A80 65%, #2D58B8); overflow: hidden; }
@@ -64,7 +64,7 @@
   .stp .door { font-size: 12px; color: var(--ok); margin-top: 4px; }
   .stp .knoppen { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
   .stp .knoppen a, .stp .knoppen button { font: inherit; font-size: 12.5px; font-weight: 600; color: var(--accent); background: var(--tint); border: 0; border-radius: 8px; padding: 6px 10px; cursor: pointer; text-decoration: none; }
-  .stp .knoppen .ag-k { color: var(--accent); background: #fff; box-shadow: inset 0 0 0 1px #C9D6F2; }
+  .stp .knoppen .ag-k { color: var(--accent); background: var(--vlak, #fff); box-shadow: inset 0 0 0 1px #C9D6F2; }
   .stp .knoppen .ag-k::before { content: "✦ "; color: #5CC8FF; }
   .wd-voet { position: sticky; bottom: 0; background: rgba(255, 255, 255, .95); backdrop-filter: blur(8px); border-top: 1px solid var(--line); padding: 14px 24px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .wd-voet select { font: inherit; font-size: 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; min-width: 0; flex: 1; }
@@ -76,17 +76,17 @@
 <body>
 <main class="db">
   <div class="wk-kop">
-    <div><h1>Werkstromen</h1><p>Al onze vaste processen als stappenplan, van dagstart tot offboarding. Start er een, eventueel voor een klant, en vink de stappen af. De agent kent ze ook.</p></div>
-    <button class="ai-knop" type="button" data-agent="Welke werkstroom past nu het best bij wat er vandaag speelt?"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 5.6L19.5 9.5l-5.7 1.9L12 17l-1.8-5.6L4.5 9.5l5.7-1.9z"/></svg>Welke past nu?</button>
+    <div><h1>Werkstromen</h1><p>Al onze vaste processen, van eerste lead tot offboarding. Ze starten en sluiten vanzelf zodra er iets speelt, en komen als missies in je dagplan. Hier zie je wat er loopt en hoe elk proces werkt.</p></div>
+    <button class="ai-knop" type="button" data-dagmodus><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 5.6L19.5 9.5l-5.7 1.9L12 17l-1.8-5.6L4.5 9.5l5.7-1.9z"/></svg>Leid me door mijn dag</button>
   </div>
-  <div id="lopend-sectie" hidden><div class="sectie">Lopend</div><div class="lopend" id="lopend"></div></div>
+  <div id="lopend-sectie" hidden><div class="sectie">Loopt nu, vanzelf gestart</div><div class="lopend" id="lopend"></div></div>
   <div id="groepen"><div class="skelet" style="width:40%;margin-top:30px"></div></div>
   <div id="afgerond"></div>
 </main>
 
 <div class="wd" id="wd" role="dialog" aria-modal="true" aria-labelledby="wd-titel"><div class="wd-doos" id="wd-doos"></div></div>
 
-<script src="/intern/app.js?v=1"></script>
+<script src="/intern/app.js?v=2"></script>
 <script>
 (function () {
   function start() {
@@ -131,7 +131,7 @@
         }).join('') + '</div>' +
         '<div class="wd-voet">' + (run
           ? (run.klant ? '<a class="ai-knop licht" href="/intern/klant.html?id=' + encodeURIComponent(run.klant) + '">Open klant</a>' : '') + '<button class="weg" type="button" id="wd-stop">Werkstroom verwijderen</button>'
-          : (p.perKlant ? '<select id="wd-klant" aria-label="Voor welke klant"><option value="">Zonder klant</option></select>' : '') + '<button class="ai-knop" type="button" id="wd-start">Start werkstroom</button>') + '</div>';
+          : '<span class="db-noot" style="margin:0">Start vanzelf (' + esc(p.wanneer.charAt(0).toLowerCase() + p.wanneer.slice(1)) + ') en verschijnt dan als missies in je dagplan.</span><button class="ai-knop" type="button" data-dagmodus style="margin-left:auto">Naar mijn dagplan</button>') + '</div>';
       wd.classList.add('open');
       history.replaceState(null, '', run ? '?run=' + run.id : '?p=' + p.id);
       if (!run && p.perKlant) AE.herlaadKlanten().then(function (kl) {

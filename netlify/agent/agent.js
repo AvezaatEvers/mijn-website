@@ -3,6 +3,7 @@
 // De functie slim() (Claude API) wordt bewust niet aangeroepen, zodat er nooit kosten ontstaan.
 import { zoekKennis } from "./kennis.js";
 import { PROCESSEN, GROEPEN, proces } from "./processen.js";
+import { synchroniseer, dagplan, verwerkMissie, GIDS } from "./dagplan.js";
 
 const WERK = "werkstromen";
 const NAMEN = { koen: "Koen", daan: "Daan" };
@@ -27,6 +28,7 @@ function voortgang(run) {
 async function werkstromenApi(request, url, pad, wie, store, h) {
   const runs = await leesRuns(store);
   const klanten = await h.leesKlanten(store);
+  if (synchroniseer(klanten, runs, h.vandaag())) await store.setJSON(WERK, runs);
   const naamVan = (kid) => { const k = klanten.find((x) => x.id === kid); return k ? (k.bedrijf || k.naam) : null; };
   const metNaam = (r) => ({ ...voortgang(r), klantNaam: r.klant ? naamVan(r.klant) : null });
 
@@ -86,7 +88,7 @@ function klantDetails(k, h, taken, runs) {
     profiel: k.profiel || {}, tevreden: !!k.tevreden, notitie: schoon(k.notitie, 600),
     lead: k.status === "prospect" ? h.leadInfo(k) : null,
     voorstel: k.voorstel ? { op: k.voorstel.op, bedrag: k.voorstel.totaal || k.voorstel.bedrag || null } : null,
-    contacten: (k.contacten || []).slice(-8).reverse().map((c) => ({ datum: c.datum, kanaal: c.kanaal, richting: c.richting, onderwerp: c.onderwerp, soort: c.soort, opgelost: c.opgelost, gevoel: c.gevoel, notitie: schoon(c.notitie, 200) })),
+    contacten: (k.contacten || []).slice(0, 8).map((c) => ({ datum: c.op, kanaal: c.kanaal, richting: c.richting, onderwerp: c.onderwerp, soort: c.soort, opgelost: c.opgelost, gevoel: c.gevoel, notitie: schoon(c.notitie, 200) })),
     nps: nps.map((n) => ({ score: n.score, reden: schoon(n.reden, 200), op: n.op })),
     kwartalen: k.kwartalen || {},
     ibIngediend: k.ib || {},
@@ -408,6 +410,21 @@ async function lokaal(c, body) {
 // ---------- Ingang ----------
 export async function agentApi(request, url, pad, wie, store, env, h) {
   if (pad === "/intern/api/werkstromen" || pad === "/intern/api/werkstroom") return werkstromenApi(request, url, pad, wie, store, h);
+  if (pad === "/intern/api/dagplan") {
+    const nu = h.vandaag();
+    const [klanten, taken, runs] = await Promise.all([h.leesKlanten(store), h.leesTaken(store), leesRuns(store)]);
+    let runsVeranderd = synchroniseer(klanten, runs, nu), takenVeranderd = false;
+    const voor = ["koen", "daan"].includes(url.searchParams.get("wie")) ? url.searchParams.get("wie") : wie;
+    if (request.method === "POST") {
+      const body = await request.json().catch(() => ({}));
+      const r = verwerkMissie(runs, taken, body.missie, wie, nu, body.actie === "later" ? "later" : "klaar");
+      if (r.fout) return json(r, 404);
+      if (r.taken) takenVeranderd = true; else runsVeranderd = true;
+    }
+    if (runsVeranderd) await store.setJSON(WERK, runs);
+    if (takenVeranderd) await h.bewaarTaken(store, taken);
+    return json(dagplan(klanten, taken, runs, voor, nu));
+  }
   if (pad === "/intern/api/agent/status") return json({ slim: false, gratis: true });
   if (pad === "/intern/api/kennis") return json({ resultaten: zoekKennis(url.searchParams.get("q") || "", 8) });
   if (pad !== "/intern/api/agent" || request.method !== "POST") return json({ fout: "Onbekende route" }, 404);

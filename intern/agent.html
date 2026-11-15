@@ -8,14 +8,14 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/style.css?v=126">
-<link rel="stylesheet" href="/intern/klanten.css?v=5">
-<link rel="stylesheet" href="/intern/app.css?v=1">
+<link rel="stylesheet" href="/intern/klanten.css?v=6">
+<link rel="stylesheet" href="/intern/app.css?v=2">
 <style>
   .ap-kop { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 18px; }
   .ap-kop .orb-plek { width: 64px; height: 64px; }
   .ap-kop h1 { font-size: clamp(26px, 3.2vw, 38px); margin: 0; letter-spacing: -.03em; }
   .ap-kop p { margin: 2px 0 0; color: var(--muted); font-size: 15px; }
-  .modi { margin-left: auto; display: inline-flex; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 4px; gap: 2px; flex-wrap: wrap; }
+  .modi { margin-left: auto; display: inline-flex; background: var(--vlak, #fff); border: 1px solid var(--line); border-radius: 14px; padding: 4px; gap: 2px; flex-wrap: wrap; }
   .modi button { font: inherit; font-size: 13.5px; font-weight: 600; padding: 8px 14px; border-radius: 10px; border: 0; background: none; color: var(--muted); cursor: pointer; transition: all .2s; }
   .modi button.is-aan { background: linear-gradient(135deg, var(--navy), var(--accent)); color: #fff; box-shadow: 0 8px 18px -10px rgba(38, 69, 143, .8); }
   .ap { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
@@ -29,12 +29,12 @@
   .ap-chat .md { font-size: 15px; }
   .ap-rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 20px; }
   .ap-rail h2 { font-size: 16px; margin: 0 0 10px; }
-  .kz { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; background: #fff; }
+  .kz { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; background: var(--vlak, #fff); }
   .kz:focus-within { border-color: var(--accent-2); }
   .kz svg { width: 16px; height: 16px; color: var(--muted); flex: none; }
   .kz input { flex: 1; min-width: 0; border: 0; outline: 0; font: inherit; font-size: 14px; background: transparent; }
   .kr { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; max-height: 46vh; overflow-y: auto; }
-  .kr details { border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+  .kr details { border: 1px solid var(--line); border-radius: 12px; background: var(--vlak, #fff); }
   .kr summary { list-style: none; cursor: pointer; padding: 9px 11px; font-size: 13.5px; font-weight: 600; color: var(--ink); line-height: 1.35; }
   .kr summary::-webkit-details-marker { display: none; }
   .kr summary small { display: block; font-weight: 500; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--accent-2); margin-bottom: 2px; }
@@ -86,7 +86,7 @@
   </div>
 </main>
 
-<script src="/intern/app.js?v=1"></script>
+<script src="/intern/app.js?v=2"></script>
 <script>
 (function () {
   function start() {

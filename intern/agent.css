@@ -98,7 +98,7 @@ body.ag-open .ag-paneel { transform: none; }
 .ag-welkom h2 { font-size: 22px; letter-spacing: -.02em; margin: 0 0 6px; color: var(--ink); }
 .ag-welkom p { margin: 0 0 18px; color: var(--muted); font-size: 14.5px; max-width: 360px; }
 .ag-sug { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
-.ag-sug button { font: inherit; text-align: left; font-size: 13.5px; line-height: 1.35; color: var(--ink); padding: 12px 13px; border-radius: 14px; border: 1px solid var(--line); background: #fff; cursor: pointer; transition: all .2s; display: flex; flex-direction: column; gap: 4px; animation: in .5s cubic-bezier(.2, .8, .2, 1) both; }
+.ag-sug button { font: inherit; text-align: left; font-size: 13.5px; line-height: 1.35; color: var(--ink); padding: 12px 13px; border-radius: 14px; border: 1px solid var(--line); background: var(--vlak, #fff); cursor: pointer; transition: all .2s; display: flex; flex-direction: column; gap: 4px; animation: in .5s cubic-bezier(.2, .8, .2, 1) both; }
 .ag-sug button small { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-2); }
 .ag-sug button:hover { border-color: var(--accent-2); box-shadow: 0 10px 24px -16px rgba(38, 69, 143, .6); transform: translateY(-1px); }
 
@@ -133,7 +133,7 @@ body.ag-open .ag-paneel { transform: none; }
 .md .typt::after { content: ""; display: inline-block; width: 7px; height: 15px; background: var(--accent-2); border-radius: 2px; margin-left: 3px; vertical-align: -2px; animation: knipper 1s steps(1) infinite; }
 
 .ag-bronnen { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-.ag-bronnen a, .ag-bronnen span { font-size: 12px; color: var(--muted); background: #fff; border: 1px solid var(--line); padding: 4px 9px; border-radius: 8px; text-decoration: none; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ag-bronnen a, .ag-bronnen span { font-size: 12px; color: var(--muted); background: var(--vlak, #fff); border: 1px solid var(--line); padding: 4px 9px; border-radius: 8px; text-decoration: none; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ag-bronnen a:hover { color: var(--accent); border-color: var(--accent-2); }
 .ag-bronnen b { font-weight: 600; color: var(--accent-2); margin-right: 4px; }
 .ag-actie { display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: linear-gradient(90deg, var(--ok-bg), #fff); border: 1px solid #C9EBD3; font-size: 13.5px; color: var(--ink); text-decoration: none; }
@@ -143,11 +143,11 @@ body.ag-open .ag-paneel { transform: none; }
 .ag-kaartjes a:hover { background: #E1E8F5; }
 .ag-fout { font-size: 13.5px; color: var(--bad); background: var(--bad-bg); padding: 9px 12px; border-radius: 10px; }
 .ag-vervolg { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 14px 36px; }
-.ag-vervolg button { font: inherit; font-size: 12.5px; color: var(--accent); background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; cursor: pointer; }
+.ag-vervolg button { font: inherit; font-size: 12.5px; color: var(--accent); background: var(--vlak, #fff); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; cursor: pointer; }
 .ag-vervolg button:hover { border-color: var(--accent-2); }
 
 .ag-invoer { padding: 10px 14px 14px; }
-.ag-veld { position: relative; display: flex; align-items: flex-end; gap: 8px; padding: 8px 8px 8px 14px; border-radius: 18px; background: #fff; border: 1px solid var(--line); box-shadow: 0 10px 30px -22px rgba(13, 24, 56, .5); transition: border-color .2s, box-shadow .2s; }
+.ag-veld { position: relative; display: flex; align-items: flex-end; gap: 8px; padding: 8px 8px 8px 14px; border-radius: 18px; background: var(--vlak, #fff); border: 1px solid var(--line); box-shadow: 0 10px 30px -22px rgba(13, 24, 56, .5); transition: border-color .2s, box-shadow .2s; }
 .ag-veld:focus-within { border-color: var(--accent-2); box-shadow: 0 0 0 4px rgba(59, 99, 196, .12), 0 10px 30px -22px rgba(13, 24, 56, .5); }
 .ag-veld textarea { flex: 1; min-width: 0; resize: none; border: 0; outline: 0; font: inherit; font-size: 15px; line-height: 1.45; color: var(--ink); background: transparent; max-height: 160px; padding: 6px 0; }
 .ag-veld button { flex: none; width: 38px; height: 38px; border-radius: 12px; border: 0; cursor: pointer; display: grid; place-items: center; color: #fff; background: linear-gradient(135deg, #5CC8FF, var(--accent)); transition: transform .15s, opacity .2s; }
@@ -178,3 +178,7 @@ body.ag-open .ag-paneel { transform: none; }
 .zij > * { flex-shrink: 0; }
 .zij-agent > span { flex: 1; min-width: 0; white-space: nowrap; }
 .zij-agent small { overflow: hidden; text-overflow: ellipsis; }
+.zij a.zij-dag { color: #B8F0FF !important; }
+.zij a.zij-dag svg { color: #5CC8FF; animation: draai-baan 12s linear infinite; }
+@keyframes draai-baan { to { transform: rotate(360deg); } }
+body.dagmodus .zij a.zij-dag { background: linear-gradient(90deg, rgba(92, 200, 255, .22), rgba(92, 200, 255, .04)); }

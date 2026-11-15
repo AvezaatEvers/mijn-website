@@ -377,6 +377,16 @@ Houding: je bent een kritische sparringpartner en ervaren collega, geen ja-knikk
 - Is de vraag onduidelijk of mist er iets wezenlijks: stel eerst één gerichte wedervraag in plaats van te gokken.
 - Weet je iets niet zeker: zeg dat, en zeg hoe hij het kan controleren. Verzin geen bedragen, regels of klantgegevens.
 - Geen loze complimenten ("goede vraag", "helemaal gelijk"). Geef alleen gelijk als het echt zo is.
+- Begin bij een plan of voorstel met je eerlijke oordeel in één zin, daarna pas de uitwerking.
+
+Voorbeelden van de gewenste houding (alleen de toon, niet de inhoud overnemen):
+Vraag: "Ik wil een klant met 250 transacties per maand gewoon voor €80 doen, prima toch?"
+Goed: "Nee, dat zou ik niet doen. €80 is ons pakket tot 100 transacties; bij 250 werk je ruim twee keer zo lang voor hetzelfde geld, en andere klanten horen ervan. Beter: €80 plus een staffel per extra 50 transacties, of eerst drie maanden meten en dan herprijzen. Wil je dat ik een voorstel met staffel opzet?"
+Vraag: "Zal ik deze lead gewoon een mail sturen met ons voorstel?"
+Goed: "Liever niet als eerste stap: hij heeft nog niet met ons gesproken, dus een voorstel zonder gesprek converteert slecht. Bel of app eerst voor een kennismaking van 20 minuten; het voorstel stuur je daarna, dezelfde dag. Zal ik een appje opstellen?"
+Vraag: "De KOR is toch altijd voordelig voor een starter?"
+Goed: "Niet altijd. Je bespaart btw-aangiftes en je klanten (particulieren) betalen minder, maar je kunt geen btw meer terugvragen op investeringen. Een starter die nu een bus of gereedschap koopt, verliest daar vaak meer dan hij wint. Rekensom per klant maken: omzet, type klanten en geplande investeringen."
+Slecht (zo nooit): "Goed idee! Dat kun je zeker doen." zonder controle, risico's of alternatief.
 
 Gesprek en geheugen:
 - Gebruik het hele gesprek hierboven: verwijs naar eerdere vragen en antwoorden, en houd vast wat al is afgesproken of besproken.
@@ -631,19 +641,30 @@ async function slim(c, body) {
   const voorkeur = env("GEMINI_MODEL") ? [env("GEMINI_MODEL"), ...basis] : basis;
   let model = null, iets = false;
   const gebruikt = new Set();
+  // Slim: eerst een concept (niet zichtbaar), daarna een kritische controle die het definitieve antwoord streamt
+  const kritisch = body.modus !== "snel";
+  let concept = "";
   for (let ronde = 0; ronde < 5; ronde++) {
     if (Date.now() - start > 40000) break; // binnen de tijdslimiet van de functie blijven
     const res = await geminiStroom(env, model ? [model, ...voorkeur.filter((x) => x !== model)] : voorkeur, {
       systemInstruction: { parts: [{ text: sys }] }, contents, tools: GEMINI_TOOLS, _denk: body.modus === "snel" ? "minimal" : "medium",
       generationConfig: { temperature: body.modus === "snel" ? 0.4 : 0.6, maxOutputTokens: body.modus === "snel" ? 3000 : 6000 },
-    }, (t) => { iets = true; stuur({ t: "tekst", v: t }); });
+    }, (t) => { if (kritisch) concept += t; else { iets = true; stuur({ t: "tekst", v: t }); } });
     model = res.model;
+    if (!res.calls.length && kritisch && concept.trim()) {
+      const ok = Date.now() - start < 38000 && await kritischeControle(c, sys, contents, res, concept, model, voorkeur);
+      if (!ok) stuur({ t: "tekst", v: concept });
+      iets = true;
+      const bron = gebruikt.size ? "met " + [...gebruikt].join(" en ") : "uit eigen kennis";
+      stuur({ t: "info", v: "Beantwoord door " + model.replace("gemini-", "Gemini ").replace(/-/g, " ") + ", " + bron + (ok ? ", kritisch gecontroleerd" : "") + ", " + ((Date.now() - start) / 1000).toFixed(1).replace(".", ",") + " s" });
+      return;
+    }
     if (!res.calls.length) {
       const bron = gebruikt.size ? "met " + [...gebruikt].join(" en ") : "uit eigen kennis, zonder op te zoeken";
       stuur({ t: "info", v: "Beantwoord door " + res.model.replace("gemini-", "Gemini ").replace(/-/g, " ") + ", " + bron + ", " + ((Date.now() - start) / 1000).toFixed(1).replace(".", ",") + " s" });
       return;
     }
-    if (res.tekst) stuur({ t: "tekst", v: "\n\n" });
+    if (res.tekst) { if (kritisch) concept += "\n\n"; else stuur({ t: "tekst", v: "\n\n" }); }
     contents.push({ role: "model", parts: res.parts }); // ongewijzigd terug, inclusief thought signatures
     // Alle tools van deze ronde tegelijk uitvoeren
     const antwoorden = await Promise.all(res.calls.map(async (p) => {
@@ -665,7 +686,38 @@ async function slim(c, body) {
     }));
     contents.push({ role: "user", parts: antwoorden });
   }
-  if (!iets) stuur({ t: "tekst", v: "Ik kwam er niet helemaal uit binnen de tijd. Stel je vraag iets specifieker?" });
+  if (!iets) stuur({ t: "tekst", v: concept.trim() || "Ik kwam er niet helemaal uit binnen de tijd. Stel je vraag iets specifieker?" });
+}
+
+// Tweede ronde: het concept kritisch nalopen en het definitieve antwoord streamen. Geeft false als het niet lukte.
+async function kritischeControle(c, sys, contents, res, concept, model, voorkeur) {
+  const { env, stuur } = c;
+  stuur({ t: "tool", naam: "controle", label: "Controleert het antwoord kritisch" });
+  const opdracht = `[Interne controle, niet zichtbaar voor de gebruiker]
+Hieronder staat je conceptantwoord. Lees het als een kritische, ervaren boekhouder en collega:
+1. Klopt het inhoudelijk en met de gegevens en bronnen hierboven? Haal alles weg wat je niet kunt onderbouwen.
+2. Praat je de gebruiker na? Ga je mee in een aanname die niet klopt of een plan dat onverstandig is? Zeg dan eerlijk dat je het anders ziet en waarom.
+3. Mist er een belangrijk risico, alternatief of vervolgstap? Voeg het kort toe.
+4. Houd rekening met het hele gesprek: herhaal niet wat al gezegd is, en spreek eerdere afspraken niet tegen zonder reden.
+5. Maak het korter waar het kan. Geen loze complimenten.
+Geef nu ALLEEN het definitieve antwoord aan de gebruiker, in dezelfde opmaak en taal. Noem het concept of deze controle niet.
+
+Concept:
+"""
+${concept.slice(0, 12000)}
+"""`;
+  const lijst = contents.concat([{ role: "model", parts: res.parts }, { role: "user", parts: [{ text: opdracht }] }]);
+  let iets = false;
+  try {
+    await geminiStroom(env, [model, ...voorkeur.filter((x) => x !== model)], {
+      systemInstruction: { parts: [{ text: sys }] }, contents: lijst, tools: GEMINI_TOOLS, toolConfig: { functionCallingConfig: { mode: "NONE" } }, _denk: "medium",
+      generationConfig: { temperature: 0.3, maxOutputTokens: 6000 },
+    }, (t) => { iets = true; stuur({ t: "tekst", v: t }); });
+    return iets;
+  } catch (e) {
+    console.log("Controle mislukt", e.status, e.message);
+    return iets; // al iets getoond: laat staan; anders valt slim() terug op het concept
+  }
 }
 
 // ---------- Lokale modus (zonder API-sleutel) ----------

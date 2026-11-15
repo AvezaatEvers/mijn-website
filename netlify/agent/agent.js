@@ -496,6 +496,7 @@ async function geminiStroom(env, modellen, body, opTekst) {
 }
 
 async function webZoeken(env, vraag, stuur) {
+  ZOEKMODELLEN.forEach((m) => GEEN_DENK.add(m)); // zoekmodellen zonder denkinstelling aanroepen
   const { j } = await geminiMetTerugval(env, ZOEKMODELLEN, {
     contents: [{ role: "user", parts: [{ text: `Zoek dit op voor een Nederlands boekhoudkantoor voor zzp'ers en vat het antwoord feitelijk en kort samen in het Nederlands, met concrete bedragen, data en jaartallen. Geef de voorkeur aan officiële Nederlandse bronnen (belastingdienst.nl, kvk.nl, rijksoverheid.nl, ondernemersplein.kvk.nl) en voor MoneyMonk aan moneymonk.nl. Vraag: ${vraag}` }] }],
     tools: [{ google_search: {} }],
@@ -529,6 +530,7 @@ async function slim(c, body) {
   const contents = lijst.map((b) => ({ role: b.role === "assistant" ? "model" : "user", parts: [{ text: b.content }] }));
   const voorkeur = env("GEMINI_MODEL") ? [env("GEMINI_MODEL"), ...MODELLEN] : MODELLEN;
   let model = null, iets = false;
+  const gebruikt = new Set();
   for (let ronde = 0; ronde < 5; ronde++) {
     if (Date.now() - start > 40000) break; // binnen de tijdslimiet van de functie blijven
     const res = await geminiStroom(env, model ? [model, ...voorkeur.filter((x) => x !== model)] : voorkeur, {
@@ -536,7 +538,11 @@ async function slim(c, body) {
       generationConfig: { temperature: 0.5, maxOutputTokens: 3000 },
     }, (t) => { iets = true; stuur({ t: "tekst", v: t }); });
     model = res.model;
-    if (!res.calls.length) { stuur({ t: "info", v: res.model.replace("gemini-", "Gemini ").replace(/-/g, " ") + ", " + ((Date.now() - start) / 1000).toFixed(1).replace(".", ",") + " s" }); return; }
+    if (!res.calls.length) {
+      const bron = gebruikt.size ? "met " + [...gebruikt].join(" en ") : "uit eigen kennis, zonder op te zoeken";
+      stuur({ t: "info", v: "Beantwoord door " + res.model.replace("gemini-", "Gemini ").replace(/-/g, " ") + ", " + bron + ", " + ((Date.now() - start) / 1000).toFixed(1).replace(".", ",") + " s" });
+      return;
+    }
     if (res.tekst) stuur({ t: "tekst", v: "\n\n" });
     contents.push({ role: "model", parts: res.parts }); // ongewijzigd terug, inclusief thought signatures
     // Alle tools van deze ronde tegelijk uitvoeren
@@ -544,8 +550,14 @@ async function slim(c, body) {
       const { name, args, id: callId } = p.functionCall;
       stuur({ t: "tool", naam: name, label: LABELS[name] || name });
       let uit;
+      gebruikt.add(name === "web_zoeken" ? "web" : name === "kennis_zoeken" ? "kennisbank" : "jullie gegevens");
       try { uit = name === "web_zoeken" ? await webZoeken(env, (args || {}).vraag || "", stuur) : await voerUit(name, args || {}, c); }
-      catch (e) { uit = { fout: String(e.message || e) }; }
+      catch (e) {
+        uit = { fout: String(e.message || e) };
+        console.log("Tool-fout", name, e.status, e.message);
+        stuur({ t: "waarschuwing", v: (name === "web_zoeken" ? "Webzoeken mislukt" : (LABELS[name] || name) + " mislukt") + ": " + String(e.message || e).slice(0, 200) });
+        if (name === "web_zoeken") gebruikt.delete("web");
+      }
       const fr = { name, response: { resultaat: JSON.parse(JSON.stringify(uit ?? null)) } };
       if (callId) fr.id = callId;
       return { functionResponse: fr };

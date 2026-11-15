@@ -279,3 +279,4 @@ body.app .ag-zweef .tip { background: rgba(29, 29, 31, .92); }
 .ag-vb-kop button { width: 32px; height: 32px; border-radius: 9px; border: 0; background: rgba(0, 0, 0, .05); font-size: 20px; cursor: pointer; }
 .ag-vb iframe { flex: 1; border: 0; width: 100%; background: #F3F5F9; }
 .ag-bev.is-klaar .ag-bev-knoppen, .ag-bev.is-weg .ag-bev-knoppen { display: none; }
+.ag-waarsch { margin-top: 8px; font-size: 12.5px; color: #B25000; background: #FFF4E5; border-radius: 9px; padding: 7px 10px; }

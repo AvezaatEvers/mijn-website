@@ -238,7 +238,8 @@
   function intro() {
     var gezien = false; try { gezien = sessionStorage.getItem('ae-intro') === '1'; sessionStorage.setItem('ae-intro', '1'); } catch (e) {}
     if (gezien || pad !== '/intern/' || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var el = document.createElement('div'); el.className = 'intro'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Welkom');
+    var vanLogin = false; try { vanLogin = sessionStorage.getItem('ae-van-login') === '1'; sessionStorage.removeItem('ae-van-login'); } catch (e) {}
+    var el = document.createElement('div'); el.className = 'intro' + (vanLogin ? ' van-login' : ''); el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Welkom');
     el.innerHTML = '<canvas aria-hidden="true"></canvas><div class="intro-in"><div class="intro-label">Avezaat &amp; Evers, intern</div>' + orb() +
       '<h1><span id="in-groet"></span><span class="cursor"></span></h1><div class="intro-regels" id="in-regels"></div>' +
       '<div class="intro-knoppen" id="in-knoppen"><button type="button" class="hoofd" data-in="dag">Leid me door mijn dag</button><button type="button" data-in="weg">Naar het dashboard</button></div></div><div class="intro-skip">Klik of druk op Esc om over te slaan</div>';

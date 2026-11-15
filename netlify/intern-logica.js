@@ -53,19 +53,96 @@ function json(data, status = 200) {
 
 export function inlogPagina(fout) {
   return `<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex, nofollow"><title>Intern | Avezaat &amp; Evers</title><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<meta name="robots" content="noindex, nofollow"><meta name="theme-color" content="#050B20"><title>Intern | Avezaat &amp; Evers</title><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <style>
-@font-face{font-family:P;font-weight:500;src:url(/assets/fonts/poppins-500.woff2)}@font-face{font-family:P;font-weight:700;src:url(/assets/fonts/poppins-700.woff2)}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:P,system-ui,sans-serif;background:#EEF2F8;color:#111827;padding:24px}
-form{width:100%;max-width:380px;background:#fff;border-radius:22px;padding:32px;box-shadow:0 20px 50px -24px rgba(17,24,39,.35);display:flex;flex-direction:column;gap:14px}
-.logo{font-weight:700;font-size:20px;letter-spacing:-.02em}.logo span{color:#26458F}h1{font-size:22px;margin:6px 0 0}p{margin:0;color:#4B5563;font-size:15px}
-.wie{display:grid;grid-template-columns:1fr 1fr;gap:8px}.wie label{display:block}.wie input{position:absolute;opacity:0}.wie span{display:block;text-align:center;padding:11px;border:1px solid #E5E7EB;border-radius:12px;cursor:pointer;font-weight:500}
-.wie input:checked+span{border-color:#26458F;background:#EEF2F8;color:#26458F}.wie input:focus-visible+span{outline:2px solid #26458F}
-input[type=password]{font:inherit;padding:12px 14px;border:1px solid #E5E7EB;border-radius:12px;font-size:16px}input[type=password]:focus{outline:2px solid #26458F;border-color:#26458F}
-button{font:inherit;font-weight:500;padding:13px;border:0;border-radius:12px;background:#26458F;color:#fff;font-size:16px;cursor:pointer}.fout{color:#B91C1C;font-size:14px}
-</style></head><body><form method="POST" action="/intern/login"><div class="logo">Avezaat <span>&amp;</span> Evers</div><h1>Intern</h1><p>Wie ben je?</p>
-<div class="wie"><label><input type="radio" name="wie" value="koen" required><span>Koen</span></label><label><input type="radio" name="wie" value="daan"><span>Daan</span></label></div>
-${fout ? '<p class="fout">Naam of wachtwoord klopt niet.</p>' : ''}<input type="password" name="wachtwoord" placeholder="Wachtwoord" autocomplete="current-password" required><button type="submit">Inloggen</button></form></body></html>`;
+@font-face{font-family:P;font-weight:400;src:url(/assets/fonts/poppins-400.woff2)}@font-face{font-family:P;font-weight:500;src:url(/assets/fonts/poppins-500.woff2)}@font-face{font-family:P;font-weight:700;src:url(/assets/fonts/poppins-700.woff2)}
+@property --hoek{syntax:"<angle>";inherits:false;initial-value:0deg}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:P,system-ui,sans-serif;color:#E7EDFC;padding:24px;overflow:hidden;
+background:radial-gradient(1200px 700px at 50% 40%,#1C3577 0%,#0D1838 55%,#050B20 100%)}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+.orb{--m:110px;position:fixed;left:0;top:0;width:var(--m);height:var(--m);border-radius:50%;isolation:isolate;z-index:3;pointer-events:none;will-change:transform;transition:width .9s cubic-bezier(.65,0,.25,1),height .9s cubic-bezier(.65,0,.25,1)}
+.orb::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from var(--hoek),#5CC8FF,#7FA4FF,#3B63C4,#9C8BFF,#5CC8FF 72%,#B8F0FF,#5CC8FF);animation:draai 7s linear infinite;-webkit-mask:radial-gradient(closest-side,#000 62%,transparent 100%);mask:radial-gradient(closest-side,#000 62%,transparent 100%)}
+.orb::after{content:"";position:absolute;inset:14%;border-radius:50%;background:radial-gradient(circle at 35% 28%,rgba(255,255,255,.95) 0 8%,rgba(255,255,255,.25) 22%,transparent 42%),radial-gradient(circle at 60% 70%,rgba(92,200,255,.55),transparent 55%),radial-gradient(circle at 50% 50%,#2A4FB0 0%,#13224D 78%);box-shadow:inset 0 0 18px rgba(127,164,255,.75),0 0 46px rgba(92,200,255,.4);animation:adem 4.5s ease-in-out infinite}
+.orb i{position:absolute;inset:-18%;border-radius:50%;border:1px solid rgba(127,164,255,.35);animation:golf 3.6s cubic-bezier(.2,.8,.2,1) infinite}.orb i:nth-child(2){animation-delay:1.2s}.orb i:nth-child(3){animation-delay:2.4s}
+.orb.snel::before{animation-duration:1.4s}.orb.rood::after{box-shadow:inset 0 0 18px rgba(251,113,133,.9),0 0 60px rgba(251,113,133,.6)}
+@keyframes draai{to{--hoek:360deg}}@keyframes adem{50%{transform:scale(.94);filter:brightness(1.15)}}@keyframes golf{from{transform:scale(.7);opacity:.9}to{transform:scale(1.35);opacity:0}}
+.vonk{position:fixed;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle,#B8F0FF,rgba(92,200,255,0));animation:vonk .9s ease-out forwards}@keyframes vonk{to{transform:scale(.2);opacity:0}}
+form{position:relative;z-index:4;width:100%;max-width:400px;border-radius:26px;padding:34px 30px 30px;display:flex;flex-direction:column;gap:14px;
+background:linear-gradient(160deg,rgba(25,42,94,.62),rgba(10,19,48,.7));backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
+box-shadow:0 40px 100px -30px rgba(0,0,0,.8),0 0 0 1px rgba(127,164,255,.25),inset 0 1px 0 rgba(255,255,255,.06);animation:op 1s .2s cubic-bezier(.2,.8,.2,1) both;transition:opacity .5s,transform .6s cubic-bezier(.7,0,.3,1),filter .5s}
+@keyframes op{from{opacity:0;transform:translateY(16px) scale(.98)}}
+form.weg{opacity:0;transform:scale(.92);filter:blur(6px);pointer-events:none}
+form.schud{animation:schud .45s}@keyframes schud{20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
+.label{font-size:11.5px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#8FB0FF}
+.logo{font-weight:700;font-size:24px;letter-spacing:-.03em;color:#fff;margin-top:-6px}.logo span{color:#7FA4FF}
+p{margin:4px 0 0;color:#AFC0E6;font-size:15px}
+.wie{display:grid;grid-template-columns:1fr 1fr;gap:10px}.wie label{display:block;position:relative}.wie input{position:absolute;opacity:0}
+.wie span{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid rgba(127,164,255,.25);border-radius:14px;cursor:pointer;font-weight:500;color:#DCE6FF;background:rgba(255,255,255,.04);transition:all .2s}
+.wie img{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.15)}
+.wie span:hover{border-color:rgba(127,164,255,.6)}
+.wie input:checked+span{border-color:transparent;background:linear-gradient(135deg,rgba(92,200,255,.25),rgba(59,99,196,.35));color:#fff;box-shadow:0 0 0 1px rgba(127,164,255,.8),0 10px 30px -12px rgba(92,200,255,.7)}
+.wie input:focus-visible+span{outline:2px solid #7FA4FF}
+input[type=password]{font:inherit;padding:13px 15px;border:1px solid rgba(127,164,255,.25);border-radius:14px;font-size:16px;background:rgba(255,255,255,.05);color:#fff}
+input[type=password]::placeholder{color:#7384AE}input[type=password]:focus{outline:2px solid rgba(127,164,255,.7);border-color:transparent}
+button{position:relative;overflow:hidden;font:inherit;font-weight:700;padding:14px;border:0;border-radius:14px;color:#04122E;font-size:16px;cursor:pointer;
+background:linear-gradient(135deg,#B8F0FF,#5CC8FF 45%,#7FA4FF);box-shadow:0 16px 40px -14px rgba(92,200,255,.85),inset 0 1px 0 rgba(255,255,255,.6);transition:transform .2s}
+button:hover{transform:translateY(-1px)}button:disabled{opacity:.7;cursor:default}
+.fout{color:#FDA4AF;font-size:14px;margin:0}
+.voile{position:fixed;inset:0;z-index:2;background:radial-gradient(1200px 700px at 50% 40%,#1C3577 0%,#0D1838 55%,#050B20 100%);opacity:0;pointer-events:none;transition:opacity .6s}
+.voile.aan{opacity:1}
+.groet{position:fixed;z-index:4;left:0;right:0;top:calc(50% + 140px);text-align:center;font-size:clamp(28px,5vw,48px);font-weight:700;letter-spacing:-.035em;color:#fff;opacity:0;transform:translateY(10px);transition:all .6s cubic-bezier(.2,.8,.2,1)}
+.groet.aan{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.orb::before,.orb::after,.orb i{animation:none}}
+</style></head><body><canvas aria-hidden="true"></canvas><div class="voile" id="voile"></div><div class="orb" id="orb"><i></i><i></i><i></i></div><div class="groet" id="groet" aria-live="polite"></div>
+<form method="POST" action="/intern/login" id="form"><div class="label">Intern</div><div class="logo">Avezaat <span>&amp;</span> Evers</div><p>Wie ben je?</p>
+<div class="wie"><label><input type="radio" name="wie" value="koen" required><span><img src="/assets/img/mail/koen.jpg" alt="">Koen</span></label><label><input type="radio" name="wie" value="daan"><span><img src="/assets/img/mail/daan.jpg" alt="">Daan</span></label></div>
+<p class="fout" id="fout"${fout ? "" : " hidden"}>Naam of wachtwoord klopt niet.</p><input type="password" name="wachtwoord" placeholder="Wachtwoord" autocomplete="current-password" required><button type="submit" id="knop">Inloggen</button></form>
+<script>
+(function(){
+var orb=document.getElementById('orb'),form=document.getElementById('form'),c=document.querySelector('canvas'),x=c.getContext('2d'),dpr=Math.min(2,devicePixelRatio||1),W,H,ster=[];
+function maat(){W=c.width=innerWidth*dpr;H=c.height=innerHeight*dpr}maat();addEventListener('resize',maat);
+for(var i=0;i<110;i++)ster.push({x:Math.random(),y:Math.random(),z:Math.random()*1.4+.3,f:Math.random()*6});
+var modus='zweef',doel=null,px=innerWidth*.2,py=innerHeight*.3,t0=performance.now(),m=110,laatsteVonk=0;
+try{var vorig=localStorage.getItem('ae-wie');if(vorig){var r=form.querySelector('input[value="'+vorig+'"]');if(r)r.checked=true}}catch(e){}
+function kies(){var r=form.querySelector('input[name=wie]:checked');doel=r?r.nextElementSibling:null}
+form.addEventListener('change',function(e){if(e.target.name==='wie'){kies();modus='bij';try{localStorage.setItem('ae-wie',e.target.value)}catch(e){}form.wachtwoord.focus()}});
+form.wachtwoord.addEventListener('focus',function(){if(modus!=='weg')modus='veld'});
+form.wachtwoord.addEventListener('blur',function(){if(modus==='veld')modus='zweef'});
+function loop(t){
+  var s=(t-t0)/1000;x.clearRect(0,0,W,H);
+  ster.forEach(function(p){var a=.25+.5*Math.abs(Math.sin(s*.6+p.f));x.beginPath();x.arc(p.x*W,p.y*H,p.z*dpr,0,7);x.fillStyle='rgba(170,195,255,'+a+')';x.fill()});
+  var tx,ty,k=.035;
+  if(modus==='zweef'){var cx=innerWidth/2,cy=innerHeight/2,A=Math.min(innerWidth*.38,520),B=Math.min(innerHeight*.36,300);tx=cx+A*Math.sin(s*.37)-m/2;ty=cy+B*Math.sin(s*.53+1)-m/2;k=.02}
+  else if(modus==='bij'&&doel){var r=doel.getBoundingClientRect();tx=r.left+r.width/2-m/2+Math.sin(s*2)*8;ty=r.top-m-6+Math.cos(s*2)*6}
+  else if(modus==='veld'){var f=form.getBoundingClientRect();tx=f.right-m*.55+Math.sin(s*1.6)*10;ty=f.top-m*.55+Math.cos(s*1.6)*8}
+  else if(modus==='weg'){tx=innerWidth/2-m/2;ty=innerHeight/2-m/2-40;k=.09}
+  else{tx=px;ty=py}
+  var vx=(tx-px)*k,vy=(ty-py)*k;px+=vx;py+=vy;
+  orb.style.transform='translate3d('+px+'px,'+py+'px,0)';
+  if(Math.hypot(vx,vy)>2.2&&t-laatsteVonk>40){laatsteVonk=t;var v=document.createElement('i');v.className='vonk';v.style.left=(px+m/2)+'px';v.style.top=(py+m/2)+'px';document.body.appendChild(v);setTimeout(function(){v.remove()},900)}
+  requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+if(form.querySelector('input[name=wie]:checked')){kies();modus='bij'}
+function groet(){var u=Number(new Intl.DateTimeFormat('nl-NL',{hour:'numeric',hour12:false,timeZone:'Europe/Amsterdam'}).format(new Date()));return u<6?'Goedenacht':u<12?'Goedemorgen':u<18?'Goedemiddag':'Goedenavond'}
+form.addEventListener('submit',function(e){
+  if(!window.fetch)return;e.preventDefault();
+  var knop=document.getElementById('knop'),fout=document.getElementById('fout'),wie=form.wie.value;knop.disabled=true;orb.classList.add('snel');
+  fetch('/intern/login',{method:'POST',body:new URLSearchParams(new FormData(form)),credentials:'same-origin',redirect:'follow'}).then(function(r){
+    if(r.ok&&!/\\/login/.test(r.url)){
+      try{sessionStorage.removeItem('ae-intro');sessionStorage.setItem('ae-van-login','1')}catch(e){}
+      form.classList.add('weg');modus='weg';
+      setTimeout(function(){m=Math.min(220,innerWidth*.46);orb.style.setProperty('--m',m+'px');document.getElementById('voile').classList.add('aan')},350);
+      setTimeout(function(){var g=document.getElementById('groet');g.textContent=groet()+', '+(wie==='daan'?'Daan':'Koen')+'.';g.classList.add('aan')},1100);
+      setTimeout(function(){location.href='/intern/'},2300);
+    }else{
+      knop.disabled=false;orb.classList.remove('snel');orb.classList.add('rood');setTimeout(function(){orb.classList.remove('rood')},900);
+      fout.hidden=false;form.classList.remove('schud');void form.offsetWidth;form.classList.add('schud');form.wachtwoord.select();
+    }
+  }).catch(function(){form.submit()});
+});
+})();
+</script></body></html>`;
 }
 
 async function ingelogd(cookieWaarde) {

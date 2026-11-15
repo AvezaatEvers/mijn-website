@@ -182,3 +182,5 @@ body.ag-open .ag-paneel { transform: none; }
 .zij a.zij-dag svg { color: #5CC8FF; animation: draai-baan 12s linear infinite; }
 @keyframes draai-baan { to { transform: rotate(360deg); } }
 body.dagmodus .zij a.zij-dag { background: linear-gradient(90deg, rgba(92, 200, 255, .22), rgba(92, 200, 255, .04)); }
+.intro.van-login .orb { animation: none; }
+.intro.van-login .intro-label { animation-delay: 0s; }

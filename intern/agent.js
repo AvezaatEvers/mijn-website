@@ -8,7 +8,7 @@
   var DUIM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10v11H4V10zM7 10l4-8a2.5 2.5 0 0 1 3 2.5V9h5.2a2 2 0 0 1 2 2.3l-1.4 8A2 2 0 0 1 17.8 21H7"/></svg>';
   var DUIM_NEER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 14V3h3v11zM17 14l-4 8a2.5 2.5 0 0 1-3-2.5V15H4.8a2 2 0 0 1-2-2.3l1.4-8A2 2 0 0 1 6.2 3H17"/></svg>';
   // Snel of slim (per persoon onthouden)
-  function modusKeuze(v) { try { if (v) localStorage.setItem('ae-agent-modus', v); return localStorage.getItem('ae-agent-modus') || 'snel'; } catch (e) { return 'snel'; } }
+  function modusKeuze(v) { try { if (v) localStorage.setItem('ae-agent-modus', v); return localStorage.getItem('ae-agent-modus') || 'slim'; } catch (e) { return 'slim'; } }
   var opgewarmd = 0;
   function opwarmen() { if (Date.now() - opgewarmd < 240000) return; opgewarmd = Date.now(); fetch('/agent-api', { credentials: 'same-origin' }).catch(function () {}); }
   function orb(kl) { return '<div class="orb ' + (kl || '') + '"><i></i><i></i><i></i></div>'; }
@@ -213,7 +213,7 @@
         open = document.createElement('span'); open.className = 'ag-stap'; open.textContent = label; stEl.appendChild(open); stappen.push(label);
       }
       fetch('/agent-api', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ modus: modusKeuze(), berichten: berichten.slice(-14).map(function (b) { return { rol: b.rol, tekst: b.tekst }; }), pagina: document.title.split('|')[0].trim(), klant: window.AE_KLANT || '' }) })
+        body: JSON.stringify({ modus: modusKeuze(), berichten: berichten.slice(-40).map(function (b) { return { rol: b.rol, tekst: b.tekst }; }), pagina: document.title.split('|')[0].trim(), klant: window.AE_KLANT || '' }) })
         .then(function (r) {
           if (r.status === 401) { location.reload(); throw new Error('Uitgelogd'); }
           if (!r.ok || !r.body) throw new Error('De agent is even niet bereikbaar (' + r.status + ')');

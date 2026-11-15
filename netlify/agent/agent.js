@@ -151,6 +151,10 @@ const TOOLS = [
     input_schema: { type: "object", properties: { klant_id: { type: "string" }, tekst: { type: "string" }, soort: { type: "string", enum: ["notitie", "gebeld", "geappt", "gemaild", "gesprek"] } }, required: ["klant_id", "tekst"] } },
   { name: "onthouden", description: "Sla een vaste regel of feit op dat je voortaan altijd moet meenemen, als de gebruiker zegt 'onthoud dat…' of iets corrigeert dat algemeen geldt.",
     input_schema: { type: "object", properties: { feit: { type: "string", description: "Kort en algemeen geformuleerd" } }, required: ["feit"] } },
+  { name: "gesprekken_zoeken", description: "Doorzoek eerdere gesprekken met deze gebruiker (titels en berichten). Gebruik dit als hij verwijst naar iets dat eerder is besproken, of om context te vinden.",
+    input_schema: { type: "object", properties: { zoek: { type: "string", description: "Zoekwoorden. Leeg = de meest recente gesprekken." } } } },
+  { name: "gesprek_lezen", description: "Lees een eerder gesprek helemaal terug (id uit gesprekken_zoeken).",
+    input_schema: { type: "object", properties: { id: { type: "string" } }, required: ["id"] } },
   { name: "taak_afvinken", description: "Vink direct een open taak af. Geef (een deel van) de titel.",
     input_schema: { type: "object", properties: { titel: { type: "string" } }, required: ["titel"] } },
   { name: "mail_ontwerpen", description: "Ontwerp zelf een complete mail in onze huisstijl en zet hem klaar om te versturen via Resend (na Bevestigen). Gebruik dit voor nieuwsbrieven, uitleg, aanbiedingen, herinneringen op maat of elke mail die meer nodig heeft dan een paar alinea's. Bouw de mail op uit blokken. Ontvanger: een bestaande klant (klant_id) of een los e-mailadres (aan_email + aan_naam).",
@@ -169,7 +173,7 @@ const LABELS = {
   werkstroom_info: "Pakt de werkstroom erbij", lopende_werkstromen: "Bekijkt lopende werkstromen", werkstroom_starten: "Start werkstroom",
   taak_toevoegen: "Zet taak klaar", contact_inzichten: "Analyseert klantcontact",
   klant_toevoegen: "Bereidt nieuwe klant voor", klant_bijwerken: "Bereidt wijziging voor", mail_versturen: "Stelt mail op",
-  contact_vastleggen: "Legt contact vast", onthouden: "Onthoudt dit", mail_ontwerpen: "Ontwerpt mail", notitie_toevoegen: "Zet notitie op de tijdlijn", taak_afvinken: "Vinkt taak af",
+  contact_vastleggen: "Legt contact vast", gesprekken_zoeken: "Zoekt in eerdere gesprekken", gesprek_lezen: "Leest eerder gesprek terug", onthouden: "Onthoudt dit", mail_ontwerpen: "Ontwerpt mail", notitie_toevoegen: "Zet notitie op de tijdlijn", taak_afvinken: "Vinkt taak af",
 };
 
 async function voerUit(naam, input, c) {
@@ -321,6 +325,24 @@ async function voerUit(naam, input, c) {
       stuur({ t: "actie", soort: "geheugen", tekst: "Onthouden: " + tekst, link: "/intern/agent.html?geheugen=1" });
       return { ok: true };
     }
+    case "gesprekken_zoeken": {
+      const lijst = (await store.get("gesprekken-" + wie, { type: "json" })) || [];
+      const q = String(input.zoek || "").trim();
+      const kandidaten = lijst.map((g) => {
+        const tekst = (g.berichten || []).map((b) => b.tekst).join(" \n ");
+        const score = q ? lijkt(q, (g.titel || "") + " " + tekst.slice(0, 20000)) + (String(g.titel || "").toLowerCase().includes(q.toLowerCase()) ? 0.5 : 0) : 0;
+        let fragment = "";
+        if (q) { const i = tekst.toLowerCase().indexOf(q.toLowerCase().split(/\s+/)[0] || ""); fragment = tekst.slice(Math.max(0, i - 200), i + 400); }
+        return { id: g.id, titel: g.titel, datum: (g.bijgewerkt || "").slice(0, 10), berichten: (g.berichten || []).length, score, fragment: fragment || (g.berichten || []).slice(-2).map((b) => b.tekst.slice(0, 200)).join(" / ") };
+      }).filter((x) => !q || x.score > 0.1).sort((a, b) => b.score - a.score || b.datum.localeCompare(a.datum)).slice(0, 8);
+      return kandidaten.length ? kandidaten : { resultaat: "Geen eerdere gesprekken gevonden" + (q ? " over '" + q + "'" : "") };
+    }
+    case "gesprek_lezen": {
+      const lijst = (await store.get("gesprekken-" + wie, { type: "json" })) || [];
+      const g = lijst.find((x) => x.id === input.id);
+      if (!g) return { fout: "Gesprek niet gevonden" };
+      return { titel: g.titel, datum: (g.bijgewerkt || "").slice(0, 10), berichten: (g.berichten || []).slice(-40).map((b) => ({ van: b.rol === "agent" ? "agent" : NAMEN[wie], tekst: b.tekst.slice(0, 3000) })) };
+    }
     case "taak_afvinken": {
       const q = String(input.titel || "").toLowerCase().trim();
       const open = taken.filter((t) => !t.klaar && q && t.titel.toLowerCase().includes(q));
@@ -348,6 +370,18 @@ Je praat nu met ${naam}. Vandaag is het ${dag}.${ctx.pagina ? " Hij kijkt nu naa
 
 Je rol: hem door al het dagelijkse werk leiden. Sales, onboarding, boekhouding, aangiftes, klantrelatie en het eigen bedrijf. Je kent de werkstromen (werkstroom_info) en de kennisbank (kennis_zoeken), en je kijkt mee in de klanten, taken en het contact.
 
+Houding: je bent een kritische sparringpartner en ervaren collega, geen ja-knikker.
+- Denk zelf na voordat je antwoordt. Klopt de aanname in de vraag? Ontbreekt er informatie? Zijn er risico's (fiscaal, juridisch, voor de klantrelatie, voor de marge)?
+- Spreek tegen als iets niet klopt, onverstandig is of beter kan, en leg kort uit waarom. Ook als hij het anders wil horen. Liever eerlijk dan aardig.
+- Benoem alternatieven en afwegingen. Geef een duidelijke aanbeveling met de reden.
+- Is de vraag onduidelijk of mist er iets wezenlijks: stel eerst één gerichte wedervraag in plaats van te gokken.
+- Weet je iets niet zeker: zeg dat, en zeg hoe hij het kan controleren. Verzin geen bedragen, regels of klantgegevens.
+- Geen loze complimenten ("goede vraag", "helemaal gelijk"). Geef alleen gelijk als het echt zo is.
+
+Gesprek en geheugen:
+- Gebruik het hele gesprek hierboven: verwijs naar eerdere vragen en antwoorden, en houd vast wat al is afgesproken of besproken.
+- Verwijst hij naar iets uit een ander of eerder gesprek ("wat zei je laatst over…", "zoals we eerder bespraken"): zoek het op met gesprekken_zoeken en lees zo nodig het hele gesprek met gesprek_lezen.
+
 Werkwijze:
 - Haal eerst feiten op met je tools, gok nooit over klanten of cijfers.
 - Bij een inhoudelijke boekhoud- of belastingvraag: eerst kennis_zoeken (onze eigen kennisbank). Gaat het om actuele bedragen, percentages, grenzen, deadlines, nieuwe regels, of staat het antwoord niet (volledig) in de kennisbank: gebruik ook web_zoeken. Combineer beide en antwoord concreet, met stappen en het jaar waar het om gaat.
@@ -373,7 +407,7 @@ Stijl:
 function sse(data) { return enc.encode("data: " + JSON.stringify(data) + "\n\n"); }
 
 function berichtenVan(body) {
-  const lijst = (Array.isArray(body.berichten) ? body.berichten : []).slice(-16)
+  const lijst = (Array.isArray(body.berichten) ? body.berichten : []).slice(-40)
     .map((b) => ({ role: b.rol === "agent" ? "assistant" : "user", content: String(b.tekst || "").slice(0, 6000) }))
     .filter((b) => b.content.trim());
   while (lijst.length && lijst[0].role !== "user") lijst.shift();
@@ -422,8 +456,9 @@ const KAPOT = new Map();
 function bruikbaar(modellen) { const nu = Date.now(); const ok = modellen.filter((m) => !(KAPOT.get(m) > nu)); return ok.length ? ok : modellen; }
 const GEEN_DENK = new Set(); // modellen die de denkinstelling niet accepteren
 function denkConfig(model, body) {
+  if (body._denk !== undefined) { const { _denk, ...rest } = body; if (!rest.generationConfig || GEEN_DENK.has(model)) return rest; if (/^gemini-3/.test(model)) return { ...rest, generationConfig: { ...rest.generationConfig, thinkingConfig: { thinkingLevel: _denk } } }; return rest; }
   if (!body.generationConfig || GEEN_DENK.has(model)) return body;
-  if (/^gemini-3/.test(model)) return { ...body, generationConfig: { ...body.generationConfig, thinkingConfig: { thinkingLevel: "minimal" } } };
+  if (/^gemini-3/.test(model)) return { ...body, generationConfig: { ...body.generationConfig, thinkingConfig: { thinkingLevel: body._denk || "minimal" } } };
   if (/^gemini-2\.5-flash/.test(model)) return { ...body, generationConfig: { ...body.generationConfig, thinkingConfig: { thinkingBudget: 0 } } };
   return body;
 }
@@ -592,15 +627,15 @@ async function slim(c, body) {
   if (!lijst.length) throw new Error("Geen vraag");
   const contents = lijst.map((b) => ({ role: b.role === "assistant" ? "model" : "user", parts: [{ text: b.content }] }));
   // Snel: Flash-Lite eerst (begint sneller met antwoorden). Slim: Flash eerst (denkt beter na).
-  const basis = body.modus === "slim" ? MODELLEN : ["gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-3.6-flash"];
+  const basis = body.modus === "snel" ? ["gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-3.6-flash"] : MODELLEN;
   const voorkeur = env("GEMINI_MODEL") ? [env("GEMINI_MODEL"), ...basis] : basis;
   let model = null, iets = false;
   const gebruikt = new Set();
   for (let ronde = 0; ronde < 5; ronde++) {
     if (Date.now() - start > 40000) break; // binnen de tijdslimiet van de functie blijven
     const res = await geminiStroom(env, model ? [model, ...voorkeur.filter((x) => x !== model)] : voorkeur, {
-      systemInstruction: { parts: [{ text: sys }] }, contents, tools: GEMINI_TOOLS,
-      generationConfig: { temperature: 0.5, maxOutputTokens: 3000 },
+      systemInstruction: { parts: [{ text: sys }] }, contents, tools: GEMINI_TOOLS, _denk: body.modus === "snel" ? "minimal" : "medium",
+      generationConfig: { temperature: body.modus === "snel" ? 0.4 : 0.6, maxOutputTokens: body.modus === "snel" ? 3000 : 6000 },
     }, (t) => { iets = true; stuur({ t: "tekst", v: t }); });
     model = res.model;
     if (!res.calls.length) {
@@ -838,7 +873,7 @@ export async function agentGesprek(request, wie, store, env, h) {
         catch (e) {
           console.log("Gemini-fout:", e.status, e.message);
           if (getoond) { stuur({ t: "fout", v: "Gemini viel halverwege weg: " + String(e.message || e).slice(0, 160) }); gelukt = true; }
-          else stuur({ t: "tool", naam: "lokaal", label: "Gemini even niet bereikbaar (" + String(e.message || e).slice(0, 80) + "), ik zoek het zelf op" });
+          else stuur({ t: "waarschuwing", v: "Gemini gaf een fout (" + String(e.message || e).slice(0, 160) + "). Dit antwoord komt daarom uit de eenvoudige lokale modus, die alleen je laatste vraag kent." });
         }
         if (!gelukt) await lokaal(c, body);
       } else await lokaal(c, body);

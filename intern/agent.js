@@ -153,7 +153,7 @@
           }
           return lees();
         })
-        .catch(function (e) { antwoord += (antwoord ? '\n\n' : '') + ''; exEl.innerHTML = '<div class="ag-fout">' + esc(e.message || 'Er ging iets mis') + '</div>'; })
+        .catch(function (e) { antwoord += (antwoord ? '\n\n' : '') + ''; var msg = /load failed|failed to fetch|networkerror|network error/i.test(e.message || '') ? 'De verbinding met de agent viel weg. Probeer het nog eens.' : (e.message || 'Er ging iets mis'); exEl.innerHTML = '<div class="ag-fout">' + esc(msg) + '</div>'; })
         .then(function () {
           if (open) open.classList.add('klaar');
           if (raf) cancelAnimationFrame(raf); teken();

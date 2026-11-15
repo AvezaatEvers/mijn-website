@@ -145,7 +145,16 @@ form.addEventListener('submit',function(e){
 </script></body></html>`;
 }
 
-async function ingelogd(cookieWaarde) {
+export function agentHulp(env) {
+  return {
+    leesKlanten, leesTaken, bewaarTaken: (st, t) => st.setJSON(SLEUTEL, t),
+    overzicht: (k, t, v) => overzicht(k, t, v, vandaag(), env), inzichten: (k, v, d) => inzichten(k, v, d),
+    leadInfo: (k) => leadInfo(k), gepland: (k) => gepland(k, vandaag(), 8, env), vandaag,
+  };
+}
+export { COOKIE };
+
+export async function ingelogd(cookieWaarde) {
   if (!cookieWaarde || cookieWaarde.indexOf(".") < 1) return null;
   const [wie, token] = cookieWaarde.split(".");
   const g = GEBRUIKERS[wie];
@@ -230,12 +239,10 @@ export async function verwerk(request, cookies, next, maakStore, env = () => und
   }
 
   if (pad.startsWith("/intern/api/agent") || pad.startsWith("/intern/api/werkstro") || pad === "/intern/api/kennis" || pad === "/intern/api/dagplan") {
-    const h = {
-      leesKlanten, leesTaken, bewaarTaken: (st, t) => st.setJSON(SLEUTEL, t),
-      overzicht: (k, t, v) => overzicht(k, t, v, vandaag(), env), inzichten: (k, v, d) => inzichten(k, v, d),
-      leadInfo: (k) => leadInfo(k), gepland: (k) => gepland(k, vandaag(), 8, env), vandaag,
-    };
-    return agentApi(request, url, pad, wie, maakStore(), env, h);
+    // Het agentgesprek zelf draait in een gewone Netlify Function (netlify/functions/agent.mjs):
+    // edge functions mogen maar 50 ms rekenen, te weinig voor een AI-gesprek met tools.
+    if (pad === "/intern/api/agent" && request.method === "POST") return next();
+    return agentApi(request, url, pad, wie, maakStore(), env, agentHulp(env));
   }
 
   if (pad.startsWith("/intern/api/klant") || pad.startsWith("/intern/api/voorstel") || pad === "/intern/api/kwartaalbord" || pad === "/intern/api/overzicht" || pad === "/intern/api/inzichten" || pad === "/intern/api/zoek") return klantenApi(request, url, pad, wie, maakStore(), env);

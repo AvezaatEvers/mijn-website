@@ -274,9 +274,15 @@ const GEMINI_TOOLS = [{ functionDeclarations: [...TOOLS, WEBTOOL].map((t) => {
 LABELS.web_zoeken = "Zoekt op het web";
 
 async function geminiPost(env, model, body) {
-  const r = await fetch(GEMINI + model + ":generateContent", {
-    method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": geminiSleutel(env) }, body: JSON.stringify(body),
-  });
+  if (/^gemini-3/.test(model) && body.generationConfig) body = { ...body, generationConfig: { ...body.generationConfig, thinkingConfig: { thinkingLevel: "low" } } };
+  const stop = new AbortController(), klok = setTimeout(() => stop.abort(), 22000);
+  let r;
+  try {
+    r = await fetch(GEMINI + model + ":generateContent", {
+      method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": geminiSleutel(env) }, body: JSON.stringify(body), signal: stop.signal,
+    });
+  } catch (e) { const f = new Error(e.name === "AbortError" ? "Gemini reageerde te traag" : "Gemini niet bereikbaar"); f.status = 504; throw f; }
+  finally { clearTimeout(klok); }
   const t = await r.text();
   let j = null; try { j = JSON.parse(t); } catch {}
   if (!r.ok) { const e = new Error((j && j.error && j.error.message) || ("Gemini " + r.status)); e.status = r.status; throw e; }
@@ -314,7 +320,9 @@ async function slim(c, body) {
   const contents = lijst.map((b) => ({ role: b.role === "assistant" ? "model" : "user", parts: [{ text: b.content }] }));
   const voorkeur = env("GEMINI_MODEL") ? [env("GEMINI_MODEL"), ...MODELLEN] : MODELLEN;
   let model = null;
-  for (let ronde = 0; ronde < 8; ronde++) {
+  const start = Date.now();
+  for (let ronde = 0; ronde < 6; ronde++) {
+    if (Date.now() - start > 38000) break; // binnen de tijdslimiet van de functie blijven
     const { j, model: m } = await geminiMetTerugval(env, model ? [model, ...voorkeur.filter((x) => x !== model)] : voorkeur, {
       systemInstruction: { parts: [{ text: sys }] }, contents, tools: GEMINI_TOOLS,
       generationConfig: { temperature: 0.5, maxOutputTokens: 4096 },
@@ -463,7 +471,11 @@ export async function agentApi(request, url, pad, wie, store, env, h) {
   if (pad === "/intern/api/agent/status") return json({ slim: !!geminiSleutel(env), gratis: true, motor: geminiSleutel(env) ? "Gemini" : "lokaal" });
   if (pad === "/intern/api/kennis") return json({ resultaten: zoekKennis(url.searchParams.get("q") || "", 8) });
   if (pad !== "/intern/api/agent" || request.method !== "POST") return json({ fout: "Onbekende route" }, 404);
+  return agentGesprek(request, wie, store, env, h);
+}
 
+// Het gesprek zelf, als SSE-stroom. Wordt aangeroepen vanuit netlify/functions/agent.mjs.
+export async function agentGesprek(request, wie, store, env, h) {
   const body = await request.json().catch(() => ({}));
   const { readable, writable } = new TransformStream();
   const w = writable.getWriter();

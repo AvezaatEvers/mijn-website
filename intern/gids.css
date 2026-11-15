@@ -124,3 +124,35 @@ body.dagmodus main.db { padding-bottom: 240px; }
 .gd-inhoud { animation: gd-in .5s cubic-bezier(.32, .72, 0, 1); }
 .gids-warp { background: #090D1A; }
 .gids-warp .orb { --m: 70px; }
+
+/* ---------- Licht: dagmodus ---------- */
+body.app .gids-dok { background: rgba(255, 255, 255, .86); color: var(--ink); box-shadow: 0 24px 60px -16px rgba(0, 0, 0, .22), 0 0 0 1px rgba(0, 0, 0, .06); }
+body.app .gd-seg { background: rgba(0, 0, 0, .07); }
+body.app .gd-seg i.k { background: #2D5BD3; }
+body.app .gd-seg i.n { background: rgba(45, 91, 211, .3); }
+body.app .gd-teller, body.app .gd-tag { color: var(--muted); }
+body.app .gd-tag b { color: var(--ink); }
+body.app .gd-tag > * + *::before { color: #C7C7CC; }
+body.app .gd-knop { color: var(--muted); }
+body.app .gd-knop:hover { background: rgba(0, 0, 0, .06); color: var(--ink); }
+body.app .gd-titel { color: var(--ink); }
+body.app .gd-uitleg { color: var(--text); }
+body.app .gd-check label { color: var(--ink); }
+body.app .gd-check label:hover { background: rgba(0, 0, 0, .03); }
+body.app .gd-check small { color: var(--muted); }
+body.app .gd-acties a, body.app .gd-acties button { background: rgba(0, 0, 0, .05); color: var(--ink); }
+body.app .gd-acties a:hover, body.app .gd-acties button:hover { background: rgba(0, 0, 0, .09); color: var(--ink); }
+body.app .gd-acties .klaar { background: #2D5BD3; color: #fff; }
+body.app .gd-acties .klaar:hover { background: #26458F; color: #fff; }
+body.app .gd-acties .ga { background: rgba(45, 91, 211, .1); color: #1E3F99; }
+body.app .gd-acties .stil { background: none; color: var(--muted); }
+body.app .gd-klaar h3 { color: var(--ink); }
+body.app .gd-klaar p { color: var(--text); }
+body.app .gd-gedaan li { border-bottom-color: var(--line); }
+body.app .gd-gedaan b { color: var(--ink); }
+body.app .gd-gedaan small { color: var(--muted); }
+body.app .gd-gedaan button { background: rgba(0, 0, 0, .05); border: 0; color: var(--accent); }
+body.app .gids-spot { box-shadow: 0 0 0 2px rgba(45, 91, 211, .85), 0 0 0 200vmax rgba(0, 0, 0, .14); }
+body.app .gids-spot.nav { box-shadow: 0 0 0 2px rgba(45, 91, 211, .85), 0 0 0 200vmax rgba(0, 0, 0, .05); }
+body.app .gids-ring { border-color: rgba(45, 91, 211, .7); }
+body.app .gids-warp { background: #F5F5F7; }

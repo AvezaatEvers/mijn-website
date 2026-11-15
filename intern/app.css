@@ -361,3 +361,111 @@ body.app .s-heet { background: rgba(255, 105, 97, .14); color: #FF8A80; }
 body.app .s-warm { background: rgba(255, 179, 64, .14); color: #FFC266; }
 body.app .s-lauw { background: rgba(138, 180, 255, .14); color: #8AB4FF; }
 body.app .s-koud { background: rgba(255, 255, 255, .07); color: #8B93A7; }
+
+/* =====================================================================
+   Licht: Apple-achtig licht thema (overschrijft het donkere thema hierboven).
+   ===================================================================== */
+body.app {
+  color-scheme: light;
+  --ink: #1D1D1F; --text: #3A3A3C; --muted: #6E6E73; --line: rgba(0, 0, 0, .08);
+  --accent: #2D5BD3; --accent-2: #2D5BD3; --accent-dark: #1E3F99; --tint: rgba(45, 91, 211, .08); --tint-border: rgba(45, 91, 211, .25);
+  --soft: #F5F5F7; --white: #FFFFFF; --vlak: #FFFFFF; --vlak-2: #FAFAFC;
+  --glas: #FFFFFF; --knop: #26458F;
+  --ok: #248A3D; --ok-bg: #E9F7EE; --warn: #B25000; --warn-bg: #FFF4E5; --bad: #D70015; --bad-bg: #FFECEE;
+  --schaduw: 0 1px 2px rgba(0, 0, 0, .04), 0 8px 24px -12px rgba(0, 0, 0, .08);
+  color: var(--text);
+  background: #F5F5F7;
+}
+body.app h1, body.app h2, body.app h3, body.app strong, body.app b { color: var(--ink); }
+body.app a { color: var(--accent); }
+body.app a:hover { color: var(--accent-dark); }
+body.app ::selection { background: rgba(45, 91, 211, .2); color: inherit; }
+body.app * { scrollbar-color: rgba(0, 0, 0, .2) transparent; }
+
+/* zijbalk */
+body.app .zij { background: rgba(246, 246, 248, .82); border-right: 1px solid var(--line); }
+body.app .zij-logo { color: var(--ink); }
+body.app .zij-logo b { background: #26458F; color: #fff; }
+body.app .zij-zoek { background: rgba(0, 0, 0, .05); color: var(--muted); }
+body.app .zij-zoek:hover { background: rgba(0, 0, 0, .08); }
+body.app .zij-zoek kbd, .zn-kbd { color: #A1A1A6; }
+body.app .zij-groep { color: #A1A1A6; }
+body.app .zij a.zn { color: #3A3A3C; }
+body.app .zij a.zn:hover { background: rgba(0, 0, 0, .05); color: var(--ink); }
+body.app .zij a.zn.is-aan { background: rgba(0, 0, 0, .07); color: var(--ink); }
+body.app .zij a.zn.is-aan svg { color: var(--accent); }
+body.app .zij a.zn .tel { background: rgba(0, 0, 0, .07); color: #3A3A3C; }
+body.app .zij-voet b, body.app .zij-voet strong { color: var(--ink); }
+body.app .mob-balk { background: rgba(246, 246, 248, .9); color: var(--ink); border-bottom: 1px solid var(--line); }
+
+/* kaarten */
+body.app .db-kaart { background: #fff; border: 0; box-shadow: var(--schaduw); }
+body.app .db-kaart.zweef:hover { background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 12px 32px -14px rgba(0, 0, 0, .14); }
+body.app .bord-tellers > div { background: #fff; border: 0; box-shadow: var(--schaduw); }
+
+/* knoppen en filters */
+body.app .db-knop, body.app .ai-knop { background: var(--knop); color: #fff; }
+body.app .db-knop.is-licht, body.app .ai-knop.licht, body.app .db-knop.is-rand { background: rgba(0, 0, 0, .05); color: var(--ink); }
+body.app .db-knop.is-licht:hover, body.app .ai-knop.licht:hover, body.app .db-knop.is-rand:hover { background: rgba(0, 0, 0, .09); color: var(--ink); }
+body.app .db-knop.is-rood { background: var(--bad-bg); color: var(--bad); }
+body.app .filters, body.app .wissel, body.app .modi { background: rgba(0, 0, 0, .05); }
+body.app .filters button, body.app .tk-filters button, body.app .wissel button, body.app .modi button { color: var(--text); }
+body.app .filters button.is-aan, body.app .wissel button.is-aan, body.app .tk-filters button.is-aan, body.app .chips-kies button.is-aan, body.app .modi button.is-aan { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+body.app .chips-kies button { background: rgba(0, 0, 0, .05); color: var(--text); }
+body.app .mini-acties a, body.app .mini-acties button { background: rgba(0, 0, 0, .05); color: var(--ink); }
+body.app .mini-acties a:hover, body.app .mini-acties button:hover { background: rgba(0, 0, 0, .09); }
+
+/* velden */
+body.app input:not([type=checkbox]):not([type=radio]):not([type=range]), body.app select, body.app textarea {
+  background: rgba(0, 0, 0, .04) !important; color: var(--ink) !important; }
+body.app input::placeholder, body.app textarea::placeholder { color: #A1A1A6; }
+body.app input:focus, body.app select:focus, body.app textarea:focus { box-shadow: 0 0 0 3px rgba(45, 91, 211, .25) !important; background: #fff !important; }
+body.app option { background: #fff; color: var(--ink); }
+body.app ::-webkit-calendar-picker-indicator { filter: none; }
+
+/* statussen, scores, kalender */
+body.app .kl-status { background: rgba(0, 0, 0, .06); color: var(--text); }
+body.app .kl-status.is-prospect { background: #FFF4E5; color: #B25000; }
+body.app .kl-status.is-gestopt, body.app .kl-status.is-verloren { background: rgba(0, 0, 0, .05); color: var(--muted); }
+body.app .s-heet { background: #FFECEE; color: #D70015; }
+body.app .s-warm { background: #FFF4E5; color: #B25000; }
+body.app .s-lauw { background: rgba(45, 91, 211, .1); color: #2D5BD3; }
+body.app .s-koud { background: rgba(0, 0, 0, .05); color: var(--muted); }
+body.app .lead:hover { background: rgba(0, 0, 0, .025); }
+body.app .lead .st.u { color: #D70015; }
+body.app .kal-raster button { color: var(--ink); }
+body.app .kal-raster button.is-anders { color: #C7C7CC; }
+body.app .kal-raster button.is-vandaag { background: #2D5BD3; color: #fff; }
+body.app .kal-raster button.is-gekozen { background: rgba(0, 0, 0, .07); color: var(--ink); }
+body.app .kal-raster button.is-vandaag.is-gekozen { background: #2D5BD3; color: #fff; }
+body.app .kal-raster button:hover { background: rgba(0, 0, 0, .05); }
+body.app .kal-nav button { background: rgba(0, 0, 0, .05) !important; color: var(--ink) !important; }
+body.app .bord-tabel tr.is-klaar td { background: #F2FBF4; }
+body.app .log .label { background: rgba(0, 0, 0, .05); color: var(--muted); }
+body.app .skelet { background: linear-gradient(90deg, rgba(0, 0, 0, .04), rgba(0, 0, 0, .08), rgba(0, 0, 0, .04)); background-size: 200% 100%; }
+body.app .balk, body.app .wd-voort { background: rgba(0, 0, 0, .06); }
+body.app .balk i { background: #2D5BD3; }
+
+/* dialogen, zoeken, meldingen */
+body.app dialog.voorbeeld, body.app .cm-doos, body.app .ob-doos, body.app .wd-doos { background: #fff; color: var(--text); box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .25), 0 0 0 1px rgba(0, 0, 0, .05); }
+body.app .cm-kop, body.app .cm-voet, body.app .ob-voet { background: #fff; }
+body.app .cm-sug { background: #fff; }
+body.app .ob, body.app .cm { background: rgba(0, 0, 0, .2); }
+body.app .ob-item.is-actief, body.app .cm-sug button:hover, body.app .cm-sug button.is-actief { background: rgba(0, 0, 0, .05); }
+body.app .ob-item i { background: rgba(45, 91, 211, .1); color: #2D5BD3; }
+body.app .toast { background: rgba(29, 29, 31, .92); color: #fff; }
+body.app .toast b, body.app .toast strong { color: #fff; }
+
+/* Vandaag */
+body.app .dag-knop { background: #26458F; color: #fff; }
+body.app .dag-knop:hover { background: #2D5BD3; }
+body.app .tekst-knop { color: var(--accent); }
+body.app .tekst-knop:hover { color: var(--accent-dark); }
+body.app .vp-balk { background: rgba(0, 0, 0, .06); }
+body.app .vp-balk i { background: #2D5BD3; }
+body.app .pm + .pm { box-shadow: inset 0 1px 0 rgba(0, 0, 0, .06); }
+body.app .pm:hover { background: rgba(0, 0, 0, .03); }
+body.app .pm:first-child .pm-nr { background: #2D5BD3; color: #fff; }
+body.app .pm-pijl { color: #C7C7CC; }
+body.app .pm:hover .pm-pijl { color: var(--ink); }
+body.app .orb::after { box-shadow: inset 0 0 calc(var(--m) * .12) rgba(138, 180, 255, .55), 0 calc(var(--m) * .12) calc(var(--m) * .3) rgba(45, 91, 211, .25); }

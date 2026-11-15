@@ -218,7 +218,7 @@
   });
 
   // Agent laden (eigen bestand, zodat elke pagina hem krijgt)
-  var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/intern/agent.css?v=6'; document.head.appendChild(css);
+  var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/intern/agent.css?v=7'; document.head.appendChild(css);
   var js = document.createElement('script'); js.src = '/intern/agent.js?v=9'; js.defer = true;
   setTimeout(function () { document.body.appendChild(js); }, 0);
 

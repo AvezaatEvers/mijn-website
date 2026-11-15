@@ -1,17 +1,22 @@
 // Mailsjablonen Avezaat & Evers.
 // Elke functie geeft { subject, html, text } terug.
-// Gebruikt door de Netlify Functions (verzenden via Resend) en door
-// scripts/build-mail-previews.js (voorbeeldpagina's in /intern/mails/).
+// Gebruikt door de Netlify Functions (verzenden via Resend), de interne klantenomgeving
+// en scripts/build-mail-previews.js (voorbeeldpagina in /intern/mails/).
 
-const KLEUR = '#26458F';
+// ---------- Huisstijl ----------
+const ACCENT = '#26458F';
+const ACCENT_DONKER = '#1C3570';
 const TINT = '#EEF2F8';
+const ACHTERGROND = '#F4F6FA';
 const INKT = '#111827';
-const GRIJS = '#4B5563';
-const RAND = '#E5E7EB';
+const TEKST = '#374151';
+const ZACHT = '#6B7280';
+const LIJN = '#E5E9F0';
 const TEL = '085 060 4363';
 const TEL_LINK = 'tel:+31850604363';
 const WA_LINK = 'https://wa.me/31850604363';
 const MAIL = 'info@avezaatenevers.nl';
+const F = "font-family:Poppins,'Segoe UI',Helvetica,Arial,sans-serif;";
 
 const esc = (s) => String(s == null ? '' : s)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -20,311 +25,375 @@ const voornaam = (naam) => {
   const v = String(naam || '').trim().split(/\s+/)[0] || '';
   return v ? v.charAt(0).toUpperCase() + v.slice(1) : '';
 };
-const aanhef = (naam) => (voornaam(naam) ? `Hoi ${esc(voornaam(naam))},` : 'Hoi,');
+const hoi = (naam) => (voornaam(naam) ? `Hoi ${esc(voornaam(naam))},` : 'Hoi,');
+const hoiTekst = (naam) => (voornaam(naam) ? `Hoi ${voornaam(naam)},` : 'Hoi,');
+const wieNaam = (wie) => (wie === 'daan' ? 'Daan' : wie === 'koen' ? 'Koen' : 'Koen en Daan');
+const wieVol = (wie) => (wie === 'daan' ? 'Daan Evers' : wie === 'koen' ? 'Koen Avezaat' : 'Koen en Daan');
 
-const font = "font-family:Poppins,'Segoe UI',Helvetica,Arial,sans-serif;";
+// ---------- Bouwstenen ----------
+const p = (t, extra = '') => `<p style="margin:0 0 18px;${F}font-size:16px;line-height:1.7;color:${TEKST};${extra}">${t}</p>`;
+const sterk = (t) => `<strong style="color:${INKT};font-weight:600">${t}</strong>`;
+const link = (href, t) => `<a href="${href}" style="color:${ACCENT};font-weight:600;text-decoration:underline;text-underline-offset:2px">${t}</a>`;
+const kop = (t) => `<h1 style="margin:0 0 22px;${F}font-size:27px;line-height:1.25;font-weight:700;letter-spacing:-0.4px;color:${INKT}">${t}</h1>`;
+const tussenkop = (t) => `<p style="margin:26px 0 12px;${F}font-size:13px;line-height:1.4;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;color:${ACCENT}">${t}</p>`;
 
-const p = (t) => `<p style="margin:0 0 16px;${font}font-size:16px;line-height:1.6;color:${GRIJS}">${t}</p>`;
-const h1 = (t) => `<h1 style="margin:0 0 20px;${font}font-size:26px;line-height:1.25;font-weight:700;color:${INKT}">${t}</h1>`;
 const knop = (href, label) => `
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 24px"><tr>
-<td style="border-radius:10px;background:${KLEUR}">
-<a href="${href}" style="display:inline-block;padding:14px 26px;${font}font-size:16px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px">${label}</a>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 26px"><tr>
+<td bgcolor="${ACCENT}" style="border-radius:12px;background:${ACCENT}">
+<a href="${href}" style="display:inline-block;padding:15px 28px;${F}font-size:16px;line-height:1.2;font-weight:600;color:#ffffff;text-decoration:none;border-radius:12px">${label}</a>
 </td></tr></table>`;
-const lijst = (items) => `
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 20px">
-${items.map((t) => `<tr><td width="28" valign="top" style="padding:3px 0 9px;${font}font-size:16px;line-height:1.5;color:${KLEUR};font-weight:700">&#10003;</td><td style="padding:3px 0 9px;${font}font-size:16px;line-height:1.5;color:${GRIJS}">${t}</td></tr>`).join('')}
+
+// Vinkjeslijst zoals op de site: blauwe rondjes met een vinkje
+const vinkjes = (items) => `
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:2px 0 22px">
+${items.map((t) => `<tr>
+<td width="34" valign="top" style="padding:2px 0 12px">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td width="22" height="22" align="center" valign="middle" bgcolor="${TINT}" style="width:22px;height:22px;border-radius:11px;background:${TINT};${F}font-size:12px;line-height:22px;font-weight:700;color:${ACCENT}">&#10003;</td></tr></table>
+</td>
+<td valign="top" style="padding:1px 0 12px;${F}font-size:16px;line-height:1.6;color:${TEKST}">${t}</td></tr>`).join('')}
 </table>`;
-const kader = (inhoud) => `
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:4px 0 24px;background:${TINT};border-radius:12px"><tr><td style="padding:20px 22px">${inhoud}</td></tr></table>`;
+
+// Genummerde stappen
+const stappen = (items) => `
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:2px 0 24px">
+${items.map(([titel, uitleg], i) => `<tr>
+<td width="44" valign="top" style="padding:0 0 16px">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td width="30" height="30" align="center" valign="middle" bgcolor="${ACCENT}" style="width:30px;height:30px;border-radius:15px;background:${ACCENT};${F}font-size:14px;line-height:30px;font-weight:700;color:#ffffff">${i + 1}</td></tr></table>
+</td>
+<td valign="top" style="padding:3px 0 16px;${F}font-size:16px;line-height:1.55;color:${TEKST}">${sterk(titel)}<br>${uitleg}</td></tr>`).join('')}
+</table>`;
+
+const blok = (inhoud) => `
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:4px 0 26px"><tr>
+<td bgcolor="${TINT}" style="background:${TINT};border-radius:14px;padding:22px 24px">${inhoud}</td></tr></table>`;
+const blokTekst = (t) => `<p style="margin:0;${F}font-size:15px;line-height:1.65;color:${TEKST}">${t}</p>`;
+
 const tabel = (rijen) => `
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-${rijen.map(([l, r], i) => `<tr><td style="padding:9px 0;${i ? `border-top:1px solid ${RAND};` : ''}${font}font-size:15px;line-height:1.45;color:${GRIJS}">${l}</td><td align="right" valign="top" style="padding:9px 0 9px 16px;${i ? `border-top:1px solid ${RAND};` : ''}${font}font-size:15px;line-height:1.45;color:${INKT};font-weight:600;${String(r).replace(/<[^>]+>/g, '').length > 18 ? 'word-break:break-word' : 'white-space:nowrap'}">${r}</td></tr>`).join('')}
+${rijen.map(([l, r], i) => {
+    const kort = String(r).replace(/<[^>]+>/g, '').length <= 18;
+    const rand = i ? `border-top:1px solid #D9E0EC;` : '';
+    return `<tr><td valign="top" style="padding:10px 0;${rand}${F}font-size:15px;line-height:1.45;color:${TEKST}">${l}</td><td align="right" valign="top" style="padding:10px 0 10px 16px;${rand}${F}font-size:15px;line-height:1.45;color:${INKT};font-weight:600;${kort ? 'white-space:nowrap' : 'word-break:break-word'}">${r}</td></tr>`;
+  }).join('')}
 </table>`;
 
-function ondertekening(base, wie) {
-  const naam = wie === 'koen' ? 'Koen' : wie === 'daan' ? 'Daan' : 'Koen en Daan';
-  const fotos = (wie === 'daan' ? ['daan'] : wie === 'koen' ? ['koen'] : ['koen', 'daan'])
-    .map((n, i) => `<img src="${base}/assets/img/mail/${n}.jpg" width="48" height="48" alt="" style="display:inline-block;width:48px;height:48px;border-radius:50%;border:2px solid #ffffff;${i ? 'margin-left:-12px;' : ''}vertical-align:middle">`).join('');
+function groet(base, wie) {
+  const namen = wie === 'daan' ? ['daan'] : wie === 'koen' ? ['koen'] : ['koen', 'daan'];
+  const fotos = namen.map((n, i) => `<img src="${base}/assets/img/mail/${n}.jpg" width="52" height="52" alt="${n === 'koen' ? 'Koen' : 'Daan'}" style="display:inline-block;width:52px;height:52px;border-radius:26px;border:3px solid #ffffff;${i ? 'margin-left:-14px;' : ''}vertical-align:middle">`).join('');
   return `
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 0"><tr>
 <td valign="middle" style="padding-right:14px;white-space:nowrap">${fotos}</td>
-<td valign="middle" style="${font}font-size:15px;line-height:1.45;color:${GRIJS}">Groet,<br><strong style="color:${INKT}">${naam}</strong><br>Avezaat &amp; Evers</td>
-</tr></table>`;
+<td valign="middle" style="${F}font-size:15px;line-height:1.45;color:${TEKST}">
+<span style="color:${INKT};font-weight:600">${wieVol(wie)}</span><br>
+<span style="color:${ZACHT};font-size:14px">${namen.length > 1 ? 'Jouw vaste boekhouders' : 'Jouw vaste boekhouder'} bij Avezaat &amp; Evers</span>
+</td></tr></table>`;
 }
 
-function omhulsel(base, { preheader, inhoud }) {
+function omhulsel(base, { preheader, inhoud, wie, appBlok = true }) {
+  const app = appBlok ? `
+<tr><td style="padding:16px 0 0">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+<td bgcolor="${ACCENT}" style="background:${ACCENT};border-radius:16px;padding:22px 26px">
+<p style="margin:0 0 4px;${F}font-size:16px;line-height:1.4;font-weight:600;color:#ffffff">Een vraag tussendoor?</p>
+<p style="margin:0 0 14px;${F}font-size:14px;line-height:1.6;color:#D6DEEF">App ${wie === 'daan' ? 'Daan' : wie === 'koen' ? 'Koen' : 'ons'} gewoon. Binnen 2 uur heb je antwoord.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+<td bgcolor="#ffffff" style="background:#ffffff;border-radius:10px"><a href="${WA_LINK}" style="display:inline-block;padding:10px 18px;${F}font-size:14px;font-weight:600;color:${ACCENT};text-decoration:none;border-radius:10px">WhatsApp ons</a></td>
+<td style="padding-left:16px;${F}font-size:14px;color:#D6DEEF">of bel <a href="${TEL_LINK}" style="color:#ffffff;font-weight:600;text-decoration:none;white-space:nowrap">${TEL}</a></td>
+</tr></table>
+</td></tr></table>
+</td></tr>` : '';
   return `<!DOCTYPE html>
-<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light">
+<html lang="nl" xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <title>Avezaat &amp; Evers</title>
-<style>@media (max-width:480px){.kaart{padding:28px 20px!important}.buiten{padding:20px 10px!important}}</style></head>
-<body style="margin:0;padding:0;background:${TINT}">
-<div style="display:none;max-height:0;overflow:hidden;opacity:0">${esc(preheader)}</div>
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${TINT}"><tr><td class="buiten" align="center" style="padding:32px 16px">
+<style>
+@media (max-width:520px){.kaart{padding:30px 22px!important}.buiten{padding:18px 10px 28px!important}h1{font-size:24px!important}}
+a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important}
+</style></head>
+<body style="margin:0;padding:0;background:${ACHTERGROND};-webkit-text-size-adjust:100%">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all">${esc(preheader)}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="${ACHTERGROND}" style="background:${ACHTERGROND}"><tr><td class="buiten" align="center" style="padding:36px 16px 44px">
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px">
-<tr><td style="padding:0 4px 20px;${font}font-size:22px;font-weight:700;color:${INKT};letter-spacing:-0.3px">
-<a href="${base}/" style="color:${INKT};text-decoration:none">Avezaat <span style="color:${KLEUR}">&amp;</span> Evers</a></td></tr>
-<tr><td class="kaart" style="background:#ffffff;border-radius:16px;padding:36px 32px">${inhoud}</td></tr>
-<tr><td style="padding:22px 8px 0;${font}font-size:13px;line-height:1.6;color:#6B7280">
-Bellen of appen: <a href="${TEL_LINK}" style="color:#6B7280">${TEL}</a> &nbsp;|&nbsp; <a href="mailto:${MAIL}" style="color:#6B7280">${MAIL}</a><br>
-Avezaat &amp; Evers VOF, Rotterdamseweg 26, 2921 AP Krimpen aan den IJssel
+<tr><td style="padding:0 6px 22px">
+<a href="${base}/" style="${F}font-size:21px;font-weight:700;letter-spacing:-0.3px;color:${INKT};text-decoration:none">Avezaat <span style="color:${ACCENT}">&amp;</span> Evers</a>
+</td></tr>
+<tr><td class="kaart" bgcolor="#ffffff" style="background:#ffffff;border-radius:18px;padding:40px 38px;border:1px solid ${LIJN}">${inhoud}</td></tr>
+${app}
+<tr><td style="padding:24px 8px 0;${F}font-size:12.5px;line-height:1.7;color:${ZACHT}">
+Avezaat &amp; Evers, jouw vaste boekhouder voor zzp’ers en eenmanszaken<br>
+Rotterdamseweg 26, 2921 AP Krimpen aan den IJssel &nbsp;|&nbsp; <a href="mailto:${MAIL}" style="color:${ZACHT}">${MAIL}</a> &nbsp;|&nbsp; <a href="${base}/" style="color:${ZACHT}">avezaatenevers.nl</a>
 </td></tr>
 </table></td></tr></table></body></html>`;
 }
 
-const tekstVoet = `\n\nBellen of appen: ${TEL}\n${MAIL}\nAvezaat & Evers VOF, Rotterdamseweg 26, 2921 AP Krimpen aan den IJssel`;
+const voet = (wie) => `\n\n${wieVol(wie)}\nAvezaat & Evers\n\nEen vraag tussendoor? App of bel ${TEL}. Binnen 2 uur antwoord.\n${MAIL}`;
 
-// Labels prijscheck
+// ---------- Prijscheck ----------
 const SITUATIE = { start: 'Net gestart', zelf: 'Doet het nu zelf', boekhouder: 'Heeft al een boekhouder', achter: 'Administratie loopt achter' };
 const TRANS = { '<50': 'Minder dan 50', '50-100': '50 tot 100', '>100': 'Meer dan 100', '?': 'Weet ik niet' };
 const JNW = { ja: 'Ja', nee: 'Nee', '?': 'Weet ik niet', geen: 'Geen fiscaal partner' };
 
 function prijsRegels(d) {
-  const r = [['Vast pakket, alles inbegrepen', '€80 p/m'], ['Uren- en rittenregistratie in de app', 'inbegrepen']];
-  if (d.transacties === '>100') r[0] = ['Vast pakket, bij meer dan 100 transacties', 'prijs op maat'];
+  const r = [['Vast pakket, alles inbegrepen', '€80 p/m']];
+  if (d.transacties === '>100') r[0] = ['Vast pakket, meer dan 100 transacties', 'prijs op maat'];
+  r.push(['Btw- en IB-aangifte, app en software', 'inbegrepen']);
   if (d.eu === 'ja') r.push(['ICP-aangifte (klanten in de EU)', '€15 p/m']);
-  if (d.eu === '?') r.push(['Klanten in de EU? Dat zoeken we samen uit', 'eventueel €15 p/m']);
+  if (d.eu === '?') r.push(['Klanten in de EU? Zoeken we samen uit', 'evt. €15 p/m']);
   if (d.partner === 'ja') r.push(['Aangifte fiscaal partner', '€150 per jaar']);
   if (d.situatie === 'boekhouder') r.push(['Overstappen, wij regelen de overdracht', '€149 eenmalig']);
-  if (d.situatie === 'achter') r.push(['Achterstand inhalen, met vooraf een prijsafspraak', '€60 per uur']);
-  if (d.transacties === '?') r.push(['Aantal transacties checken we samen', 'tot 100 inbegrepen']);
+  if (d.situatie === 'achter') r.push(['Achterstand inhalen, prijs vooraf afgesproken', '€60 per uur']);
   return r;
 }
 
+// ---------- Mails ----------
 const mails = {
-  // 1. Bevestiging kennismakingsformulier (naar bezoeker)
+  // 1. Bevestiging kennismaking (naar bezoeker)
   kennismaking(d, base = '') {
-    const inhoud = h1('Bedankt, we nemen snel contact op') +
-      p(aanhef(d.naam)) +
-      p('Leuk dat je kennis wilt maken. Je aanvraag is binnen. Binnen 2 uur (op werkdagen) bellen of appen we je om een moment te plannen.') +
-      p('Liever meteen zelf een tijd kiezen? Dat kan ook:') +
+    const inhoud = kop('Leuk dat je kennis wilt maken') +
+      p(hoi(d.naam)) +
+      p(`Je aanvraag is binnen. ${sterk('Binnen 2 uur')} bellen of appen we je om een moment te prikken. Op werkdagen, en meestal sneller.`) +
+      p('Liever zelf meteen een tijd kiezen? Dat kan ook:') +
       knop(`${base}/contact.html#plannen`, 'Kies een moment') +
-      kader(`<p style="margin:0 0 6px;${font}font-size:15px;font-weight:600;color:${INKT}">Zo gaat de kennismaking</p>
-<p style="margin:0;${font}font-size:15px;line-height:1.6;color:${GRIJS}">20 minuten, telefonisch of via video. We vragen naar je bedrijf en je administratie, en je hoort precies wat het kost. Vrijblijvend.</p>`) +
-      p(`Vraag tussendoor? App ons op <a href="${WA_LINK}" style="color:${KLEUR};white-space:nowrap">${TEL}</a>.`) +
-      ondertekening(base);
+      tussenkop('Zo gaat de kennismaking') +
+      vinkjes([
+        '20 minuten, telefonisch of via video. Wat jij het fijnst vindt.',
+        'We vragen naar je bedrijf en hoe je administratie nu loopt.',
+        'Je hoort precies wat het kost. Vrijblijvend, geen verkooppraatje.',
+      ]) +
+      p('Tot snel!', 'margin-bottom:22px') +
+      groet(base);
     return {
-      subject: 'We hebben je aanvraag ontvangen',
-      html: omhulsel(base, { preheader: 'Binnen 2 uur nemen we contact met je op.', inhoud }),
-      text: `${aanhef(d.naam)}\n\nLeuk dat je kennis wilt maken. Je aanvraag is binnen. Binnen 2 uur (op werkdagen) bellen of appen we je om een moment te plannen.\n\nZelf een moment kiezen: ${base}/contact.html#plannen\n\nDe kennismaking duurt 20 minuten, telefonisch of via video, en is vrijblijvend.\n\nGroet,\nKoen en Daan${tekstVoet}`,
+      subject: 'Leuk dat je kennis wilt maken',
+      html: omhulsel(base, { preheader: 'Binnen 2 uur bellen of appen we je om een moment te prikken.', inhoud }),
+      text: `${hoiTekst(d.naam)}\n\nJe aanvraag is binnen. Binnen 2 uur bellen of appen we je om een moment te prikken.\n\nZelf een tijd kiezen: ${base}/contact.html#plannen\n\nDe kennismaking duurt 20 minuten, telefonisch of via video. Je hoort precies wat het kost. Vrijblijvend.\n\nTot snel!${voet()}`,
     };
   },
 
-  // 2. Prijscheck-resultaat (naar bezoeker)
+  // 2. Uitkomst prijscheck (naar bezoeker)
   prijscheck(d, base = '') {
     const regels = prijsRegels(d);
-    const opMaat = d.transacties === '>100';
-    const bedrag = esc(d.prijs || (opMaat ? 'op maat vanaf €80 p/m' : '€80 p/m'));
-    const inhoud = h1('Je prijs bij Avezaat &amp; Evers') +
-      p(aanhef(d.naam)) +
-      p('Hier is de uitkomst van je prijscheck, zodat je hem rustig terug kunt lezen.') +
-      kader(`<p style="margin:0 0 2px;${font}font-size:14px;color:${GRIJS}">Jouw prijs</p>
-<p style="margin:0 0 14px;${font}font-size:30px;line-height:1.2;font-weight:700;color:${KLEUR}">${bedrag}</p>
+    const bedrag = esc(d.prijs || (d.transacties === '>100' ? 'Op maat' : '€80 p/m'));
+    const inhoud = kop('Dit kost je boekhouding bij ons') +
+      p(hoi(d.naam)) +
+      p('Je deed net onze prijscheck. Hieronder staat de uitkomst, zodat je hem rustig terug kunt lezen.') +
+      blok(`<p style="margin:0 0 2px;${F}font-size:13px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;color:${ACCENT}">Jouw prijs</p>
+<p style="margin:0 0 16px;${F}font-size:34px;line-height:1.15;font-weight:700;letter-spacing:-0.6px;color:${INKT}">${bedrag}</p>
 ${tabel(regels)}
-<p style="margin:12px 0 0;${font}font-size:13px;color:${GRIJS}">Prijzen excl. btw. Maandelijks opzegbaar.</p>`) +
-      (d.situatie === 'boekhouder' ? p('<strong style="color:' + INKT + '">Overstappen per 1 januari?</strong> Meld je aan vóór 15 december, dan is de overstap gratis.') : '') +
-      p('In een kennismaking van 20 minuten lopen we je situatie door en hoor je of dit klopt. Vrijblijvend.') +
-      knop(`${base}/contact.html#plannen`, 'Plan een kennismaking') +
-      ondertekening(base);
+<p style="margin:14px 0 0;${F}font-size:13px;line-height:1.5;color:${ZACHT}">Prijzen excl. btw. Maandelijks opzegbaar. Niet tevreden na de eerste maand? Geld terug.</p>`) +
+      (d.situatie === 'boekhouder' ? p(`${sterk('Overstappen per 1 januari?')} Meld je uiterlijk 15 december aan, dan is de overstap gratis. Wij regelen alles met je oude boekhouder.`) : '') +
+      p('Klopt dit met jouw situatie? In een kennismaking van 20 minuten lopen we het samen door. Dan weet je het zeker.') +
+      knop(`${base}/contact.html#plannen`, 'Plan een gratis kennismaking') +
+      groet(base);
     return {
-      subject: 'Je prijscheck: zo ziet je prijs eruit',
-      html: omhulsel(base, { preheader: `Jouw prijs: ${d.prijs || '€80 p/m'}. Rustig terug te lezen.`, inhoud }),
-      text: `${aanhef(d.naam)}\n\nDe uitkomst van je prijscheck: ${d.prijs || '€80 p/m'}\n\n${regels.map((r) => `${r[0]}: ${r[1]}`).join('\n')}\n\nPrijzen excl. btw. Maandelijks opzegbaar.\n\nPlan een kennismaking: ${base}/contact.html#plannen\n\nGroet,\nKoen en Daan${tekstVoet}`,
+      subject: `Jouw prijs: ${d.prijs || '€80 per maand'}`,
+      html: omhulsel(base, { preheader: `Jouw prijs: ${d.prijs || '€80 p/m'}. Alles inbegrepen, maandelijks opzegbaar.`, inhoud }),
+      text: `${hoiTekst(d.naam)}\n\nDe uitkomst van je prijscheck: ${d.prijs || '€80 p/m'}\n\n${regels.map((r) => `${r[0]}: ${r[1]}`).join('\n')}\n\nPrijzen excl. btw. Maandelijks opzegbaar.\n\nPlan een gratis kennismaking: ${base}/contact.html#plannen${voet()}`,
     };
   },
 
-  // 3. Interne melding nieuwe aanvraag (naar MAIL_TO)
+  // 3. Melding nieuwe aanvraag (naar jullie)
   intern(d, base = '', formulier = 'kennismaking') {
-    const tel = d.telefoon ? `<a href="tel:${esc(String(d.telefoon).replace(/[^\d+]/g, ''))}" style="color:${KLEUR}">${esc(d.telefoon)}</a>` : 'niet ingevuld';
+    const tel = d.telefoon ? `<a href="tel:${esc(String(d.telefoon).replace(/[^\d+]/g, ''))}" style="color:${ACCENT}">${esc(d.telefoon)}</a>` : '-';
     const wa = d.telefoon ? String(d.telefoon).replace(/\D/g, '').replace(/^0/, '31') : '';
-    const rijen = [['Naam', esc(d.naam)], ['E-mail', `<a href="mailto:${esc(d.email)}" style="color:${KLEUR}">${esc(d.email)}</a>`], ['Telefoon', tel]];
+    const rijen = [['Naam', esc(d.naam) || '-'], ['E-mail', d.email ? `<a href="mailto:${esc(d.email)}" style="color:${ACCENT}">${esc(d.email)}</a>` : '-'], ['Telefoon', tel]];
     if (formulier === 'prijscheck') {
-      rijen.push(['Situatie', esc(SITUATIE[d.situatie] || d.situatie || '')], ['Branche', esc(d.branche)], ['Transacties p/m', esc(TRANS[d.transacties] || d.transacties || '')],
-        ['Klanten in EU', esc(JNW[d.eu] || d.eu || '')], ['Fiscaal partner', esc(JNW[d.partner] || d.partner || '')], ['Berekende prijs', esc(d.prijs)]);
+      rijen.push(['Situatie', esc(SITUATIE[d.situatie] || d.situatie || '-')], ['Branche', esc(d.branche || '-')], ['Transacties p/m', esc(TRANS[d.transacties] || d.transacties || '-')],
+        ['Klanten in EU', esc(JNW[d.eu] || d.eu || '-')], ['Fiscaal partner', esc(JNW[d.partner] || d.partner || '-')], ['Berekende prijs', esc(d.prijs || '-')]);
     } else {
-      rijen.push(['Situatie', esc(d.situatie)], ['Transacties p/m', esc(d.transacties)]);
+      rijen.push(['Situatie', esc(d.situatie || '-')], ['Transacties p/m', esc(d.transacties || '-')]);
     }
-    const inhoud = h1(`Nieuwe aanvraag: ${esc(d.naam)}`) +
-      p(`Via het formulier <strong style="color:${INKT}">${formulier === 'prijscheck' ? 'prijscheck' : 'kennismaking'}</strong>. Reageer binnen 2 uur, dat beloven we op de site.`) +
-      kader(tabel(rijen.map(([l, r]) => [l, r || '-']))) +
-      (d.bericht ? p(`<strong style="color:${INKT}">Bericht</strong><br>${esc(d.bericht).replace(/\n/g, '<br>')}`) : '') +
-      (wa ? knop(`https://wa.me/${wa}`, 'Stuur een WhatsApp') : '');
+    const inhoud = kop(`Nieuwe aanvraag van ${esc(voornaam(d.naam) || 'een bezoeker')}`) +
+      p(`Binnen via de ${sterk(formulier === 'prijscheck' ? 'prijscheck' : 'kennismaking')}. We beloven reactie binnen 2 uur, dus de klok loopt.`) +
+      blok(tabel(rijen)) +
+      (d.bericht ? p(`${sterk('Bericht')}<br>${esc(d.bericht).replace(/\n/g, '<br>')}`) : '') +
+      (wa ? knop(`https://wa.me/${wa}`, `App ${esc(voornaam(d.naam) || 'de klant')}`) : '') +
+      p(`Staat ook als prospect in ${link(`${base}/intern/klanten.html`, 'Klanten')}.`, `font-size:14px;color:${ZACHT}`);
     return {
       subject: `Nieuwe aanvraag (${formulier}): ${d.naam || 'onbekend'}`,
-      html: omhulsel(base, { preheader: `${d.naam || ''} ${d.telefoon || ''}`, inhoud }),
-      text: `Nieuwe aanvraag via ${formulier}\n\nNaam: ${d.naam}\nE-mail: ${d.email}\nTelefoon: ${d.telefoon || '-'}\nSituatie: ${d.situatie || '-'}\nTransacties: ${d.transacties || '-'}${formulier === 'prijscheck' ? `\nBranche: ${d.branche || '-'}\nEU: ${d.eu || '-'}\nPartner: ${d.partner || '-'}\nPrijs: ${d.prijs || '-'}` : ''}\n\n${d.bericht || ''}`,
+      html: omhulsel(base, { preheader: `${d.naam || ''}, ${d.telefoon || d.email || ''}`, inhoud, appBlok: false }),
+      text: `Nieuwe aanvraag via ${formulier}\n\nNaam: ${d.naam || '-'}\nE-mail: ${d.email || '-'}\nTelefoon: ${d.telefoon || '-'}\nSituatie: ${d.situatie || '-'}\nTransacties: ${d.transacties || '-'}${formulier === 'prijscheck' ? `\nBranche: ${d.branche || '-'}\nEU: ${d.eu || '-'}\nPartner: ${d.partner || '-'}\nPrijs: ${d.prijs || '-'}` : ''}\n\n${d.bericht || ''}`,
     };
   },
 
-  // 4. Herinnering voorstel (2 dagen na versturen, nog niet getekend)
+  // 4. Herinnering voorstel
   voorstelHerinnering(d, base = '') {
-    const inhoud = h1('Nog vragen over het voorstel?') +
-      p(aanhef(d.naam)) +
-      p('Twee dagen geleden stuurden we je ons voorstel. Misschien is het erbij ingeschoten, of heb je nog een vraag. Beide prima.') +
-      p('Akkoord? Dan teken je het voorstel online, in een minuut:') +
+    const inhoud = kop('Heb je ons voorstel nog kunnen bekijken?') +
+      p(hoi(d.naam)) +
+      p('Twee dagen geleden stuurde ik je ons voorstel. Misschien is het erbij ingeschoten, of zit je nog met een vraag. Allebei prima.') +
+      p(`Ben je eruit? Dan teken je het voorstel online. Dat is ${sterk('in een minuut')} geregeld, en daarna zetten wij alles voor je klaar.`) +
       knop(d.link || `${base}/voorstel.html`, 'Bekijk het voorstel') +
-      p(`Liever eerst even overleggen? Bel of app ${d.wie === 'daan' ? 'Daan' : d.wie === 'koen' ? 'Koen' : 'ons'} op <a href="${WA_LINK}" style="color:${KLEUR};white-space:nowrap">${TEL}</a>.`) +
-      ondertekening(base, d.wie);
+      p('Twijfel je nog ergens over? Bel of app me even. Dan lopen we het samen door, zonder verplichtingen.', 'margin-bottom:22px') +
+      groet(base, d.wie);
     return {
-      subject: 'Nog vragen over het voorstel?',
-      html: omhulsel(base, { preheader: 'Akkoord? Dan teken je het voorstel online in een minuut.', inhoud }),
-      text: `${aanhef(d.naam)}\n\nTwee dagen geleden stuurden we je ons voorstel. Nog een vraag? Bel of app ${TEL}.\n\nBekijk het voorstel: ${d.link || base + '/voorstel.html'}\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : d.wie === 'koen' ? 'Koen' : 'Koen en Daan'}${tekstVoet}`,
+      subject: 'Heb je ons voorstel nog kunnen bekijken?',
+      html: omhulsel(base, { preheader: 'Ben je eruit? Dan teken je het voorstel online, in een minuut.', inhoud, wie: d.wie }),
+      text: `${hoiTekst(d.naam)}\n\nTwee dagen geleden stuurde ik je ons voorstel. Ben je eruit? Dan teken je het online, in een minuut.\n\n${d.link || base + '/voorstel.html'}\n\nTwijfel je nog? Bel of app me even.${voet(d.wie)}`,
     };
   },
 
-  // 5. Welkom (na tekenen)
+  // 5. Welkom
   welkom(d, base = '') {
-    const inhoud = h1('Welkom bij Avezaat &amp; Evers') +
-      p(aanhef(d.naam)) +
-      p(`Fijn dat je voor ons kiest. Vanaf nu is ${d.wie === 'daan' ? 'Daan' : 'Koen'} je vaste boekhouder. Dit zijn de eerste stappen:`) +
-      lijst([
-        'Activeer je MoneyMonk-account via de uitnodiging in je mail.',
-        'Download de app en koppel je bank. Duurt 20 minuten.',
-        'Maak een foto van je eerste bonnetje. Dan weet je meteen hoe het werkt.',
+    const inhoud = kop(`Welkom, ${esc(voornaam(d.naam) || 'fijn dat je er bent')}!`) +
+      p(voornaam(d.naam) ? `Fijn dat je voor ons kiest. Vanaf nu ben ik je vaste boekhouder. Je hebt dus altijd hetzelfde aanspreekpunt, dat jouw bedrijf kent.` : 'Fijn dat je voor ons kiest. Vanaf nu heb je één vaste boekhouder, die jouw bedrijf kent.') +
+      p('Om te beginnen zijn er maar drie stappen:') +
+      stappen([
+        ['Activeer je MoneyMonk-account', 'Je krijgt een uitnodiging per mail. Klik op de link en kies een wachtwoord.'],
+        ['Download de app en koppel je bank', 'Duurt een kwartiertje. Daarna komen je transacties vanzelf binnen.'],
+        ['Fotografeer je eerste bonnetje', 'Dan weet je meteen hoe het werkt. Meer hoef je eigenlijk niet te doen.'],
       ]) +
       knop(`${base}/welkom.html`, 'Open je welkomstpagina') +
-      p(`Liever stap voor stap? Lees de <a href="${base}/kennisbank/starten-met-moneymonk.html" style="color:${KLEUR}">handleiding Van start met MoneyMonk</a>. Onze afspraken over je gegevens staan in de <a href="${base}/verwerkersovereenkomst.html" style="color:${KLEUR}">verwerkersovereenkomst</a>.`) +
-      p(`Loop je ergens tegenaan? App gerust op <a href="${WA_LINK}" style="color:${KLEUR};white-space:nowrap">${TEL}</a>.`) +
-      ondertekening(base, d.wie);
+      p(`Liever stap voor stap met plaatjes? Lees ${link(`${base}/kennisbank/starten-met-moneymonk.html`, 'Van start met MoneyMonk')}. Hoe we met je gegevens omgaan, staat in de ${link(`${base}/verwerkersovereenkomst.html`, 'verwerkersovereenkomst')}.`) +
+      p('Loop je ergens tegenaan? App me gewoon. Daar ben ik voor.', 'margin-bottom:22px') +
+      groet(base, d.wie);
     return {
       subject: 'Welkom! Zo ga je van start',
-      html: omhulsel(base, { preheader: 'In 3 stappen klaar: account activeren, bank koppelen, eerste bonnetje.', inhoud }),
-      text: `${aanhef(d.naam)}\n\nFijn dat je voor ons kiest. De eerste stappen:\n1. Activeer je MoneyMonk-account via de uitnodiging in je mail.\n2. Download de app en koppel je bank.\n3. Maak een foto van je eerste bonnetje.\n\nWelkomstpagina: ${base}/welkom.html\nHandleiding: ${base}/kennisbank/starten-met-moneymonk.html\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : 'Koen'}${tekstVoet}`,
+      html: omhulsel(base, { preheader: 'Drie stappen en je bent klaar: account activeren, bank koppelen, eerste bonnetje.', inhoud, wie: d.wie }),
+      text: `${hoiTekst(d.naam)}\n\nFijn dat je voor ons kiest. Vanaf nu ben ik je vaste boekhouder.\n\nOm te beginnen:\n1. Activeer je MoneyMonk-account via de uitnodiging in je mail.\n2. Download de app en koppel je bank.\n3. Fotografeer je eerste bonnetje.\n\nWelkomstpagina: ${base}/welkom.html\nHandleiding: ${base}/kennisbank/starten-met-moneymonk.html\n\nLoop je ergens tegenaan? App me gewoon.${voet(d.wie)}`,
     };
   },
 
   // 6. Check-in na 2 weken
   checkIn(d, base = '') {
-    const inhoud = h1('Hoe gaat het met de app?') +
-      p(aanhef(d.naam)) +
-      p('Je bent nu twee weken klant. Even checken of alles goed loopt:') +
-      lijst(['Is je bank gekoppeld?', 'Lukt het om bonnetjes te fotograferen?', 'Kun je facturen maken in de app?']) +
-      p(`Ergens nee op? Geen probleem. Stuur een appje naar <a href="${WA_LINK}" style="color:${KLEUR};white-space:nowrap">${TEL}</a>, dan lopen we het samen door. Tien minuten werk.`) +
-      p('Gaat alles goed? Dan hoef je niets te doen.') +
-      ondertekening(base, d.wie);
+    const inhoud = kop('Hoe bevalt de app?') +
+      p(hoi(d.naam)) +
+      p('Je bent nu twee weken klant. Tijd voor een korte check. Lukt dit allemaal?') +
+      vinkjes(['Je bank is gekoppeld en je transacties komen binnen', 'Je fotografeert je bonnetjes in de app', 'Je maakt je facturen in MoneyMonk']) +
+      p(`Ergens nee op? Geen probleem, dat hebben de meeste mensen in het begin. ${sterk('App me even')}, dan lopen we het samen door. Tien minuten werk.`) +
+      p('Gaat alles goed? Dan hoef je niets te doen. Wij houden de rest in de gaten.', 'margin-bottom:22px') +
+      groet(base, d.wie);
     return {
-      subject: 'Hoe gaat het met de app?',
-      html: omhulsel(base, { preheader: 'Bank gekoppeld, bonnetjes in de app? Even checken.', inhoud }),
-      text: `${aanhef(d.naam)}\n\nJe bent nu twee weken klant. Is je bank gekoppeld, lukt het met bonnetjes en facturen? Ergens nee op? App ons op ${TEL}.\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : 'Koen'}${tekstVoet}`,
+      subject: 'Hoe bevalt de app?',
+      html: omhulsel(base, { preheader: 'Twee weken klant. Bank gekoppeld, bonnetjes in de app? Even checken.', inhoud, wie: d.wie }),
+      text: `${hoiTekst(d.naam)}\n\nJe bent nu twee weken klant. Is je bank gekoppeld, lukt het met bonnetjes en facturen? Ergens nee op? App me even, dan lopen we het samen door.${voet(d.wie)}`,
     };
   },
 
-  // 7. Kwartaalherinnering stukken aanleveren
+  // 7. Kwartaalherinnering btw
   kwartaal(d, base = '') {
-    const inhoud = h1(`Lever je stukken aan vóór ${esc(d.aanleverdatum)}`) +
-      p(aanhef(d.naam)) +
-      p(`Het ${esc(d.kwartaal)} zit erop. Wij doen je btw-aangifte, jij levert alleen de laatste stukken aan.`) +
-      lijst(['Bonnetjes en inkoopfacturen in de app', 'Alle verkoopfacturen verstuurd of geüpload', 'Contante uitgaven? Even een foto van het bonnetje'].concat(d.icp ? ['Facturen aan klanten in de EU, voor je ICP-opgaaf'] : [])) +
-      kader(`<p style="margin:0;${font}font-size:15px;line-height:1.6;color:${GRIJS}"><strong style="color:${INKT}">Uiterlijk ${esc(d.aanleverdatum)}</strong>, dan dienen wij de aangifte op tijd in (deadline ${esc(d.deadline)}). Later aanleveren kan, maar dan rekenen we €50 spoedtoeslag.</p>`) +
-      p('Alles al in de app? Dan hoef je niets te doen.') +
-      ondertekening(base, d.wie);
+    const items = ['Bonnetjes en inkoopfacturen in de app', 'Alle verkoopfacturen verstuurd of geüpload', 'Contant betaald? Maak even een foto van het bonnetje'];
+    if (d.icp) items.push('Facturen aan klanten in de EU, voor je ICP-opgaaf');
+    const inhoud = kop(`Het ${esc(d.kwartaal)} zit erop`) +
+      p(hoi(d.naam)) +
+      p('Tijd voor je btw-aangifte. Die doen wij. Jij zorgt alleen dat alles in de app staat:') +
+      vinkjes(items) +
+      blok(blokTekst(`${sterk(`Graag uiterlijk ${esc(d.aanleverdatum)}.`)} Dan dienen wij je aangifte ruim op tijd in, vóór de deadline van ${esc(d.deadline)}. Lever je later aan, dan rekenen we €50 spoedtoeslag.`)) +
+      p('Staat alles er al in? Top, dan hoef je niets te doen.', 'margin-bottom:22px') +
+      groet(base, d.wie);
     return {
       subject: `Btw ${d.kwartaal}: lever aan vóór ${d.aanleverdatum}`,
-      html: omhulsel(base, { preheader: `Bonnetjes en facturen in de app vóór ${d.aanleverdatum}.`, inhoud }),
-      text: `${aanhef(d.naam)}\n\nHet ${d.kwartaal} zit erop. Lever je bonnetjes en facturen aan vóór ${d.aanleverdatum}, dan dienen wij de btw-aangifte op tijd in (deadline ${d.deadline}). Later aanleveren: €50 spoedtoeslag.\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : 'Koen'}${tekstVoet}`,
+      html: omhulsel(base, { preheader: `Zet je bonnetjes en facturen vóór ${d.aanleverdatum} in de app. De aangifte doen wij.`, inhoud, wie: d.wie }),
+      text: `${hoiTekst(d.naam)}\n\nHet ${d.kwartaal} zit erop. Zet je bonnetjes en facturen vóór ${d.aanleverdatum} in de app, dan dienen wij je btw-aangifte op tijd in (deadline ${d.deadline}). Later aanleveren: €50 spoedtoeslag.${voet(d.wie)}`,
     };
   },
 
-  // 8. Jaareinde (begin december)
-  jaareinde(d, base = '') {
-    const inhoud = h1('Nog een paar weken tot 31 december') +
-      p(aanhef(d.naam)) +
-      p('Deze punten regel je vóór de jaarwisseling, anders ben je te laat voor dit belastingjaar:') +
-      lijst(['Investeringen die je toch al van plan was? Vóór 31 december kan het schelen.', 'Haal je het urencriterium van 1.225 uur? Check je urenregistratie.', 'Facturen die niet meer betaald worden: laat het ons weten.', 'Overweeg je de KOR voor volgend jaar? Aanmelden kan tot begin december.']) +
-      knop(`${base}/kennisbank/jaareinde-checklist-zzp.html`, 'Bekijk de jaareinde-checklist') +
-      p('Twijfel je ergens over? App ons, dan kijken we samen of het voor jou iets oplevert.') +
-      ondertekening(base, d.wie);
-    return {
-      subject: 'Jaareinde: dit regel je vóór 31 december',
-      html: omhulsel(base, { preheader: 'Investeringen, urencriterium en KOR: check het vóór 31 december.', inhoud }),
-      text: `${aanhef(d.naam)}\n\nVóór 31 december: investeringen, urencriterium (1.225 uur), oninbare facturen en de KOR.\n\nChecklist: ${base}/kennisbank/jaareinde-checklist-zzp.html\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : 'Koen'}${tekstVoet}`,
-    };
-  },
-
-  // 9. Inkomstenbelasting (maart)
-  inkomstenbelasting(d, base = '') {
-    const inhoud = h1(`Aangifte ${esc(d.jaar)}: dit hebben we van je nodig`) +
-      p(aanhef(d.naam)) +
-      p(`We gaan aan de slag met je aangifte inkomstenbelasting over ${esc(d.jaar)}. Je bedrijfscijfers hebben we al. Voor de rest hebben we deze stukken nodig:`) +
-      lijst(['Jaaropgaven van je bankrekeningen en spaarrekeningen', 'Jaaropgave van je hypotheek en de WOZ-waarde van je huis', 'Loonstroken of jaaropgaven als je ook in loondienst werkte'].concat(d.partner === false ? [] : ['Gegevens en jaaropgaven van je fiscaal partner'])) +
-      kader(`<p style="margin:0;${font}font-size:15px;line-height:1.6;color:${GRIJS}">Mail ze naar <a href="mailto:${MAIL}" style="color:${KLEUR}">${MAIL}</a>. <strong style="color:${INKT}">Graag vóór ${esc(d.aanleverdatum)}</strong>, dan heb je ruim voor 1 mei duidelijkheid.</p>`) +
-      ondertekening(base, d.wie);
-    return {
-      subject: `Aangifte inkomstenbelasting ${d.jaar}: lever aan vóór ${d.aanleverdatum}`,
-      html: omhulsel(base, { preheader: 'Jaaropgaven van bank, hypotheek en eventueel loondienst.', inhoud }),
-      text: `${aanhef(d.naam)}\n\nVoor je aangifte inkomstenbelasting over ${d.jaar} hebben we nodig: jaaropgaven bank en sparen, hypotheek en WOZ, loondienst, en gegevens van je fiscaal partner. Mail ze naar ${MAIL}, graag vóór ${d.aanleverdatum}.\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : 'Koen'}${tekstVoet}`,
-    };
-  },
-  // 10. Tweede kwartaalherinnering (rond de 8e, alleen als de stukken nog niet binnen zijn)
+  // 8. Tweede kwartaalherinnering (alleen als stukken nog niet binnen zijn)
   kwartaalTweede(d, base = '') {
-    const inhoud = h1(`Nog even: lever aan vóór ${esc(d.aanleverdatum)}`) +
-      p(aanhef(d.naam)) +
-      p(`We missen nog stukken voor je btw-aangifte over het ${esc(d.kwartaal)}. Zet je bonnetjes en facturen deze week in de app, dan regelen wij de rest.`) +
-      kader(`<p style="margin:0;${font}font-size:15px;line-height:1.6;color:${GRIJS}"><strong style="color:${INKT}">Uiterlijk ${esc(d.aanleverdatum)}</strong>. Daarna rekenen we €50 spoedtoeslag, zodat we de aangifte toch op tijd kunnen indienen (deadline ${esc(d.deadline)}).</p>`) +
-      p(`Alles al aangeleverd? Dan kruisen onze berichten elkaar. Stuur gerust een appje naar <a href="${WA_LINK}" style="color:${KLEUR};white-space:nowrap">${TEL}</a>.`) +
-      ondertekening(base, d.wie);
+    const inhoud = kop(`Nog even: je btw-stukken`) +
+      p(hoi(d.naam)) +
+      p(`Voor je btw-aangifte over het ${esc(d.kwartaal)} missen we nog stukken. Kun je ze deze week in de app zetten? Dan regelen wij de rest.`) +
+      blok(blokTekst(`${sterk(`Uiterlijk ${esc(d.aanleverdatum)}.`)} Daarna rekenen we €50 spoedtoeslag, zodat we de aangifte toch op tijd kunnen indienen, vóór ${esc(d.deadline)}.`)) +
+      p('Heb je alles net aangeleverd? Dan kruisen onze berichten elkaar. Laat het even weten, dan kijk ik het na.', 'margin-bottom:22px') +
+      groet(base, d.wie);
     return {
-      subject: `Herinnering: btw ${d.kwartaal}, lever aan vóór ${d.aanleverdatum}`,
-      html: omhulsel(base, { preheader: `We missen nog stukken. Uiterlijk ${d.aanleverdatum}, daarna €50 spoedtoeslag.`, inhoud }),
-      text: `${aanhef(d.naam)}\n\nWe missen nog stukken voor je btw-aangifte over het ${d.kwartaal}. Lever aan vóór ${d.aanleverdatum}; daarna rekenen we €50 spoedtoeslag (deadline ${d.deadline}).\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : 'Koen'}${tekstVoet}`,
+      subject: `Herinnering: btw-stukken vóór ${d.aanleverdatum}`,
+      html: omhulsel(base, { preheader: `We missen nog stukken voor je btw-aangifte. Uiterlijk ${d.aanleverdatum}.`, inhoud, wie: d.wie }),
+      text: `${hoiTekst(d.naam)}\n\nVoor je btw-aangifte over het ${d.kwartaal} missen we nog stukken. Uiterlijk ${d.aanleverdatum}; daarna rekenen we €50 spoedtoeslag (deadline ${d.deadline}).${voet(d.wie)}`,
     };
   },
 
-  // 11. Review vragen (3 maanden na de start)
+  // 9. Jaareinde
+  jaareinde(d, base = '') {
+    const inhoud = kop('Nog een paar weken tot 31 december') +
+      p(hoi(d.naam)) +
+      p('Het jaar is bijna om. Een paar punten kun je nu nog regelen. Na 31 december is het te laat voor dit belastingjaar.') +
+      vinkjes([
+        `${sterk('Investeringen')}: een bus, gereedschap of laptop die je toch al wilde kopen? Vóór 31 december kan dat belasting schelen.`,
+        `${sterk('Urencriterium')}: kom je aan 1.225 uur? Check je urenregistratie in de app.`,
+        `${sterk('Onbetaalde facturen')}: klanten die echt niet meer betalen? Laat het ons weten.`,
+        `${sterk('KOR')}: volgend jaar in of uit de kleineondernemersregeling? Dat moet begin december geregeld zijn.`,
+      ]) +
+      knop(`${base}/kennisbank/jaareinde-checklist-zzp.html`, 'Bekijk de jaareinde-checklist') +
+      p('Twijfel je ergens over? App me. Dan rekenen we samen uit of het iets oplevert.', 'margin-bottom:22px') +
+      groet(base, d.wie);
+    return {
+      subject: 'Dit regel je nog vóór 31 december',
+      html: omhulsel(base, { preheader: 'Investeringen, urencriterium en KOR: nu nog te regelen voor dit jaar.', inhoud, wie: d.wie }),
+      text: `${hoiTekst(d.naam)}\n\nVóór 31 december nog te regelen: investeringen, urencriterium (1.225 uur), onbetaalde facturen en de KOR.\n\nChecklist: ${base}/kennisbank/jaareinde-checklist-zzp.html${voet(d.wie)}`,
+    };
+  },
+
+  // 10. Aangifte inkomstenbelasting
+  inkomstenbelasting(d, base = '') {
+    const items = ['Jaaropgaven van je bank- en spaarrekeningen', 'Jaaropgave van je hypotheek en de WOZ-waarde van je huis', 'Werkte je ook in loondienst? Dan je jaaropgave'];
+    if (d.partner !== false) items.push('Heb je een fiscaal partner? Dan ook die stukken van je partner');
+    const inhoud = kop(`Tijd voor je aangifte over ${esc(d.jaar)}`) +
+      p(hoi(d.naam)) +
+      p(`We gaan aan de slag met je aangifte inkomstenbelasting. Je bedrijfscijfers hebben we al. Voor de rest hebben we nog dit van je nodig:`) +
+      vinkjes(items) +
+      blok(blokTekst(`${sterk('Mail ze naar')} ${link(`mailto:${MAIL}`, MAIL)}, ${sterk(`graag vóór ${esc(d.aanleverdatum)}`)}. Een foto met je telefoon is ook prima, als alles maar leesbaar is.`)) +
+      p('Dan heb je ruim voor 1 mei duidelijkheid over wat je terugkrijgt of moet betalen.', 'margin-bottom:22px') +
+      groet(base, d.wie);
+    return {
+      subject: `Je aangifte over ${d.jaar}: dit hebben we nodig`,
+      html: omhulsel(base, { preheader: `Jaaropgaven van bank, hypotheek en loondienst. Graag vóór ${d.aanleverdatum}.`, inhoud, wie: d.wie }),
+      text: `${hoiTekst(d.naam)}\n\nVoor je aangifte inkomstenbelasting over ${d.jaar} hebben we nodig:\n- ${items.join('\n- ')}\n\nMail ze naar ${MAIL}, graag vóór ${d.aanleverdatum}.${voet(d.wie)}`,
+    };
+  },
+
+  // 11. Review vragen
   review(d, base = '') {
-    const link = d.reviewLink || `${base}/`;
-    const inhoud = h1('Mogen we je iets vragen?') +
-      p(aanhef(d.naam)) +
-      p('Je bent nu drie maanden klant. We hopen dat je administratie je minder tijd en zorgen kost dan eerst.') +
-      p('Als dat zo is: wil je dat in een paar zinnen op Google zetten? Andere ondernemers kiezen een boekhouder vaak op basis van reviews. Voor ons maakt het echt verschil.') +
-      knop(link, 'Schrijf een review') +
-      p('Is er juist iets wat beter kan? Laat het ons dan liever direct weten, dan lossen we het op.') +
-      ondertekening(base, d.wie);
+    const href = d.reviewLink || `${base}/`;
+    const inhoud = kop('Mag ik je iets vragen?') +
+      p(hoi(d.naam)) +
+      p('Je bent nu drie maanden klant. Ik hoop dat je administratie je minder tijd en kopzorgen kost dan eerst.') +
+      p(`Als dat zo is: wil je dat in een paar zinnen op Google zetten? Ondernemers kiezen hun boekhouder vaak op basis van reviews. ${sterk('Voor ons maakt het echt verschil.')}`) +
+      knop(href, 'Schrijf een review') +
+      p('Kan er juist iets beter? Dan hoor ik het liever direct van je. Dan lossen we het op.', 'margin-bottom:22px') +
+      groet(base, d.wie);
     return {
-      subject: 'Mogen we je iets vragen?',
-      html: omhulsel(base, { preheader: 'Drie maanden klant. Wil je een korte review op Google zetten?', inhoud }),
-      text: `${aanhef(d.naam)}\n\nJe bent nu drie maanden klant. Wil je in een paar zinnen een review op Google zetten? Dat helpt ons echt.\n\n${link}\n\nIets wat beter kan? Laat het ons direct weten.\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : 'Koen'}${tekstVoet}`,
+      subject: 'Mag ik je iets vragen?',
+      html: omhulsel(base, { preheader: 'Drie maanden klant. Wil je in een paar zinnen een review op Google zetten?', inhoud, wie: d.wie }),
+      text: `${hoiTekst(d.naam)}\n\nJe bent nu drie maanden klant. Wil je in een paar zinnen een review op Google zetten? Voor ons maakt het echt verschil.\n\n${href}\n\nKan er iets beter? Laat het me direct weten.${voet(d.wie)}`,
     };
   },
 
-  // 12. Aanbevelen (na de eerste afgeronde IB-aangifte, alleen tevreden klanten)
+  // 12. Aanbevelen
   aanbevelen(d, base = '') {
-    const inhoud = h1('Ken je iemand die hier ook last van heeft?') +
-      p(aanhef(d.naam)) +
+    const inhoud = kop('Ken jij iemand die hier ook mee worstelt?') +
+      p(hoi(d.naam)) +
       p('Je aangifte inkomstenbelasting is ingediend. Weer een zorg minder.') +
-      p('Ken je een collega of vriend die nog zelf met bonnetjes en aangiftes worstelt? Stuur hem onze kant op. Noemt hij jouw naam bij de kennismaking, dan krijgen jullie <strong style="color:' + INKT + '">allebei een maand gratis</strong>.') +
+      p('Ken je een collega, vriend of familielid die nog zelf met bonnetjes en aangiftes stoeit? Stuur hem of haar onze kant op.') +
+      blok(blokTekst(`${sterk('Allebei een maand gratis.')} Noemt diegene jouw naam bij de kennismaking en wordt het klant? Dan krijgen jullie allebei een maand boekhouding cadeau.`)) +
       knop(`${base}/aanbevelen.html`, 'Stuur de link door') +
-      p('Geen tijd of geen idee wie? Helemaal prima, dan hoef je niets te doen.') +
-      ondertekening(base, d.wie);
+      p('Geen tijd of niemand in gedachten? Helemaal prima. Dan hoef je niets te doen.', 'margin-bottom:22px') +
+      groet(base, d.wie);
     return {
-      subject: 'Je aangifte is ingediend. En dan nog dit...',
-      html: omhulsel(base, { preheader: 'Ken je iemand? Dan krijgen jullie allebei een maand gratis.', inhoud }),
-      text: `${aanhef(d.naam)}\n\nJe aangifte inkomstenbelasting is ingediend. Ken je iemand die ook nog worstelt met zijn administratie? Noemt hij jouw naam, dan krijgen jullie allebei een maand gratis.\n\n${base}/aanbevelen.html\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : 'Koen'}${tekstVoet}`,
+      subject: 'Je aangifte is ingediend. Nog één ding...',
+      html: omhulsel(base, { preheader: 'Ken je iemand? Dan krijgen jullie allebei een maand gratis.', inhoud, wie: d.wie }),
+      text: `${hoiTekst(d.naam)}\n\nJe aangifte inkomstenbelasting is ingediend. Ken je iemand die nog zelf met zijn administratie stoeit? Noemt diegene jouw naam en wordt het klant, dan krijgen jullie allebei een maand gratis.\n\n${base}/aanbevelen.html${voet(d.wie)}`,
     };
   },
 
-  // 13. Jubileum (1 jaar klant)
+  // 13. Een jaar klant
   jubileum(d, base = '') {
     const n = Number(d.btwAantal) || 0;
     const items = [];
-    if (n) items.push(`${n} btw-aangifte${n === 1 ? '' : 's'} ingediend`);
-    if (d.ib) items.push('je aangifte inkomstenbelasting gedaan');
-    items.push('je bonnetjes en facturen verwerkt, zonder dat je er zelf naar om hoefde te kijken');
-    const inhoud = h1('Een jaar samen') +
-      p(aanhef(d.naam)) +
-      p('Vandaag is het precies een jaar geleden dat je klant werd. Even een korte terugblik:') +
-      lijst(items) +
-      p('Dank je voor het vertrouwen. Heb je wensen voor het komende jaar, of wil je eens sparren over je cijfers? App ons, dan plannen we een moment.') +
-      ondertekening(base, d.wie);
+    if (n) items.push(`${sterk(`${n} btw-aangifte${n === 1 ? '' : 's'}`)} op tijd ingediend`);
+    if (d.ib) items.push(`Je ${sterk('aangifte inkomstenbelasting')} geregeld`);
+    items.push(`Je bonnetjes en facturen verwerkt, ${sterk('zonder dat jij erover hoefde in te zitten')}`);
+    const inhoud = kop('Vandaag precies een jaar') +
+      p(hoi(d.naam)) +
+      p('Een jaar geleden werd je klant. Even een korte terugblik op wat we samen deden:') +
+      vinkjes(items) +
+      p('Dank je wel voor het vertrouwen. Heb je wensen voor het komende jaar, of wil je eens rustig door je cijfers lopen? App me, dan plannen we een moment.', 'margin-bottom:22px') +
+      groet(base, d.wie);
     return {
-      subject: 'Een jaar samen',
-      html: omhulsel(base, { preheader: 'Een korte terugblik op je eerste jaar bij Avezaat & Evers.', inhoud }),
-      text: `${aanhef(d.naam)}\n\nVandaag ben je een jaar klant. Dit jaar: ${items.join('; ')}.\n\nDank je voor het vertrouwen.\n\nGroet,\n${d.wie === 'daan' ? 'Daan' : 'Koen'}${tekstVoet}`,
+      subject: 'Vandaag precies een jaar',
+      html: omhulsel(base, { preheader: 'Een korte terugblik op je eerste jaar bij Avezaat & Evers.', inhoud, wie: d.wie }),
+      text: `${hoiTekst(d.naam)}\n\nEen jaar geleden werd je klant. Dank je wel voor het vertrouwen. Wil je eens rustig door je cijfers lopen? App me, dan plannen we een moment.${voet(d.wie)}`,
     };
   },
-
 };
 
 export { mails, voornaam };

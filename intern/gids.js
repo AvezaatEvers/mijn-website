@@ -167,6 +167,7 @@
       if (opt.door) { var ga = dok.querySelector('.ga'); if (ga) { ga.classList.add('telt'); ga._t = setTimeout(function () { reis(m.url); }, 1600); } }
       return;
     }
+    if (m.doel) document.dispatchEvent(new CustomEvent('ae:toon', { detail: m.doel }));
     wachtOp(m.doel, 3500).then(function (el) {
       if (huidig !== m) return;
       if (!el) { var r = rustPlek(); return vlieg(r.x, r.y); }

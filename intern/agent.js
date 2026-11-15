@@ -488,7 +488,7 @@
   AE.agent = { open: open, sluit: sluit, maakChat: maakChat, md: md, orb: orb };
   // Dagmodus (de orb als gids) laden
   var gc = document.createElement('link'); gc.rel = 'stylesheet'; gc.href = '/intern/gids.css?v=4'; document.head.appendChild(gc);
-  var gs = document.createElement('script'); gs.src = '/intern/gids.js?v=3'; document.body.appendChild(gs);
+  var gs = document.createElement('script'); gs.src = '/intern/gids.js?v=4'; document.body.appendChild(gs);
   document.dispatchEvent(new CustomEvent('ae:agent-klaar'));
   intro();
 })();

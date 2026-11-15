@@ -8,7 +8,7 @@
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/style.css?v=126">
-<link rel="stylesheet" href="/intern/klanten.css?v=6">
+<link rel="stylesheet" href="/intern/klanten.css?v=7">
 <link rel="stylesheet" href="/intern/app.css?v=5">
 </head>
 <body>
@@ -19,97 +19,136 @@
   </div>
 
   <a class="db-terug" href="/intern/klanten.html">Alle klanten</a>
-  <h1 id="titel">Klant</h1>
-  <p class="db-sub" id="sub"></p>
-  <div class="snel" id="snel" hidden></div>
 
-  <div class="raster" id="inhoud" hidden>
-    <div class="db-kaart breed" id="lead-kaart" hidden>
-      <div class="db-kop"><h2>Lead</h2><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="db-knop is-klein" type="button" data-status="klant">Klant geworden</button><button class="db-knop is-rand is-klein" type="button" data-status="verloren">Verloren</button></div></div>
-      <div id="lead"></div>
+  <header class="kh" id="kop" hidden>
+    <div class="kh-avatar" id="avatar" aria-hidden="true"></div>
+    <div class="kh-tekst">
+      <div class="kh-rij"><h1 id="titel">Klant</h1><span class="kh-status" id="status-pil"></span></div>
+      <p class="db-sub" id="sub"></p>
     </div>
+    <div class="kh-acties" id="snel"></div>
+  </header>
+  <p class="db-sub" id="laad">Laden…</p>
 
-    <div class="db-kaart">
-      <div class="db-kop"><h2>Geplande mails</h2></div>
-      <div id="gepland"></div>
-      <p class="db-noot">Gaan automatisch om 08:00 de ochtend van de datum, vanaf info@avezaatenevers.nl, ondertekend door de vaste boekhouder. Vink uit om een soort mail voor deze klant over te slaan.</p>
-    </div>
+  <div id="inhoud" hidden>
+    <div class="kt" id="tegels"></div>
 
-    <div class="db-kaart">
-      <div class="db-kop"><h2>Mail sturen</h2></div>
-      <div class="typen" id="typen"></div>
-    </div>
+    <nav class="seg" id="tabs" role="tablist" aria-label="Onderdelen">
+      <button type="button" role="tab" data-tab="overzicht">Overzicht</button>
+      <button type="button" role="tab" data-tab="belasting">Btw en IB</button>
+      <button type="button" role="tab" data-tab="mails">Mails</button>
+      <button type="button" role="tab" data-tab="gegevens">Gegevens</button>
+    </nav>
 
-    <div class="db-kaart" id="kw-kaart">
-      <h2>Btw per kwartaal</h2>
-      <div id="kwartalen"></div>
-      <p class="db-noot">Staat "Stukken binnen" aan, dan krijgt de klant rond de 8e geen tweede herinnering. Alles staat ook op het <a href="/intern/kwartaal.html">kwartaalbord</a>.</p>
-    </div>
-
-    <div class="db-kaart">
-      <h2>Fiscaal profiel</h2>
-      <p class="sectie">Situatie</p>
-      <div class="vinken" id="profiel">
-        <label class="vink"><input type="checkbox" data-p="kor">KOR (geen btw-aangifte)</label>
-        <label class="vink"><input type="checkbox" data-p="icp">Klanten in de EU (ICP)</label>
-        <label class="vink"><input type="checkbox" data-p="partner">Fiscaal partner</label>
-        <label class="vink"><input type="checkbox" data-p="urencriterium">Haalt urencriterium</label>
+    <section class="paneel" data-paneel="overzicht">
+      <div class="db-kaart" id="lead-kaart" hidden>
+        <div class="db-kop"><h2>Lead</h2><div class="kh-knoppen"><button class="db-knop is-klein" type="button" data-status="klant">Klant geworden</button><button class="db-knop is-rand is-klein" type="button" data-status="verloren">Verloren</button></div></div>
+        <div id="lead"></div>
       </div>
-      <div class="rij-inline" style="margin-top:12px"><label for="branche" style="font-size:14px">Branche</label>
-        <select id="branche"><option value="">Kies…</option><option>Bouw</option><option>Installatie</option><option>Schilder / stukadoor</option><option>Hovenier</option><option>Kapper / barber</option><option>Zorg</option><option>Webshop</option><option>Maatwerk / ambacht</option><option>Anders</option></select></div>
-      <p class="sectie">Aangifte inkomstenbelasting ingediend</p>
-      <div class="vinken" id="ib"></div>
-      <p class="sectie">Relatie</p>
-      <div class="vinken"><label class="vink"><input type="checkbox" id="tevreden">Tevreden klant (krijgt de aanbevelingsmail)</label></div>
-      <p class="db-noot">KOR uit de kwartaalmails, ICP en fiscaal partner passen de tekst van de mails aan.</p>
-    </div>
-
-    <div class="db-kaart">
-      <div class="db-kop"><h2>Tijdlijn en contact</h2><button class="ai-knop" type="button" data-contact style="font-size:13px;padding:8px 12px">+ Contact vastleggen</button></div>
-      <form class="rij-inline" id="tl-form" autocomplete="off">
-        <select id="tl-soort" aria-label="Soort"><option value="notitie">Notitie</option><option value="gebeld">Gebeld</option><option value="geappt">Geappt</option><option value="gemaild">Gemaild</option><option value="gesprek">Gesprek</option></select>
-        <input type="text" id="tl-tekst" placeholder="Wat is er besproken of afgesproken?" maxlength="1000" required>
-        <button class="db-knop" type="submit">Toevoegen</button>
-      </form>
-      <ul class="tl" id="tijdlijn"></ul>
-    </div>
-
-    <div class="db-kaart">
-      <h2>Taken</h2>
-      <form class="rij-inline" id="tk-form" autocomplete="off">
-        <input type="text" id="tk-titel" placeholder="Nieuwe taak voor deze klant…" maxlength="160" required>
-        <input type="date" id="tk-datum" aria-label="Deadline">
-        <select id="tk-voor" aria-label="Voor wie"><option value="koen">Koen</option><option value="daan">Daan</option><option value="samen">Samen</option></select>
-        <button class="db-knop" type="submit">Toevoegen</button>
-      </form>
-      <ul class="tl" id="taken"></ul>
-      <p class="db-noot">Staan ook in de gedeelde takenlijst op het dashboard, met de klantnaam ervoor.</p>
-    </div>
-
-    <div class="db-kaart">
-      <h2>Gegevens</h2>
-      <form id="gegevens" class="velden" autocomplete="off">
-        <label>Naam contactpersoon<input name="naam" required maxlength="200"></label>
-        <label>Bedrijfsnaam<input name="bedrijf" maxlength="200"></label>
-        <label>E-mailadres<input name="email" type="email" required></label>
-        <label>Telefoon<input name="telefoon" type="tel" maxlength="30"></label>
-        <label>Vaste boekhouder<select name="boekhouder"><option value="">Nog niet toegewezen</option><option value="koen">Koen</option><option value="daan">Daan</option></select></label>
-        <label>Status<select name="status"><option value="klant">Klant</option><option value="prospect">Lead</option><option value="gestopt">Gestopt</option><option value="verloren">Verloren (lead)</option></select></label>
-        <label>Startdatum<input name="start" type="date"></label>
-        <label>Link naar voorstel<input name="voorstelLink" type="url" placeholder="https://"></label>
-        <label class="breed">Notitie<textarea name="notitie" maxlength="2000" placeholder="Alleen intern zichtbaar"></textarea></label>
-        <div class="breed" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <button class="db-knop" type="submit">Opslaan</button>
-          <button class="db-knop is-rood" type="button" id="verwijder">Klant verwijderen</button>
-          <span class="db-melding" id="g-melding"></span>
+      <div class="raster raster-ov">
+        <div class="db-kaart">
+          <div class="db-kop"><h2>Contact</h2></div>
+          <form class="rij-inline notitie-form" id="tl-form" autocomplete="off">
+            <select id="tl-soort" aria-label="Soort"><option value="notitie">Notitie</option><option value="gebeld">Gebeld</option><option value="geappt">Geappt</option><option value="gemaild">Gemaild</option><option value="gesprek">Gesprek</option></select>
+            <input type="text" id="tl-tekst" placeholder="Wat is er besproken of afgesproken?" maxlength="1000" required>
+            <button class="db-knop" type="submit">Noteer</button>
+          </form>
+          <ul class="tl" id="tijdlijn"></ul>
         </div>
-      </form>
-    </div>
+        <div class="db-kaart">
+          <div class="db-kop"><h2>Taken</h2></div>
+          <ul class="tl tl-taken" id="taken"></ul>
+          <form class="taak-form" id="tk-form" autocomplete="off">
+            <input type="text" id="tk-titel" placeholder="Nieuwe taak…" maxlength="160" required>
+            <div class="rij-inline">
+              <input type="date" id="tk-datum" aria-label="Deadline">
+              <select id="tk-voor" aria-label="Voor wie"><option value="koen">Koen</option><option value="daan">Daan</option><option value="samen">Samen</option></select>
+              <button class="db-knop" type="submit">Toevoegen</button>
+            </div>
+          </form>
+          <p class="db-noot">Staan ook in de gedeelde takenlijst op Vandaag.</p>
+        </div>
+      </div>
+    </section>
 
-    <div class="db-kaart">
-      <h2>Verstuurd</h2>
-      <ul class="log" id="log"></ul>
-    </div>
+    <section class="paneel" data-paneel="belasting" hidden>
+      <div class="raster">
+        <div class="db-kaart" id="kw-kaart">
+          <h2>Btw per kwartaal</h2>
+          <div id="kwartalen"></div>
+          <p class="db-noot">Met "Stukken binnen" aan krijgt de klant geen tweede herinnering. Alle klanten samen staan op het <a href="/intern/kwartaal.html">kwartaalbord</a>.</p>
+        </div>
+        <div class="db-kaart">
+          <h2>Fiscaal profiel</h2>
+          <div class="vinken kolom" id="profiel">
+            <label class="vink"><input type="checkbox" data-p="kor">KOR (geen btw-aangifte)</label>
+            <label class="vink"><input type="checkbox" data-p="icp">Klanten in de EU (ICP)</label>
+            <label class="vink"><input type="checkbox" data-p="partner">Fiscaal partner</label>
+            <label class="vink"><input type="checkbox" data-p="urencriterium">Haalt urencriterium</label>
+          </div>
+          <div class="rij-inline" style="margin-top:14px"><label for="branche" style="font-size:14px">Branche</label>
+            <select id="branche"><option value="">Kies…</option><option>Bouw</option><option>Installatie</option><option>Schilder / stukadoor</option><option>Hovenier</option><option>Kapper / barber</option><option>Zorg</option><option>Webshop</option><option>Maatwerk / ambacht</option><option>Anders</option></select></div>
+          <p class="sectie">Aangifte inkomstenbelasting ingediend</p>
+          <div class="vinken" id="ib"></div>
+          <p class="db-noot">KOR haalt de klant uit de kwartaalmails. ICP en fiscaal partner passen de tekst van de mails aan. <a href="/intern/ib-werkblad.html">IB-werkblad</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="paneel" data-paneel="mails" hidden>
+      <div class="raster">
+        <div class="db-kaart">
+          <div class="db-kop"><h2>Gepland</h2></div>
+          <div id="gepland"></div>
+          <p class="db-noot">Gaan om 08:00 op de datum, vanaf info@, ondertekend door de vaste boekhouder. Zet uit om een mail voor deze klant over te slaan.</p>
+        </div>
+        <div class="kolom-stapel">
+          <div class="db-kaart">
+            <div class="db-kop"><h2>Nu een mail sturen</h2></div>
+            <div class="typen" id="typen"></div>
+          </div>
+          <div class="db-kaart">
+            <h2>Verstuurd</h2>
+            <ul class="log" id="log"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="paneel" data-paneel="gegevens" hidden>
+      <div class="raster">
+        <div class="db-kaart">
+          <h2>Gegevens</h2>
+          <form id="gegevens" class="velden" autocomplete="off">
+            <label>Naam contactpersoon<input name="naam" required maxlength="200"></label>
+            <label>Bedrijfsnaam<input name="bedrijf" maxlength="200"></label>
+            <label>E-mailadres<input name="email" type="email" required></label>
+            <label>Telefoon<input name="telefoon" type="tel" maxlength="30"></label>
+            <label>Vaste boekhouder<select name="boekhouder"><option value="">Nog niet toegewezen</option><option value="koen">Koen</option><option value="daan">Daan</option></select></label>
+            <label>Status<select name="status"><option value="klant">Klant</option><option value="prospect">Lead</option><option value="gestopt">Gestopt</option><option value="verloren">Verloren (lead)</option></select></label>
+            <label>Startdatum<input name="start" type="date"></label>
+            <label>Link naar voorstel<input name="voorstelLink" type="url" placeholder="https://"></label>
+            <label class="breed">Interne notitie<textarea name="notitie" maxlength="2000" placeholder="Alleen intern zichtbaar"></textarea></label>
+            <div class="breed" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <button class="db-knop" type="submit">Opslaan</button>
+              <span class="db-melding" id="g-melding"></span>
+            </div>
+          </form>
+        </div>
+        <div class="kolom-stapel">
+          <div class="db-kaart">
+            <h2>Relatie</h2>
+            <div class="vinken"><label class="vink"><input type="checkbox" id="tevreden">Tevreden klant</label></div>
+            <p class="db-noot">Tevreden klanten krijgen de aanbevelingsmail.</p>
+          </div>
+          <div class="db-kaart gevaar">
+            <h2>Verwijderen</h2>
+            <p class="db-noot" style="margin:0 0 12px">Haalt de klant met tijdlijn en geplande mails weg. Gestopt? Zet dan liever de status op Gestopt.</p>
+            <button class="db-knop is-rood" type="button" id="verwijder">Klant verwijderen</button>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </main>
 
@@ -123,11 +162,11 @@
   </div>
 </dialog>
 
-<script src="/intern/app.js?v=3"></script>
+<script src="/intern/app.js?v=4"></script>
 <script>
 (function () {
   var id = new URLSearchParams(location.search).get('id'); window.AE_KLANT = id;
-  var klant = null, types = {}, huidig = null, zeker = false, HANDMATIG = [], kwartalen = [], reviewLink = false, taken = [];
+  var ik = '', klant = null, types = {}, huidig = null, zeker = false, HANDMATIG = [], kwartalen = [], reviewLink = false, taken = [];
   var MAAND = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
   function d(s) { if (!s) return ''; var p = s.slice(0, 10).split('-'); return +p[2] + ' ' + MAAND[+p[1] - 1] + ' ' + p[0]; }
   function dt(s) { var x = new Date(s); return x.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + x.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }); }
@@ -142,7 +181,13 @@
     var k = klant;
     document.title = (k.bedrijf || k.naam) + ' | Avezaat & Evers intern';
     document.getElementById('titel').textContent = k.bedrijf || k.naam;
-    document.getElementById('sub').textContent = (k.bedrijf ? k.naam + ', ' : '') + k.email + '. ' + (k.boekhouder ? 'Vaste boekhouder: ' + naamVan(k.boekhouder) + '.' : 'Nog geen boekhouder toegewezen.');
+    var STAT = { klant: 'Klant', prospect: 'Lead', gestopt: 'Gestopt', verloren: 'Verloren' };
+    var pil = document.getElementById('status-pil'); pil.textContent = STAT[k.status] || k.status; pil.className = 'kh-status is-' + k.status;
+    var ini = String(k.bedrijf || k.naam || '?').replace(/[^A-Za-zÀ-ÿ ]/g, '').split(/\s+/).filter(Boolean);
+    document.getElementById('avatar').textContent = ((ini[0] || '?')[0] + (ini[1] ? ini[1][0] : '')).toUpperCase();
+    document.getElementById('sub').innerHTML = [k.bedrijf ? esc(k.naam) : '', esc(k.email), k.telefoon ? esc(k.telefoon) : ''].filter(Boolean).join(' <i>·</i> ') +
+      '<br>' + (k.boekhouder ? 'Boekhouder ' + naamVan(k.boekhouder) : '<span class="let-op">Nog geen boekhouder</span>') + (k.start && k.status === 'klant' ? ' <i>·</i> klant sinds ' + d(k.start) : '');
+    document.getElementById('kop').hidden = false; document.getElementById('laad').hidden = true;
     document.getElementById('inhoud').hidden = false;
 
     // Gepland
@@ -159,8 +204,8 @@
     // Handmatig
     document.getElementById('typen').innerHTML = HANDMATIG.filter(function (t) { return k.status !== 'prospect' || t === 'voorstelHerinnering' || t === 'welkom'; }).map(function (t) {
       var verstuurd = (k.log || []).filter(function (l) { return l.type === t && l.ok && !l.test; })[0];
-      return '<div class="type"><strong>' + esc(types[t].label) + '</strong><small>' + esc(types[t].wanneer) + (verstuurd ? '<br>Laatst verstuurd: ' + dt(verstuurd.op) : '') + '</small>' +
-        '<div><button class="db-knop is-licht is-klein" type="button" data-bekijk="' + t + '">Bekijk en verstuur</button></div></div>';
+      return '<div class="ms-rij"><div><strong>' + esc(types[t].label) + '</strong><small>' + esc(types[t].wanneer) + (verstuurd ? '. Laatst: ' + d(verstuurd.op) : '') + '</small></div>' +
+        '<button class="db-knop is-licht is-klein" type="button" data-bekijk="' + t + '">Bekijk</button></div>';
     }).join('');
 
     // Lead
@@ -183,11 +228,14 @@
     var voornaam = (k.naam || '').split(' ')[0];
     var mg = btoa(unescape(encodeURIComponent(JSON.stringify({ naam: voornaam, bedrijf: k.bedrijf || '', wie: naamVan(k.boekhouder) }))));
     var snel = document.getElementById('snel'); snel.hidden = false;
-    snel.innerHTML = (tel ? '<a class="db-knop is-rand" href="tel:' + esc(tel) + '">Bellen</a><a class="db-knop is-rand" href="https://wa.me/' + esc(wa) + '" target="_blank" rel="noopener">WhatsApp</a>' : '') +
-      '<a class="db-knop is-rand" href="mailto:' + esc(k.email) + '">Mailen</a>' +
-      '<a class="db-knop is-rand" href="/intern/maandgesprek.html?voorbereiden=1&d=' + encodeURIComponent(mg) + '" target="_blank" rel="noopener">Maandgesprek voorbereiden</a>' +
-      '<a class="db-knop is-rand" href="/voorstel.html?klant=' + encodeURIComponent(k.id) + '">' + (k.voorstel ? 'Voorstel opnieuw sturen' : 'Voorstel maken') + '</a>' +
-      '<button class="db-knop is-rand" type="button" id="kopieer-welkom">Kopieer welkomstlink</button>';
+    var open = snel.querySelector('details[open]') ? ' open' : '';
+    snel.innerHTML = (tel ? '<a class="rk" href="tel:' + esc(tel) + '"><span>' + IC.bel + '</span>Bel</a><a class="rk" href="https://wa.me/' + esc(wa) + '" target="_blank" rel="noopener"><span>' + IC.app + '</span>App</a>' : '') +
+      '<a class="rk" href="mailto:' + esc(k.email) + '"><span>' + IC.mail + '</span>Mail</a>' +
+      '<details class="rk meer"' + open + '><summary><span>' + IC.meer + '</span>Meer</summary><div class="meer-menu">' +
+      (k.status === 'klant' ? '<a href="/intern/maandgesprek.html?voorbereiden=1&d=' + encodeURIComponent(mg) + '" target="_blank" rel="noopener">Maandgesprek voorbereiden</a>' : '') +
+      '<a href="/voorstel.html?klant=' + encodeURIComponent(k.id) + '">' + (k.voorstel ? 'Voorstel opnieuw sturen' : 'Voorstel maken') + '</a>' +
+      '<button type="button" id="kopieer-welkom">Kopieer welkomstlink</button></div></details>' +
+      '<button class="db-knop kh-contact" type="button" data-contact>' + IC.plus + 'Contact vastleggen</button>';
     document.getElementById('kopieer-welkom').onclick = function () {
       var url = 'https://avezaatenevers.nl/welkom.html?naam=' + encodeURIComponent(voornaam) + '&boekhouder=' + naamVan(k.boekhouder);
       var b = this; (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function () { b.textContent = 'Gekopieerd'; }, function () { prompt('Kopieer de link:', url); });
@@ -219,9 +267,10 @@
       .sort(function (a, b) { return b.op.localeCompare(a.op); });
     document.getElementById('tijdlijn').innerHTML = tl.length ? tl.map(function (n) {
       return '<li><div><span class="soort">' + esc(n.soort) + '</span>' + esc(n.tekst) + '<small>' + dt(n.op) + ', ' + naamVan(n.door) + '</small></div>' + (String(n.id).indexOf('n:') === 0 ? '<span></span>' : '<button class="weg" type="button" data-nid="' + n.id + '" aria-label="Verwijderen">&times;</button>') + '</li>';
-    }).join('') : '<li class="kl-leeg" style="display:block">Nog niets genoteerd.</li>';
+    }).join('') : '<li class="kl-leeg" style="display:block">Nog niets genoteerd. Leg het eerste contact vast met de knop bovenaan.</li>';
 
     tekenTaken();
+    tekenTegels(tl);
 
     // Log
     var log = k.log || [];
@@ -234,6 +283,64 @@
     var f = document.getElementById('gegevens');
     ['naam', 'bedrijf', 'email', 'telefoon', 'boekhouder', 'status', 'start', 'voorstelLink', 'notitie'].forEach(function (n) { f.elements[n].value = k[n] || ''; });
   }
+
+  var IC = {
+    bel: '<svg viewBox="0 0 24 24"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z"/></svg>',
+    app: '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
+    mail: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+    meer: '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+    plus: '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>'
+  };
+  function dagenGeleden(s) { var n = Math.round((Date.now() - new Date(s).getTime()) / 864e5); return n <= 0 ? 'vandaag' : n === 1 ? 'gisteren' : n + ' dagen geleden'; }
+  function kwartaalEinde(sl) { var j = +sl.slice(0, 4), q = +sl.slice(-1); return j + '-' + String(q * 3).padStart(2, '0') + '-28'; }
+  function tegel(tab, label, waarde, sub, ernst) {
+    return '<button type="button" class="tegel' + (ernst ? ' is-' + ernst : '') + '" data-naar="' + tab + '"><span>' + label + '</span><b>' + waarde + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</button>';
+  }
+  function tekenTegels(tl) {
+    var k = klant, uit = [], vandaag = new Date().toISOString().slice(0, 10);
+    var eigen = taken.filter(function (t) { return t.klant === id && !t.klaar; }).sort(function (a, b) { return String(a.deadline || '9').localeCompare(String(b.deadline || '9')); });
+    var laat = eigen.filter(function (t) { return t.deadline && t.deadline < vandaag; }).length;
+    var laatste = tl[0];
+    if (k.leadInfo) {
+      var li = k.leadInfo;
+      uit.push(tegel('overzicht', 'Warmte', li.score + ' <em>' + esc(li.label) + '</em>', esc((li.redenen || [])[0] || ''), li.urgent ? 'rood' : ''));
+      uit.push(tegel('overzicht', 'Voorstel', k.voorstel ? 'Verstuurd' : 'Nog niet', k.voorstel && k.voorstel.op ? d(k.voorstel.op) : 'Maak het via Meer', k.voorstel ? '' : 'oranje'));
+    } else if (k.status === 'klant') {
+      var pr = k.profiel || {}, q = kwartalen[0];
+      if (pr.kor) uit.push(tegel('belasting', 'Btw', 'KOR', 'Geen aangifte nodig'));
+      else if (q) {
+        var st = (k.kwartalen || {})[q.sleutel] || {};
+        var w = st.betaald ? 'Afgerond' : st.ingediend ? 'Ingediend' : st.binnen ? 'Stukken binnen' : 'Wacht op stukken';
+        var open = kwartalen.slice(1).filter(function (x) { var s2 = (k.kwartalen || {})[x.sleutel] || {}; return !s2.ingediend && (!k.start || k.start <= kwartaalEinde(x.sleutel)); });
+        uit.push(tegel('belasting', 'Btw ' + q.kort, w, open.length ? esc(open.map(function (x) { return x.kort; }).join(', ')) + ' nog niet ingediend' : 'Deadline ' + q.deadline, open.length ? 'rood' : st.betaald ? 'groen' : ''));
+      }
+      var vm = (k.gepland || []).filter(function (m) { return m.aan && !m.vervalt; })[0];
+      uit.push(tegel('mails', 'Volgende mail', vm ? d(vm.datum) : 'Geen', vm ? esc(vm.label) : 'Niets gepland'));
+    }
+    uit.push(tegel('overzicht', 'Laatste contact', laatste ? dagenGeleden(laatste.op) : 'Nog geen', laatste ? esc(laatste.soort.replace(/ \(klant\)/, '')) : 'Leg het eerste contact vast', laatste && (Date.now() - new Date(laatste.op)) > 45 * 864e5 && k.status === 'klant' ? 'oranje' : ''));
+    uit.push(tegel('overzicht', 'Open taken', String(eigen.length), eigen.length ? (laat ? laat + ' te laat' : eigen[0].deadline ? 'Eerste: ' + d(eigen[0].deadline) : 'Zonder deadline') : 'Alles af', laat ? 'rood' : ''));
+    document.getElementById('tegels').innerHTML = uit.join('');
+  }
+
+  // Tabs
+  var TABS = ['overzicht', 'belasting', 'mails', 'gegevens'];
+  function toonTab(naam, focus) {
+    if (TABS.indexOf(naam) < 0) naam = 'overzicht';
+    document.querySelectorAll('#tabs [data-tab]').forEach(function (b) { var aan = b.dataset.tab === naam; b.classList.toggle('is-aan', aan); b.setAttribute('aria-selected', aan); });
+    document.querySelectorAll('[data-paneel]').forEach(function (p) { p.hidden = p.dataset.paneel !== naam; });
+    if (location.hash.slice(1) !== naam) history.replaceState(null, '', location.pathname + location.search + (naam === 'overzicht' ? '' : '#' + naam));
+    if (focus) document.getElementById('tabs').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  document.getElementById('tabs').addEventListener('click', function (e) { var b = e.target.closest('[data-tab]'); if (b) toonTab(b.dataset.tab); });
+  document.getElementById('tegels').addEventListener('click', function (e) { var b = e.target.closest('[data-naar]'); if (b) toonTab(b.dataset.naar, true); });
+  window.addEventListener('hashchange', function () { toonTab(location.hash.slice(1)); });
+  // De orb (dagmodus) en links kunnen naar een element in een ander tabblad wijzen
+  document.addEventListener('ae:toon', function (e) {
+    var el = null; try { el = document.querySelector(e.detail); } catch (x) {}
+    var p = el && el.closest('[data-paneel]'); if (p && p.hidden) toonTab(p.dataset.paneel);
+  });
+  toonTab(location.hash.slice(1));
+  document.addEventListener('click', function (e) { var m = document.querySelector('#snel details[open]'); if (m && !m.contains(e.target)) m.open = false; });
 
   // Aan/uit per soort
   document.getElementById('gepland').addEventListener('change', function (e) {
@@ -332,18 +439,19 @@
     document.getElementById('taken').innerHTML = eigen.length ? eigen.map(function (t) {
       var titel = t.titel.replace(/^[^:]+: /, '');
       return '<li class="' + (t.klaar ? 'is-klaar' : '') + '"><label class="tk"><input type="checkbox" data-tid="' + t.id + '"' + (t.klaar ? ' checked' : '') + '><span>' + esc(titel) + '<small>' + (t.deadline ? d(t.deadline) + ', ' : '') + 'voor ' + naamVan(t.voor === 'samen' ? 'Samen' : t.voor) + '</small></span></label></li>';
-    }).join('') : '<li class="kl-leeg" style="display:block">Geen taken.</li>';
+    }).join('') : '<li class="kl-leeg" style="display:block">Geen open taken.</li>';
   }
-  function laadTaken() { return api('/intern/api/taken').then(function (r) { taken = r; tekenTaken(); }); }
+  function tekenTakenEnTegels() { tekenTaken(); if (klant) teken(); }
+  function laadTaken() { return api('/intern/api/taken').then(function (r) { taken = r; tekenTakenEnTegels(); }); }
   document.getElementById('tk-form').addEventListener('submit', function (e) {
     e.preventDefault();
     var t = document.getElementById('tk-titel');
     api('/intern/api/taken', { method: 'POST', body: JSON.stringify({ titel: (klant.bedrijf || klant.naam) + ': ' + t.value, deadline: document.getElementById('tk-datum').value, voor: document.getElementById('tk-voor').value, klant: id }) })
-      .then(function (r) { taken = r; t.value = ''; tekenTaken(); });
+      .then(function (r) { taken = r; t.value = ''; tekenTakenEnTegels(); });
   });
   document.getElementById('taken').addEventListener('change', function (e) {
     var i = e.target; if (!i.dataset.tid) return;
-    api('/intern/api/taken', { method: 'PATCH', body: JSON.stringify({ id: i.dataset.tid, klaar: i.checked }) }).then(function (r) { taken = r; tekenTaken(); });
+    api('/intern/api/taken', { method: 'PATCH', body: JSON.stringify({ id: i.dataset.tid, klaar: i.checked }) }).then(function (r) { taken = r; tekenTakenEnTegels(); });
   });
 
   document.getElementById('lead-kaart').addEventListener('click', function (e) {
@@ -354,14 +462,14 @@
   });
 
   api('/intern/api/ik').then(function (r) {
-    document.getElementById('db-ik').textContent = 'Ingelogd als ' + r.naam;
+    document.getElementById('db-ik').textContent = 'Ingelogd als ' + r.naam; ik = String(r.naam || '').toLowerCase();
     return api('/intern/api/klant?id=' + encodeURIComponent(id || ''));
   }).then(function (r) {
-    zet(r); document.getElementById('tk-voor').value = klant.boekhouder; laadTaken();
+    zet(r); document.getElementById('tk-voor').value = klant.boekhouder || ik || 'samen'; laadTaken();
     if (/nieuw=1/.test(location.search) && klant.status === 'klant') {
       var b = document.querySelector('[data-bekijk="welkom"]'); if (b) b.click(); history.replaceState(null, '', '?id=' + encodeURIComponent(id));
     }
-  }).catch(function (err) { document.getElementById('sub').textContent = err.message; });
+  }).catch(function (err) { document.getElementById('laad').textContent = err.message; });
 })();
 </script>
 </body>

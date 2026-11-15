@@ -1,7 +1,7 @@
 // De A&E-agent: een assistent die Koen en Daan door hun werk leidt.
 // Gratis: denkt mee via Google Gemini (gratis tier, env GEMINI_API_KEY) met jullie data en het web.
 // Zonder sleutel of bij een storing antwoordt de lokale agent (kennisbank, werkstromen, klanten, dagbriefing).
-import { zoekKennis } from "./kennis.js";
+import { zoekKennis, tokens } from "./kennis.js";
 import { PROCESSEN, GROEPEN, proces } from "./processen.js";
 import { synchroniseer, dagplan, verwerkMissie, GIDS } from "./dagplan.js";
 import { TYPES, HANDMATIG } from "../klant-mails.js";
@@ -149,6 +149,8 @@ const TOOLS = [
       vermijdbaar: { type: "boolean" }, notitie: { type: "string" } }, required: ["klant_id"] } },
   { name: "notitie_toevoegen", description: "Zet direct een notitie op de tijdlijn van een klant.",
     input_schema: { type: "object", properties: { klant_id: { type: "string" }, tekst: { type: "string" }, soort: { type: "string", enum: ["notitie", "gebeld", "geappt", "gemaild", "gesprek"] } }, required: ["klant_id", "tekst"] } },
+  { name: "onthouden", description: "Sla een vaste regel of feit op dat je voortaan altijd moet meenemen, als de gebruiker zegt 'onthoud dat…' of iets corrigeert dat algemeen geldt.",
+    input_schema: { type: "object", properties: { feit: { type: "string", description: "Kort en algemeen geformuleerd" } }, required: ["feit"] } },
   { name: "taak_afvinken", description: "Vink direct een open taak af. Geef (een deel van) de titel.",
     input_schema: { type: "object", properties: { titel: { type: "string" } }, required: ["titel"] } },
   { name: "mail_ontwerpen", description: "Ontwerp zelf een complete mail in onze huisstijl en zet hem klaar om te versturen via Resend (na Bevestigen). Gebruik dit voor nieuwsbrieven, uitleg, aanbiedingen, herinneringen op maat of elke mail die meer nodig heeft dan een paar alinea's. Bouw de mail op uit blokken. Ontvanger: een bestaande klant (klant_id) of een los e-mailadres (aan_email + aan_naam).",
@@ -167,7 +169,7 @@ const LABELS = {
   werkstroom_info: "Pakt de werkstroom erbij", lopende_werkstromen: "Bekijkt lopende werkstromen", werkstroom_starten: "Start werkstroom",
   taak_toevoegen: "Zet taak klaar", contact_inzichten: "Analyseert klantcontact",
   klant_toevoegen: "Bereidt nieuwe klant voor", klant_bijwerken: "Bereidt wijziging voor", mail_versturen: "Stelt mail op",
-  contact_vastleggen: "Legt contact vast", mail_ontwerpen: "Ontwerpt mail", notitie_toevoegen: "Zet notitie op de tijdlijn", taak_afvinken: "Vinkt taak af",
+  contact_vastleggen: "Legt contact vast", onthouden: "Onthoudt dit", mail_ontwerpen: "Ontwerpt mail", notitie_toevoegen: "Zet notitie op de tijdlijn", taak_afvinken: "Vinkt taak af",
 };
 
 async function voerUit(naam, input, c) {
@@ -308,6 +310,15 @@ async function voerUit(naam, input, c) {
       if (r.fout) return r;
       c.klanten = null;
       stuur({ t: "actie", soort: "notitie", tekst: "Notitie gezet bij " + (k.bedrijf || k.naam), link: "/intern/klant.html?id=" + k.id });
+      return { ok: true };
+    }
+    case "onthouden": {
+      const tekst = schoon(input.feit, 400);
+      if (!tekst) return { fout: "Leeg" };
+      const g = await leesGeheugen(store);
+      g.feiten.push({ id: id(), tekst, door: wie, op: new Date().toISOString() });
+      await store.setJSON(GEHEUGEN, { feiten: g.feiten.slice(-60), antwoorden: g.antwoorden.slice(-300) });
+      stuur({ t: "actie", soort: "geheugen", tekst: "Onthouden: " + tekst, link: "/intern/agent.html?geheugen=1" });
       return { ok: true };
     }
     case "taak_afvinken": {
@@ -551,12 +562,19 @@ async function vooraf(c, body) {
     if (body.klant) { const k = (c.klanten || []).find((x) => x.id === body.klant); if (k) uit.openKlant = klantDetails(k, c.h, c.taken || [], c.runs || []); }
     // De kennisbank alvast doorzoeken op de vraag: scheelt vaak een hele ronde naar Gemini
     const vraag = ((berichtenVan(body).filter((b) => b.role === "user").pop()) || {}).content || "";
+    const geheugen = await leesGeheugen(c.store);
+    c.feiten = geheugen.feiten;
+    const geleerd = geleerdVoor(geheugen, vraag);
+    if (geleerd.length) {
+      uit.eerderBeoordeeld = geleerd.map((a) => ({ vraag: a.vraag, oordeel: a.oordeel === "goed" ? "goedgekeurd antwoord, hergebruik dit" : "afgekeurd, volg de correctie", antwoord: a.antwoord.slice(0, 1500), correctie: a.correctie || undefined, bronnen: a.bronnen.length ? a.bronnen : undefined }));
+      c.stuur({ t: "tool", naam: "geheugen", label: "Kent deze vraag al" });
+    }
     const kennis = zoekKennis(vraag, 3);
     if (kennis.length) {
       uit.kennisbank = kennis.map((x) => ({ titel: x.titel, bron: x.bron, tekst: x.tekst.slice(0, 900) }));
       c.stuur({ t: "bronnen", v: kennis.map((x) => ({ titel: x.titel, bron: x.bron, groep: x.groep })) });
     }
-    return JSON.stringify(uit).slice(0, 7000);
+    return JSON.stringify(uit).slice(0, 9000);
   } catch { return ""; }
 }
 
@@ -565,7 +583,8 @@ async function slim(c, body) {
   const start = Date.now();
   const context = await vooraf(c, body);
   const sys = systeem(wie, { pagina: schoon(body.pagina, 80), klant: schoon(body.klant, 40) }) +
-    (context ? "\n\nActuele gegevens en de best passende stukken uit onze kennisbank (al opgehaald; roep hiervoor geen tool aan. Gebruik kennis_zoeken alleen als dit niet genoeg is, en web_zoeken alleen voor actuele bedragen, regels of iets wat hier niet staat):\n" + context : "");
+    ((c.feiten || []).length ? "\n\nVaste regels en feiten die Koen en Daan je hebben geleerd (altijd toepassen):\n" + c.feiten.map((f) => "- " + f.tekst).join("\n") : "") +
+    (context ? "\n\nActuele gegevens en de best passende stukken uit onze kennisbank (al opgehaald; roep hiervoor geen tool aan. Gebruik kennis_zoeken alleen als dit niet genoeg is, en web_zoeken alleen voor actuele bedragen, regels of iets wat hier niet staat. Staat er onder eerderBeoordeeld een goedgekeurd antwoord op een vergelijkbare vraag: gebruik dat als basis (geen nieuwe zoekopdracht nodig). Staat er een correctie: neem die altijd over):\n" + context : "");
   const lijst = berichtenVan(body);
   if (!lijst.length) throw new Error("Geen vraag");
   const contents = lijst.map((b) => ({ role: b.role === "assistant" ? "model" : "user", parts: [{ text: b.content }] }));
@@ -703,6 +722,47 @@ async function lokaal(c, body) {
   for (let i = 0; i < delen.length; i += 3) { stuur({ t: "tekst", v: delen.slice(i, i + 3).join("") }); await pauze(14); }
 }
 
+// ---------- Geheugen: wat Koen en Daan de agent leren ----------
+// Gedeeld door Koen en Daan. feiten = vaste regels; antwoorden = beoordeelde antwoorden (goed of met correctie).
+const GEHEUGEN = "agent-geheugen";
+async function leesGeheugen(store) { const g = await store.get(GEHEUGEN, { type: "json" }); return { feiten: (g && g.feiten) || [], antwoorden: (g && g.antwoorden) || [] }; }
+function lijkt(a, b) {
+  const x = new Set(tokens(a)), y = new Set(tokens(b));
+  if (!x.size || !y.size) return 0;
+  let s = 0; x.forEach((t) => { if (y.has(t)) s++; });
+  return s / Math.sqrt(x.size * y.size);
+}
+function geleerdVoor(geheugen, vraag) {
+  return geheugen.antwoorden.map((a) => ({ a, s: lijkt(vraag, a.vraag) })).filter((x) => x.s >= 0.34)
+    .sort((p, q) => q.s - p.s || q.a.op.localeCompare(p.a.op)).slice(0, 3).map((x) => x.a);
+}
+async function geheugenApi(request, url, pad, wie, store) {
+  const g = await leesGeheugen(store);
+  const bewaar = () => store.setJSON(GEHEUGEN, { feiten: g.feiten.slice(-60), antwoorden: g.antwoorden.slice(-300) });
+  if (request.method === "GET") return json(g);
+  if (request.method === "DELETE") {
+    const weg = url.searchParams.get("id");
+    g.feiten = g.feiten.filter((f) => f.id !== weg); g.antwoorden = g.antwoorden.filter((a) => a.id !== weg);
+    await bewaar(); return json({ ok: true });
+  }
+  const body = await request.json().catch(() => ({}));
+  if (pad === "/intern/api/geheugen/feit") {
+    const tekst = schoon(body.tekst, 400); if (!tekst) return json({ fout: "Leeg" }, 400);
+    const f = { id: id(), tekst, door: wie, op: new Date().toISOString() }; g.feiten.push(f); await bewaar(); return json(f);
+  }
+  if (pad === "/intern/api/geheugen/oordeel") {
+    const vraag = schoon(body.vraag, 600), antwoord = String(body.antwoord || "").replace(/[<>]/g, "").slice(0, 4000);
+    if (!vraag || !antwoord) return json({ fout: "Vraag en antwoord ontbreken" }, 400);
+    const oordeel = body.oordeel === "goed" ? "goed" : "kan-beter";
+    // Eerder oordeel over dezelfde vraag vervangen
+    g.antwoorden = g.antwoorden.filter((a) => !(a.vraag === vraag && a.antwoord === antwoord));
+    const a = { id: id(), vraag, antwoord, oordeel, correctie: schoon(body.correctie, 1500), web: !!body.web,
+      bronnen: (Array.isArray(body.bronnen) ? body.bronnen : []).slice(0, 6).map((b) => ({ titel: schoon(b.titel, 120), bron: schoon(b.bron, 400) })), door: wie, op: new Date().toISOString() };
+    g.antwoorden.push(a); await bewaar(); return json(a);
+  }
+  return json({ fout: "Onbekende route" }, 404);
+}
+
 // ---------- Gesprekken (per persoon bewaard, zichtbaar op elk apparaat) ----------
 async function gesprekkenApi(request, url, pad, wie, store) {
   const sleutel = "gesprekken-" + wie;
@@ -733,6 +793,7 @@ async function gesprekkenApi(request, url, pad, wie, store) {
 export async function agentApi(request, url, pad, wie, store, env, h) {
   if (pad === "/intern/api/werkstromen" || pad === "/intern/api/werkstroom") return werkstromenApi(request, url, pad, wie, store, h);
   if (pad === "/intern/api/gesprekken" || pad === "/intern/api/gesprek") return gesprekkenApi(request, url, pad, wie, store);
+  if (pad === "/intern/api/geheugen" || pad.startsWith("/intern/api/geheugen/")) return geheugenApi(request, url, pad, wie, store);
   if (pad === "/intern/api/dagplan") {
     const nu = h.vandaag();
     const [klanten, taken, runs] = await Promise.all([h.leesKlanten(store), h.leesTaken(store), leesRuns(store)]);

@@ -280,3 +280,15 @@ body.app .ag-zweef .tip { background: rgba(29, 29, 31, .92); }
 .ag-vb iframe { flex: 1; border: 0; width: 100%; background: #F3F5F9; }
 .ag-bev.is-klaar .ag-bev-knoppen, .ag-bev.is-weg .ag-bev-knoppen { display: none; }
 .ag-waarsch { margin-top: 8px; font-size: 12.5px; color: #B25000; background: #FFF4E5; border-radius: 9px; padding: 7px 10px; }
+
+/* Beoordelen: de agent leert van goed/kan beter */
+.ag-oordeel { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.ag-oordeel button { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 12.5px; color: var(--muted); background: none; border: 0; border-radius: 8px; padding: 5px 8px; cursor: pointer; transition: background .15s, color .15s; }
+.ag-oordeel button svg { width: 14px; height: 14px; }
+.ag-oordeel button:hover { background: rgba(0, 0, 0, .05); color: var(--ink); }
+.ag-oordeel.is-gegeven { font-size: 12.5px; color: #248A3D; }
+.ag-correctie { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.ag-correctie textarea { width: 100%; font: inherit; font-size: 13.5px; padding: 8px 10px; border-radius: 10px; resize: vertical; }
+.ag-correctie div { display: flex; gap: 6px; }
+.ag-correctie button[data-oordeel=opslaan] { background: #2D5BD3; color: #fff; font-weight: 600; }
+.ag-correctie button[data-oordeel=opslaan]:hover { background: #26458F; color: #fff; }

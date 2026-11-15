@@ -5,6 +5,8 @@
   var PIJL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
   var GROOT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>';
   var NIEUW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+  var DUIM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10v11H4V10zM7 10l4-8a2.5 2.5 0 0 1 3 2.5V9h5.2a2 2 0 0 1 2 2.3l-1.4 8A2 2 0 0 1 17.8 21H7"/></svg>';
+  var DUIM_NEER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 14V3h3v11zM17 14l-4 8a2.5 2.5 0 0 1-3-2.5V15H4.8a2 2 0 0 1-2-2.3l1.4-8A2 2 0 0 1 6.2 3H17"/></svg>';
   function orb(kl) { return '<div class="orb ' + (kl || '') + '"><i></i><i></i><i></i></div>'; }
   var STATUS = AE.api('/intern/api/agent/status').catch(function () { return { slim: false }; });
 
@@ -140,9 +142,32 @@
         el.querySelector('.md').innerHTML = md(b.tekst);
         if (b.stappen) el.querySelector('.ag-stappen').innerHTML = b.stappen.map(function (s) { return '<span class="ag-stap klaar">' + esc(s) + '</span>'; }).join('');
         if (b.extra) { el.querySelector('.ag-extra').innerHTML = b.extra; herstelKaarten(el); }
+        if (b.tekst && b.vraag) { el._bericht = b; el.querySelector(':scope > div:not(.orb)').insertAdjacentHTML('beforeend', oordeelHtml(b)); }
       }
       stroom.appendChild(el);
       return el;
+    }
+    function oordeelHtml(b) {
+      if (b.oordeel) return '<div class="ag-oordeel is-gegeven">' + (b.oordeel === 'goed' ? 'Gemarkeerd als goed antwoord. De agent gebruikt dit voortaan.' : 'Correctie opgeslagen. De agent neemt dit voortaan mee.') + '</div>';
+      return '<div class="ag-oordeel"><button type="button" data-oordeel="goed" title="Goed antwoord: de agent hergebruikt dit">' + DUIM + 'Goed antwoord</button><button type="button" data-oordeel="beter" title="Kan beter: vertel wat er anders moet">' + DUIM_NEER + 'Kan beter</button></div>';
+    }
+    function oordeelKlik(e) {
+      var k = e.target.closest('[data-oordeel]'); if (!k) return;
+      var msg = k.closest('.ag-msg'), b = msg && msg._bericht; if (!b) return;
+      var vak = k.closest('.ag-oordeel');
+      if (k.dataset.oordeel === 'beter') {
+        vak.innerHTML = '<form class="ag-correctie"><textarea rows="2" placeholder="Wat moet anders? Bijvoorbeeld: het juiste bedrag, wat er ontbrak, of hoe wij het doen."></textarea><div><button type="submit" data-oordeel="opslaan">Opslaan</button><button type="button" data-oordeel="annuleer" class="stil">Annuleren</button></div></form>';
+        vak.querySelector('textarea').focus();
+        return;
+      }
+      if (k.dataset.oordeel === 'annuleer') { vak.outerHTML = oordeelHtml(b); return; }
+      e.preventDefault();
+      var correctie = k.dataset.oordeel === 'opslaan' ? (vak.querySelector('textarea').value || '').trim() : '';
+      if (k.dataset.oordeel === 'opslaan' && !correctie) { vak.querySelector('textarea').focus(); return; }
+      k.disabled = true;
+      AE.api('/intern/api/geheugen/oordeel', { method: 'POST', body: JSON.stringify({ vraag: b.vraag, antwoord: b.tekst, oordeel: correctie ? 'kan-beter' : 'goed', correctie: correctie, web: !!b.web, bronnen: b.bronnen || [] }) })
+        .then(function () { b.oordeel = correctie ? 'kan-beter' : 'goed'; vak.outerHTML = oordeelHtml(b); bewaar(); AE.meld(correctie ? 'Correctie onthouden' : 'Onthouden als goed antwoord'); })
+        .catch(function (err) { k.disabled = false; AE.meld(err.message); });
     }
     function bronnenHtml(lijst) {
       if (!lijst || !lijst.length) return '';
@@ -222,7 +247,11 @@
           if (info) extra += '<div class="ag-info">' + esc(info) + '</div>';
           exEl.innerHTML = extra + exEl.innerHTML;
           orbEl.classList.remove('denkt'); document.querySelectorAll('.ag-kop .orb').forEach(function (o) { o.classList.remove('denkt'); });
-          if (antwoord) { berichten.push({ rol: 'agent', tekst: antwoord, stappen: stappen, extra: extra }); bewaar(); }
+          if (antwoord) {
+            var nieuw = { rol: 'agent', tekst: antwoord, stappen: stappen, extra: extra, vraag: tekst, web: /web/.test(info), bronnen: bronnen.filter(function (x) { return x.bron; }).slice(0, 6).map(function (x) { return { titel: x.titel, bron: x.bron }; }) };
+            berichten.push(nieuw); bewaar();
+            el._bericht = nieuw; el.querySelector(':scope > div:not(.orb)').insertAdjacentHTML('beforeend', oordeelHtml(nieuw));
+          }
           else berichten.pop();
           bezig = false; knop.disabled = !ta.value.trim();
           if (acties.length) document.dispatchEvent(new CustomEvent('ae:agent-actie'));
@@ -235,6 +264,8 @@
     form.addEventListener('submit', function (e) { e.preventDefault(); vraag(ta.value); });
     stroom.addEventListener('click', function (e) { var b = e.target.closest('[data-vraag]'); if (b) vraag(b.getAttribute('data-vraag')); });
     stroom.addEventListener('click', kaartKlik);
+    stroom.addEventListener('click', oordeelKlik);
+    stroom.addEventListener('submit', function (e) { if (e.target.closest('.ag-correctie')) { e.preventDefault(); var b = e.target.querySelector('[data-oordeel=opslaan]'); if (b) b.click(); } });
 
     function bewaar() {
       return AE.api('/intern/api/gesprek', { method: 'POST', body: JSON.stringify({ id: gid, berichten: berichten }) }).then(function (m) {

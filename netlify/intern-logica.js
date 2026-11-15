@@ -245,7 +245,7 @@ export async function verwerk(request, cookies, next, maakStore, env = () => und
     return json(taken);
   }
 
-  if (pad.startsWith("/intern/api/agent") || pad.startsWith("/intern/api/werkstro") || pad === "/intern/api/kennis" || pad === "/intern/api/dagplan" || pad.startsWith("/intern/api/gesprek")) {
+  if (pad.startsWith("/intern/api/agent") || pad.startsWith("/intern/api/werkstro") || pad === "/intern/api/kennis" || pad === "/intern/api/dagplan" || pad.startsWith("/intern/api/gesprek") || pad.startsWith("/intern/api/geheugen")) {
     // Het agentgesprek zelf draait in een gewone Netlify Function (netlify/functions/agent.mjs):
     // edge functions mogen maar 50 ms rekenen, te weinig voor een AI-gesprek met tools.
     if (pad === "/intern/api/agent" && request.method === "POST") return next();

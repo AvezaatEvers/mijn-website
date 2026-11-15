@@ -6,7 +6,7 @@ export const KENNIS = [...KENNIS_BASIS, ...KENNIS_SITE];
 
 const STOP = new Set("de het een en of in op aan van voor met bij als dat die dit is zijn wordt worden je jij ik we wij mijn mij hoe wat wie waar wanneer waarom welke moet moeten kan kunnen mag mogen te om er ook nog niet wel dan maar naar over uit tot door zo heb hebben heeft had was u uw ze hij zij".split(" "));
 
-function tokens(s) {
+export function tokens(s) {
   return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")
     .replace(/[^a-z0-9%€ ]+/g, " ").split(/\s+/).filter((w) => w.length > 1 && !STOP.has(w))
     .map((w) => (w.length > 6 ? w.slice(0, 6) : w)); // grove stam: btw-aangifte/aangiftes/aangifte vallen samen

@@ -249,8 +249,12 @@
     var klaar = false;
     function weg(daarna) {
       if (klaar) return; klaar = true;
-      el.classList.add('weg'); document.body.style.overflow = '';
-      setTimeout(function () { el.remove(); if (daarna) daarna(); }, 750);
+      var heroOrb = document.getElementById('hero-orb'), introOrb = el.querySelector('.intro-in > .orb');
+      if (!heroOrb || !introOrb || !el.animate) {
+        el.classList.add('weg'); document.body.style.overflow = '';
+        return setTimeout(function () { el.remove(); if (daarna) daarna(); }, 750);
+      }
+      vlucht(el, introOrb, heroOrb, daarna);
     }
     el.addEventListener('click', function (e) {
       var k = e.target.closest('[data-in]');
@@ -285,6 +289,63 @@
       });
     });
   }
+  // Na de begroeting: warp, de orb vliegt naar zijn plek op Vandaag en het dashboard bouwt zich op
+  function vlucht(el, introOrb, heroOrb, daarna) {
+    scrollTo(0, 0);
+    var canvas = el.querySelector('canvas'), van = introOrb.getBoundingClientRect();
+    heroOrb.style.opacity = '0';
+    document.body.classList.add('ae-onthul');
+    el.classList.add('vertrek');
+    // warp op- en afbouwen
+    var t0 = performance.now();
+    (function warp(t) {
+      var s = (t - t0) / 1000;
+      canvas._warp = s < .8 ? s / .8 : s < 2 ? 1 : Math.max(0, 1 - (s - 2) / 1);
+      if (s < 3.1 && canvas.isConnected) requestAnimationFrame(warp);
+    })(t0);
+    // kopie van de orb die de reis maakt
+    var kloon = document.createElement('div'); kloon.className = 'reis-orb'; kloon.innerHTML = orb();
+    kloon.style.width = kloon.style.height = van.width + 'px'; kloon.style.left = van.left + 'px'; kloon.style.top = van.top + 'px';
+    kloon.querySelector('.orb').style.setProperty('--m', van.width + 'px');
+    document.body.appendChild(kloon);
+    introOrb.style.visibility = 'hidden';
+    setTimeout(function () {
+      var naar = heroOrb.getBoundingClientRect();
+      var dx = naar.left + naar.width / 2 - (van.left + van.width / 2), dy = naar.top + naar.height / 2 - (van.top + van.height / 2), sc = naar.width / van.width;
+      var anim = kloon.animate([
+        { transform: 'translate(0,0) scale(1)', filter: 'brightness(1)' },
+        { transform: 'translate(0,-24px) scale(1.18)', filter: 'brightness(1.5)', offset: .18 },
+        { transform: 'translate(' + (dx * .45 - 120) + 'px,' + (dy * .45 + 90) + 'px) scale(' + (sc * .7) + ')', filter: 'brightness(1.9)', offset: .55 },
+        { transform: 'translate(' + (dx + 18) + 'px,' + (dy - 10) + 'px) scale(' + (sc * 1.08) + ')', filter: 'brightness(1.4)', offset: .86 },
+        { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')', filter: 'brightness(1)' }
+      ], { duration: 2800, easing: 'cubic-bezier(.55,0,.25,1)', fill: 'forwards' });
+      var spoor = setInterval(function () {
+        var r = kloon.getBoundingClientRect();
+        for (var i = 0; i < 2; i++) {
+          var v = document.createElement('i'); v.className = 'reis-vonk';
+          v.style.left = (r.left + r.width / 2 + (Math.random() - .5) * r.width * .5) + 'px'; v.style.top = (r.top + r.height / 2 + (Math.random() - .5) * r.height * .5) + 'px';
+          document.body.appendChild(v); setTimeout(function (x) { return function () { x.remove(); }; }(v), 1000);
+        }
+      }, 30);
+      setTimeout(function () { el.classList.add('weg'); document.body.style.overflow = ''; }, 1300);
+      anim.onfinish = function () {
+        clearInterval(spoor);
+        heroOrb.style.opacity = ''; heroOrb.classList.add('aangekomen');
+        var r = heroOrb.getBoundingClientRect();
+        [0, 160, 320].forEach(function (d) {
+          setTimeout(function () {
+            var g = document.createElement('i'); g.className = 'reis-golf';
+            g.style.left = r.left + 'px'; g.style.top = r.top + 'px'; g.style.width = r.width + 'px'; g.style.height = r.height + 'px';
+            document.body.appendChild(g); setTimeout(function () { g.remove(); }, 1300);
+          }, d);
+        });
+        kloon.remove(); el.remove();
+        setTimeout(function () { document.body.classList.remove('ae-onthul'); heroOrb.classList.remove('aangekomen'); }, 2400);
+        if (daarna) setTimeout(daarna, 500);
+      };
+    }, 450);
+  }
+
   function typ(el, tekst, snel, klaar) {
     var i = 0; (function stap() { el.textContent = tekst.slice(0, ++i); if (i < tekst.length) setTimeout(stap, snel); else if (klaar) setTimeout(klaar, 280); })();
   }
@@ -301,7 +362,13 @@
         var a = q.a + dt * q.s * 0.25, rr = R * q.r * (1 + 0.04 * Math.sin(dt + q.a));
         var px = cx + Math.cos(a) * rr, py = cy + Math.sin(a) * rr * 0.55;
         var alfa = Math.min(1, dt / 1.5) * (0.25 + 0.5 * Math.abs(Math.sin(dt * .8 + q.a * 3)));
-        x.beginPath(); x.arc(px, py, q.z * dpr, 0, 7); x.fillStyle = 'rgba(160,190,255,' + alfa + ')'; x.fill();
+        var wp = c._warp || 0;
+        if (wp > 0.02) {
+          var dx = px - cx, dy = py - cy, l = Math.hypot(dx, dy) || 1, len = wp * (60 + q.z * 90) * dpr;
+          q.r += wp * 0.012; if (q.r > 1.4) q.r = 0.05 + Math.random() * 0.2;
+          x.beginPath(); x.moveTo(px, py); x.lineTo(px + dx / l * len, py + dy / l * len);
+          x.strokeStyle = 'rgba(184,240,255,' + Math.min(1, alfa + wp * .6) + ')'; x.lineWidth = q.z * dpr * (0.6 + wp); x.stroke();
+        } else { x.beginPath(); x.arc(px, py, q.z * dpr, 0, 7); x.fillStyle = 'rgba(160,190,255,' + alfa + ')'; x.fill(); }
       });
       requestAnimationFrame(loop);
     })(t0);

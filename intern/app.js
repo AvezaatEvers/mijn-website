@@ -218,8 +218,8 @@
   });
 
   // Agent laden (eigen bestand, zodat elke pagina hem krijgt)
-  var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/intern/agent.css?v=3'; document.head.appendChild(css);
-  var js = document.createElement('script'); js.src = '/intern/agent.js?v=3'; js.defer = true;
+  var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/intern/agent.css?v=4'; document.head.appendChild(css);
+  var js = document.createElement('script'); js.src = '/intern/agent.js?v=4'; js.defer = true;
   setTimeout(function () { document.body.appendChild(js); }, 0);
 
   window.AE = { api: api, ik: function () { return ikBelofte; }, meld: meld, openContact: openContact, esc: esc, svg: svg, herlaadKlanten: function () { KLANTEN = null; return laadKlanten(); } };

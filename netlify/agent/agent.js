@@ -651,14 +651,14 @@ async function slim(c, body) {
   const kritisch = body.modus !== "snel";
   let concept = "";
   for (let ronde = 0; ronde < 5; ronde++) {
-    if (Date.now() - start > 40000) break; // binnen de tijdslimiet van de functie blijven
+    if (Date.now() - start > 20000) break; // Netlify breekt streams rond 30 s af
     const res = await geminiStroom(env, model ? [model, ...voorkeur.filter((x) => x !== model)] : voorkeur, {
       systemInstruction: { parts: [{ text: sys }] }, contents, tools: GEMINI_TOOLS, _denk: body.modus === "snel" ? "minimal" : "medium",
       generationConfig: { temperature: body.modus === "snel" ? 0.4 : 0.6, maxOutputTokens: body.modus === "snel" ? 3000 : 6000 },
     }, (t) => { if (kritisch) concept += t; else { iets = true; stuur({ t: "tekst", v: t }); } });
     model = res.model;
     if (!res.calls.length && kritisch && concept.trim()) {
-      const ok = Date.now() - start < 38000 && await kritischeControle(c, sys, contents, res, concept, model, voorkeur);
+      const ok = Date.now() - start < 14000 && await kritischeControle(c, sys, contents, res, concept, model, voorkeur);
       if (!ok) stuur({ t: "tekst", v: concept });
       iets = true;
       const bron = gebruikt.size ? "met " + [...gebruikt].join(" en ") : "uit eigen kennis";
@@ -1018,6 +1018,11 @@ export async function agentGesprek(request, wie, store, env, h) {
   let getoond = false;
   const stuur = (d) => { if (d.t === "tekst" && d.v) getoond = true; if (open) w.write(sse(d)).catch(() => { open = false; }); };
   const c = { store, wie, env, h, stuur };
+  // Meteen een eerste byte en daarna elke 3 s een hartslag: anders geeft Netlify een 504
+  // als het (niet zichtbare) concept plus de kritische controle even duren.
+  const hart = enc.encode(": hartslag\n\n");
+  w.write(enc.encode(": start\n\n")).catch(() => { open = false; });
+  const tik = setInterval(() => { if (open) w.write(hart).catch(() => { open = false; }); }, 3000);
   (async () => {
     try {
       // Gratis: Gemini (gratis tier) als er een sleutel is, anders of bij een storing de lokale agent
@@ -1034,7 +1039,7 @@ export async function agentGesprek(request, wie, store, env, h) {
       stuur({ t: "klaar" });
     } catch (e) {
       stuur({ t: "fout", v: String(e.message || e).slice(0, 300) });
-    } finally { open = false; w.close().catch(() => {}); }
+    } finally { clearInterval(tik); open = false; w.close().catch(() => {}); }
   })();
   return new Response(readable, { headers: { "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-store", "X-Accel-Buffering": "no" } });
 }

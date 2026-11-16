@@ -37,7 +37,7 @@
         return '<a class="zn' + (aan ? ' is-aan' : '') + '" href="' + n[0] + '"' + (aan ? ' aria-current="page"' : '') + '>' + svg(n[2]) + '<span>' + n[1] + '</span>' + (n[3] ? '<span class="tel" id="' + n[3] + '" hidden></span>' : '') + '</a>';
       }).join('');
     }).join('') +
-    '<div class="zij-groep">Snel</div><a class="zn" href="#" data-contact>' + svg('plus') + '<span>Contact vastleggen</span></a>' +
+    '<div class="zij-groep">Snel</div><a class="zn' + (location.pathname === '/intern/agent.html' ? ' is-aan' : '') + '" href="/intern/agent.html">' + svg('agent') + '<span>Vraag de agent</span></a><a class="zn" href="#" data-contact>' + svg('plus') + '<span>Contact vastleggen</span></a>' +
     '<div class="zij-voet"><img id="zij-foto" src="/assets/img/mail/koen.jpg" alt="" width="36" height="36"><div><strong id="zij-naam">Ingelogd</strong><a href="/intern/logout">Uitloggen</a></div></div>';
   document.body.insertBefore(zij, document.body.firstChild);
 
@@ -78,6 +78,7 @@
     '<div class="ob-voet"><span><kbd>↑↓</kbd>kiezen</span><span><kbd>↵</kbd>openen</span><span><kbd>esc</kbd>sluiten</span></div></div>';
   document.body.appendChild(ob);
   var ACTIES = [
+    { t: 'Vraag de agent', s: 'Agent', url: '/intern/agent.html' },
     { t: 'Vandaag', s: 'Pagina', url: '/intern/' },
     { t: 'Activiteit: wie deed wat', s: 'Pagina', url: '/intern/activiteit.html' },
     { t: 'Claude koppelen', s: 'Pagina', url: '/intern/claude.html' },
@@ -113,7 +114,7 @@
         if (g !== groep) { html += '<div class="ob-kop">' + g + '</div>'; groep = g; }
         html += '<a class="ob-item' + (i === obIdx ? ' is-actief' : '') + '" data-i="' + i + '" href="' + (x.url || '#') + '"><i>' + esc((x.t || '?').slice(0, 1).toUpperCase()) + '</i><span>' + esc(x.t) + (x.sub ? ' <small style="margin-left:6px">' + esc(x.sub) + '</small>' : '') + '</span><small>' + esc(x.s) + '</small></a>';
       });
-      // (De agent is weggehaald; vragen stel je nu in Claude via de koppeling.)
+      if (q.length > 2) { obItems.push({ t: 'Vraag de agent: ' + document.getElementById('ob-in').value.trim(), s: 'Agent', doe: (function (v) { return function () { window.AE.agent && window.AE.agent.open(v); }; })(document.getElementById('ob-in').value.trim()) }); html += '<div class="ob-kop">Agent</div><a class="ob-item' + (obItems.length - 1 === obIdx ? ' is-actief' : '') + '" data-i="' + (obItems.length - 1) + '" href="#"><i>✦</i><span>' + esc(obItems[obItems.length - 1].t) + '</span><small>Enter</small></a>'; }
       document.getElementById('ob-lijst').innerHTML = html || '<div class="ob-kop">Niets gevonden</div>';
     });
   }
@@ -221,7 +222,7 @@
 
   // Agent laden (eigen bestand, zodat elke pagina hem krijgt)
   var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/intern/agent.css?v=12'; document.head.appendChild(css);
-  var js = document.createElement('script'); js.src = '/intern/agent.js?v=21'; js.defer = true;
+  var js = document.createElement('script'); js.src = '/intern/agent.js?v=22'; js.defer = true;
   setTimeout(function () { document.body.appendChild(js); }, 0);
 
   window.AE = { api: api, ik: function () { return ikBelofte; }, meld: meld, openContact: openContact, esc: esc, svg: svg, herlaadKlanten: function () { KLANTEN = null; return laadKlanten(); } };

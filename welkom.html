@@ -211,7 +211,7 @@
         <p class="lead wk-in" style="--d:.16s">Fijn dat je voor ons kiest. Hier zie je precies wat er de komende weken gebeurt, en wat je zelf in een paar minuten regelt. De rest doen wij.</p>
         <div class="wk-wie wk-in" style="--d:.24s">
           <img class="wk-avatar" id="wk-foto" src="/assets/img/daan-160.webp?v=4" alt="" width="160" height="160">
-          <p>Jouw vaste boekhouder is <strong id="wk-boekhouder">Daan</strong>.<br>Vragen? Je kunt altijd even bellen, mailen of appen.</p>
+          <p>Jouw vaste boekhouder is <strong id="wk-boekhouder">Koen of Daan</strong>.<br>Vragen? Je kunt altijd even bellen, mailen of appen.</p>
         </div>
       </div>
 
@@ -359,7 +359,7 @@
       <div class="wk-contact wk-in">
         <div>
           <h2>Vragen? Gewoon even appen.</h2>
-          <p><span id="wk-boekhouder-2">Daan</span> is je vaste aanspreekpunt. Je krijgt binnen 24 uur antwoord op je mail, binnen 2 uur op WhatsApp, en bellen we je binnen 30 minuten terug.</p>
+          <p><span id="wk-boekhouder-2">Je boekhouder</span> is je vaste aanspreekpunt. Je krijgt binnen 24 uur antwoord op je mail, binnen 2 uur op WhatsApp, en bellen we je binnen 30 minuten terug.</p>
         </div>
         <div class="wk-knoppen">
           <a class="wk-knop is-wit" href="https://wa.me/31850604363"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/></svg>WhatsApp</a>
@@ -397,12 +397,14 @@
   // Persoonlijk maken via de link: /welkom.html?naam=Sanne&boekhouder=Daan
   var q = new URLSearchParams(location.search);
   var naam = (q.get('naam') || '').trim().slice(0, 40);
-  var wie = (q.get('boekhouder') || 'Daan').trim();
-  wie = /^koen$/i.test(wie) ? 'Koen' : 'Daan';
+  // Zonder (geldige) boekhouder in de link noemen we niet zomaar iemand
+  var b = (q.get('boekhouder') || '').trim();
+  var wie = /^koen$/i.test(b) ? 'Koen' : /^daan$/i.test(b) ? 'Daan' : '';
   if (naam) document.getElementById('wk-naam').textContent = ', ' + naam;
-  document.getElementById('wk-boekhouder').textContent = wie;
-  document.getElementById('wk-boekhouder-2').textContent = wie;
-  document.getElementById('wk-foto').src = '/assets/img/' + wie.toLowerCase() + '-160.webp';
+  document.getElementById('wk-boekhouder').textContent = wie || 'Koen of Daan';
+  document.getElementById('wk-boekhouder-2').textContent = wie || 'Je boekhouder';
+  if (wie) document.getElementById('wk-foto').src = '/assets/img/' + wie.toLowerCase() + '-160.webp'; else document.getElementById('wk-foto').hidden = true;
+  wie = wie || 'Koen en Daan';
   if (naam) document.title = 'Welkom, ' + naam + ' | Avezaat & Evers';
   var idTekst = 'Hoi ' + wie + ',\n\nIn de bijlage stuur ik een kopie van mijn identiteitsbewijs.\n\nGroet,\n' + (naam || '');
   document.getElementById('wk-mail-id').href = 'mailto:info@avezaatenevers.nl?subject=' + encodeURIComponent('Identiteitsbewijs' + (naam ? ' ' + naam : '') + ' (t.a.v. ' + wie + ')') + '&body=' + encodeURIComponent(idTekst);

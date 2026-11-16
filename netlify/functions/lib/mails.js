@@ -294,6 +294,8 @@ ${tabel(regels)}`) +
 
   // 5. Welkom
   welkom(d, base = '') {
+    // Welkomstpagina persoonlijk maken: zelfde voornaam en vaste boekhouder als in deze mail
+    const welkomUrl = `${base}/welkom.html` + (d.wie === 'koen' || d.wie === 'daan' || voornaam(d.naam) ? '?' + [voornaam(d.naam) ? 'naam=' + encodeURIComponent(voornaam(d.naam)) : '', d.wie === 'koen' || d.wie === 'daan' ? 'boekhouder=' + wieNaam(d.wie) : ''].filter(Boolean).join('&') : '');
     const inhoud = kop(`Welkom, ${esc(voornaam(d.naam) || 'fijn dat je er bent')}!`) +
       p(voornaam(d.naam) ? `Fijn dat je voor ons kiest. Vanaf nu ben ik je vaste boekhouder. Je hebt dus altijd hetzelfde aanspreekpunt, dat jouw bedrijf kent.` : 'Fijn dat je voor ons kiest. Vanaf nu heb je één vaste boekhouder, die jouw bedrijf kent.') +
       p('Om te beginnen zijn er maar drie stappen:') +
@@ -302,14 +304,14 @@ ${tabel(regels)}`) +
         ['Download de app en koppel je bank', 'Duurt een kwartiertje. Daarna komen je transacties vanzelf binnen.'],
         ['Fotografeer je eerste bonnetje', 'Dan weet je meteen hoe het werkt. Meer hoef je eigenlijk niet te doen.'],
       ]) +
-      knop(`${base}/welkom.html`, 'Open je welkomstpagina') +
+      knop(welkomUrl, 'Open je welkomstpagina') +
       p(`Liever stap voor stap met plaatjes? Lees ${link(`${base}/kennisbank/starten-met-moneymonk.html`, 'Van start met MoneyMonk')}. Hoe we met je gegevens omgaan, staat in de ${link(`${base}/verwerkersovereenkomst.html`, 'verwerkersovereenkomst')}.`) +
       p('Loop je ergens tegenaan? App me gewoon. Daar ben ik voor.', 'margin-bottom:22px') +
       groet(base, d.wie);
     return {
       subject: 'Welkom! Zo ga je van start',
       html: omhulsel(base, { preheader: 'Drie stappen en je bent klaar: account activeren, bank koppelen, eerste bonnetje.', inhoud, wie: d.wie }),
-      text: `${hoiTekst(d.naam)}\n\nFijn dat je voor ons kiest. Vanaf nu ben ik je vaste boekhouder.\n\nOm te beginnen:\n1. Activeer je MoneyMonk-account via de uitnodiging in je mail.\n2. Download de app en koppel je bank.\n3. Fotografeer je eerste bonnetje.\n\nWelkomstpagina: ${base}/welkom.html\nHandleiding: ${base}/kennisbank/starten-met-moneymonk.html\n\nLoop je ergens tegenaan? App me gewoon.${voet(d.wie)}`,
+      text: `${hoiTekst(d.naam)}\n\nFijn dat je voor ons kiest. Vanaf nu ben ik je vaste boekhouder.\n\nOm te beginnen:\n1. Activeer je MoneyMonk-account via de uitnodiging in je mail.\n2. Download de app en koppel je bank.\n3. Fotografeer je eerste bonnetje.\n\nWelkomstpagina: ${welkomUrl}\nHandleiding: ${base}/kennisbank/starten-met-moneymonk.html\n\nLoop je ergens tegenaan? App me gewoon.${voet(d.wie)}`,
     };
   },
 

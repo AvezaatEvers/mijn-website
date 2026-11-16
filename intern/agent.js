@@ -203,7 +203,7 @@
       var antwoord = '', stappen = [], bronnen = [], acties = [], links = [], open = null, raf = 0, info = '', kaarten = [], waarschuwingen = [];
       function teken() {
         raf = 0;
-        mdEl.innerHTML = antwoord ? md(antwoord) : '<div class="ag-denkt"><span></span><span></span><span></span></div>';
+        mdEl.innerHTML = antwoord ? md(antwoord) : afgerond ? '' : '<div class="ag-denkt"><span></span><span></span><span></span></div>';
         var laatste = mdEl.lastElementChild; if (antwoord && laatste) laatste.classList.add('typt');
         var dichtbij = stroom.scrollHeight - stroom.scrollTop - stroom.clientHeight < 140;
         if (dichtbij) stroom.scrollTop = stroom.scrollHeight;
@@ -212,7 +212,9 @@
         if (open) open.classList.add('klaar');
         open = document.createElement('span'); open.className = 'ag-stap'; open.textContent = label; stEl.appendChild(open); stappen.push(label);
       }
-      fetch('/agent-api', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+      // Nooit eindeloos laden: na 45 s geven we het op met een duidelijke melding
+      var afgerond = false, afbreek = new AbortController(), afbreekKlok = setTimeout(function () { afbreek.abort(); }, 45000);
+      fetch('/agent-api', { method: 'POST', credentials: 'same-origin', signal: afbreek.signal, headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ modus: modusKeuze(), berichten: berichten.slice(-40).map(function (b) { return { rol: b.rol, tekst: b.tekst }; }), pagina: document.title.split('|')[0].trim(), klant: window.AE_KLANT || '' }) })
         .then(function (r) {
           if (r.status === 401) { location.reload(); throw new Error('Uitgelogd'); }
@@ -228,6 +230,7 @@
                 if (regel.indexOf('data:') !== 0) continue;
                 var d; try { d = JSON.parse(regel.slice(5)); } catch (e) { continue; }
                 if (d.t === 'tekst') { if (d.v) { if (open) { open.classList.add('klaar'); open = null; } antwoord += d.v; if (!raf) raf = requestAnimationFrame(teken); } }
+                else if (d.t === 'vervang') { if (d.v) { antwoord = d.v; if (open) { open.classList.add('klaar'); open = null; } if (!raf) raf = requestAnimationFrame(teken); } }
                 else if (d.t === 'tool') stap(d.label);
                 else if (d.t === 'bronnen') bronnen = bronnen.concat(d.v || []);
                 else if (d.t === 'info') info = d.v;
@@ -243,8 +246,10 @@
           }
           return lees();
         })
-        .catch(function (e) { antwoord += (antwoord ? '\n\n' : '') + ''; var msg = /load failed|failed to fetch|networkerror|network error/i.test(e.message || '') ? 'De verbinding met de agent viel weg. Probeer het nog eens.' : (e.message || 'Er ging iets mis'); exEl.innerHTML = '<div class="ag-fout">' + esc(msg) + '</div>'; })
+        .then(function () { if (!antwoord) throw new Error('Geen antwoord ontvangen: de server stopte voordat Gemini antwoordde. Probeer het nog eens, of kies Snel.'); })
+        .catch(function (e) { var msg = e.name === 'AbortError' ? 'De agent deed er te lang over (45 s). Probeer het nog eens, of kies Snel.' : /load failed|failed to fetch|networkerror|network error/i.test(e.message || '') ? 'De verbinding met de agent viel weg. Probeer het nog eens.' : (e.message || 'Er ging iets mis'); exEl.innerHTML = '<div class="ag-fout">' + esc(msg) + '</div>'; })
         .then(function () {
+          clearTimeout(afbreekKlok); afgerond = true;
           if (open) open.classList.add('klaar');
           if (raf) cancelAnimationFrame(raf); teken();
           var t = mdEl.querySelector('.typt'); if (t) t.classList.remove('typt');

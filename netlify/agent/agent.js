@@ -469,6 +469,14 @@ LABELS.pagina_lezen = "Leest webpagina";
 
 // Modellen die net een limiet of fout gaven, slaan we 10 minuten over (scheelt wachttijd bij elke vraag)
 const KAPOT = new Map();
+let KAPOT_GEWIJZIGD = false;
+function zetKapot(m) { KAPOT.set(m, Date.now() + 600000); KAPOT_GEWIJZIGD = true; }
+// Haperende modellen bewaren, zodat we ze na een koude start niet opnieuw proberen
+async function laadKapot(store) { try { const k = (await store.get("agent-kapot", { type: "json" })) || {}; const nu = Date.now(); for (const [m, t] of Object.entries(k)) if (t > nu && !(KAPOT.get(m) > t)) KAPOT.set(m, t); } catch {} }
+async function bewaarKapot(store) { if (!KAPOT_GEWIJZIGD) return; KAPOT_GEWIJZIGD = false; const nu = Date.now(); try { await store.setJSON("agent-kapot", Object.fromEntries([...KAPOT].filter(([, t]) => t > nu))); } catch {} }
+// Uiterste tijd voor dit verzoek: Netlify breekt de stream rond 30 s af, dus wij stoppen eerder.
+let EIND = 0;
+function resttijd(max) { const r = (EIND || Date.now() + 60000) - Date.now() - 400; if (r < 1500) throw Object.assign(new Error("Geen tijd meer over"), { status: 504, deadline: true }); return Math.min(max, r); }
 function bruikbaar(modellen) { const nu = Date.now(); const ok = modellen.filter((m) => !(KAPOT.get(m) > nu)); return ok.length ? ok : modellen; }
 const GEEN_DENK = new Set(); // modellen die de denkinstelling niet accepteren
 function denkConfig(model, body) {
@@ -481,13 +489,13 @@ function denkConfig(model, body) {
 
 // Gewone aanroep (voor webzoeken)
 async function geminiPost(env, model, body) {
-  const stop = new AbortController(), klok = setTimeout(() => stop.abort(), 20000);
+  const stop = new AbortController(), ms = resttijd(15000), klok = setTimeout(() => stop.abort(), ms);
   let r;
   try {
     r = await fetch(GEMINI + model + ":generateContent", {
       method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": geminiSleutel(env) }, body: JSON.stringify(denkConfig(model, body)), signal: stop.signal,
     });
-  } catch (e) { const f = new Error(e.name === "AbortError" ? "Gemini reageerde te traag" : "Gemini niet bereikbaar"); f.status = 504; throw f; }
+  } catch (e) { const f = new Error(e.name === "AbortError" ? "Gemini reageerde te traag" : "Gemini niet bereikbaar"); f.status = 504; if (e.name === "AbortError" && ms < 15000) f.deadline = true; throw f; }
   finally { clearTimeout(klok); }
   const t = await r.text();
   let j = null; try { j = JSON.parse(t); } catch {}
@@ -501,7 +509,7 @@ async function geminiMetTerugval(env, modellen, body) {
     catch (e) {
       laatste = e;
       if (e.status === 400 && /think/i.test(e.message) && !GEEN_DENK.has(m)) { GEEN_DENK.add(m); try { return { j: await geminiPost(env, m, body), model: m }; } catch (e2) { laatste = e2; } }
-      if (![429, 500, 502, 503, 504, 404].includes(laatste.status)) throw laatste; KAPOT.set(m, Date.now() + 600000);
+      if (laatste.deadline || ![429, 500, 502, 503, 504, 404].includes(laatste.status)) throw laatste; zetKapot(m);
     }
   }
   throw laatste;
@@ -513,7 +521,12 @@ async function geminiStroom(env, modellen, body, opTekst) {
   const lijst = bruikbaar(modellen);
   for (let mi = 0; mi < lijst.length; mi++) {
     const model = lijst[mi];
-    const stop = new AbortController(), klok = setTimeout(() => stop.abort(), 25000);
+    let ms, eersteKlok = null, eersteBinnen = false;
+    try { ms = resttijd(18000); } catch (e) { throw laatste || e; }
+    const stop = new AbortController(), klok = setTimeout(() => stop.abort(), ms);
+    // Geen enkel teken binnen 10 s? Dan hangt dit model; probeer het volgende.
+    const traag = { v: false };
+    if (ms > 11000) eersteKlok = setTimeout(() => { if (!eersteBinnen) { traag.v = true; stop.abort(); } }, 10000);
     try {
       const r = await fetch(GEMINI + model + ":streamGenerateContent?alt=sse", {
         method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": geminiSleutel(env) }, body: JSON.stringify(denkConfig(model, body)), signal: stop.signal,
@@ -528,6 +541,7 @@ async function geminiStroom(env, modellen, body, opTekst) {
       for (;;) {
         const { value, done } = await reader.read();
         if (done) break;
+        eersteBinnen = true;
         buf += dec.decode(value, { stream: true });
         let i;
         while ((i = buf.indexOf("\n")) >= 0) {
@@ -542,19 +556,20 @@ async function geminiStroom(env, modellen, body, opTekst) {
           }
         }
       }
-      clearTimeout(klok);
+      clearTimeout(klok); clearTimeout(eersteKlok);
       if (!tekst && !calls.length) throw Object.assign(new Error(geblokkeerd ? "Vraag geblokkeerd door Gemini" : "Leeg antwoord van Gemini"), { status: geblokkeerd ? 400 : 503 });
       const parts = [];
       if (tekst) parts.push(tekstSig ? { text: tekst, thoughtSignature: tekstSig } : { text: tekst });
       parts.push(...calls);
       return { model, parts, calls, tekst };
     } catch (e) {
-      clearTimeout(klok);
-      laatste = e.name === "AbortError" ? Object.assign(new Error("Gemini reageerde te traag"), { status: 504 }) : e;
+      clearTimeout(klok); clearTimeout(eersteKlok);
+      laatste = e.name === "AbortError" ? Object.assign(new Error(traag.v ? "Gemini (" + model + ") gaf 10 s geen antwoord" : "Gemini reageerde te traag"), { status: 504, deadline: !traag.v && ms < 18000 }) : e;
+      if (laatste.deadline) throw laatste;
       if (laatste.status === undefined) laatste.status = 503;
       if (laatste.status === 400 && /think/i.test(laatste.message) && !GEEN_DENK.has(model)) { GEEN_DENK.add(model); mi--; continue; }
       if (![429, 500, 502, 503, 504, 404].includes(laatste.status)) throw laatste;
-      KAPOT.set(model, Date.now() + 600000);
+      zetKapot(model);
     }
   }
   throw laatste;
@@ -647,20 +662,18 @@ async function slim(c, body) {
   const voorkeur = env("GEMINI_MODEL") ? [env("GEMINI_MODEL"), ...basis] : basis;
   let model = null, iets = false;
   const gebruikt = new Set();
-  // Slim: eerst een concept (niet zichtbaar), daarna een kritische controle die het definitieve antwoord streamt
+  // Slim: het antwoord verschijnt direct; daarna (als er tijd is) een kritische controle die het zo nodig verbetert
   const kritisch = body.modus !== "snel";
   let concept = "";
   for (let ronde = 0; ronde < 5; ronde++) {
-    if (Date.now() - start > 20000) break; // Netlify breekt streams rond 30 s af
+    if (Date.now() - start > 19000) break; // Netlify breekt streams rond 30 s af
     const res = await geminiStroom(env, model ? [model, ...voorkeur.filter((x) => x !== model)] : voorkeur, {
-      systemInstruction: { parts: [{ text: sys }] }, contents, tools: GEMINI_TOOLS, _denk: body.modus === "snel" ? "minimal" : "medium",
+      systemInstruction: { parts: [{ text: sys }] }, contents, tools: GEMINI_TOOLS, _denk: body.modus === "snel" ? "minimal" : "low",
       generationConfig: { temperature: body.modus === "snel" ? 0.4 : 0.6, maxOutputTokens: body.modus === "snel" ? 3000 : 6000 },
-    }, (t) => { if (kritisch) concept += t; else { iets = true; stuur({ t: "tekst", v: t }); } });
+    }, (t) => { concept += t; iets = true; stuur({ t: "tekst", v: t }); });
     model = res.model;
     if (!res.calls.length && kritisch && concept.trim()) {
-      const ok = Date.now() - start < 14000 && await kritischeControle(c, sys, contents, res, concept, model, voorkeur);
-      if (!ok) stuur({ t: "tekst", v: concept });
-      iets = true;
+      const ok = Date.now() - start < 15000 && await kritischeControle(c, sys, contents, res, concept, model, voorkeur);
       const bron = gebruikt.size ? "met " + [...gebruikt].join(" en ") : "uit eigen kennis";
       stuur({ t: "info", v: "Beantwoord door " + model.replace("gemini-", "Gemini ").replace(/-/g, " ") + ", " + bron + (ok ? ", kritisch gecontroleerd" : "") + ", " + ((Date.now() - start) / 1000).toFixed(1).replace(".", ",") + " s" });
       return;
@@ -670,7 +683,7 @@ async function slim(c, body) {
       stuur({ t: "info", v: "Beantwoord door " + res.model.replace("gemini-", "Gemini ").replace(/-/g, " ") + ", " + bron + ", " + ((Date.now() - start) / 1000).toFixed(1).replace(".", ",") + " s" });
       return;
     }
-    if (res.tekst) { if (kritisch) concept += "\n\n"; else stuur({ t: "tekst", v: "\n\n" }); }
+    if (res.tekst) { concept += "\n\n"; stuur({ t: "tekst", v: "\n\n" }); }
     contents.push({ role: "model", parts: res.parts }); // ongewijzigd terug, inclusief thought signatures
     // Alle tools van deze ronde tegelijk uitvoeren
     const antwoorden = await Promise.all(res.calls.map(async (p) => {
@@ -695,7 +708,7 @@ async function slim(c, body) {
   if (!iets) stuur({ t: "tekst", v: concept.trim() || "Ik kwam er niet helemaal uit binnen de tijd. Stel je vraag iets specifieker?" });
 }
 
-// Tweede ronde: het concept kritisch nalopen en het definitieve antwoord streamen. Geeft false als het niet lukte.
+// Tweede ronde: het getoonde antwoord kritisch nalopen; een verbeterde versie vervangt het. Geeft false als het niet lukte.
 async function kritischeControle(c, sys, contents, res, concept, model, voorkeur) {
   const { env, stuur } = c;
   stuur({ t: "tool", naam: "controle", label: "Controleert het antwoord kritisch" });
@@ -706,24 +719,24 @@ Hieronder staat je conceptantwoord. Lees het als een kritische, ervaren boekhoud
 3. Mist er een belangrijk risico, alternatief of vervolgstap? Voeg het kort toe.
 4. Houd rekening met het hele gesprek: herhaal niet wat al gezegd is, en spreek eerdere afspraken niet tegen zonder reden.
 5. Maak het korter waar het kan. Geen loze complimenten.
-Geef nu ALLEEN het definitieve antwoord aan de gebruiker, in dezelfde opmaak en taal. Noem het concept of deze controle niet.
+Geef nu ALLEEN het definitieve antwoord aan de gebruiker, in dezelfde opmaak en taal. Noem het concept of deze controle niet. Is het concept al goed, geef het dan ongewijzigd terug.
 
 Concept:
 """
 ${concept.slice(0, 12000)}
 """`;
   const lijst = contents.concat([{ role: "model", parts: res.parts }, { role: "user", parts: [{ text: opdracht }] }]);
-  let iets = false;
+  let beter = "";
   try {
-    await geminiStroom(env, [model, ...voorkeur.filter((x) => x !== model)], {
-      systemInstruction: { parts: [{ text: sys }] }, contents: lijst, tools: GEMINI_TOOLS, toolConfig: { functionCallingConfig: { mode: "NONE" } }, _denk: "medium",
-      generationConfig: { temperature: 0.3, maxOutputTokens: 6000 },
-    }, (t) => { iets = true; stuur({ t: "tekst", v: t }); });
-    return iets;
-  } catch (e) {
-    console.log("Controle mislukt", e.status, e.message);
-    return iets; // al iets getoond: laat staan; anders valt slim() terug op het concept
-  }
+    await geminiStroom(env, [model], {
+      systemInstruction: { parts: [{ text: sys }] }, contents: lijst, tools: GEMINI_TOOLS, toolConfig: { functionCallingConfig: { mode: "NONE" } }, _denk: "low",
+      generationConfig: { temperature: 0.3, maxOutputTokens: 4000 },
+    }, (t) => { beter += t; });
+  } catch (e) { console.log("Controle mislukt", e.status, e.message); return false; }
+  beter = beter.trim();
+  if (beter.length < 20) return false;
+  if (beter.replace(/\s+/g, " ") !== concept.trim().replace(/\s+/g, " ")) stuur({ t: "vervang", v: beter });
+  return true;
 }
 
 // ---------- Lokale modus (zonder API-sleutel) ----------
@@ -1018,6 +1031,7 @@ export async function agentGesprek(request, wie, store, env, h) {
   let getoond = false;
   const stuur = (d) => { if (d.t === "tekst" && d.v) getoond = true; if (open) w.write(sse(d)).catch(() => { open = false; }); };
   const c = { store, wie, env, h, stuur };
+  EIND = Date.now() + 25000;
   // Meteen een eerste byte en daarna elke 3 s een hartslag: anders geeft Netlify een 504
   // als het (niet zichtbare) concept plus de kritische controle even duren.
   const hart = enc.encode(": hartslag\n\n");
@@ -1027,6 +1041,7 @@ export async function agentGesprek(request, wie, store, env, h) {
     try {
       // Gratis: Gemini (gratis tier) als er een sleutel is, anders of bij een storing de lokale agent
       if (geminiSleutel(env)) {
+        await laadKapot(store);
         let gelukt = false;
         try { await slim(c, body); gelukt = true; }
         catch (e) {
@@ -1039,7 +1054,7 @@ export async function agentGesprek(request, wie, store, env, h) {
       stuur({ t: "klaar" });
     } catch (e) {
       stuur({ t: "fout", v: String(e.message || e).slice(0, 300) });
-    } finally { clearInterval(tik); open = false; w.close().catch(() => {}); }
+    } finally { clearInterval(tik); open = false; w.close().catch(() => {}); bewaarKapot(store); }
   })();
   return new Response(readable, { headers: { "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-store", "X-Accel-Buffering": "no" } });
 }

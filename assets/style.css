@@ -1586,25 +1586,27 @@ p, li, dd, dt, td, th, blockquote, figcaption, summary, label { overflow-wrap: b
 @media (max-width: 480px) { .over-kaart dl > div { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
 .wij-bio { display: block; margin-top: 6px; font-size: 14px; color: var(--text); line-height: 1.45; }
 
-/* Hero: MoneyMonk-app met appje van je boekhouder */
-.hv { position: relative; aspect-ratio: 4/5; border-radius: 24px; overflow: hidden; background: radial-gradient(120% 90% at 80% 10%, #DCE6FF 0%, #EEF2FB 45%, #F7F8FC 100%); }
-.hv::before { content: ""; position: absolute; width: 70%; aspect-ratio: 1; right: -12%; top: -14%; border-radius: 50%; background: radial-gradient(circle, rgba(45,91,211,.18), transparent 65%); }
-.hv-tel { position: absolute; left: 50%; top: 7%; width: 56%; transform: translateX(-38%) rotate(4deg); filter: drop-shadow(0 30px 40px rgba(17,24,39,.22)); }
-.hv-kaart { position: absolute; background: #fff; border-radius: 16px; box-shadow: 0 18px 40px -12px rgba(17,24,39,.22); padding: 14px 16px; font-size: 14px; line-height: 1.4; color: #1D1D1F; }
-.hv-chat { left: 5%; top: 16%; width: 58%; display: grid; grid-template-columns: 38px 1fr; gap: 10px; }
-.hv-chat img { width: 38px; height: 38px; border-radius: 50%; }
-.hv-chat b { display: block; font-size: 13px; } .hv-chat small { color: #6B7280; font-size: 12px; font-weight: 500; }
-.hv-chat p { margin: 4px 0 0; }
-.hv-bon { left: 7%; top: 52%; display: flex; gap: 10px; align-items: center; }
-.hv-bon i { width: 34px; height: 34px; border-radius: 10px; background: #E8F5EC; color: #1F7A3D; display: grid; place-items: center; font-style: normal; font-weight: 700; }
-.hv-bon b { display: block; font-size: 13.5px; } .hv-bon small { color: #6B7280; font-size: 12.5px; }
-.hero-media .hv ~ .price-badge { left: auto; right: -16px; bottom: 28px; }
-@media (max-width: 700px) { .hv-chat { width: 70%; } .hero-media .hv ~ .price-badge { right: 12px; } }
-@media (min-width: 701px) { .home .hero-media .hv { width: 100%; aspect-ratio: auto; min-height: 420px; } }
+/* Hero: MoneyMonk-app met één appje van je boekhouder. Rustig: telefoon recht en vrij, één kaart die maar een klein stuk overlapt. */
+.hv { position: relative; aspect-ratio: 4/5; border-radius: 24px; overflow: hidden; background: radial-gradient(110% 80% at 70% 0%, #DCE6FF 0%, #EEF2FB 50%, #F7F8FC 100%); }
+.hv-tel { position: absolute; left: 50%; top: 8%; width: 50%; transform: translateX(-50%); filter: drop-shadow(0 28px 36px rgba(17,24,39,.20)); }
+.hv-kaart { position: absolute; background: rgba(255,255,255,.96); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-radius: 18px; box-shadow: 0 20px 44px -16px rgba(17,24,39,.28), 0 0 0 1px rgba(17,24,39,.04); color: #1D1D1F; }
+.hv-chat { left: 7%; bottom: 9%; width: 60%; display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: start; padding: 14px 16px; font-size: 14.5px; line-height: 1.45; }
+.hv-chat img { width: 40px; height: 40px; border-radius: 50%; }
+.hv-chat b { display: block; font-size: 13.5px; } .hv-chat small { color: #6B7280; font-size: 12.5px; font-weight: 500; }
+.hv-chat p { margin: 3px 0 0; }
+.hero-media .hv ~ .price-badge { left: auto; right: -16px; top: 12%; bottom: auto; }
+@media (min-width: 701px) {
+  .home .hero-media .hv { width: 100%; aspect-ratio: auto; min-height: 420px; }
+  /* Desktop: telefoon links, prijs rechtsboven, appje rechtsonder; elk op een eigen plek */
+  .home .hv-tel { left: 9%; width: 45%; top: 9%; transform: none; }
+  .home .hv-chat { left: auto; right: 5%; bottom: 13%; width: 64%; }
+}
 @media (max-width: 700px) {
-  .home .hero-media .hv { aspect-ratio: auto; height: 340px; border-radius: var(--radius); }
-  .home .hv-tel { width: 46%; top: 6%; transform: translateX(-10%) rotate(4deg); }
-  .home .hv-chat { top: 9%; left: 4%; width: 66%; font-size: 13px; padding: 11px 12px; grid-template-columns: 32px 1fr; }
-  .home .hv-chat img { width: 32px; height: 32px; }
-  .home .hv-bon { top: auto; bottom: 30%; left: 6%; }
+  /* Mobiel: telefoon in het midden, het appje als vaste kaart onderaan (vervangt de Koen & Daan-kaart) */
+  .home .hero-media .hv { aspect-ratio: auto; height: 330px; border-radius: var(--radius); }
+  .home .hv-tel { width: 48%; top: 7%; }
+  .home .hv-chat { left: 12px; right: 12px; width: auto; bottom: 12px; font-size: 14px; padding: 12px 14px; grid-template-columns: 36px 1fr; gap: 10px; }
+  .home .hv-chat img { width: 36px; height: 36px; }
+  .home .hero-media:has(.hv) .hero-status { display: none; }
+  .home .hero-media .hv ~ .price-badge { right: 12px; top: auto; }
 }

@@ -1479,7 +1479,7 @@ article:not(:has(.mm-head)) .prose { max-width: 712px; margin-left: auto; margin
 .tijdlijn span { color: var(--text); font-size: 15.5px; line-height: 1.55; }
 .wissel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
 .wissel div { border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: grid; gap: 8px; background: var(--white); }
-.wissel span { color: var(--muted); font-size: 14.5px; text-decoration: line-through; text-decoration-color: rgba(107, 114, 128, .5); }
+.wissel div > span { color: var(--muted); font-size: 14.5px; text-decoration: line-through; text-decoration-color: rgba(107, 114, 128, .5); }
 .wissel strong { color: var(--ink); font-size: 16px; line-height: 1.4; padding-left: 26px; position: relative; }
 .wissel strong::before { content: ""; position: absolute; left: 0; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 12px no-repeat; }
 @media (max-width: 900px) { .wissel { grid-template-columns: minmax(0, 1fr); } }

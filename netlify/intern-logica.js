@@ -8,7 +8,7 @@ import { inzichten, KANALEN, ONDERWERPEN, SOORTEN, GEVOEL } from "./inzichten.js
 
 export const GEBRUIKERS = {
   koen: { naam: "Koen", ww: "4d145e1be9338e703b4ef3439309c1901f53f3a6b3d4e8d78c7d4fcaee69384a", token: "6a183805e91b11ed14fe55d8d60f44ff6b62411bb477b7c239bb5e8ecd943cc0" },
-  daan: { naam: "Daan", ww: "9c9beef291a55bc0ac3f76e5facac1ae1a532eaf01819a42d47594f8321ae0f0", token: "53725357bdf816ded6bf89b45f6185ce63f6af76649c03bd6474073400509bbf" },
+  daan: { naam: "Daan", ww: "794f4990b31f8cf80e5d5a80f014f2d80a7676d869ffee302f716f458c75fba1", token: "f9fc79a217101230eed3b1fa6f0d5c9ae774a69d93e4373067c0f1aee1e60375" },
 };
 const SALT = "avezaat-evers:intern:v2:";
 const COOKIE = "ae_intern";

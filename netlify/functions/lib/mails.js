@@ -133,12 +133,12 @@ const voet = (wie) => `\n\n${wieVol(wie)}\nAvezaat & Evers\n\nEen vraag tussendo
 
 // ---------- Prijscheck ----------
 const SITUATIE = { start: 'Net gestart', zelf: 'Doet het nu zelf', boekhouder: 'Heeft al een boekhouder', achter: 'Administratie loopt achter' };
-const TRANS = { '<50': 'Minder dan 50', '50-100': '50 tot 100', '>100': 'Meer dan 100', '?': 'Weet ik niet' };
+const TRANS = { '<50': 'Minder dan 50', '50-150': '50 tot 150', '>150': 'Meer dan 150', '50-100': '50 tot 100', '>100': 'Meer dan 100', '?': 'Weet ik niet' };
 const JNW = { ja: 'Ja', nee: 'Nee', '?': 'Weet ik niet', geen: 'Geen fiscaal partner' };
 
 function prijsRegels(d) {
   const r = [['Vast pakket, alles inbegrepen', '€80 p/m']];
-  if (d.transacties === '>100') r[0] = ['Vast pakket, meer dan 100 transacties', 'prijs op maat'];
+  if (d.transacties === '>150') r.push(['Structureel meer dan 150 transacties', '+€15 per 50 extra']);
   r.push(['Btw- en IB-aangifte, app en software', 'inbegrepen']);
   if (d.eu === 'ja') r.push(['ICP-aangifte (klanten in de EU)', '€15 p/m']);
   if (d.eu === '?') r.push(['Klanten in de EU? Zoeken we samen uit', 'evt. €15 p/m']);
@@ -175,7 +175,7 @@ const mails = {
   // 2. Uitkomst prijscheck (naar bezoeker)
   prijscheck(d, base = '') {
     const regels = prijsRegels(d);
-    const bedrag = esc(d.prijs || (d.transacties === '>100' ? 'Op maat' : '€80 p/m'));
+    const bedrag = esc(d.prijs || (d.transacties === '>150' ? 'vanaf €80 p/m' : '€80 p/m'));
     const inhoud = kop('Dit kost je boekhouding bij ons') +
       p(hoi(d.naam)) +
       p('Je deed net onze prijscheck. Hieronder staat de uitkomst, zodat je hem rustig terug kunt lezen.') +
@@ -265,7 +265,7 @@ ${tabel(regels)}`) +
       tussenkop('Altijd inbegrepen') +
       vinkjes([
         `Eén vaste boekhouder: ${sterk(wieKort)}, die jouw bedrijf kent`,
-        'Je complete boekhouding, tot 100 banktransacties per maand',
+        'Je complete boekhouding, tot 150 banktransacties per maand',
         '4 btw-aangiftes per jaar, vooraf met je besproken',
         'Je aangifte inkomstenbelasting en je jaarcijfers',
         'MoneyMonk: software en app om je bonnetjes aan te leveren',

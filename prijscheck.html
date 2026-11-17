@@ -82,8 +82,8 @@
         <p class="pc-hint">Elke betaling op je zakelijke rekening telt als één.</p>
         <div class="pc-opts">
           <button type="button" class="pc-opt" data-v="<50"><strong>Minder dan 50</strong><small>De meeste zzp’ers</small></button>
-          <button type="button" class="pc-opt" data-v="50-100"><strong>50 tot 100</strong></button>
-          <button type="button" class="pc-opt" data-v=">100"><strong>Meer dan 100</strong><small>Bijvoorbeeld door een webshop of pinbetalingen</small></button>
+          <button type="button" class="pc-opt" data-v="50-150"><strong>50 tot 150</strong></button>
+          <button type="button" class="pc-opt" data-v=">150"><strong>Meer dan 150</strong><small>Bijvoorbeeld door een webshop of losse pinbetalingen</small></button>
           <button type="button" class="pc-opt" data-v="?"><strong>Weet ik niet</strong></button>
         </div>
       </fieldset>
@@ -218,19 +218,19 @@
   }
   function bereken() {
     var pm = 80, regels = [['Vast pakket, alles inbegrepen', '€80 p/m'], ['Uren- en rittenregistratie in de app', 'inbegrepen']], opMaat = false;
-    if (ant.transacties === '>100') { opMaat = true; regels[0] = ['Vast pakket, bij meer dan 100 transacties', 'prijs op maat']; }
+    if (ant.transacties === '>150') { opMaat = true; regels.splice(1, 0, ['Structureel meer dan 150 transacties', '+€15 per 50 extra']); }
     if (ant.eu === 'ja') { pm += 15; regels.push(['ICP-aangifte (klanten in de EU)', '€15 p/m']); }
     if (ant.eu === '?') regels.push(['Klanten in de EU? Dat zoeken we samen uit', 'eventueel €15 p/m']);
     if (ant.partner === 'ja') regels.push(['Aangifte fiscaal partner', '€150 per jaar']);
     if (ant.situatie === 'boekhouder') regels.push(['Overstappen, wij regelen de overdracht', '€149 eenmalig']);
     if (ant.situatie === 'achter') regels.push(['Achterstand inhalen, met vooraf een prijsafspraak', '€60 per uur']);
-    if (ant.transacties === '?') regels.push(['Aantal transacties checken we samen', 'tot 100 inbegrepen']);
+    if (ant.transacties === '?') regels.push(['Aantal transacties checken we samen', 'tot 150 inbegrepen']);
     document.getElementById('pc-bedrag').textContent = (opMaat ? 'vanaf ' : '') + eur(pm);
-    document.getElementById('pc-incl').textContent = opMaat ? 'We maken in de kennismaking een prijs op maat.' : eur(pm * 1.21) + ' incl. btw, maandelijks opzegbaar';
+    document.getElementById('pc-incl').textContent = opMaat ? 'Plus €15 per 50 transacties boven de 150. Je precieze aantal bekijken we samen.' : eur(pm * 1.21) + ' incl. btw, maandelijks opzegbaar';
     document.getElementById('pc-regels').innerHTML = regels.map(function (r) { return '<li><span>' + r[0] + '</span><strong>' + r[1] + '</strong></li>'; }).join('') +
       (ant.situatie === 'boekhouder' ? '<li class="pc-tip">Overstappen per 1 januari? Dan is het gratis bij aanmelding t/m 15 december.</li>' : '');
     Object.keys(ant).forEach(function (k) { var v = uit.querySelector('input[name="' + k + '"]'); if (v) v.value = ant[k]; });
-    uit.querySelector('input[name="prijs"]').value = (opMaat ? 'op maat vanaf ' : '') + eur(pm) + ' p/m';
+    uit.querySelector('input[name="prijs"]').value = (opMaat ? 'vanaf ' : '') + eur(pm) + ' p/m' + (opMaat ? ' (+€15 per 50 transacties boven de 150)' : '');
   }
   kaart.addEventListener('click', function (e) {
     var b = e.target.closest('.pc-opt'); if (!b) return;

@@ -405,7 +405,7 @@
           <button class="chip" type="button" data-k="icp" aria-pressed="false">Klanten in de EU</button>
           <button class="chip" type="button" data-k="partner" aria-pressed="false">Fiscaal partner</button>
           <button class="chip" type="button" data-k="achterstand" aria-pressed="false">Achterstand</button>
-          <button class="chip" type="button" data-k="veel" aria-pressed="false">Meer dan 100 transacties p/m</button>
+          <button class="chip" type="button" data-k="veel" aria-pressed="false">Meer dan 150 transacties p/m</button>
           <button class="chip" type="button" data-k="personeel" aria-pressed="false">Personeel</button>
         </div>
       </div>
@@ -415,7 +415,7 @@
       <ul>
         <li><b>Wat doe je?</b> Branche, sinds wanneer, eenmanszaak? (Geen vof/bv.)</li>
         <li><b>Nu:</b> zelf in een programma, Excel/schoenendoos, of een boekhouder? Zo ja: wat kost die en waarom overstappen?</li>
-        <li><b>Volume:</b> ongeveer hoeveel bonnetjes en facturen per maand? (Grens 100 banktransacties.)</li>
+        <li><b>Volume:</b> ongeveer hoeveel bonnetjes en facturen per maand? (Grens 150 banktransacties; daarboven +€15 per 50, alleen bij een structureel hoger aantal.)</li>
         <li><b>Klanten in de EU?</b> Dan ICP-aangifte (€15 p/m).</li>
         <li><b>Fiscaal partner?</b> Diens IB-aangifte erbij voor €150 per jaar.</li>
         <li><b>Achterstand?</b> Vooraf prijsafspraak, €60 per uur.</li>
@@ -590,7 +590,7 @@
         <p class="pk-sub">€96,80 incl. btw, maandelijks opzegbaar</p>
         <ul>
           <li><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Boekhouding volledig verzorgd</li>
-          <li><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Tot 100 transacties per maand</li>
+          <li><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Tot 150 transacties per maand</li>
           <li><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>4× btw-aangifte per jaar</li>
           <li><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Aangifte inkomsten&shy;belasting</li>
           <li><span class="v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Jaarcijfers: winst en verlies, balans</li>
@@ -607,14 +607,14 @@
           <div><dt>IB-aangifte fiscaal partner</dt><dd>€150 p/jaar</dd></div>
           <div><dt>Overstappen (eenmalig)</dt><dd>€149</dd></div>
           <div><dt>Achterstallige administratie</dt><dd>€60 p/uur</dd></div>
-          <div><dt>Meer dan 100 transacties p/m</dt><dd>op maat</dd></div>
+          <div><dt>Structureel meer dan 150 transacties p/m</dt><dd>+€15 per 50</dd></div>
         </dl>
       </div>
     </div>
     <aside class="notes">
       <ul>
         <li>"Geen ingewikkelde pakketten: vrijwel iedereen betaalt hetzelfde."</li>
-        <li>Waarom 100 transacties? Vrijwel elke dienstverlenende zzp'er blijft daar ruim onder.</li>
+        <li>Waarom 150 transacties? Vrijwel elke zzp'er blijft daaronder, ook vakmensen met veel bouwmarktbonnetjes. Een drukke maand telt niet mee; we kijken naar het gemiddelde.</li>
         <li>KOR? Dan is de btw niet terug te vragen: €96,80 per maand.</li>
         <li>Door naar de volgende dia: daar staat wat het <b>voor hen</b> kost.</li>
       </ul>
@@ -927,7 +927,7 @@
     var totaal = maand.reduce(function (a, r) { return a + r[1]; }, 0);
     document.getElementById('bon-maand').innerHTML = maand.map(function (r) {
       return '<div class="bon-r"><span>' + r[0] + '</span><b>' + euro(r[1]) + '</b></div>';
-    }).join('') + (keuze.veel ? '<div class="bon-r"><span>Meer dan 100 transacties<small>We maken vooraf een prijs op maat</small></span><b>op maat</b></div>' : '');
+    }).join('') + (keuze.veel ? '<div class="bon-r"><span>Structureel meer dan 150 transacties<small>Alleen bij een blijvend hoger aantal</small></span><b>+€15 per 50</b></div>' : '');
     document.getElementById('bon-totaal').textContent = euro(totaal) + (keuze.veel ? '+' : '');
     document.getElementById('bon-incl').textContent = 'excl. btw · ' + euro(totaal * 1.21) + ' incl. btw';
 

@@ -19,3 +19,8 @@ Website van Avezaat & Evers (statische HTML, gehost op Netlify).
 ## Contactgegevens
 
 - Telefoon en WhatsApp: 085 060 4363 (links `tel:+31850604363` en `wa.me/31850604363`).
+
+## Linear
+
+- Projectbeheer staat in Linear (team AVE). Klantwerk blijft in het interne dashboard, niet in Linear.
+- Hoort een wijziging bij een issue, zet het nummer in de commit, bijvoorbeeld `Fixes AVE-26`. GitHub koppelt de commit dan aan het issue.

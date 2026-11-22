@@ -10,6 +10,12 @@
 <link rel="stylesheet" href="/assets/style.css?v=132">
 <link rel="stylesheet" href="/intern/klanten.css?v=7">
 <link rel="stylesheet" href="/intern/app.css?v=5">
+<style>
+  #f-status button { display: inline-flex; align-items: center; gap: 6px; }
+  #f-status .tel { font-size: 12px; font-weight: 500; color: #9CA3AF; }
+  #f-status .tel-o { font-size: 11px; font-weight: 700; line-height: 1; min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 999px; background: #F97316; color: #fff; display: inline-grid; place-items: center; }
+  #f-status .tel-o[hidden] { display: none; }
+</style>
 </head>
 <body>
 <main class="db">
@@ -32,10 +38,10 @@
           <button type="button" data-v="alle">Alle</button>
         </div>
         <div class="filters" id="f-status">
-          <button type="button" data-v="klant" class="is-aan">Klanten</button>
-          <button type="button" data-v="prospect">Leads</button>
-          <button type="button" data-v="gestopt">Gestopt</button>
-          <button type="button" data-v="verloren">Verloren</button>
+          <button type="button" data-v="klant" class="is-aan">Klanten<span class="tel-o" hidden></span><span class="tel"></span></button>
+          <button type="button" data-v="prospect">Leads<span class="tel-o" hidden></span><span class="tel"></span></button>
+          <button type="button" data-v="gestopt">Gestopt<span class="tel-o" hidden></span><span class="tel"></span></button>
+          <button type="button" data-v="verloren">Verloren<span class="tel-o" hidden></span><span class="tel"></span></button>
         </div>
         <input class="zoek" id="zoek" type="search" placeholder="Zoek op naam of bedrijf" aria-label="Zoek klant">
       </div>
@@ -76,7 +82,20 @@
       .then(function (r) { if (r.status === 401) { location.reload(); throw new Error('uitgelogd'); } return r.json().then(function (j) { if (!r.ok) throw new Error(j.fout || 'Er ging iets mis'); return j; }); });
   }
 
+  function tellers() {
+    var wie = fWie === 'ik' ? ik : fWie;
+    document.querySelectorAll('#f-status button').forEach(function (b) {
+      var groep = klanten.filter(function (k) { return k.status === b.dataset.v && (fWie === 'alle' || k.boekhouder === wie || !k.boekhouder); });
+      var open = groep.filter(function (k) { return k.meldingen > 0; }).length;
+      var o = b.querySelector('.tel-o');
+      o.hidden = !open; o.textContent = open || '';
+      o.title = open ? open + (open === 1 ? ' met een open melding' : ' met open meldingen') : '';
+      b.querySelector('.tel').textContent = klanten.length ? groep.length : '';
+    });
+  }
+
   function teken() {
+    tellers();
     var wie = fWie === 'ik' ? ik : fWie;
     var lijst = klanten.filter(function (k) {
       return (fWie === 'alle' || k.boekhouder === wie || !k.boekhouder) && k.status === fStatus &&

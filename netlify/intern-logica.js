@@ -1,7 +1,7 @@
 // Logica van de interne omgeving (inloggen per persoon, gedeelde takenlijst en klanten met hun mails).
 import { BASE, TYPES, AUTOMATISCH, HANDMATIG, gepland, maakMail, handmatigeData, verstuur, vandaag, actueelKwartaal, kwartalenRond, kwartaalInfo } from "./klant-mails.js";
 import { mails } from "./functions/lib/mails.js";
-import { overzicht, leadInfo } from "./overzicht.js";
+import { overzicht, leadInfo, aandachtVoor } from "./overzicht.js";
 import { agentApi } from "./agent/agent.js";
 import { inzichten, KANALEN, ONDERWERPEN, SOORTEN, GEVOEL } from "./inzichten.js";
 // Los van Netlify gehouden zodat het lokaal te testen is; intern.js koppelt de opslag.
@@ -312,7 +312,12 @@ function berichtData(body) {
   return { onderwerp: String(body.onderwerp || "").replace(/[<>]/g, "").trim().slice(0, 140), tekst: String(body.tekst || "").replace(/[<>]/g, "").trim().slice(0, 4000) };
 }
 
-function metPlanning(k, env) { return { ...k, gepland: gepland(k, vandaag(), 8, env), leadInfo: k.status === "prospect" ? leadInfo(k) : null }; }
+function metPlanning(k, env) {
+  const li = k.status === "prospect" ? leadInfo(k) : null;
+  // Open meldingen: dezelfde punten als "Aandacht nodig" op het dashboard, plus een lead die nu actie vraagt.
+  const meldingen = aandachtVoor(k, vandaag(), env).length + (li && li.urgent ? 1 : 0);
+  return { ...k, gepland: gepland(k, vandaag(), 8, env), leadInfo: li, meldingen };
+}
 
 async function klantenApi(request, url, pad, wie, store, env) {
   const klanten = await leesKlanten(store);

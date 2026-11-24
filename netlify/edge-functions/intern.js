@@ -7,5 +7,6 @@ export default async (request, context) =>
   verwerk(request, context.cookies, () => context.next(), () => getStore({ name: "intern", consistency: "strong" }), (k) => Netlify.env.get(k));
 
 export const config = {
-  path: ["/intern", "/intern/*", "/handtekening.html", "/voorstel.html"],
+  // Ook de adressen zonder .html: Netlify serveert /voorstel als voorstel.html, dus die moeten ook achter de inlog
+  path: ["/intern", "/intern/*", "/handtekening", "/handtekening.html", "/voorstel", "/voorstel.html"],
 };

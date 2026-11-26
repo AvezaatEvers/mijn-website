@@ -1615,3 +1615,18 @@ p, li, dd, dt, td, th, blockquote, figcaption, summary, label { overflow-wrap: b
   .home-wij .wij-duo figcaption strong { font-size: 15px; }
 }
 @media (max-width: 700px) { .home .warm-wie { font-size: 14px; justify-content: center; margin: -4px 0 0; } }
+@media (min-width: 901px) {
+  .home-wij .wij-grid { align-items: stretch; }
+  .home-wij .wij-links { display: flex; flex-direction: column; gap: 18px; }
+  .home-wij .wij-duo { flex: 1; min-height: 0; }
+  .home-wij .wij-duo figure { display: flex; flex-direction: column; min-height: 0; }
+  .home-wij .wij-duo img { flex: 1; min-height: 0; height: 100%; aspect-ratio: auto; object-position: 50% 30%; }
+}
+.wij-foto { margin: 0; position: relative; }
+.wij-foto img { width: 100%; height: auto; display: block; border-radius: 14px; }
+.wij-foto figcaption { position: absolute; left: 14px; bottom: 14px; background: var(--white); color: var(--text); font-size: 14px; padding: 8px 14px; border-radius: 8px; box-shadow: 0 10px 26px rgba(17, 24, 39, .12); }
+.wij-foto figcaption strong { color: var(--ink); font-weight: 600; }
+@media (min-width: 901px) {
+  .home-wij .wij-foto { flex: 1; min-height: 0; display: flex; }
+  .home-wij .wij-foto img { flex: 1; height: 100%; object-fit: cover; object-position: 55% 40%; }
+}

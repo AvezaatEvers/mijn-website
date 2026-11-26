@@ -550,7 +550,7 @@ ${rij(0, 5)}${rij(6, 10)}
   afspraakVerzet(d, base = '') {
     const inhoud = kop('Je kennismaking is verzet') +
       p(hoi(d.naam)) +
-      p('Gelukt. Dit is je nieuwe moment:') +
+      p('Gelukt. Hieronder staat je nieuwe moment.') +
       afspraakKaart(d, 'verzet') +
       afspraakWijzigen(d) +
       p('Tot snel!', 'margin-bottom:22px') +
@@ -565,8 +565,7 @@ ${rij(0, 5)}${rij(6, 10)}
   afspraakGeannuleerd(d, base = '') {
     const inhoud = kop('Je kennismaking is geannuleerd') +
       p(hoi(d.naam)) +
-      p('Deze afspraak gaat niet door. Je hoeft verder niets te doen.') +
-      afspraakKaart(d, 'geannuleerd') +
+      p(`Je afspraak van ${sterk(esc(d.wanneer))} gaat niet door. Je hoeft verder niets te doen.`) +
       (d.reden ? p(`${sterk('Reden:')} ${esc(d.reden)}`) : '') +
       p('Wil je toch kennismaken? Kies gerust een nieuw moment dat jou beter uitkomt.') +
       knop(`${base}/contact#plannen`, 'Kies een nieuw moment') +
@@ -585,30 +584,20 @@ const cap = (s) => { const t = String(s || ''); return t.charAt(0).toUpperCase()
 const metWie = (wie) => (wie === 'daan' ? 'Daan Evers' : wie === 'koen' ? 'Koen Avezaat' : 'Koen of Daan');
 const hoeVan = (d) => (d.video ? 'Videogesprek' : d.telefoon ? 'Telefonisch' : 'Online');
 
-// De afspraak als kaart: datum groot, tijd en vorm eronder, met wie, en de knop om deel te nemen
+// De afspraak in het vaste lichtblauwe blok met tabel (zoals in de prijscheckmail), met de standaardknop eronder
 function afspraakKaart(d, status) {
-  const weg = status === 'geannuleerd';
-  const label = { gepland: 'Jouw kennismaking', verzet: 'Nieuw moment', geannuleerd: 'Geannuleerd' }[status];
-  const doorhalen = weg ? 'text-decoration:line-through;' : '';
-  const tijden = `${esc(d.tijd)}${d.eindtijd ? '&ndash;' + esc(d.eindtijd) : ''}`;
-  const deelnemen = !weg && d.video ? `
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:20px 0 0"><tr>
-<td bgcolor="${ACCENT}" style="border-radius:12px;background:${ACCENT}">
-<a href="${esc(d.video)}" style="display:inline-block;padding:14px 24px;${F}font-size:15px;line-height:1.2;font-weight:600;color:#ffffff;text-decoration:none;border-radius:12px">Deelnemen aan het gesprek</a>
-</td></tr></table>` : '';
-  return `
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:6px 0 ${weg ? 22 : 12}px"><tr>
-<td bgcolor="${TINT}" style="background:${TINT};border-radius:16px;padding:24px 26px;border-left:4px solid ${weg ? LIJN : ACCENT}">
-<p style="margin:0 0 6px;${F}font-size:12.5px;line-height:1.4;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:${weg ? ZACHT : ACCENT}">${label}</p>
-<p style="margin:0 0 4px;${F}font-size:24px;line-height:1.25;font-weight:700;letter-spacing:-0.3px;color:${weg ? ZACHT : INKT};${doorhalen}">${esc(cap(d.datum))}</p>
-<p style="margin:0;${F}font-size:16px;line-height:1.5;color:${weg ? ZACHT : TEKST};${doorhalen}">${tijden} &nbsp;&middot;&nbsp; ${esc(d.duur)} minuten &nbsp;&middot;&nbsp; ${hoeVan(d)}</p>
-${weg ? '' : `<p style="margin:10px 0 0;${F}font-size:15px;line-height:1.5;color:${TEKST}">Met ${sterk(metWie(d.wie))}${!d.video && d.telefoon ? `. We bellen je op ${esc(d.telefoon)}.` : ''}</p>`}
-${deelnemen}
-</td></tr></table>` +
-    (weg ? '' : `<p style="margin:0 0 24px;${F}font-size:13.5px;line-height:1.6;color:${ZACHT}">Zet de afspraak in je agenda met de bijlage bij deze mail.</p>`);
+  if (status === 'geannuleerd') return '';
+  return blok(tabel([
+    ['Datum', esc(cap(d.datum))],
+    ['Tijd', `${esc(d.tijd)}${d.eindtijd ? ' - ' + esc(d.eindtijd) : ''} (${esc(d.duur)} min)`],
+    ['Met', metWie(d.wie)],
+    ['Gesprek', d.video ? 'Videogesprek' : d.telefoon ? `We bellen je op ${esc(d.telefoon)}` : 'Online'],
+  ])) +
+    (d.video ? knop(esc(d.video), 'Deelnemen aan het gesprek') : '') +
+    p('Met de bijlage bij deze mail zet je de afspraak in je agenda.', `font-size:14px;color:${ZACHT}`);
 }
 function afspraakWijzigen(d) {
-  return `<p style="margin:4px 0 22px;padding-top:18px;border-top:1px solid ${LIJN};${F}font-size:14px;line-height:1.6;color:${ZACHT}">Komt het toch niet uit? ${link(esc(d.verzet), 'Kies een ander moment')} of ${link(esc(d.annuleer), 'annuleer de afspraak')}.</p>`;
+  return p(`Komt het toch niet uit? ${link(esc(d.verzet), 'Kies een ander moment')} of ${link(esc(d.annuleer), 'annuleer de afspraak')}.`);
 }
 function afspraakTekst(d) {
   return `${cap(d.datum)}, ${d.tijd}${d.eindtijd ? '-' + d.eindtijd : ''} (${d.duur} minuten)\n${hoeVan(d)} met ${metWie(d.wie)}${!d.video && d.telefoon ? `, we bellen je op ${d.telefoon}` : ''}${d.video ? `\nDeelnemen: ${d.video}` : ''}`;

@@ -260,3 +260,11 @@ body.app .ag-zweef .tip { background: rgba(29, 29, 31, .92); }
 .ag-schakel { display: inline-flex; background: rgba(0, 0, 0, .05); border-radius: 8px; padding: 2px; gap: 1px; }
 .ag-schakel button { font: inherit; font-size: 11.5px; font-weight: 500; color: var(--muted); background: none; border: 0; border-radius: 6px; padding: 3px 10px; cursor: pointer; }
 .ag-schakel button.is-aan { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(0, 0, 0, .12); }
+
+/* Geen bal meer: een rustig icoon in huisstijl */
+.orb.ag-ico { border-radius: calc(var(--m) * .3); background: #26458F; color: #fff; display: grid; place-items: center; box-shadow: none; }
+.orb.ag-ico::before, .orb.ag-ico::after, .orb.ag-ico i { display: none !important; }
+.orb.ag-ico svg { width: 56%; height: 56%; }
+.ag-welkom .orb.ag-ico, #grote-chat .ag-welkom .orb.ag-ico { --m: 56px; margin: 10px 0 18px; }
+.orb.ag-ico.denkt svg { animation: ico-denkt 1.2s ease-in-out infinite; }
+@keyframes ico-denkt { 50% { opacity: .45; transform: scale(.85); } }

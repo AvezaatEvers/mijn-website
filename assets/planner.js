@@ -65,6 +65,21 @@
   function datumLang(iso) { return new Date(iso).toLocaleDateString('nl-NL', { timeZone: TZ, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); }
   function vandaagNL() { var p = {}; new Intl.DateTimeFormat('en-GB', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date()).forEach(function (x) { p[x.type] = x.value; }); return p.year + '-' + p.month + '-' + p.day; }
   function maandVan(datum) { return [+datum.slice(0, 4), +datum.slice(5, 7) - 1]; }
+  // Scrollen tot net onder de vaste menubalk (scrollIntoView zou de bovenkant erachter laten vallen)
+  function scrollNaar(doel) {
+    var kop = document.querySelector('.site-header'), pos = kop ? getComputedStyle(kop).position : '';
+    var hoogte = kop && (pos === 'sticky' || pos === 'fixed') ? kop.getBoundingClientRect().bottom : 0;
+    var y = doel.getBoundingClientRect().top + window.pageYOffset - Math.max(0, hoogte) - 12;
+    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+  }
+  // Na het kiezen van een dag: alleen zover scrollen dat de tijden net helemaal in beeld zijn, zodat de kalender zichtbaar blijft
+  function inBeeld(doel) {
+    var kop = document.querySelector('.site-header'), pos = kop ? getComputedStyle(kop).position : '';
+    var boven = (kop && (pos === 'sticky' || pos === 'fixed') ? kop.getBoundingClientRect().bottom : 0) + 12;
+    var r = doel.getBoundingClientRect(), teVer = r.bottom - (window.innerHeight - 16);
+    if (teVer <= 0) return;
+    window.scrollBy({ top: Math.min(teVer, r.top - boven), behavior: 'smooth' });
+  }
   function zetCss() { if (document.getElementById('pl-css')) return; var s = document.createElement('style'); s.id = 'pl-css'; s.textContent = css; document.head.appendChild(s); }
 
   function start(el, opt) {
@@ -179,7 +194,7 @@
       var d = t.closest('[data-dag]');
       if (d) {
         dag = d.dataset.dag; gekozen = null; teken();
-        var tl = el.querySelector('.pl-tijden'); if (tl && window.matchMedia('(max-width: 900px)').matches) tl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        var tl = el.querySelector('.pl-tijden'); if (tl && window.matchMedia('(max-width: 900px)').matches) inBeeld(tl);
         return;
       }
       var mb = t.closest('[data-maand]');
@@ -188,7 +203,7 @@
       if (tb) { gekozen = tb.dataset.tijd; el.querySelectorAll('.pl-t').forEach(function (r) { r.classList.toggle('is-aan', r.querySelector('.tijd') === tb); }); return; }
       if (t.closest('[data-verder]')) {
         stap = 'form'; teken();
-        var top = el.getBoundingClientRect().top; if (top < 0) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        var top = el.getBoundingClientRect().top; if (top < 80) scrollNaar(el);
         var n = el.querySelector('input[name="naam"]'); if (n) setTimeout(function () { n.focus({ preventScroll: true }); }, 250);
         return;
       }

@@ -19,9 +19,10 @@ export const TYPES = {
   jubileum: { label: "Een jaar klant", wanneer: "Automatisch, 1 jaar na de startdatum" },
   ontwerp: { label: "Ontworpen mail", wanneer: "Opgesteld door de agent" },
   bericht: { label: "Eigen bericht", wanneer: "Handmatig, bijvoorbeeld opgesteld door de agent" },
-  afspraak: { label: "Afspraak (Cal.com)", wanneer: "Automatisch na boeken, verzetten of annuleren via Cal.com" },
+  afspraak: { label: "Afspraak (kennismaking)", wanneer: "Automatisch na boeken, verzetten of annuleren" },
+  afspraakHerinnering: { label: "Herinnering kennismaking", wanneer: "Automatisch, ongeveer 2 uur voor de kennismaking" },
 };
-export const AUTOMATISCH = ["voorstelHerinnering", "checkIn", "kwartaal", "kwartaalTweede", "jaareinde", "inkomstenbelasting", "nps", "aanbevelen", "jubileum"];
+export const AUTOMATISCH = ["voorstelHerinnering", "checkIn", "kwartaal", "kwartaalTweede", "jaareinde", "inkomstenbelasting", "nps", "aanbevelen", "jubileum", "afspraakHerinnering"];
 export const HANDMATIG = ["welkom", "voorstelHerinnering", "checkIn", "nps", "kwartaal", "kwartaalTweede", "jaareinde", "inkomstenbelasting", "review", "aanbevelen", "jubileum"];
 
 const MAANDEN = ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"];
@@ -61,8 +62,26 @@ export function kwartalenRond(nu = vandaag(), aantal = 6) {
 }
 
 // Alle momenten van een klant tussen twee jaren
+// Herinnering voor een geplande kennismaking. Verstuurd door netlify/functions/afspraak-herinnering.mjs (elke 10 minuten),
+// niet door de dagelijkse mails; hier alleen zodat hij in het klantdossier onder Gepland staat (met Bekijk en Aan/uit).
+function afspraakMoment(k) {
+  const a = k.afspraak;
+  if (!a || a.status === "geannuleerd" || !a.start) return null;
+  const start = new Date(a.start).getTime(), eind = a.eind ? new Date(a.eind).getTime() : start + 20 * 60e3;
+  if (start <= Date.now() || a.herinnerd === a.uid + "|" + a.start) return null;
+  if (a.op && start - new Date(a.op).getTime() < 3 * 3600e3) return null; // te kort van tevoren geboekt: geen herinnering
+  const tz = "Europe/Amsterdam", om = start - 2 * 3600e3;
+  const tijd = (ms) => new Date(ms).toLocaleTimeString("nl-NL", { timeZone: tz, hour: "2-digit", minute: "2-digit" });
+  const dag = new Date(start).toLocaleDateString("nl-NL", { timeZone: tz, weekday: "long", day: "numeric", month: "long" });
+  return { type: "afspraakHerinnering", sleutel: `afspraakHerinnering-${a.uid}|${a.start}`, datum: new Intl.DateTimeFormat("en-CA", { timeZone: tz }).format(new Date(om)),
+    data: { noot: `Rond ${tijd(om)}, 2 uur voor de kennismaking van ${tijd(start)}`, wanneer: `${dag} om ${tijd(start)}`, datum: dag, tijd: tijd(start), eindtijd: tijd(eind),
+      duur: Math.round((eind - start) / 60000), video: a.video || "", videoVolgt: a.bron === "planner" && !a.video, telefoon: a.telefoon || "", verzet: a.verzet, annuleer: a.annuleer, wie: a.bron === "planner" ? "" : a.wie } };
+}
+
 function momenten(k, vanJaar, totJaar) {
   const uit = [];
+  const am = afspraakMoment(k);
+  if (am) uit.push(am);
   if (k.status === "prospect" && k.voorstel && k.voorstel.op) {
     const op = k.voorstel.op.slice(0, 10);
     uit.push({ type: "voorstelHerinnering", sleutel: `voorstelHerinnering-${op}`, datum: werkdag(plusDagen(op, 2)), data: { voorstelDatum: mooieDatumKort(op), start: (k.voorstel.data || {}).start || "" } });
@@ -138,7 +157,7 @@ export function teVersturen(k, nu = vandaag(), env) {
   const verstuurd = k.verstuurd || {};
   const uitgezet = k.uit || [];
   const ondergrens = plusDagen(nu, -7);
-  return momenten(k, j - 1, j).filter((m) => m.datum <= nu && m.datum >= ondergrens && !verstuurd[m.sleutel] && !uitgezet.includes(m.type) && !vervalt(k, m, env));
+  return momenten(k, j - 1, j).filter((m) => m.type !== "afspraakHerinnering" && m.datum <= nu && m.datum >= ondergrens && !verstuurd[m.sleutel] && !uitgezet.includes(m.type) && !vervalt(k, m, env));
 }
 
 // Gegevens voor een handmatige mail van een bepaald type

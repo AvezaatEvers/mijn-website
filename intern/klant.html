@@ -204,7 +204,7 @@
     if (k.status === 'gestopt') g.innerHTML = '<p class="kl-leeg">Gestopte klanten krijgen geen geplande mails.</p>';
     else if (!k.gepland.length) g.innerHTML = '<p class="kl-leeg">' + (k.status === 'prospect' ? 'Niets gepland. Stuur een voorstel via de voorstelpagina, dan volgt na 2 dagen automatisch een herinnering.' : 'Niets gepland.') + '</p>';
     else g.innerHTML = k.gepland.map(function (m) {
-      var noot = m.vervalt ? '<small class="vervalt">' + (m.type === 'review' ? 'Wacht op REVIEW_LINK in Netlify' : 'Vervalt: stukken zijn binnen') + '</small>' : '<small>' + esc(m.data.kwartaal || (m.data.jaar ? 'Over ' + m.data.jaar : '')) + '</small>';
+      var noot = m.vervalt ? '<small class="vervalt">' + (m.type === 'review' ? 'Wacht op REVIEW_LINK in Netlify' : 'Vervalt: stukken zijn binnen') + '</small>' : '<small>' + esc(m.data.noot || m.data.kwartaal || (m.data.jaar ? 'Over ' + m.data.jaar : '')) + '</small>';
       return '<div class="mail-rij' + (m.aan ? '' : ' is-uit') + (m.vervalt ? ' is-vervalt' : '') + '"><time>' + d(m.datum) + '</time><div><strong>' + esc(m.label) + '</strong>' + noot + '</div>' +
         '<div class="mail-acties"><label class="schakel"><input type="checkbox" data-type="' + m.type + '"' + (m.aan ? ' checked' : '') + '>Aan</label>' +
         '<button class="db-knop is-licht is-klein" type="button" data-bekijk="' + m.type + '" data-sleutel="' + esc(m.sleutel) + '">Bekijk</button></div></div>';

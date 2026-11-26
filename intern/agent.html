@@ -90,7 +90,11 @@
   body.app.chatmodus .ag-zweef { display: none; }
 
   @media (max-width: 960px) {
-    body.app main.db.chatpagina { grid-template-columns: 1fr; margin-top: var(--balkh, 56px); height: calc(100vh - var(--balkh, 56px) - var(--tabh, 64px)); height: calc(100dvh - var(--balkh, 56px) - var(--tabh, 64px)); }
+    /* Vast tussen boven- en tabbalk: de pagina zelf scrolt niet, alleen de chat. Zo blijft de typbalk onderaan staan.
+       --kb is de hoogte van het toetsenbord (zie script onderaan), zodat de typbalk erboven blijft. */
+    html.app, html.app body.chatmodus { height: 100%; overflow: hidden; }
+    body.app main.db.chatpagina { grid-template-columns: 1fr; position: fixed; left: 0; right: 0; top: var(--balkh, 56px); bottom: max(var(--tabh, 64px), var(--kb, 0px)); height: auto; margin: 0; }
+    #grote-chat .ag-stroom { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
     .gs { position: fixed; z-index: 60; top: 0; bottom: 0; left: 0; width: min(300px, 86vw); background: #F6F6F8; transform: translateX(-102%); transition: transform .35s var(--veer); }
     body.gs-open .gs { transform: none; box-shadow: 20px 0 50px -20px rgba(0, 0, 0, .3); }
     .cp-menu { display: grid; place-items: center; }
@@ -126,6 +130,18 @@
 </div></div>
 
 <script src="/intern/app.js?v=14"></script>
+<script>
+// Toetsenbord op de telefoon: hou de chat boven het toetsenbord en laat de pagina niet meeschuiven
+(function () {
+  var vv = window.visualViewport; if (!vv) return;
+  function pas() {
+    var kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+    document.documentElement.style.setProperty('--kb', kb > 80 ? kb + 'px' : '0px');
+    if (window.scrollY) window.scrollTo(0, 0);
+  }
+  vv.addEventListener('resize', pas); vv.addEventListener('scroll', pas); pas();
+})();
+</script>
 <script>
 (function () {
   function start() {

@@ -11,6 +11,27 @@ import { googleIngesteld, leesGoogle, accountVoor, maakAfspraak, verzetAfspraak,
 
 const nieuweId = () => crypto.randomUUID().replace(/-/g, "").slice(0, 16);
 export const beheerLink = (env, a, actie) => `${BASE}/afspraak?id=${a.id}&t=${token(env, a.id)}${actie ? "&actie=" + actie : ""}`;
+// Bij welke klantkaart hoort deze afspraak: op e-mail, of zonder e-mail op telefoonnummer
+const telNr = (t) => String(t || "").replace(/\D/g, "").replace(/^0031|^31/, "0");
+export function klantVoor(klanten, a) {
+  return (a.email ? klanten.find((x) => x.email === a.email) : a.telefoon ? klanten.find((x) => x.telefoon && telNr(x.telefoon) === telNr(a.telefoon)) : null) || null;
+}
+
+// Na het gesprek: gehouden of niet gekomen (vanuit het dashboard). Werkt de klantkaart en het logboek bij.
+export async function naUitkomst(store, a, uitkomst, door) {
+  const klanten = (await store.get("klanten", { type: "json" })) || [];
+  const k = klantVoor(klanten, a), w = wanneer(a.start);
+  const tekst = uitkomst === "gehouden" ? `Kennismaking van ${w} gehouden (met ${NAMEN[a.wie]})` : uitkomst === "noshow" ? `Niet gekomen op de kennismaking van ${w}` : `Uitkomst van de kennismaking van ${w} gewist`;
+  if (k) {
+    if (k.afspraak && k.afspraak.uid === a.id) k.afspraak.uitkomst = uitkomst || null;
+    k.tijdlijn = k.tijdlijn || [];
+    k.tijdlijn.unshift({ id: nieuweId(), soort: "notitie", door, op: new Date().toISOString(), tekst });
+    await store.setJSON("klanten", klanten);
+  }
+  await log(store, { wie: door, soort: "klant", klant: k, tekst });
+  return { klantId: k ? k.id : null };
+}
+
 const SITUATIE = { start: "Net gestart", boekhouder: "Wil overstappen van boekhouder", zelf: "Doet het nu zelf", anders: "Anders" };
 
 // soort: "gepland" | "verzet" | "geannuleerd"; door: "systeem" (klant via de site) of "koen"/"daan" (vanuit het dashboard)
@@ -48,8 +69,7 @@ export async function naAfspraak(store, env, a, soort, { door = "systeem", reden
   // 2. Lead en afspraak in het dashboard
   const klanten = (await store.get("klanten", { type: "json" })) || [];
   const nu = new Date().toISOString();
-  const tel = (t) => String(t || "").replace(/\D/g, "").replace(/^0031|^31/, "0");
-  let k = a.email ? klanten.find((x) => x.email === a.email) : a.telefoon ? klanten.find((x) => x.telefoon && tel(x.telefoon) === tel(a.telefoon)) : null, nieuw = false;
+  let k = klantVoor(klanten, a), nieuw = false;
   if (!k && soort !== "geannuleerd") {
     k = { id: nieuweId(), naam: a.naam, bedrijf: a.bedrijf || "", email: a.email, telefoon: a.telefoon, boekhouder: a.wie, status: "prospect", start: "", voorstelLink: "", notitie: "", uit: [], verstuurd: {}, log: [], tijdlijn: [],
       door: door === "systeem" ? "formulier" : door, aangemaakt: nu, herkomst: door === "systeem" ? "website" : "", lead: { bron: "afspraak", op: nu, situatie: a.situatie, situatieTekst: SITUATIE[a.situatie] || "", bericht: a.bericht } };

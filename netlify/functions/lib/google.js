@@ -3,7 +3,7 @@
 // in de agenda van wie het gesprek doet; die is dan ook host van de Meet.
 // Nodig in Netlify: GOOGLE_CLIENT_ID en GOOGLE_CLIENT_SECRET (OAuth-client uit Google Cloud).
 // De refresh tokens staan in de Blobs-store onder "planner-google".
-import { TZ } from "./planner.js";
+import { TZ, lokaalNaarUtc } from "./planner.js";
 
 const SLEUTEL = "planner-google";
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
@@ -112,4 +112,31 @@ export async function verwijderAfspraak(env, g, account, eventId) {
   const at = await toegang(env, g[account].refresh);
   const r = await fetch(AGENDA + "/" + encodeURIComponent(eventId) + "?sendUpdates=none", { method: "DELETE", headers: { Authorization: "Bearer " + at } });
   if (!r.ok && r.status !== 404 && r.status !== 410) throw new Error("Google Agenda verwijderen: " + r.status);
+}
+
+// Bezette tijden uit de eigen (primaire) Google Agenda: [[startMs, eindMs, eventId]].
+// Telt niet mee: afspraken op "Beschikbaar" (transparent, standaard bij hele-dag-items), geannuleerde en afgeslagen uitnodigingen.
+// Hiervoor is calendar.events genoeg (lezen mag met die toestemming).
+export async function bezetUitGoogle(env, g, wie, van, tot) {
+  if (!g[wie] || !g[wie].refresh) return [];
+  const at = await toegang(env, g[wie].refresh);
+  const blokken = [];
+  let pagina = "";
+  for (let i = 0; i < 5; i++) {
+    const q = new URLSearchParams({ timeMin: new Date(van).toISOString(), timeMax: new Date(tot).toISOString(), singleEvents: "true", maxResults: "2500", showDeleted: "false",
+      fields: "items(id,status,transparency,start,end,attendees(self,responseStatus)),nextPageToken", ...(pagina ? { pageToken: pagina } : {}) });
+    const r = await fetch(AGENDA + "?" + q, { headers: { Authorization: "Bearer " + at }, signal: AbortSignal.timeout(10000) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error("Google Agenda lezen: " + ((j.error && j.error.message) || r.status));
+    for (const ev of j.items || []) {
+      if (ev.status === "cancelled" || ev.transparency === "transparent") continue;
+      if ((ev.attendees || []).some((x) => x.self && x.responseStatus === "declined")) continue;
+      const s = ev.start && (ev.start.dateTime ? Date.parse(ev.start.dateTime) : ev.start.date ? lokaalNaarUtc(ev.start.date, "00:00").getTime() : NaN);
+      const e = ev.end && (ev.end.dateTime ? Date.parse(ev.end.dateTime) : ev.end.date ? lokaalNaarUtc(ev.end.date, "00:00").getTime() : NaN);
+      if (Number.isFinite(s) && Number.isFinite(e) && e > s) blokken.push([s, e, ev.id]);
+    }
+    if (!j.nextPageToken) break;
+    pagina = j.nextPageToken;
+  }
+  return blokken;
 }

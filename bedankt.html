@@ -23,6 +23,15 @@
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#26458F">
 <link rel="stylesheet" href="/assets/style.css?v=140">
+<style>
+  .bd-agenda { position: relative; margin-left: auto; }
+  .bd-agenda > summary { list-style: none; cursor: pointer; margin-left: 0; }
+  .bd-agenda > summary::-webkit-details-marker { display: none; }
+  .bd-agenda-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 5; min-width: 220px; background: var(--white, #fff); border-radius: 10px; padding: 6px; box-shadow: 0 1px 2px rgba(17,24,39,.08), 0 14px 32px -12px rgba(17,24,39,.28); display: flex; flex-direction: column; }
+  .bd-agenda-menu a { padding: 10px 12px; border-radius: 7px; color: var(--ink, #111827); text-decoration: none; font-size: 14.5px; font-weight: 500; }
+  .bd-agenda-menu a:hover { background: var(--tint); }
+  @media (max-width: 600px) { .bd-agenda { margin-left: 72px; } .bd-agenda > summary { margin-left: 0; } .bd-agenda-menu { left: 0; right: auto; } }
+</style>
 </head>
 <body>
 <header class="site-header">
@@ -40,7 +49,8 @@
         <div class="bd-moment" id="bd-moment" hidden>
           <div class="bd-kal" aria-hidden="true"><span id="bd-maand"></span><b id="bd-dag"></b></div>
           <div><strong id="bd-datum"></strong><span id="bd-tijd"></span></div>
-          <a class="bd-ics" id="bd-ics" href="#"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>In mijn agenda</a>
+          <details class="bd-agenda"><summary class="bd-ics"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>In mijn agenda</summary>
+            <div class="bd-agenda-menu"><a id="bd-google" href="#" target="_blank" rel="noopener">Google Agenda</a><a id="bd-outlook" href="#" target="_blank" rel="noopener">Outlook</a><a id="bd-ics" href="#">Apple Agenda / iPhone</a><a id="bd-ics2" href="#">Andere agenda (.ics)</a></div></details>
         </div>
         <p class="lead" data-alleen="afspraak" hidden>De bevestiging met de link voor het gesprek zit in je mail.</p>
         <p class="lead" data-alleen="formulier">We lezen je bericht zelf en nemen binnen 2 uur persoonlijk contact met je op.</p>
@@ -145,7 +155,7 @@
   document.querySelectorAll('[data-alleen]').forEach(function (el) {
     el.hidden = el.getAttribute('data-alleen') !== (afspraak ? 'afspraak' : 'formulier');
   });
-  // Datum en tijd van de afspraak (doorgegeven door Cal.com)
+  // Datum en tijd van de afspraak (doorgegeven door de planner)
   var q = new URLSearchParams(location.search);
   var start = new Date(q.get('start') || '');
   if (afspraak && !isNaN(start)) {
@@ -158,7 +168,16 @@
     var datum = f(start, { weekday: 'long', day: 'numeric', month: 'long' });
     document.getElementById('bd-datum').textContent = datum.charAt(0).toUpperCase() + datum.slice(1);
     document.getElementById('bd-tijd').textContent = f(start, { hour: '2-digit', minute: '2-digit' }) + ' – ' + f(eind, { hour: '2-digit', minute: '2-digit' }) + ' uur';
-    document.getElementById('bd-ics').href = '/agenda.ics?start=' + encodeURIComponent(start.toISOString()) + '&eind=' + encodeURIComponent(eind.toISOString());
+    var id = q.get('id') || '', meet = /^https:\/\/meet\.google\.com\/[a-z0-9-]+$/i.test(q.get('meet') || '') ? q.get('meet') : '';
+    var titel = 'Kennismaking Avezaat & Evers';
+    var uitleg = 'Gratis kennismaking van 20 minuten.' + (meet ? ' Deelnemen: ' + meet : ' De link voor het gesprek staat in je bevestigingsmail.');
+    var ics = '/agenda.ics?start=' + encodeURIComponent(start.toISOString()) + '&eind=' + encodeURIComponent(eind.toISOString()) + (id ? '&id=' + encodeURIComponent(id) : '') + (meet ? '&meet=' + encodeURIComponent(meet) : '');
+    var g = function (d) { return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); };
+    document.getElementById('bd-ics').href = ics;
+    document.getElementById('bd-ics2').href = ics;
+    document.getElementById('bd-google').href = 'https://calendar.google.com/calendar/render?' + new URLSearchParams({ action: 'TEMPLATE', text: titel, dates: g(start) + '/' + g(eind), details: uitleg, location: meet }).toString();
+    document.getElementById('bd-outlook').href = 'https://outlook.live.com/calendar/0/action/compose?' + new URLSearchParams({ subject: titel, startdt: start.toISOString(), enddt: eind.toISOString(), body: uitleg, location: meet, path: '/calendar/action/compose', rru: 'addevent' }).toString();
+    document.addEventListener('click', function (e) { var d = document.querySelector('.bd-agenda'); if (d && d.open && !d.contains(e.target)) d.open = false; });
     document.getElementById('bd-moment').hidden = false;
   }
 })();

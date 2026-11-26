@@ -8,7 +8,7 @@ import { getStore } from "@netlify/blobs";
 import { leesBeschikbaarheid, leesAfspraken, vrijeTijden, tijdenPerDag, boek, verzet, annuleer, tokenKlopt, TZ } from "./lib/planner.js";
 import { naAfspraak } from "./lib/planner-acties.js";
 import { wanneer } from "./lib/afspraak.js";
-import { bezetVoor } from "./lib/apple.js";
+import { bezetVoor } from "./lib/bezet.js";
 
 const json = (data, status = 200) => new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
 const schoon = (s, n = 200) => String(s || "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, n);
@@ -43,7 +43,7 @@ export default async (req) => {
     if (r.fout) return json({ fout: r.fout }, 503);
     const na = await naAfspraak(store, env, r.afspraak, "gepland");
     if (na.problemen.length) console.error("Planner: boeking gelukt met problemen:", na.problemen.join(" | "));
-    return json({ ok: true, start: r.afspraak.start, eind: r.afspraak.eind });
+    return json({ ok: true, id: r.afspraak.id, start: r.afspraak.start, eind: r.afspraak.eind, meet: na.meet || "" });
   }
 
   // Beheer met de beveiligde link uit de mail

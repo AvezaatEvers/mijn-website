@@ -2,6 +2,7 @@
 //   GET  /intern/api/planner                    beschikbaarheid, afspraken, Google-status, aantal vrije momenten
 //   POST /intern/api/planner/beschikbaarheid    { koen: { week, dicht }, daan: { week, dicht } }
 //   POST /intern/api/planner/annuleer           { id, reden }  annuleren namens Koen of Daan (klant krijgt een mail)
+//   POST /intern/api/planner/uitkomst           { id, uitkomst: "gehouden" | "noshow" | "" }  na afloop vastleggen
 //   POST /intern/api/planner/plan               { naam, bedrijf, email, telefoon, bericht, mailKlant, datum, tijd, met, toch }  zelf inplannen
 //   POST /intern/api/planner/verzet             { id, datum, tijd, met, toch }  verzetten namens Koen of Daan (klant krijgt een mail)
 //   GET  /intern/api/planner/google/start       naar Google om de eigen agenda te koppelen
@@ -14,10 +15,11 @@ import { getStore } from "@netlify/blobs";
 import { createHmac } from "node:crypto";
 import { ingelogd, COOKIE } from "../intern-logica.js";
 import { log } from "../logboek.js";
-import { leesBeschikbaarheid, bewaarBeschikbaarheid, schoneBeschikbaarheid, leesAfspraken, vrijeTijden, annuleer, verzetDoorOns, planDoorOns, NAMEN, MENSEN, DUUR, MIN_UREN, vooruitDagen } from "./lib/planner.js";
-import { naAfspraak, beheerLink } from "./lib/planner-acties.js";
+import { leesBeschikbaarheid, bewaarBeschikbaarheid, schoneBeschikbaarheid, leesAfspraken, vrijeTijden, annuleer, verzetDoorOns, planDoorOns, zetUitkomst, NAMEN, MENSEN, DUUR, MIN_UREN, vooruitDagen, feestdagen, lokaleDatum, plusDagen } from "./lib/planner.js";
+import { naAfspraak, naUitkomst, klantVoor, beheerLink } from "./lib/planner-acties.js";
 import { googleIngesteld, leesGoogle, bewaarGoogle, googleAuthUrl, googleCode } from "./lib/google.js";
-import { ontdek, herontdek, versleutel, leesApple, bewaarApple, bezetVoor, bezetStatus, wisBezet } from "./lib/apple.js";
+import { ontdek, herontdek, versleutel, leesApple, bewaarApple, bezetVoor as appleBezet, bezetStatus, wisBezet } from "./lib/apple.js";
+import { bezetVoor, googleBezetStatus, wisGoogleBezet } from "./lib/bezet.js";
 
 const json = (data, status = 200) => new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
 const terug = (pad) => new Response(null, { status: 303, headers: { Location: pad } });
@@ -41,36 +43,49 @@ export default async (req) => {
   if (pad === "/intern/api/planner" && req.method === "GET") {
     const [b, lijst, g, klanten, apple] = await Promise.all([leesBeschikbaarheid(store), leesAfspraken(store), leesGoogle(store), store.get("klanten", { type: "json" }), leesApple(store)]);
     const bezet = await bezetVoor(store, env);
-    const status = await bezetStatus(store);
+    const [status, gStatus] = await Promise.all([bezetStatus(store), googleBezetStatus(store)]);
+    const eigenIds = new Set(lijst.map((a) => a.googleEventId).filter(Boolean));
+    const telBlokken = (l) => (l || []).filter((x) => x[1] > Date.now() && x[0] < Date.now() + vooruitDagen(b) * 864e5 && !eigenIds.has(x[2])).length;
     const grens = new Date(Date.now() - 30 * 864e5).toISOString();
     const vrij = vrijeTijden(b, lijst, new Date(), { bezet });
     return json({
       wie, beschikbaarheid: b,
       regels: { duur: DUUR, vooruitWeken: vooruitDagen(b) / 7, minUren: MIN_UREN },
+      feestdagen: (() => { const v = lokaleDatum(), t = plusDagen(v, 180), j = +v.slice(0, 4); return [...feestdagen(j), ...feestdagen(j + 1)].filter((f) => f.datum >= v && f.datum <= t); })(),
       // Vrije momenten vanaf nu (zonder de 24-uursgrens voor klanten), als suggestie bij verzetten
       suggesties: vrijeTijden(b, lijst, new Date(), { bezet, minUren: 0 }).map((t) => ({ start: t.start, wie: t.wie })),
       vrij: { totaal: vrij.length, koen: vrij.filter((t) => t.wie.includes("koen")).length, daan: vrij.filter((t) => t.wie.includes("daan")).length },
       afspraken: lijst.filter((a) => a.start >= grens).sort((x, y) => x.start.localeCompare(y.start)).map((a) => {
-        const k = (klanten || []).find((x) => x.email === a.email);
+        const k = klantVoor(klanten || [], a);
         return { id: a.id, start: a.start, eind: a.eind, wie: a.wie, naam: a.naam, bedrijf: a.bedrijf || "", email: a.email, telefoon: a.telefoon, situatie: a.situatie, bericht: a.bericht, status: a.status,
-          reden: a.reden || "", meet: a.meet || "", klantId: k ? k.id : null, beheer: beheerLink(env, a) };
+          reden: a.reden || "", meet: a.meet || "", uitkomst: a.uitkomst || "", ingeplandDoor: a.ingeplandDoor || "", klantId: k ? k.id : null, beheer: beheerLink(env, a) };
       }),
-      google: { ingesteld: googleIngesteld(env), redirect, ...Object.fromEntries(MENSEN.map((m) => [m, g[m] && g[m].refresh ? { email: g[m].email || "", sinds: g[m].op } : null])) },
+      google: { ingesteld: googleIngesteld(env), redirect, ...Object.fromEntries(MENSEN.map((m) => [m, g[m] && g[m].refresh ? { email: g[m].email || "", sinds: g[m].op,
+        gelezen: (gStatus[m] || {}).laatstGoed || null, fout: (gStatus[m] || {}).fout || null, blokken: telBlokken((gStatus[m] || {}).blokken) } : null])) },
       apple: Object.fromEntries(MENSEN.map((m) => [m, apple[m] && apple[m].appleId ? { appleId: apple[m].appleId, agendas: apple[m].agendas, sinds: apple[m].op,
         gelezen: (status[m] || {}).laatstGoed || null, fout: (status[m] || {}).fout || null, perAgenda: (status[m] || {}).agendas || [],
-        blokken: (bezet[m] || []).filter((x) => x[1] > Date.now() && x[0] < Date.now() + vooruitDagen(b) * 864e5).length } : null])),
+        blokken: telBlokken((status[m] || {}).blokken) } : null])),
     });
   }
 
   if (pad === "/intern/api/planner/beschikbaarheid" && req.method === "POST") {
     const body = await req.json().catch(() => ({}));
     const oud = await leesBeschikbaarheid(store);
-    const nieuw = schoneBeschikbaarheid({ ...oud, ...body });
+    const nieuw = schoneBeschikbaarheid({ ...oud, ...body, instellingen: { ...oud.instellingen, ...(body.instellingen || {}) } });
     await bewaarBeschikbaarheid(store, nieuw);
     const anders = MENSEN.filter((m) => JSON.stringify(oud[m]) !== JSON.stringify(nieuw[m]));
     if (anders.length) await log(store, { wie, soort: "instelling", tekst: "Beschikbaarheid voor kennismakingen aangepast (" + anders.map((m) => NAMEN[m]).join(" en ") + ")" });
+    if (oud.instellingen.feestdagen !== nieuw.instellingen.feestdagen) await log(store, { wie, soort: "instelling", tekst: nieuw.instellingen.feestdagen ? "Feestdagen gaan weer automatisch dicht voor kennismakingen" : "Feestdagen gaan niet meer automatisch dicht voor kennismakingen" });
     if (oud.instellingen.vooruitWeken !== nieuw.instellingen.vooruitWeken) await log(store, { wie, soort: "instelling", tekst: `Klanten kunnen nu ${nieuw.instellingen.vooruitWeken} ${nieuw.instellingen.vooruitWeken === 1 ? "week" : "weken"} vooruit een kennismaking boeken` });
     return json({ ok: true, beschikbaarheid: nieuw });
+  }
+
+  if (pad === "/intern/api/planner/uitkomst" && req.method === "POST") {
+    const body = await req.json().catch(() => ({}));
+    const r = await zetUitkomst(store, String(body.id || ""), String(body.uitkomst || ""), wie);
+    if (r.fout) return json({ fout: r.fout }, 409);
+    await naUitkomst(store, r.afspraak, r.afspraak.uitkomst || "", wie);
+    return json({ ok: true });
   }
 
   if (pad === "/intern/api/planner/plan" && req.method === "POST") {
@@ -119,6 +134,7 @@ export default async (req) => {
     g[wie] = { refresh: r.refresh, email: r.email, op: new Date().toISOString() };
     await bewaarGoogle(store, g);
     await log(store, { wie, soort: "instelling", tekst: "Google Agenda gekoppeld voor kennismakingen" + (r.email ? " (" + r.email + ")" : "") });
+    await wisGoogleBezet(store, wie);
     return terug("/intern/beschikbaarheid.html?google=ok");
   }
 
@@ -151,7 +167,7 @@ export default async (req) => {
     const apple = await leesApple(store);
     if (apple[wie]) { try { apple[wie] = await herontdek(env, apple[wie]); await bewaarApple(store, apple); } catch (e) { return json({ fout: e.message }, 400); } }
     await wisBezet(store, wie);
-    await bezetVoor(store, env, 0);
+    await appleBezet(store, env, 0);
     return json({ ok: true });
   }
 

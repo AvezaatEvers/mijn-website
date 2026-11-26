@@ -4,7 +4,8 @@
 import { getStore } from "@netlify/blobs";
 import { stuur, laadPush, voorkeurVan, nlTijd, MENSEN } from "../push.js";
 import { leesBeschikbaarheid, leesAfspraken, vrijeTijden, vooruitDagen } from "./lib/planner.js";
-import { bezetVoor, leesApple, bezetStatus } from "./lib/apple.js";
+import { leesApple, bezetStatus } from "./lib/apple.js";
+import { bezetVoor } from "./lib/bezet.js";
 
 const NAAM = { koen: "Koen", daan: "Daan" };
 

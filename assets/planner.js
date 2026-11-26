@@ -86,6 +86,11 @@
     opt = opt || {};
     var verzet = opt.modus === 'verzet';
     var dagen = {}, lijstDagen = [], dag = null, gekozen = null, maand = null, stap = 'laden';
+    // Persoonlijke link uit het dashboard (?naam=…&email=…&telefoon=…&bedrijf=…) vult het formulier alvast in;
+    // wat de bezoeker zelf typt, blijft bewaard als hij terug gaat en een ander moment kiest.
+    var voor = {};
+    try { var q = new URLSearchParams(location.search); ['naam', 'bedrijf', 'email', 'telefoon'].forEach(function (k) { var v = q.get(k); if (v) voor[k] = v.slice(0, 200); }); } catch (e) { /* oude browser */ }
+    function vulIn() { Object.keys(voor).forEach(function (k) { var i = el.querySelector('input[name="' + k + '"]'); if (i && !i.value) i.value = voor[k]; }); }
     zetCss();
 
     // Het vaste deel (foto's, naam) wordt één keer getekend; alleen dit wisselende deel verandert bij een klik
@@ -211,7 +216,7 @@
       var tb = t.closest('[data-tijd]');
       // Eén klik op een tijd: direct door naar de gegevens (zoals bij Cal.com)
       if (tb) {
-        gekozen = tb.dataset.tijd; stap = 'form'; teken();
+        gekozen = tb.dataset.tijd; stap = 'form'; teken(); vulIn();
         var top = el.getBoundingClientRect().top; if (top < 80) scrollNaar(el);
         var n = el.querySelector('input[name="naam"]'); if (n) setTimeout(function () { n.focus({ preventScroll: true }); }, 250);
         return;
@@ -220,6 +225,7 @@
       var vz = t.closest('#pl-verzet');
       if (vz) verstuur('/api/planner/verzet', { id: opt.id, t: opt.t, start: gekozen }, vz, 'Verzet naar dit moment', function (j) { if (opt.klaar) opt.klaar(j); });
     });
+    el.addEventListener('input', function (e) { var n = e.target.name; if (n === 'naam' || n === 'bedrijf' || n === 'email' || n === 'telefoon') voor[n] = e.target.value; });
     el.addEventListener('submit', function (e) {
       e.preventDefault();
       var fm = e.target, knop = fm.querySelector('.pl-knop'), w = {}, mel = el.querySelector('.pl-melding');
@@ -229,7 +235,7 @@
       w.privacy = true; w.start = gekozen;
       verstuur('/api/planner/boek', w, knop, 'Bevestig je kennismaking', function (j) {
         try { if (window.umami && typeof window.umami.track === 'function') window.umami.track('Afspraak ingepland', { pagina: location.pathname }); } catch (x) { /* meten mag nooit het boeken blokkeren */ }
-        location.href = '/bedankt?afspraak=1&start=' + encodeURIComponent(j.start) + '&eind=' + encodeURIComponent(j.eind);
+        location.href = '/bedankt?afspraak=1&start=' + encodeURIComponent(j.start) + '&eind=' + encodeURIComponent(j.eind) + (j.id ? '&id=' + encodeURIComponent(j.id) : '') + (j.meet ? '&meet=' + encodeURIComponent(j.meet) : '');
       });
     });
     laad();

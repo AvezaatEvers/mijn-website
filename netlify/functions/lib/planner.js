@@ -37,6 +37,32 @@ export function plusDagen(datum, n) { const d = new Date(datum + "T12:00:00Z"); 
 const weekdag = (datum) => new Date(datum + "T12:00:00Z").getUTCDay();
 const tijdOk = (t) => /^([01]\d|2[0-3]):[0-5]\d$/.test(t);
 
+// ---------- Feestdagen (standaard automatisch dicht, uit te zetten in het dashboard) ----------
+const twee = (n) => String(n).padStart(2, "0");
+function pasen(j) { // Gregoriaanse paasdatum (Meeus/Jones/Butcher)
+  const a = j % 19, b = Math.floor(j / 100), c = j % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const n = h + l - 7 * m + 114;
+  return `${j}-${twee(Math.floor(n / 31))}-${twee((n % 31) + 1)}`;
+}
+// Nederlandse feestdagen waarop vrijwel iedereen vrij is; Bevrijdingsdag alleen in lustrumjaren (2030, 2035, …)
+export function feestdagen(jaar) {
+  const p = pasen(jaar), koning = weekdag(`${jaar}-04-27`) === 0 ? `${jaar}-04-26` : `${jaar}-04-27`;
+  return [
+    [`${jaar}-01-01`, "Nieuwjaarsdag"], [p, "Eerste Paasdag"], [plusDagen(p, 1), "Tweede Paasdag"], [koning, "Koningsdag"],
+    ...(jaar % 5 === 0 ? [[`${jaar}-05-05`, "Bevrijdingsdag"]] : []),
+    [plusDagen(p, 39), "Hemelvaartsdag"], [plusDagen(p, 49), "Eerste Pinksterdag"], [plusDagen(p, 50), "Tweede Pinksterdag"],
+    [`${jaar}-12-25`, "Eerste Kerstdag"], [`${jaar}-12-26`, "Tweede Kerstdag"],
+  ].map(([datum, naam]) => ({ datum, naam })).sort((x, y) => x.datum.localeCompare(y.datum));
+}
+const feestCache = new Map();
+export function feestdag(datum) {
+  const j = +datum.slice(0, 4);
+  if (!feestCache.has(j)) feestCache.set(j, new Map(feestdagen(j).map((f) => [f.datum, f.naam])));
+  return feestCache.get(j).get(datum) || "";
+}
+export const feestdagenDicht = (b) => !(b && b.instellingen && b.instellingen.feestdagen === false);
+
 // ---------- Opslag ----------
 export function schoneBeschikbaarheid(ruw) {
   const uit = {};
@@ -51,7 +77,7 @@ export function schoneBeschikbaarheid(ruw) {
     uit[wie] = { week, dicht };
   }
   const w = Number(ruw && ruw.instellingen && ruw.instellingen.vooruitWeken);
-  uit.instellingen = { vooruitWeken: Number.isInteger(w) && w >= 1 && w <= MAX_WEKEN ? w : VOORUIT_WEKEN };
+  uit.instellingen = { vooruitWeken: Number.isInteger(w) && w >= 1 && w <= MAX_WEKEN ? w : VOORUIT_WEKEN, feestdagen: !(ruw && ruw.instellingen && ruw.instellingen.feestdagen === false) };
   return uit;
 }
 export async function leesBeschikbaarheid(store) { return schoneBeschikbaarheid(await store.get(BESCHIKBAAR, { type: "json" })); }
@@ -82,9 +108,10 @@ function bezetDoorAfspraak(lijst, wie, s, e, negeer) {
 // Alle tijden waarop minstens één van beiden vrij is: [{ start, eind, wie: ["koen", "daan"] }]
 // bezet: { koen: [[startMs, eindMs]], daan: [...] } uit de eigen agenda (Apple Agenda), zie lib/apple.js
 export function vrijeTijden(beschikbaar, afspraken, nu = new Date(), { negeer, bezet = {}, minUren = MIN_UREN } = {}) {
-  const vanaf = nu.getTime() + minUren * 3600e3, vandaag = lokaleDatum(nu), uit = new Map();
+  const vanaf = nu.getTime() + minUren * 3600e3, vandaag = lokaleDatum(nu), uit = new Map(), feest = feestdagenDicht(beschikbaar);
   for (let i = 0, n = vooruitDagen(beschikbaar); i <= n; i++) {
     const datum = plusDagen(vandaag, i), wd = weekdag(datum);
+    if (feest && feestdag(datum)) continue;
     for (const wie of MENSEN) {
       const p = beschikbaar[wie] || { week: {}, dicht: [] };
       if (p.dicht.includes(datum)) continue;
@@ -200,6 +227,21 @@ export async function verzetDoorOns(store, id, datum, tijd, wie, door, { nu = ne
     const vorige = { start: a.start, wie: a.wie };
     a.wie = wie; a.start = start; a.eind = new Date(e).toISOString(); a.status = "verzet"; a.verzetDoor = door; a.op = nu.toISOString(); a.seq = (a.seq || 0) + 1;
     uit = { ...a, vorige };
+    return { ok: true };
+  });
+  return r.fout ? r : { ok: true, afspraak: uit };
+}
+
+// Uitkomst na afloop: "gehouden", "noshow" of "" (wissen)
+export async function zetUitkomst(store, id, uitkomst, door, nu = new Date()) {
+  if (!["gehouden", "noshow", ""].includes(uitkomst)) return { fout: "Onbekende uitkomst" };
+  let uit = null;
+  const r = await wijzigAfspraken(store, (lijst) => {
+    const a = lijst.find((x) => x.id === id);
+    if (!a || !actief(a)) return { fout: "Deze kennismaking bestaat niet of is geannuleerd." };
+    if (new Date(a.start) > nu) return { fout: "Deze kennismaking moet nog beginnen." };
+    if (uitkomst) { a.uitkomst = uitkomst; a.uitkomstDoor = door; a.uitkomstOp = nu.toISOString(); } else { delete a.uitkomst; delete a.uitkomstDoor; delete a.uitkomstOp; }
+    uit = { ...a };
     return { ok: true };
   });
   return r.fout ? r : { ok: true, afspraak: uit };

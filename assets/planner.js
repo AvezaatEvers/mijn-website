@@ -1,6 +1,6 @@
 // Eigen planner voor de kennismaking (vervangt Cal.com), in de bekende indeling van Calendly en Cal.com:
 // links de info over het gesprek, in het midden een maandkalender, rechts de tijden van de gekozen dag.
-// Na het kiezen van een tijd komt het formulier in beeld (met een terugknop).
+// Een klik op een tijd brengt je direct naar het formulier (met een terugknop).
 // Op /contact: <div id="planner"></div>. Op /afspraak: AEPlanner.start(element, { modus: "verzet", id, t, huidig, klaar }).
 // De server staat in netlify/functions/planner.mjs; beschikbaarheid stellen Koen en Daan in het dashboard in.
 (function () {
@@ -34,7 +34,7 @@
     '.pl-lijst{display:flex;flex-direction:column;gap:8px;max-height:390px;overflow-y:auto;padding-right:4px}' +
     '.pl-t{display:flex;gap:6px}.pl-t button{font:inherit;font-weight:600;font-size:15px;height:48px;border-radius:8px;cursor:pointer;flex:1;min-width:0}' +
     '.pl-t .tijd{border:1px solid var(--tint-border,#CAD4E8);background:#fff;color:var(--accent,#26458F)}.pl-t .tijd:hover{border:2px solid var(--accent,#26458F)}' +
-    '.pl-t.is-aan .tijd{background:#4B5563;border-color:#4B5563;color:#fff}.pl-t .verder{display:none;border:0;background:var(--accent,#26458F);color:#fff}.pl-t.is-aan .verder{display:block}' +
+    '.pl-t.is-aan .tijd{background:var(--accent,#26458F);border-color:var(--accent,#26458F);color:#fff}' +
     '.pl-leeg{color:var(--muted,#4B5563);font-size:14.5px;line-height:1.6;margin:0}' +
     '.pl-form{display:grid;gap:16px}' +
     '.pl-form label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--ink,#111827)}' +
@@ -129,7 +129,7 @@
       var d = dagen[dag], label = d.label.charAt(0).toUpperCase() + d.label.slice(1);
       return '<div class="pl-tijden"><h3>' + esc(label) + '</h3><div class="pl-lijst">' + d.tijden.map(function (t) {
         var aan = gekozen === t.start;
-        return '<div class="pl-t' + (aan ? ' is-aan' : '') + '"><button type="button" class="tijd" data-tijd="' + esc(t.start) + '">' + esc(t.tijd) + '</button><button type="button" class="verder" data-verder>' + (verzet ? 'Kiezen' : 'Volgende') + '</button></div>';
+        return '<div class="pl-t' + (aan ? ' is-aan' : '') + '"><button type="button" class="tijd" data-tijd="' + esc(t.start) + '">' + esc(t.tijd) + '</button></div>';
       }).join('') + '</div></div>';
     }
 
@@ -200,9 +200,9 @@
       var mb = t.closest('[data-maand]');
       if (mb && !mb.disabled) { var x = maand[0] * 12 + maand[1] + (+mb.dataset.maand); maand = [Math.floor(x / 12), x % 12]; teken(); return; }
       var tb = t.closest('[data-tijd]');
-      if (tb) { gekozen = tb.dataset.tijd; el.querySelectorAll('.pl-t').forEach(function (r) { r.classList.toggle('is-aan', r.querySelector('.tijd') === tb); }); return; }
-      if (t.closest('[data-verder]')) {
-        stap = 'form'; teken();
+      // Eén klik op een tijd: direct door naar de gegevens (zoals bij Cal.com)
+      if (tb) {
+        gekozen = tb.dataset.tijd; stap = 'form'; teken();
         var top = el.getBoundingClientRect().top; if (top < 80) scrollNaar(el);
         var n = el.querySelector('input[name="naam"]'); if (n) setTimeout(function () { n.focus({ preventScroll: true }); }, 250);
         return;

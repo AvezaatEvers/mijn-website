@@ -38,11 +38,11 @@ const voorbeelden = [
   ['nps', 'Tevredenheid meten (NPS)', 'Automatisch na 3 maanden, een week na de IB-aangifte, en op 10 juni en 10 november.',
     mails.nps({ naam: 'Sanne de Vries', wie: 'koen', npsBasis: '#' })],
   ['afspraak', 'Kennismaking gepland (Cal.com)', 'Automatisch, naar de bezoeker, direct na het boeken via Cal.com. Met agenda-bijlage.',
-    mails.afspraak({ naam: 'Sanne de Vries', wie: 'daan', wanneer: 'donderdag 3 december om 14:00', duur: 20, video: 'https://app.cal.com/video/voorbeeld', verzet: 'https://cal.com/reschedule/voorbeeld', annuleer: 'https://cal.com/booking/voorbeeld?cancel=true' })],
+    mails.afspraak({ naam: 'Sanne de Vries', wie: '', wanneer: 'donderdag 3 december om 14:00', datum: 'donderdag 3 december', tijd: '14:00', eindtijd: '14:20', duur: 20, video: 'https://app.cal.com/video/voorbeeld', verzet: 'https://cal.com/reschedule/voorbeeld', annuleer: 'https://cal.com/booking/voorbeeld?cancel=true' })],
   ['afspraakVerzet', 'Kennismaking verzet (Cal.com)', 'Automatisch, naar de bezoeker, na het verzetten via Cal.com. Werkt het agenda-item bij.',
-    mails.afspraakVerzet({ naam: 'Sanne de Vries', wie: 'daan', wanneer: 'vrijdag 4 december om 10:30', duur: 20, video: 'https://app.cal.com/video/voorbeeld', verzet: 'https://cal.com/reschedule/voorbeeld', annuleer: 'https://cal.com/booking/voorbeeld?cancel=true' })],
+    mails.afspraakVerzet({ naam: 'Sanne de Vries', wie: '', wanneer: 'vrijdag 4 december om 10:30', datum: 'vrijdag 4 december', tijd: '10:30', eindtijd: '10:50', duur: 20, video: 'https://app.cal.com/video/voorbeeld', verzet: 'https://cal.com/reschedule/voorbeeld', annuleer: 'https://cal.com/booking/voorbeeld?cancel=true' })],
   ['afspraakGeannuleerd', 'Kennismaking geannuleerd (Cal.com)', 'Automatisch, naar de bezoeker, na het annuleren via Cal.com. Haalt het agenda-item weg.',
-    mails.afspraakGeannuleerd({ naam: 'Sanne de Vries', wie: 'daan', wanneer: 'vrijdag 4 december om 10:30', reden: '' })],
+    mails.afspraakGeannuleerd({ naam: 'Sanne de Vries', wie: '', wanneer: 'vrijdag 4 december om 10:30', datum: 'vrijdag 4 december', tijd: '10:30', eindtijd: '10:50', duur: 20, video: 'https://app.cal.com/video/voorbeeld', reden: '' })],
 ];
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

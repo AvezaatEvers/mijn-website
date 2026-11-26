@@ -79,7 +79,7 @@ ${rijen.map(([l, r], i) => {
   }).join('')}
 </table>`;
 
-function groet(base, wie) {
+function groet(base, wie, onder) {
   const namen = wie === 'daan' ? ['daan'] : wie === 'koen' ? ['koen'] : ['koen', 'daan'];
   const fotos = namen.map((n, i) => `<img src="${base}/assets/img/mail/${n}.jpg" width="52" height="52" alt="${n === 'koen' ? 'Koen' : 'Daan'}" style="display:inline-block;width:52px;height:52px;border-radius:26px;border:3px solid #ffffff;${i ? 'margin-left:-14px;' : ''}vertical-align:middle">`).join('');
   return `
@@ -87,17 +87,17 @@ function groet(base, wie) {
 <td valign="middle" style="padding-right:14px;white-space:nowrap">${fotos}</td>
 <td valign="middle" style="${F}font-size:15px;line-height:1.45;color:${TEKST}">
 <span style="color:${INKT};font-weight:600">${wieVol(wie)}</span><br>
-<span style="color:${ZACHT};font-size:14px">${namen.length > 1 ? 'Jouw vaste boekhouders' : 'Jouw vaste boekhouder'} bij Avezaat &amp; Evers</span>
+<span style="color:${ZACHT};font-size:14px">${onder || `${namen.length > 1 ? 'Jouw vaste boekhouders' : 'Jouw vaste boekhouder'} bij Avezaat &amp; Evers`}</span>
 </td></tr></table>`;
 }
 
-function omhulsel(base, { preheader, inhoud, wie, appBlok = true }) {
+function omhulsel(base, { preheader, inhoud, wie, appBlok = true, appTitel = 'Een vraag tussendoor?' }) {
   const app = appBlok ? `
 <tr><td style="padding:16px 0 0">
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
 <td bgcolor="${ACCENT}" style="background:${ACCENT};border-radius:16px;padding:22px 26px">
-<p style="margin:0 0 4px;${F}font-size:16px;line-height:1.4;font-weight:600;color:#ffffff">Een vraag tussendoor?</p>
-<p style="margin:0 0 14px;${F}font-size:14px;line-height:1.6;color:#D6DEEF">App ${wie === 'daan' ? 'Daan' : wie === 'koen' ? 'Koen' : 'ons'} gewoon. Binnen 2 uur heb je antwoord.</p>
+<p style="margin:0 0 4px;${F}font-size:16px;line-height:1.4;font-weight:600;color:#ffffff">${appTitel}</p>
+<p style="margin:0 0 14px;${F}font-size:14px;line-height:1.6;color:#D6DEEF">Stuur ${wie === 'daan' ? 'Daan' : wie === 'koen' ? 'Koen' : 'ons'} gerust een appje. Je hoort binnen 2 uur van ${wie === 'daan' || wie === 'koen' ? 'hem' : 'ons'}.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
 <td bgcolor="#ffffff" style="background:#ffffff;border-radius:10px"><a href="${WA_LINK}" style="display:inline-block;padding:10px 18px;${F}font-size:14px;font-weight:600;color:${ACCENT};text-decoration:none;border-radius:10px">WhatsApp ons</a></td>
 <td style="padding-left:16px;${F}font-size:14px;color:#D6DEEF">of bel <a href="${TEL_LINK}" style="color:#ffffff;font-weight:600;text-decoration:none;white-space:nowrap">${TEL}</a></td>
@@ -129,7 +129,7 @@ Rotterdamseweg 26, 2921 AP Krimpen aan den IJssel &nbsp;|&nbsp; <a href="mailto:
 </table></td></tr></table></body></html>`;
 }
 
-const voet = (wie) => `\n\n${wieVol(wie)}\nAvezaat & Evers\n\nEen vraag tussendoor? App of bel ${TEL}. Binnen 2 uur antwoord.\n${MAIL}`;
+const voet = (wie) => `\n\n${wieVol(wie)}\nAvezaat & Evers\n\nEen vraag tussendoor? Stuur gerust een appje of bel ${TEL}. Je hoort binnen 2 uur van ons.\n${MAIL}`;
 
 // ---------- Prijscheck ----------
 const SITUATIE = { start: 'Net gestart', zelf: 'Doet het nu zelf', boekhouder: 'Heeft al een boekhouder', achter: 'Administratie loopt achter' };
@@ -306,12 +306,12 @@ ${tabel(regels)}`) +
       ]) +
       knop(welkomUrl, 'Open je welkomstpagina') +
       p(`Liever stap voor stap met plaatjes? Lees ${link(`${base}/kennisbank/starten-met-moneymonk.html`, 'Van start met MoneyMonk')}. Hoe we met je gegevens omgaan, staat in de ${link(`${base}/verwerkersovereenkomst.html`, 'verwerkersovereenkomst')}.`) +
-      p('Loop je ergens tegenaan? App me gewoon. Daar ben ik voor.', 'margin-bottom:22px') +
+      p('Loop je ergens tegenaan? Stuur me gerust een appje, daar ben ik voor.', 'margin-bottom:22px') +
       groet(base, d.wie);
     return {
       subject: 'Welkom! Zo ga je van start',
       html: omhulsel(base, { preheader: 'Drie stappen en je bent klaar: account activeren, bank koppelen, eerste bonnetje.', inhoud, wie: d.wie }),
-      text: `${hoiTekst(d.naam)}\n\nFijn dat je voor ons kiest. Vanaf nu ben ik je vaste boekhouder.\n\nOm te beginnen:\n1. Activeer je MoneyMonk-account via de uitnodiging in je mail.\n2. Download de app en koppel je bank.\n3. Fotografeer je eerste bonnetje.\n\nWelkomstpagina: ${welkomUrl}\nHandleiding: ${base}/kennisbank/starten-met-moneymonk.html\n\nLoop je ergens tegenaan? App me gewoon.${voet(d.wie)}`,
+      text: `${hoiTekst(d.naam)}\n\nFijn dat je voor ons kiest. Vanaf nu ben ik je vaste boekhouder.\n\nOm te beginnen:\n1. Activeer je MoneyMonk-account via de uitnodiging in je mail.\n2. Download de app en koppel je bank.\n3. Fotografeer je eerste bonnetje.\n\nWelkomstpagina: ${welkomUrl}\nHandleiding: ${base}/kennisbank/starten-met-moneymonk.html\n\nLoop je ergens tegenaan? Stuur me gerust een appje.${voet(d.wie)}`,
     };
   },
 
@@ -525,56 +525,52 @@ ${rij(0, 5)}${rij(6, 10)}
   },
 
   // Afspraak via Cal.com: bevestiging, verzet en geannuleerd (naar de bezoeker, vanuit netlify/functions/cal-webhook.mjs)
-  // d: { naam, wie, wanneer, duur, video, telefoon, verzet, annuleer, reden }
+  // d: { naam, wie ('koen' | 'daan' | '' als het nog niet vaststaat), wanneer, datum, tijd, eindtijd, duur, video, telefoon, verzet, annuleer, reden }
   afspraak(d, base = '') {
     const inhoud = kop('Je kennismaking staat gepland') +
       p(hoi(d.naam)) +
-      p(`Fijn dat je een moment hebt gekozen. We spreken elkaar ${sterk(esc(d.wanneer))}.`) +
-      afspraakBlok(d) +
-      (d.video ? knop(esc(d.video), 'Deelnemen aan het gesprek') +
-        p('Bewaar deze mail, dan heb je de link straks bij de hand. De afspraak staat ook in de bijlage, voor in je agenda.', `font-size:14px;color:${ZACHT}`) :
-        p('De afspraak staat in de bijlage, voor in je agenda.', `font-size:14px;color:${ZACHT}`)) +
-      tussenkop('Zo gaat de kennismaking') +
+      p('Fijn dat je een moment hebt gekozen. Hieronder staat alles op een rij.') +
+      afspraakKaart(d, 'gepland') +
+      tussenkop('Wat je kunt verwachten') +
       vinkjes([
-        'We vragen naar je bedrijf en hoe je administratie nu loopt.',
-        'Je hoort precies wat het kost. Vrijblijvend, geen verkooppraatje.',
-        'Handig om bij de hand te hebben: een idee van hoeveel bonnetjes en facturen je per maand hebt.',
+        'Een ontspannen gesprek over je bedrijf en hoe je administratie nu loopt.',
+        'Je hoort precies wat het kost. Vrijblijvend, zonder verkooppraatje.',
+        'Handig als je ongeveer weet hoeveel bonnetjes en facturen je per maand hebt.',
       ]) +
       afspraakWijzigen(d) +
-      p('Tot dan!', 'margin-bottom:22px') +
-      groet(base, d.wie);
+      p('Tot snel!', 'margin-bottom:22px') +
+      groet(base, d.wie, 'Avezaat &amp; Evers');
     return {
       subject: `Je kennismaking staat gepland: ${d.wanneer}`,
-      html: omhulsel(base, { preheader: `We spreken elkaar ${d.wanneer}.${d.video ? ' De link om deel te nemen staat in deze mail.' : ''}`, inhoud, wie: d.wie }),
-      text: `${hoiTekst(d.naam)}\n\nFijn dat je een moment hebt gekozen. We spreken elkaar ${d.wanneer} (${d.duur} minuten) met ${wieVol(d.wie)}.\n\n${d.video ? `Deelnemen aan het gesprek: ${d.video}\n\n` : d.telefoon ? `We bellen je op ${d.telefoon}.\n\n` : ''}Komt het toch niet uit?\nAnder moment kiezen: ${d.verzet}\nAnnuleren: ${d.annuleer}\n\nTot dan!${voet(d.wie)}`,
+      html: omhulsel(base, { preheader: `${cap(d.datum)} om ${d.tijd}, met ${metWie(d.wie)}.${d.video ? ' De link om deel te nemen staat in deze mail.' : ''}`, inhoud, wie: d.wie, appTitel: 'Vragen voor het gesprek?' }),
+      text: `${hoiTekst(d.naam)}\n\nFijn dat je een moment hebt gekozen. Je kennismaking staat gepland:\n\n${afspraakTekst(d)}\n\nKomt het toch niet uit?\nAnder moment kiezen: ${d.verzet}\nAnnuleren: ${d.annuleer}\n\nTot snel!${voet(d.wie)}`,
     };
   },
 
   afspraakVerzet(d, base = '') {
     const inhoud = kop('Je kennismaking is verzet') +
       p(hoi(d.naam)) +
-      p(`Gelukt. Je nieuwe moment is ${sterk(esc(d.wanneer))}.`) +
-      afspraakBlok(d) +
-      (d.video ? knop(esc(d.video), 'Deelnemen aan het gesprek') : '') +
-      p('In de bijlage staat de nieuwe tijd voor in je agenda. Stond de oude afspraak er al in, dan wordt die meestal vanzelf bijgewerkt.', `font-size:14px;color:${ZACHT}`) +
+      p('Gelukt. Dit is je nieuwe moment:') +
+      afspraakKaart(d, 'verzet') +
       afspraakWijzigen(d) +
-      p('Tot dan!', 'margin-bottom:22px') +
-      groet(base, d.wie);
+      p('Tot snel!', 'margin-bottom:22px') +
+      groet(base, d.wie, 'Avezaat &amp; Evers');
     return {
       subject: `Je kennismaking is verzet naar ${d.wanneer}`,
-      html: omhulsel(base, { preheader: `Je nieuwe moment: ${d.wanneer}.`, inhoud, wie: d.wie }),
-      text: `${hoiTekst(d.naam)}\n\nJe kennismaking is verzet. Je nieuwe moment is ${d.wanneer} (${d.duur} minuten) met ${wieVol(d.wie)}.\n\n${d.video ? `Deelnemen aan het gesprek: ${d.video}\n\n` : ''}Ander moment kiezen: ${d.verzet}\nAnnuleren: ${d.annuleer}\n\nTot dan!${voet(d.wie)}`,
+      html: omhulsel(base, { preheader: `Je nieuwe moment: ${cap(d.datum)} om ${d.tijd}.`, inhoud, wie: d.wie, appTitel: 'Vragen voor het gesprek?' }),
+      text: `${hoiTekst(d.naam)}\n\nJe kennismaking is verzet. Je nieuwe moment:\n\n${afspraakTekst(d)}\n\nAnder moment kiezen: ${d.verzet}\nAnnuleren: ${d.annuleer}\n\nTot snel!${voet(d.wie)}`,
     };
   },
 
   afspraakGeannuleerd(d, base = '') {
     const inhoud = kop('Je kennismaking is geannuleerd') +
       p(hoi(d.naam)) +
-      p(`Je afspraak van ${sterk(esc(d.wanneer))} gaat niet door. Je hoeft verder niets te doen.`) +
-      (d.reden ? blok(blokTekst(`${sterk('Reden')}<br>${esc(d.reden)}`)) : '') +
-      p('Wil je toch kennismaken? Kies gerust een nieuw moment. Of app of bel ons, dan prikken we samen een tijd.') +
+      p('Deze afspraak gaat niet door. Je hoeft verder niets te doen.') +
+      afspraakKaart(d, 'geannuleerd') +
+      (d.reden ? p(`${sterk('Reden:')} ${esc(d.reden)}`) : '') +
+      p('Wil je toch kennismaken? Kies gerust een nieuw moment dat jou beter uitkomt.') +
       knop(`${base}/contact#plannen`, 'Kies een nieuw moment') +
-      groet(base, d.wie);
+      groet(base, d.wie, 'Avezaat &amp; Evers');
     return {
       subject: 'Je kennismaking is geannuleerd',
       html: omhulsel(base, { preheader: `Je afspraak van ${d.wanneer} gaat niet door. Een nieuw moment kiezen kan altijd.`, inhoud, wie: d.wie }),
@@ -584,16 +580,38 @@ ${rij(0, 5)}${rij(6, 10)}
 
 };
 
-function afspraakBlok(d) {
-  return blok(tabel([
-    ['Wanneer', esc(d.wanneer)],
-    ['Duur', `${esc(d.duur)} minuten`],
-    ['Met', wieVol(d.wie)],
-    ['Hoe', d.video ? 'Videogesprek' : d.telefoon ? `We bellen je op ${esc(d.telefoon)}` : 'Online'],
-  ]));
+// ---------- Bouwstenen voor de afspraakmails ----------
+const cap = (s) => { const t = String(s || ''); return t.charAt(0).toUpperCase() + t.slice(1); };
+const metWie = (wie) => (wie === 'daan' ? 'Daan Evers' : wie === 'koen' ? 'Koen Avezaat' : 'Koen of Daan');
+const hoeVan = (d) => (d.video ? 'Videogesprek' : d.telefoon ? 'Telefonisch' : 'Online');
+
+// De afspraak als kaart: datum groot, tijd en vorm eronder, met wie, en de knop om deel te nemen
+function afspraakKaart(d, status) {
+  const weg = status === 'geannuleerd';
+  const label = { gepland: 'Jouw kennismaking', verzet: 'Nieuw moment', geannuleerd: 'Geannuleerd' }[status];
+  const doorhalen = weg ? 'text-decoration:line-through;' : '';
+  const tijden = `${esc(d.tijd)}${d.eindtijd ? '&ndash;' + esc(d.eindtijd) : ''}`;
+  const deelnemen = !weg && d.video ? `
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:20px 0 0"><tr>
+<td bgcolor="${ACCENT}" style="border-radius:12px;background:${ACCENT}">
+<a href="${esc(d.video)}" style="display:inline-block;padding:14px 24px;${F}font-size:15px;line-height:1.2;font-weight:600;color:#ffffff;text-decoration:none;border-radius:12px">Deelnemen aan het gesprek</a>
+</td></tr></table>` : '';
+  return `
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:6px 0 ${weg ? 22 : 12}px"><tr>
+<td bgcolor="${TINT}" style="background:${TINT};border-radius:16px;padding:24px 26px;border-left:4px solid ${weg ? LIJN : ACCENT}">
+<p style="margin:0 0 6px;${F}font-size:12.5px;line-height:1.4;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:${weg ? ZACHT : ACCENT}">${label}</p>
+<p style="margin:0 0 4px;${F}font-size:24px;line-height:1.25;font-weight:700;letter-spacing:-0.3px;color:${weg ? ZACHT : INKT};${doorhalen}">${esc(cap(d.datum))}</p>
+<p style="margin:0;${F}font-size:16px;line-height:1.5;color:${weg ? ZACHT : TEKST};${doorhalen}">${tijden} &nbsp;&middot;&nbsp; ${esc(d.duur)} minuten &nbsp;&middot;&nbsp; ${hoeVan(d)}</p>
+${weg ? '' : `<p style="margin:10px 0 0;${F}font-size:15px;line-height:1.5;color:${TEKST}">Met ${sterk(metWie(d.wie))}${!d.video && d.telefoon ? `. We bellen je op ${esc(d.telefoon)}.` : ''}</p>`}
+${deelnemen}
+</td></tr></table>` +
+    (weg ? '' : `<p style="margin:0 0 24px;${F}font-size:13.5px;line-height:1.6;color:${ZACHT}">Zet de afspraak in je agenda met de bijlage bij deze mail.</p>`);
 }
 function afspraakWijzigen(d) {
-  return p(`Komt het toch niet uit? ${link(esc(d.verzet), 'Kies een ander moment')} of ${link(esc(d.annuleer), 'annuleer de afspraak')}.`);
+  return `<p style="margin:4px 0 22px;padding-top:18px;border-top:1px solid ${LIJN};${F}font-size:14px;line-height:1.6;color:${ZACHT}">Komt het toch niet uit? ${link(esc(d.verzet), 'Kies een ander moment')} of ${link(esc(d.annuleer), 'annuleer de afspraak')}.</p>`;
+}
+function afspraakTekst(d) {
+  return `${cap(d.datum)}, ${d.tijd}${d.eindtijd ? '-' + d.eindtijd : ''} (${d.duur} minuten)\n${hoeVan(d)} met ${metWie(d.wie)}${!d.video && d.telefoon ? `, we bellen je op ${d.telefoon}` : ''}${d.video ? `\nDeelnemen: ${d.video}` : ''}`;
 }
 
 export { mails, voornaam };

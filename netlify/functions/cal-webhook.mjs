@@ -29,14 +29,18 @@ function handtekeningKlopt(ruw, kop, geheim) {
   return gekregen.length === verwacht.length && timingSafeEqual(gekregen, verwacht);
 }
 
-// "donderdag 3 december om 14:00", in de tijdzone van de bezoeker (Nederland als die onbekend is)
-function wanneer(iso, tz) {
+// Datum en tijd in de tijdzone van de bezoeker (Nederland als die onbekend is)
+function delen(iso, tz) {
   let zone = TZ;
   try { if (tz) { new Intl.DateTimeFormat("nl-NL", { timeZone: tz }); zone = tz; } } catch { /* onbekende tijdzone */ }
   const d = new Date(iso);
-  const dag = d.toLocaleDateString("nl-NL", { timeZone: zone, weekday: "long", day: "numeric", month: "long" });
-  const tijd = d.toLocaleTimeString("nl-NL", { timeZone: zone, hour: "2-digit", minute: "2-digit" });
-  return `${dag} om ${tijd}${zone !== TZ ? ` (${zone})` : ""}`;
+  return { zone, datum: d.toLocaleDateString("nl-NL", { timeZone: zone, weekday: "long", day: "numeric", month: "long" }),
+    tijd: d.toLocaleTimeString("nl-NL", { timeZone: zone, hour: "2-digit", minute: "2-digit" }) };
+}
+// "donderdag 3 december om 14:00"
+function wanneer(iso, tz) {
+  const x = delen(iso, tz);
+  return `${x.datum} om ${x.tijd}${x.zone !== TZ ? ` (${x.zone})` : ""}`;
 }
 
 // Agenda-bijlage (.ics). Eén vaste UID per afspraak, zodat verzetten en annuleren het bestaande agenda-item bijwerken.
@@ -116,10 +120,12 @@ export default async (req) => {
   // Mail naar de bezoeker
   let mailOk = null;
   if (email) {
-    const d = { naam, wie, wanneer: tekstWanneer, duur, video, telefoon, verzet, annuleer, reden: soort === "geannuleerd" ? schoon(b.cancellationReason, 300) : "" };
+    const begin = delen(b.startTime, gast.timeZone), eind = b.endTime ? delen(b.endTime, gast.timeZone) : null;
+    const d = { naam, wie, wanneer: tekstWanneer, datum: begin.datum, tijd: begin.tijd + (begin.zone !== TZ ? ` (${begin.zone})` : ""), eindtijd: eind ? eind.tijd : "",
+      duur, video, telefoon, verzet, annuleer, reden: soort === "geannuleerd" ? schoon(b.cancellationReason, 300) : "" };
     const m = soort === "gepland" ? mails.afspraak(d, BASE) : soort === "verzet" ? mails.afspraakVerzet(d, BASE) : mails.afspraakGeannuleerd(d, BASE);
     const agenda = ics({ uid: icsUid, seq, start: b.startTime, eind: b.endTime || b.startTime, geannuleerd: soort === "geannuleerd", locatie: video || (telefoon ? "Telefonisch" : ""),
-      titel: "Kennismaking Avezaat & Evers" + (wie ? ` met ${wie === "daan" ? "Daan" : "Koen"}` : ""),
+      titel: "Kennismaking Avezaat & Evers" + (wie ? ` met ${wie === "daan" ? "Daan" : "Koen"}` : " (Koen of Daan)"),
       beschrijving: `${video ? "Deelnemen: " + video + "\n" : ""}Ander moment kiezen: ${verzet}\nAnnuleren: ${annuleer}\n\nVragen? App of bel 085 060 4363.` });
     const res = await verstuur((x) => process.env[x], {
       aan: email, mail: m,

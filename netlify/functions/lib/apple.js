@@ -35,7 +35,8 @@ const eerste = (xml, naam) => { const m = tag(naam).exec(xml); return m ? m[1] :
 async function dav(methode, url, body, auth, diepte) {
   const r = await fetch(url, { method: methode, redirect: "follow", signal: AbortSignal.timeout(8000),
     headers: { Authorization: "Basic " + Buffer.from(auth.appleId + ":" + auth.wachtwoord).toString("base64"), Depth: String(diepte), "Content-Type": "application/xml; charset=utf-8" }, body });
-  if (r.status === 401 || r.status === 403) throw new Error("Apple ID of app-specifiek wachtwoord klopt niet");
+  if (r.status === 401) throw new Error("Apple ID of app-specifiek wachtwoord klopt niet");
+  if (r.status === 403) throw new Error("geen toegang tot deze agenda (403)");
   if (r.status !== 207 && !r.ok) throw new Error("iCloud gaf fout " + r.status);
   return { xml: await r.text(), url: r.url || url };
 }
@@ -106,9 +107,18 @@ export function bezetUitIcs(teksten, van, tot) {
 async function haalBezet(env, cfg, van, tot) {
   const auth = { appleId: cfg.appleId, wachtwoord: ontsleutel(env, cfg.wachtwoord) };
   const body = `<?xml version="1.0" encoding="utf-8"?><c:calendar-query xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:prop><c:calendar-data/></d:prop><c:filter><c:comp-filter name="VCALENDAR"><c:comp-filter name="VEVENT"><c:time-range start="${ics(new Date(van))}" end="${ics(new Date(tot))}"/></c:comp-filter></c:comp-filter></c:filter></c:calendar-query>`;
-  const delen = await Promise.all(cfg.agendas.filter((a) => a.aan).map((a) => dav("REPORT", a.href, body, auth, 1)));
-  const teksten = delen.flatMap((d) => tags(d.xml, "calendar-data").map(ontsnap)).filter((t) => t.includes("BEGIN:VCALENDAR"));
-  return bezetUitIcs(teksten, van, tot);
+  // Per agenda: weigert er één (bijvoorbeeld een gedeelde agenda), dan tellen de andere gewoon mee
+  const aan = cfg.agendas.filter((a) => a.aan);
+  const delen = await Promise.allSettled(aan.map((a) => dav("REPORT", a.href, body, auth, 1)));
+  const teksten = [], agendas = [];
+  delen.forEach((d, i) => {
+    if (d.status === "rejected") { agendas.push({ naam: aan[i].naam, fout: d.reason.message }); return; }
+    const t = tags(d.value.xml, "calendar-data").map(ontsnap).filter((x) => x.includes("BEGIN:VCALENDAR"));
+    teksten.push(...t);
+    agendas.push({ naam: aan[i].naam, items: t.length });
+  });
+  if (aan.length && agendas.every((a) => a.fout)) throw new Error(agendas[0].fout);
+  return { blokken: bezetUitIcs(teksten, van, tot), agendas };
 }
 
 // ---------- Opslag en cache ----------
@@ -131,10 +141,10 @@ export async function bezetVoor(store, env, maxOud = 5 * 60e3) {
     // Na een fout pas na 2 minuten opnieuw proberen, zodat bezoekers niet steeds op iCloud wachten
     if (oud && oud.fout && leeftijd(oud.op) < 2 * 60e3) { uit[wie] = bruikbaar; return; }
     try {
-      const blokken = await haalBezet(env, c, nu - 864e5, nu + VOORUIT_MS);
+      const r = await haalBezet(env, c, nu - 864e5, nu + VOORUIT_MS);
       const op = new Date().toISOString();
-      cache[wie] = { op, laatstGoed: op, blokken, fout: null }; gewijzigd = true;
-      uit[wie] = blokken;
+      cache[wie] = { op, laatstGoed: op, blokken: r.blokken, agendas: r.agendas, fout: null }; gewijzigd = true;
+      uit[wie] = r.blokken;
     } catch (e) {
       console.error(`Apple Agenda (${wie}) niet gelezen:`, e.message);
       uit[wie] = bruikbaar;

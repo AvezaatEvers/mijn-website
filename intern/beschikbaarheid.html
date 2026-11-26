@@ -197,9 +197,11 @@
       }
       var status = x.fout ? '<span class="ap-fout">Lezen lukt niet: ' + esc(x.fout) + '</span>' : x.gelezen ? 'Gelezen om ' + esc(f(x.gelezen, { hour: '2-digit', minute: '2-digit' })) + ' · ' + x.blokken + ' bezette momenten in de komende 2 weken' : 'Nog niet gelezen';
       return '<div class="gk" style="display:block"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><div><strong>' + NAAM[m] + '</strong><small>' + esc(x.appleId) + '<br>' + status + '</small></div>' +
-        (mij ? '<button class="db-knop is-rand is-klein" type="button" data-apple-uit>Ontkoppelen</button>' : '') + '</div>' +
+        (mij ? '<span style="display:flex;gap:6px"><button class="db-knop is-licht is-klein" type="button" data-apple-lees>Opnieuw lezen</button><button class="db-knop is-rand is-klein" type="button" data-apple-uit>Ontkoppelen</button></span>' : '') + '</div>' +
         '<div class="ap-agendas">' + x.agendas.map(function (a) {
-          return '<label><input type="checkbox" data-agenda="' + esc(a.href) + '"' + (a.aan ? ' checked' : '') + (mij ? '' : ' disabled') + '> ' + esc(a.naam) + '</label>';
+          var st = (x.perAgenda || []).filter(function (p) { return p.naam === a.naam; })[0];
+          var extra = !a.aan ? '' : !st ? '' : st.fout ? ' <span class="ap-fout" style="font-size:12.5px">(niet gelezen: ' + esc(st.fout) + ')</span>' : ' <span style="font-size:12.5px;color:var(--muted)">(' + st.items + ' afspraken gevonden)</span>';
+          return '<label><input type="checkbox" data-agenda="' + esc(a.href) + '"' + (a.aan ? ' checked' : '') + (mij ? '' : ' disabled') + '> ' + esc(a.naam) + extra + '</label>';
         }).join('') + '</div></div>';
     }).join('');
   }
@@ -244,6 +246,8 @@
       if (van >= tot) { alertNiet(z, 'Eindtijd moet na de begintijd liggen'); return; }
       var wk = data.beschikbaarheid[persoon].week; (wk[z.dataset.zet] = wk[z.dataset.zet] || []).push([van, tot]); bewaar(); return;
     }
+    var lees = t.closest('[data-apple-lees]');
+    if (lees) { lees.disabled = true; lees.textContent = 'Bezig…'; api('POST', '/apple/vernieuw').then(laad).catch(function (e2) { melding('Lezen mislukt: ' + esc(e2.message), true); laad(); }); return; }
     if (t.closest('[data-apple-uit]')) { if (confirm('Apple Agenda ontkoppelen? De planner kijkt dan niet meer naar je afspraken.')) api('POST', '/apple/ontkoppel').then(laad); return; }
     if (t.closest('[data-ontkoppel]')) { if (confirm('Google Agenda ontkoppelen? Nieuwe kennismakingen met jou krijgen dan geen Meet-link meer.')) api('POST', '/google/ontkoppel').then(laad); return; }
     var an = t.closest('[data-annuleer]');

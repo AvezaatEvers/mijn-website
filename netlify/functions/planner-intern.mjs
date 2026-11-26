@@ -53,7 +53,7 @@ export default async (req) => {
       }),
       google: { ingesteld: googleIngesteld(env), redirect, ...Object.fromEntries(MENSEN.map((m) => [m, g[m] && g[m].refresh ? { email: g[m].email || "", sinds: g[m].op } : null])) },
       apple: Object.fromEntries(MENSEN.map((m) => [m, apple[m] && apple[m].appleId ? { appleId: apple[m].appleId, agendas: apple[m].agendas, sinds: apple[m].op,
-        gelezen: (status[m] || {}).laatstGoed || null, fout: (status[m] || {}).fout || null,
+        gelezen: (status[m] || {}).laatstGoed || null, fout: (status[m] || {}).fout || null, perAgenda: (status[m] || {}).agendas || [],
         blokken: (bezet[m] || []).filter((x) => x[1] > Date.now() && x[0] < Date.now() + 14 * 864e5).length } : null])),
     });
   }
@@ -116,6 +116,12 @@ export default async (req) => {
     apple[wie].agendas = apple[wie].agendas.map((a) => ({ ...a, aan: aan.has(a.href) }));
     await bewaarApple(store, apple); await wisBezet(store, wie);
     await log(store, { wie, soort: "instelling", tekst: "Agenda's voor kennismakingen aangepast: " + (apple[wie].agendas.filter((a) => a.aan).map((a) => a.naam).join(", ") || "geen") });
+    return json({ ok: true });
+  }
+
+  if (pad === "/intern/api/planner/apple/vernieuw" && req.method === "POST") {
+    await wisBezet(store, wie);
+    await bezetVoor(store, env, 0);
     return json({ ok: true });
   }
 

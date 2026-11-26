@@ -57,11 +57,12 @@ export default async (req) => {
   const geheim = process.env.CAL_WEBHOOK_SECRET;
   if (!geheim) { console.error("Cal.com-webhook: CAL_WEBHOOK_SECRET ontbreekt in Netlify"); return new Response("niet ingesteld", { status: 500 }); }
   const ruw = await req.text();
-  if (!handtekeningKlopt(ruw, req.headers.get("x-cal-signature-256"), geheim)) return new Response("ongeldige handtekening", { status: 401 });
-
   let body;
   try { body = JSON.parse(ruw); } catch { return new Response("geen JSON", { status: 400 }); }
-  if (body.triggerEvent === "PING") return new Response("pong");
+  const getekend = handtekeningKlopt(ruw, req.headers.get("x-cal-signature-256"), geheim);
+  // De ping-test van Cal.com doet niets, dus die mag ook zonder (geldige) handtekening; we melden wel of de handtekening klopt
+  if (body.triggerEvent === "PING") { console.log("Cal.com-webhook: ping ontvangen, handtekening " + (getekend ? "klopt" : "ontbreekt of klopt niet")); return new Response("pong"); }
+  if (!getekend) { console.error("Cal.com-webhook: ongeldige handtekening bij " + body.triggerEvent + ". Klopt CAL_WEBHOOK_SECRET met de secret in Cal.com?"); return new Response("ongeldige handtekening", { status: 401 }); }
   const soort = SOORT[body.triggerEvent];
   if (!soort) return new Response("overgeslagen");
 

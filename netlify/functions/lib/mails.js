@@ -567,13 +567,13 @@ ${rij(0, 5)}${rij(6, 10)}
       p(hoi(d.naam)) +
       p('Over ongeveer twee uur spreken we elkaar. We kijken ernaar uit! Hieronder staat alles nog even op een rij.') +
       afspraakKaart(d, 'herinnering') +
-      afspraakWijzigen(d) +
       p('Tot zo!', 'margin-bottom:22px') +
-      groet(base, d.wie, 'Avezaat &amp; Evers');
+      groet(base, d.wie, 'Avezaat &amp; Evers') +
+      `<p style="margin:26px 0 0;${F}font-size:13.5px;line-height:1.6;color:${ZACHT}">Lukt het onverwacht niet? Kies dan even ${link(esc(d.verzet), 'een ander moment')}.</p>`;
     return {
       subject: `Herinnering: je kennismaking om ${d.tijd}`,
       html: omhulsel(base, { preheader: `Vandaag om ${d.tijd}.${d.video ? ' De link om deel te nemen staat in deze mail.' : ''}`, inhoud, wie: d.wie, appTitel: 'Vragen voor het gesprek?' }),
-      text: `${hoiTekst(d.naam)}\n\nOver ongeveer twee uur spreken we elkaar:\n\n${afspraakTekst(d)}\n\nLukt het toch niet?\nAnder moment kiezen: ${d.verzet}\nAnnuleren: ${d.annuleer}\n\nTot zo!${voet(d.wie)}`,
+      text: `${hoiTekst(d.naam)}\n\nOver ongeveer twee uur spreken we elkaar:\n\n${afspraakTekst(d)}\n\nTot zo!${voet(d.wie)}\n\nLukt het onverwacht niet? Kies dan even een ander moment: ${d.verzet}`,
     };
   },
 

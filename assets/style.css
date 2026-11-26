@@ -1602,31 +1602,19 @@ p, li, dd, dt, td, th, blockquote, figcaption, summary, label { overflow-wrap: b
 }
 
 /* Homepage: wie wij zijn direct na de hero */
-.home-wij .wij-grid { grid-template-columns: minmax(0, .9fr) minmax(0, 1fr); grid-template-areas: "links kop" "links rest"; grid-template-rows: auto 1fr; gap: 24px 56px; align-items: start; }
+.home-wij .wij-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "links kop" "rest rest"; gap: 56px; align-items: center; }
 .home-wij .wij-links { grid-area: links; } .home-wij .wij-kop { grid-area: kop; } .home-wij .wij-rest { grid-area: rest; }
-.home-wij .wij-links { display: grid; gap: 18px; }
-.wij-plek { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin: 0; font-size: 14px; color: var(--muted); }
+.wij-plek { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin: 4px 0 0; font-size: 14px; color: var(--muted); }
 .wij-plek img { width: 150px; height: auto; display: block; }
+.wij-punten { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; padding-top: 36px; border-top: 1px solid var(--line); margin: 0; }
+.wij-punten li { flex-direction: column; gap: 12px; }
+@media (max-width: 1100px) { .wij-punten { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 900px) {
-  .home-wij .wij-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "kop" "links" "rest"; grid-template-rows: auto; gap: 28px; }
+  .home-wij .wij-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "kop" "links" "rest"; gap: 28px; }
   .home-wij .wij-duo { gap: 12px; }
-  .home-wij .wij-duo img { aspect-ratio: 1; }
   .home-wij .wij-duo figcaption { font-size: 13px; padding-top: 8px; }
   .home-wij .wij-duo figcaption strong { font-size: 15px; }
+  .wij-punten { grid-template-columns: minmax(0, 1fr); gap: 22px; padding-top: 0; border-top: 0; }
+  .wij-punten li { flex-direction: row; gap: 16px; }
 }
 @media (max-width: 700px) { .home .warm-wie { font-size: 14px; justify-content: center; margin: -4px 0 0; } }
-@media (min-width: 901px) {
-  .home-wij .wij-grid { align-items: stretch; }
-  .home-wij .wij-links { display: flex; flex-direction: column; gap: 18px; }
-  .home-wij .wij-duo { flex: 1; min-height: 0; }
-  .home-wij .wij-duo figure { display: flex; flex-direction: column; min-height: 0; }
-  .home-wij .wij-duo img { flex: 1; min-height: 0; height: 100%; aspect-ratio: auto; object-position: 50% 30%; }
-}
-.wij-foto { margin: 0; position: relative; }
-.wij-foto img { width: 100%; height: auto; display: block; border-radius: 14px; }
-.wij-foto figcaption { position: absolute; left: 14px; bottom: 14px; background: var(--white); color: var(--text); font-size: 14px; padding: 8px 14px; border-radius: 8px; box-shadow: 0 10px 26px rgba(17, 24, 39, .12); }
-.wij-foto figcaption strong { color: var(--ink); font-weight: 600; }
-@media (min-width: 901px) {
-  .home-wij .wij-foto { flex: 1; min-height: 0; display: flex; }
-  .home-wij .wij-foto img { flex: 1; height: 100%; object-fit: cover; object-position: 55% 40%; }
-}

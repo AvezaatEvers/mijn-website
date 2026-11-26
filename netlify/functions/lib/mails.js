@@ -562,6 +562,21 @@ ${rij(0, 5)}${rij(6, 10)}
     };
   },
 
+  afspraakHerinnering(d, base = '') {
+    const inhoud = kop(`Straks om ${esc(d.tijd)}: je kennismaking`) +
+      p(hoi(d.naam)) +
+      p('Over ongeveer twee uur spreken we elkaar. We kijken ernaar uit! Hieronder staat alles nog even op een rij.') +
+      afspraakKaart(d, 'herinnering') +
+      afspraakWijzigen(d) +
+      p('Tot zo!', 'margin-bottom:22px') +
+      groet(base, d.wie, 'Avezaat &amp; Evers');
+    return {
+      subject: `Herinnering: je kennismaking om ${d.tijd}`,
+      html: omhulsel(base, { preheader: `Vandaag om ${d.tijd}.${d.video ? ' De link om deel te nemen staat in deze mail.' : ''}`, inhoud, wie: d.wie, appTitel: 'Vragen voor het gesprek?' }),
+      text: `${hoiTekst(d.naam)}\n\nOver ongeveer twee uur spreken we elkaar:\n\n${afspraakTekst(d)}\n\nLukt het toch niet?\nAnder moment kiezen: ${d.verzet}\nAnnuleren: ${d.annuleer}\n\nTot zo!${voet(d.wie)}`,
+    };
+  },
+
   afspraakGeannuleerd(d, base = '') {
     const inhoud = kop('Je kennismaking is geannuleerd') +
       p(hoi(d.naam)) +
@@ -593,7 +608,7 @@ function afspraakKaart(d, status) {
     ['Gesprek', d.video ? 'Videogesprek' : d.telefoon ? `We bellen je op ${esc(d.telefoon)}` : 'Online'],
   ])) +
     (d.video ? knop(esc(d.video), 'Deelnemen aan het gesprek') : '') +
-    p('Met de bijlage bij deze mail zet je de afspraak in je agenda.', `font-size:14px;color:${ZACHT}`);
+    (status === 'herinnering' ? '' : p('Met de bijlage bij deze mail zet je de afspraak in je agenda.', `font-size:14px;color:${ZACHT}`));
 }
 function afspraakWijzigen(d) {
   return p(`Komt het toch niet uit? ${link(esc(d.verzet), 'Kies een ander moment')} of ${link(esc(d.annuleer), 'annuleer de afspraak')}.`);

@@ -41,6 +41,8 @@ const voorbeelden = [
     mails.afspraak({ naam: 'Sanne de Vries', wie: '', wanneer: 'donderdag 3 december om 14:00', datum: 'donderdag 3 december', tijd: '14:00', eindtijd: '14:20', duur: 20, video: 'https://app.cal.com/video/voorbeeld', verzet: 'https://cal.com/reschedule/voorbeeld', annuleer: 'https://cal.com/booking/voorbeeld?cancel=true' })],
   ['afspraakVerzet', 'Kennismaking verzet (Cal.com)', 'Automatisch, naar de bezoeker, na het verzetten via Cal.com. Werkt het agenda-item bij.',
     mails.afspraakVerzet({ naam: 'Sanne de Vries', wie: '', wanneer: 'vrijdag 4 december om 10:30', datum: 'vrijdag 4 december', tijd: '10:30', eindtijd: '10:50', duur: 20, video: 'https://app.cal.com/video/voorbeeld', verzet: 'https://cal.com/reschedule/voorbeeld', annuleer: 'https://cal.com/booking/voorbeeld?cancel=true' })],
+  ['afspraakHerinnering', 'Herinnering kennismaking (Cal.com)', 'Automatisch, naar de bezoeker, ongeveer 2 uur voor de kennismaking. Niet als er minder dan 3 uur tussen boeken en de afspraak zit.',
+    mails.afspraakHerinnering({ naam: 'Sanne de Vries', wie: '', wanneer: 'donderdag 3 december om 14:00', datum: 'donderdag 3 december', tijd: '14:00', eindtijd: '14:20', duur: 20, video: 'https://app.cal.com/video/voorbeeld', verzet: 'https://cal.com/reschedule/voorbeeld', annuleer: 'https://cal.com/booking/voorbeeld?cancel=true' })],
   ['afspraakGeannuleerd', 'Kennismaking geannuleerd (Cal.com)', 'Automatisch, naar de bezoeker, na het annuleren via Cal.com. Haalt het agenda-item weg.',
     mails.afspraakGeannuleerd({ naam: 'Sanne de Vries', wie: '', wanneer: 'vrijdag 4 december om 10:30', datum: 'vrijdag 4 december', tijd: '10:30', eindtijd: '10:50', duur: 20, video: 'https://app.cal.com/video/voorbeeld', reden: '' })],
 ];

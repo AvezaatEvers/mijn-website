@@ -13,9 +13,9 @@ import { mails } from "./lib/mails.js";
 import { verstuur, BASE } from "../klant-mails.js";
 import { stuur, MENSEN } from "../push.js";
 import { log } from "../logboek.js";
+import { TZ, wanneer, mailData } from "./lib/afspraak.js";
 
 const CAL = "https://cal.com";
-const TZ = "Europe/Amsterdam";
 const SOORT = { BOOKING_CREATED: "gepland", BOOKING_RESCHEDULED: "verzet", BOOKING_CANCELLED: "geannuleerd" };
 
 const schoon = (s, n = 200) => String(s || "").replace(/[<>]/g, "").trim().slice(0, n);
@@ -29,19 +29,6 @@ function handtekeningKlopt(ruw, kop, geheim) {
   return gekregen.length === verwacht.length && timingSafeEqual(gekregen, verwacht);
 }
 
-// Datum en tijd in de tijdzone van de bezoeker (Nederland als die onbekend is)
-function delen(iso, tz) {
-  let zone = TZ;
-  try { if (tz) { new Intl.DateTimeFormat("nl-NL", { timeZone: tz }); zone = tz; } } catch { /* onbekende tijdzone */ }
-  const d = new Date(iso);
-  return { zone, datum: d.toLocaleDateString("nl-NL", { timeZone: zone, weekday: "long", day: "numeric", month: "long" }),
-    tijd: d.toLocaleTimeString("nl-NL", { timeZone: zone, hour: "2-digit", minute: "2-digit" }) };
-}
-// "donderdag 3 december om 14:00"
-function wanneer(iso, tz) {
-  const x = delen(iso, tz);
-  return `${x.datum} om ${x.tijd}${x.zone !== TZ ? ` (${x.zone})` : ""}`;
-}
 
 // Agenda-bijlage (.ics). Eén vaste UID per afspraak, zodat verzetten en annuleren het bestaande agenda-item bijwerken.
 function ics({ uid, seq, start, eind, titel, beschrijving, locatie, geannuleerd }) {
@@ -108,7 +95,7 @@ export default async (req) => {
     if (!k.telefoon && telefoon) k.telefoon = telefoon;
     if (!k.naam && naam) k.naam = naam;
     if (!k.boekhouder && wie) k.boekhouder = wie;
-    k.afspraak = { uid, icsUid, seq, start: b.startTime, eind: b.endTime || b.startTime, status: soort, video, verzet, annuleer, wie, op: nu };
+    k.afspraak = { uid, icsUid, seq, start: b.startTime, eind: b.endTime || b.startTime, status: soort, video, telefoon, tz: gast.timeZone || TZ, verzet, annuleer, wie, op: nu, herinnerd: null };
     k.tijdlijn = k.tijdlijn || [];
     const w = wanneer(b.startTime);
     const tekst = soort === "gepland" ? `Kennismaking gepland via Cal.com: ${w}`
@@ -120,9 +107,7 @@ export default async (req) => {
   // Mail naar de bezoeker
   let mailOk = null;
   if (email) {
-    const begin = delen(b.startTime, gast.timeZone), eind = b.endTime ? delen(b.endTime, gast.timeZone) : null;
-    const d = { naam, wie, wanneer: tekstWanneer, datum: begin.datum, tijd: begin.tijd + (begin.zone !== TZ ? ` (${begin.zone})` : ""), eindtijd: eind ? eind.tijd : "",
-      duur, video, telefoon, verzet, annuleer, reden: soort === "geannuleerd" ? schoon(b.cancellationReason, 300) : "" };
+    const d = mailData({ naam, wie, start: b.startTime, eind: b.endTime, tz: gast.timeZone, video, telefoon, verzet, annuleer, reden: soort === "geannuleerd" ? schoon(b.cancellationReason, 300) : "" });
     const m = soort === "gepland" ? mails.afspraak(d, BASE) : soort === "verzet" ? mails.afspraakVerzet(d, BASE) : mails.afspraakGeannuleerd(d, BASE);
     const agenda = ics({ uid: icsUid, seq, start: b.startTime, eind: b.endTime || b.startTime, geannuleerd: soort === "geannuleerd", locatie: video || (telefoon ? "Telefonisch" : ""),
       titel: "Kennismaking Avezaat & Evers" + (wie ? ` met ${wie === "daan" ? "Daan" : "Koen"}` : " (Koen of Daan)"),

@@ -16,7 +16,7 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/style.css?v=140">
 <link rel="stylesheet" href="/intern/klanten.css?v=7">
-<link rel="stylesheet" href="/intern/app.css?v=7">
+<link rel="stylesheet" href="/intern/app.css?v=8">
 <style>
   /* Volledig chatscherm: gesprekken links, chat in het midden */
   body.app main.db.chatpagina { padding: 0; max-width: none; height: 100vh; height: 100dvh; display: grid; grid-template-columns: 272px minmax(0, 1fr); }
@@ -90,9 +90,9 @@
   body.app.chatmodus .ag-zweef { display: none; }
 
   @media (max-width: 960px) {
-    body.app main.db.chatpagina { grid-template-columns: 1fr; height: calc(100dvh - 56px); }
-    .gs { position: fixed; z-index: 60; top: 0; bottom: 0; left: 0; width: min(300px, 86vw); background: #F6F6F8; transform: translateX(-102%); transition: transform .35s var(--veer); box-shadow: 20px 0 50px -20px rgba(0, 0, 0, .3); }
-    body.gs-open .gs { transform: none; }
+    body.app main.db.chatpagina { grid-template-columns: 1fr; margin-top: var(--balkh, 56px); height: calc(100vh - var(--balkh, 56px) - var(--tabh, 64px)); height: calc(100dvh - var(--balkh, 56px) - var(--tabh, 64px)); }
+    .gs { position: fixed; z-index: 60; top: 0; bottom: 0; left: 0; width: min(300px, 86vw); background: #F6F6F8; transform: translateX(-102%); transition: transform .35s var(--veer); }
+    body.gs-open .gs { transform: none; box-shadow: 20px 0 50px -20px rgba(0, 0, 0, .3); }
     .cp-menu { display: grid; place-items: center; }
     .cp-kop { padding: 10px 14px; }
   }

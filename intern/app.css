@@ -505,3 +505,9 @@ body.app .wd-kop h2, body.app .wd-kop strong, body.app .cm-kop h2, body.app .cm-
 /* Geen verend scrollen (iOS): anders veren de vaste balken mee */
 html.app, html.app body { overscroll-behavior-y: none; }
 @media (max-width: 960px) { html.app { background: #F5F5F7; } }
+
+/* Vaste maten van boven- en tabbalk, zodat pagina's met eigen hoogte (agent) ermee kunnen rekenen */
+@media (max-width: 960px) {
+  html.app { --balkh: calc(56px + env(safe-area-inset-top)); --tabh: calc(64px + env(safe-area-inset-bottom)); }
+  .tabbalk { box-sizing: border-box; height: var(--tabh); }
+}

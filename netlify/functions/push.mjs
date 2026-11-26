@@ -62,7 +62,7 @@ export async function pushApi(request, wie, store) {
     d.voorkeuren[wie] = Object.fromEntries(Object.keys(SOORTEN).map((s) => [s, s in v ? !!v[s] : oud[s]]));
     await bewaarPush(store, d);
     const anders = Object.keys(SOORTEN).filter((s) => !!oud[s] !== !!d.voorkeuren[wie][s]);
-    const lbl = (s) => (SOORTEN[s] && (SOORTEN[s].label || SOORTEN[s].titel)) || (typeof SOORTEN[s] === "string" ? SOORTEN[s] : s);
+    const lbl = (s) => (SOORTEN[s] && SOORTEN[s].naam) || s;
     if (anders.length) await log(store, { wie, soort: "instelling", tekst: "Meldingsvoorkeuren gewijzigd: " + anders.map((s) => lbl(s) + (d.voorkeuren[wie][s] ? " aan" : " uit")).join(", ") });
     return json({ voorkeuren: d.voorkeuren[wie] });
   }

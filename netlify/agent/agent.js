@@ -954,7 +954,9 @@ export function activiteit(klanten, taken, runs, opt = {}) {
   const lb = opt.logboek || { sinds: null, items: [] };
   const naam = (k) => ({ id: k.id, naam: k.bedrijf || k.naam });
   // Stappen die het systeem zelf afvinkt (door "auto") staan niet in het logboek, die blijven we uit de werkstromen halen
-  const zet = (op, wie, via, tekst, k, soort) => { if (op && op >= sinds && wie && (!lb.sinds || op < lb.sinds || wie === "auto")) uit.push({ op, wie, via: via || null, tekst, klant: k ? naam(k) : null, soort }); };
+  // De allereerste logregel komt een fractie later dan de actie zelf: 10 seconden marge, anders staat die actie er dubbel in
+  const grens = lb.sinds ? new Date(new Date(lb.sinds).getTime() - 10000).toISOString() : null;
+  const zet = (op, wie, via, tekst, k, soort) => { if (op && op >= sinds && wie && (!grens || op < grens || wie === "auto")) uit.push({ op, wie, via: via || null, tekst, klant: k ? naam(k) : null, soort }); };
   for (const it of lb.items) {
     if (!it.op || it.op < sinds) continue;
     if (opt.klant && (!it.klant || it.klant.id !== opt.klant)) continue;

@@ -34,6 +34,7 @@ export async function naAfspraak(store, env, a, soort, { door = "systeem", reden
         if (eventId && account) await verwijderAfspraak(env, g, account, eventId).catch(() => {});
         const r = await maakAfspraak(env, g, a, { titel, beschrijving });
         meet = r.meet; eventId = r.eventId; account = r.account;
+        if (!r.open) problemen.push("Google Meet staat niet op Open (zet de Meet-API aan en koppel Google opnieuw)");
       }
       await zetGoogle(store, a.id, { meet: soort === "geannuleerd" ? a.meet : meet, googleEventId: soort === "geannuleerd" ? "" : eventId, googleWie: soort === "geannuleerd" ? "" : account });
     } catch (e) {
@@ -86,7 +87,7 @@ export async function naAfspraak(store, env, a, soort, { door = "systeem", reden
   // 4. Logboek en pushmelding
   const w = wanneer(a.start);
   await log(store, { wie: door, soort: "klant", klant: k,
-    tekst: `Kennismaking ${soort} (${w}, ${NAMEN[a.wie]})${nieuw ? ", lead aangemaakt" : ""}${r.ok ? ", klant gemaild" : ", mail mislukt"}${problemen.some((p) => p.startsWith("Google")) ? ", zonder Meet-link" : ""}` });
+    tekst: `Kennismaking ${soort} (${w}, ${NAMEN[a.wie]})${nieuw ? ", lead aangemaakt" : ""}${r.ok ? ", klant gemaild" : ", mail mislukt"}${problemen.some((p) => p.startsWith("Google Agenda")) ? ", zonder Meet-link" : problemen.some((p) => p.startsWith("Google Meet")) ? ", Meet niet open" : ""}` });
   try {
     const kort = new Date(a.start).toLocaleString("nl-NL", { timeZone: TZ, weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
     const aan = door === "systeem" ? [a.wie] : MENSEN.filter((x) => x !== door);

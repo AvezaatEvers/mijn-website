@@ -8,7 +8,9 @@ import { TZ } from "./planner.js";
 const SLEUTEL = "planner-google";
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const AGENDA = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
-export const SCOPE = "openid email https://www.googleapis.com/auth/calendar.events";
+// meetings.space.created: om een Meet-ruimte op "Open" te zetten (iedereen met de link kan direct meedoen, ook zonder Google-account)
+export const SCOPE = "openid email https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/meetings.space.created";
+const MEET = "https://meet.googleapis.com/v2/spaces";
 
 export const googleIngesteld = (env) => !!(env("GOOGLE_CLIENT_ID") && env("GOOGLE_CLIENT_SECRET"));
 export async function leesGoogle(store) { return (await store.get(SLEUTEL, { type: "json" })) || {}; }
@@ -46,6 +48,18 @@ export function accountVoor(g, wie) {
   return ["koen", "daan"].find((w) => g[w] && g[w].refresh) || "";
 }
 
+// Een Meet-ruimte met toegang "Open" aanmaken via de Meet-API. Geeft de link, of null als het niet lukt
+// (bijvoorbeeld omdat de Meet-API nog niet aanstaat in Google Cloud of het account gekoppeld is vóór deze toestemming).
+async function openMeet(at) {
+  try {
+    const r = await fetch(MEET, { method: "POST", headers: { Authorization: "Bearer " + at, "Content-Type": "application/json" },
+      body: JSON.stringify({ config: { accessType: "OPEN", entryPointAccess: "ALL" } }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.meetingUri) { console.error("Meet-API: open ruimte niet gemaakt:", r.status, (j.error && j.error.message) || ""); return null; }
+    return j.meetingUri;
+  } catch (e) { console.error("Meet-API:", e.message); return null; }
+}
+
 const meetVan = (ev) => ev.hangoutLink || ((((ev.conferenceData || {}).entryPoints) || []).find((e) => e.entryPointType === "video") || {}).uri || "";
 
 // Nieuw agenda-item met Meet-link. Geeft { eventId, meet, account } of gooit een fout.
@@ -53,6 +67,18 @@ export async function maakAfspraak(env, g, a, { titel, beschrijving }) {
   const account = accountVoor(g, a.wie);
   if (!account) throw new Error("Geen Google-account gekoppeld");
   const at = await toegang(env, g[account].refresh);
+  // Voorkeur: een open Meet (geen aankloppen, geen account nodig). Lukt dat niet, dan een gewone Meet via de agenda.
+  const open = await openMeet(at);
+  if (open) {
+    const r0 = await fetch(AGENDA + "?sendUpdates=none", {
+      method: "POST", headers: { Authorization: "Bearer " + at, "Content-Type": "application/json" },
+      body: JSON.stringify({ summary: titel, description: "Google Meet: " + open + "\n\n" + beschrijving, location: open, start: { dateTime: a.start, timeZone: TZ }, end: { dateTime: a.eind, timeZone: TZ },
+        attendees: a.email ? [{ email: a.email, displayName: a.naam || undefined }] : [], guestsCanInviteOthers: false, guestsCanSeeOtherGuests: false }),
+    });
+    const ev0 = await r0.json().catch(() => ({}));
+    if (!r0.ok) throw new Error("Google Agenda: " + ((ev0.error && ev0.error.message) || r0.status));
+    return { eventId: ev0.id, meet: open, account, open: true };
+  }
   const r = await fetch(AGENDA + "?conferenceDataVersion=1&sendUpdates=none", {
     method: "POST", headers: { Authorization: "Bearer " + at, "Content-Type": "application/json" },
     // De klant als gast (Google mailt niet: sendUpdates=none), zodat hij de Meet direct in kan zonder aan te kloppen
@@ -68,7 +94,7 @@ export async function maakAfspraak(env, g, a, { titel, beschrijving }) {
     const r2 = await fetch(AGENDA + "/" + encodeURIComponent(ev.id), { headers: { Authorization: "Bearer " + at } });
     if (r2.ok) ev = await r2.json();
   }
-  return { eventId: ev.id, meet: meetVan(ev), account };
+  return { eventId: ev.id, meet: meetVan(ev), account, open: false };
 }
 
 export async function verzetAfspraak(env, g, account, eventId, a) {

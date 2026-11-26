@@ -93,6 +93,7 @@ button:hover{transform:translateY(-1px)}button:disabled{opacity:.7;cursor:defaul
 .voile.aan{opacity:1}
 .groet{position:fixed;z-index:4;left:0;right:0;top:calc(50% + 140px);text-align:center;font-size:clamp(28px,5vw,48px);font-weight:700;letter-spacing:-.035em;color:#fff;opacity:0;transform:translateY(10px);transition:all .6s cubic-bezier(.2,.8,.2,1)}
 .groet.aan{opacity:1;transform:none}
+.orb{display:none!important}
 @media (prefers-reduced-motion:reduce){.orb::before,.orb::after,.orb i{animation:none}}
 </style></head><body><canvas aria-hidden="true"></canvas><div class="voile" id="voile"></div><div class="orb" id="orb"><i></i><i></i><i></i></div><div class="groet" id="groet" aria-live="polite"></div>
 <form method="POST" action="/intern/login" id="form"><div class="label">Intern</div><div class="logo">Avezaat <span>&amp;</span> Evers</div><p>Wie ben je?</p>
@@ -130,11 +131,7 @@ form.addEventListener('submit',function(e){
   var knop=document.getElementById('knop'),fout=document.getElementById('fout'),wie=form.wie.value;knop.disabled=true;orb.classList.add('snel');
   fetch('/intern/login',{method:'POST',body:new URLSearchParams(new FormData(form)),credentials:'same-origin',redirect:'follow'}).then(function(r){
     if(r.ok&&!/\\/login/.test(r.url)){
-      try{sessionStorage.removeItem('ae-intro');sessionStorage.setItem('ae-van-login','1')}catch(e){}
-      form.classList.add('weg');modus='weg';
-      setTimeout(function(){m=Math.min(220,innerWidth*.46);orb.style.setProperty('--m',m+'px');document.getElementById('voile').classList.add('aan')},350);
-      setTimeout(function(){var g=document.getElementById('groet');g.textContent=groet()+', '+(wie==='daan'?'Daan':'Koen')+'.';g.classList.add('aan')},1100);
-      setTimeout(function(){location.href='/intern/'},2300);
+      location.href='/intern/';
     }else{
       knop.disabled=false;orb.classList.remove('snel');orb.classList.add('rood');setTimeout(function(){orb.classList.remove('rood')},900);
       fout.hidden=false;form.classList.remove('schud');void form.offsetWidth;form.classList.add('schud');form.wachtwoord.select();

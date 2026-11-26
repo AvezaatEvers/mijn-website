@@ -209,13 +209,6 @@
   /* ---------- Hero met grote orb en dagplan ---------- */
   .hero { position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 28px; align-items: stretch; margin-bottom: 18px; }
   .hero-links { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 8px 10px 4px; }
-  .hero-orb { position: relative; width: 260px; height: 260px; display: grid; place-items: center; margin-bottom: 8px; }
-  .hero-orb .orb { --m: 168px; }
-  .hero-orb .baan { position: absolute; inset: -20px; width: calc(100% + 40px); height: calc(100% + 40px); animation: draai-baan 40s linear infinite; }
-  .hero-orb .baan circle { fill: none; stroke: rgba(127, 164, 255, .22); stroke-width: 1; stroke-dasharray: 2 6; }
-  .hero-orb .baan .b2 { stroke: rgba(92, 200, 255, .12); stroke-dasharray: none; }
-  .hero-orb .baan .sat { fill: #B8F0FF; stroke: none; filter: drop-shadow(0 0 6px #5CC8FF); }
-  .hero-orb .baan .s2 { fill: #7FA4FF; }
   @keyframes draai-baan { to { transform: rotate(360deg); } }
   .hero-datum { margin: 0; font-size: 12.5px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: #8FB0FF; }
   .hero h1 { font-size: clamp(32px, 4vw, 50px); margin: 6px 0 10px; letter-spacing: -.035em; }
@@ -254,11 +247,11 @@
   .hp-voet { margin: 10px 0 0; font-size: 12.5px; color: #8C9BC4; position: relative; }
   .plan-leeg { padding: 26px 10px; text-align: center; color: #C6D1EC; }
   @media (max-width: 1100px) { .hero { grid-template-columns: minmax(0, 1fr); } }
-  @media (max-width: 600px) { .hero-orb { width: 200px; height: 200px; } .hero-orb .orb { --m: 128px; } .dag-knop { width: 100%; } }
+  @media (max-width: 600px) { .dag-knop { width: 100%; } }
 
 
   /* ---------- Vandaag, rustig ---------- */
-  .vd { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 32px; padding: 28px 4px 36px; }
+  .vd { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 32px; padding: 28px 4px 36px; }
   .vd-datum { margin: 0 0 6px; font-size: 15px; font-weight: 500; color: var(--muted); }
   .vd h1 { font-size: clamp(36px, 4.6vw, 56px); line-height: 1.05; margin: 0 0 14px; letter-spacing: -.035em; }
   .vd-samen { margin: 0; font-size: 19px; line-height: 1.5; color: var(--text); max-width: 620px; }
@@ -269,8 +262,6 @@
   .dag-knop:active { transform: scale(.97); }
   .tekst-knop { font: inherit; font-size: 15px; font-weight: 500; color: var(--accent); background: none; border: 0; padding: 6px 2px; cursor: pointer; }
   .tekst-knop:hover { color: #fff; }
-  .vd-orb { width: 180px; height: 180px; display: grid; place-items: center; }
-  .vd-orb .orb { --m: 150px; }
   .vd-plan { padding: 22px 8px 10px !important; margin-bottom: 28px; }
   .vp-kop { display: flex; justify-content: space-between; align-items: baseline; padding: 0 16px; }
   .vp-kop h2 { margin: 0; font-size: 22px; }
@@ -301,7 +292,7 @@
   .pm:hover .pm-pijl { transform: translateX(3px); color: var(--ink); }
   .vp-meer { margin: 4px 16px 6px; font-size: 14px; }
   .plan-leeg { padding: 22px 16px; color: var(--muted); }
-  @media (max-width: 760px) { .vd { grid-template-columns: 1fr; padding-top: 8px; } .vd-orb { display: none; } .vd-samen { font-size: 17px; } .pm-min { display: none; } .pm { grid-template-columns: 24px minmax(0, 1fr) auto; } .pm-later { opacity: 1; } }
+  @media (max-width: 760px) { .vd { grid-template-columns: 1fr; padding-top: 8px; } .vd-samen { font-size: 17px; } .pm-min { display: none; } .pm { grid-template-columns: 24px minmax(0, 1fr) auto; } .pm-later { opacity: 1; } }
 
   /* Cijfers */
   .kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
@@ -362,7 +353,6 @@
       <h1 id="groet">&nbsp;</h1>
       <p class="vd-samen" id="samenvatting">&nbsp;</p>
     </div>
-    <div class="vd-orb" aria-hidden="true"><div class="orb" id="hero-orb"><i></i><i></i><i></i></div></div>
     <div id="briefing" hidden></div><div id="acties" hidden></div>
     <div class="wissel" id="wissel" hidden><button type="button" data-v="ik" class="is-aan">Mijn werk</button><button type="button" data-v="alle">Alles</button></div>
   </section>
@@ -437,7 +427,7 @@
     </div>
   </div>
 </main>
-<script src="/intern/app.js?v=9"></script>
+<script src="/intern/app.js?v=10"></script>
 <script>
 (function () {
   var alles = false, laatste = null;

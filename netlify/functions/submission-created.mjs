@@ -49,6 +49,7 @@ export default async (req) => {
       k = { id: nieuweId(), naam: gegevens.naam, bedrijf: "", email, telefoon: gegevens.telefoon, boekhouder: "", status: "prospect", start: "", voorstelLink: "", notitie: "", uit: [], verstuurd: {}, log: [], tijdlijn: [], door: "formulier", aangemaakt: nu };
       klanten.push(k);
     }
+    if (!k.herkomst) k.herkomst = "website";
     if (k.status !== "klant") {
       if (k.status !== "prospect") k.status = "prospect";
       k.lead = lead;

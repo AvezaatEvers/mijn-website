@@ -135,11 +135,11 @@ const TOOLS = [
   // ---- Acties (wijzigingen) ----
   { name: "klant_toevoegen", description: "Stel voor een nieuwe klant of lead toe te voegen. Wordt pas opgeslagen als de gebruiker op Bevestigen klikt. Naam en e-mailadres zijn verplicht; vraag ze na als ze ontbreken.",
     input_schema: { type: "object", properties: { naam: { type: "string", description: "Naam contactpersoon" }, bedrijf: { type: "string" }, email: { type: "string" }, telefoon: { type: "string" },
-      status: { type: "string", enum: ["klant", "prospect"], description: "prospect = lead" }, boekhouder: { type: "string", enum: ["koen", "daan"] }, start: { type: "string", description: "Startdatum JJJJ-MM-DD" },
+      status: { type: "string", enum: ["klant", "prospect"], description: "prospect = lead" }, herkomst: { type: "string", enum: ["moneymonk", "trustoo", "netwerk", "google", "website", "anders"], description: "Waar de lead vandaan kwam" }, boekhouder: { type: "string", enum: ["koen", "daan"] }, start: { type: "string", description: "Startdatum JJJJ-MM-DD" },
       notitie: { type: "string" }, branche: { type: "string" }, kor: { type: "boolean" }, icp: { type: "boolean" }, partner: { type: "boolean" } }, required: ["naam", "email"] } },
   { name: "klant_bijwerken", description: "Stel een wijziging voor aan een bestaande klant of lead: status (klant, prospect, gestopt, verloren), contactgegevens, boekhouder, startdatum, notitie of fiscaal profiel. Wordt pas opgeslagen na Bevestigen.",
     input_schema: { type: "object", properties: { klant_id: { type: "string" }, naam: { type: "string" }, bedrijf: { type: "string" }, email: { type: "string" }, telefoon: { type: "string" },
-      status: { type: "string", enum: ["klant", "prospect", "gestopt", "verloren"] }, boekhouder: { type: "string", enum: ["koen", "daan"] }, start: { type: "string", description: "JJJJ-MM-DD" },
+      status: { type: "string", enum: ["klant", "prospect", "gestopt", "verloren"] }, herkomst: { type: "string", enum: ["moneymonk", "trustoo", "netwerk", "google", "website", "anders"], description: "Waar de lead vandaan kwam" }, boekhouder: { type: "string", enum: ["koen", "daan"] }, start: { type: "string", description: "JJJJ-MM-DD" },
       notitie: { type: "string", description: "Vervangt de vaste notitie" }, branche: { type: "string" }, kor: { type: "boolean" }, icp: { type: "boolean" }, partner: { type: "boolean" }, urencriterium: { type: "boolean" }, tevreden: { type: "boolean" } }, required: ["klant_id"] } },
   { name: "mail_versturen", description: "Stel voor een mail naar een klant te sturen: een vast sjabloon (welkom, checkIn, nps, kwartaal, kwartaalTweede, jaareinde, inkomstenbelasting, review, aanbevelen, jubileum, voorstelHerinnering) of type 'bericht' met een eigen onderwerp en tekst in onze huisstijl. De mail gaat pas na Bevestigen; de gebruiker kan eerst een voorbeeld zien. Schrijf bij 'bericht' in je-vorm, kort, zonder aanhef en zonder afsluiting (die voegt het sjabloon toe).",
     input_schema: { type: "object", properties: { klant_id: { type: "string" }, type: { type: "string", enum: [...HANDMATIG, "bericht"] }, onderwerp: { type: "string" }, tekst: { type: "string", description: "Alleen bij type bericht. Alinea's scheiden met een lege regel." } }, required: ["klant_id", "type"] } },
@@ -240,9 +240,10 @@ async function voerUit(naam, input, c) {
       if (dubbel) return { fout: "Er bestaat al een klant met dit e-mailadres", klant: kortKlant(dubbel) };
       const body = { naam: schoon(input.naam), bedrijf: schoon(input.bedrijf || ""), email, telefoon: schoon(input.telefoon || "", 30), status: input.status === "prospect" ? "prospect" : "klant",
         boekhouder: ["koen", "daan"].includes(input.boekhouder) ? input.boekhouder : wie, start: datumOk(input.start), notitie: schoon(input.notitie || "", 2000) };
+      if (["moneymonk", "trustoo", "netwerk", "google", "website", "anders"].includes(input.herkomst)) body.herkomst = input.herkomst;
       const pr = {}; ["kor", "icp", "partner"].forEach((x) => { if (typeof input[x] === "boolean") pr[x] = input[x]; }); if (input.branche) pr.branche = schoon(input.branche, 60);
       if (Object.keys(pr).length) body.profiel = pr;
-      const regels = [["Naam", body.naam], ["Bedrijf", body.bedrijf], ["E-mail", body.email], ["Telefoon", body.telefoon], ["Status", body.status === "prospect" ? "Lead" : "Klant"], ["Boekhouder", NAMEN[body.boekhouder]], ["Start", body.start], ["Branche", pr.branche], ["Notitie", body.notitie]].filter((r) => r[1]);
+      const regels = [["Naam", body.naam], ["Bedrijf", body.bedrijf], ["E-mail", body.email], ["Telefoon", body.telefoon], ["Status", body.status === "prospect" ? "Lead" : "Klant"], ["Boekhouder", NAMEN[body.boekhouder]], ["Bron", body.herkomst], ["Start", body.start], ["Branche", pr.branche], ["Notitie", body.notitie]].filter((r) => r[1]);
       stuur({ t: "bevestig", id: id(), titel: body.status === "prospect" ? "Nieuwe lead toevoegen" : "Nieuwe klant toevoegen", regels, knop: "Toevoegen", klaar: "Toegevoegd",
         verzoek: { method: "POST", url: "/intern/api/klanten", body } });
       return { status: "Wacht op bevestiging van de gebruiker (knop Toevoegen in de kaart). Nog niet opgeslagen." };
@@ -251,7 +252,7 @@ async function voerUit(naam, input, c) {
       const k = klanten.find((x) => x.id === input.klant_id);
       if (!k) return { fout: "Klant niet gevonden. Gebruik eerst zoek_klanten." };
       const body = { id: k.id }, regels = [];
-      const LBL = { naam: "Naam", bedrijf: "Bedrijf", email: "E-mail", telefoon: "Telefoon", status: "Status", boekhouder: "Boekhouder", start: "Startdatum", notitie: "Notitie", tevreden: "Tevreden klant" };
+      const LBL = { naam: "Naam", bedrijf: "Bedrijf", email: "E-mail", telefoon: "Telefoon", status: "Status", boekhouder: "Boekhouder", herkomst: "Bron", start: "Startdatum", notitie: "Notitie", tevreden: "Tevreden klant" };
       for (const v of Object.keys(LBL)) if (input[v] !== undefined && input[v] !== "") {
         body[v] = v === "start" ? datumOk(input[v]) : typeof input[v] === "boolean" ? input[v] : schoon(input[v], v === "notitie" ? 2000 : 200);
         const oud = k[v], nieuw = body[v];

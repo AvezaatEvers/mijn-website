@@ -86,7 +86,7 @@
 <body>
 <main class="db">
   <div class="hk">
-    <div><h1>Contact en NPS</h1><p>Waarom klanten contact zoeken, hoe goed we helpen, en hoe tevreden ze zijn.</p></div>
+    <div><h1>Contact en NPS</h1><p>Waar leads vandaan komen, waarom klanten contact zoeken, hoe goed we helpen en hoe tevreden ze zijn.</p></div>
     <div class="rechts">
       <div class="wissel" id="f-wie"><button type="button" data-v="ik" class="is-aan">Mijn klanten</button><button type="button" data-v="alle">Alles</button></div>
       <div class="wissel" id="f-dagen"><button type="button" data-v="30">30 dagen</button><button type="button" data-v="90" class="is-aan">90 dagen</button><button type="button" data-v="365">Jaar</button></div>
@@ -107,6 +107,13 @@
     </div>
 
     <div class="c12 in" style="animation-delay:.12s"><div class="mini-kpi" id="mini"></div></div>
+
+    <div class="db-kaart c12 in" style="animation-delay:.14s">
+      <h2>Leads per bron</h2>
+      <p class="sub">Alle leads en klanten die in deze periode binnenkwamen, van Koen en Daan samen. Conversie = klant geworden van de afgeronde leads (klant of verloren).</p>
+      <table class="tabel"><thead><tr><th>Bron</th><th class="r">Leads</th><th class="r">Klant</th><th class="r verberg">Verloren</th><th class="r verberg">Open</th><th class="r">Conversie</th><th class="r">Per klant</th></tr></thead><tbody id="bronnen"></tbody></table>
+      <p class="sub" style="margin:10px 0 0">Per klant: alleen bij betaalde bronnen (Trustoo €35 per aanvraag, zonder het profiel van €39 per maand). Zet de bron bij een lead via Gegevens, of bij het toevoegen.</p>
+    </div>
 
     <div class="db-kaart c8 in" style="animation-delay:.16s">
       <h2>Contact per week</h2>
@@ -200,7 +207,29 @@
       return '<div class="reactie"><a href="/intern/klant.html?id=' + encodeURIComponent(r.klantId) + '" style="color:var(--ink);font-weight:600;text-decoration:none">' + esc(r.klant) + '</a> <small>' + dk(r.op) + ', ' + KAN[r.kanaal] + ', ' + (OND[r.onderwerp] || r.onderwerp) + (r.opgelost === false ? ', nog niet opgelost' : '') + '</small>' + (r.notitie ? '<q>' + esc(r.notitie) + '</q>' : '') + '</div>';
     }).join('') : '<p class="leeg">Nog niets vastgelegd. Gebruik de knop Contact vastleggen, of Ctrl/Cmd + K.</p>';
   }
-  function laad() { AE.api('/intern/api/inzichten?wie=' + (wie === 'ik' ? IK.wie : 'alle') + '&dagen=' + dagen).then(teken); }
+  var BRON = { moneymonk: 'MoneyMonk', trustoo: 'Trustoo', netwerk: 'Eigen netwerk', google: 'Google', website: 'Website (formulier)', anders: 'Anders', onbekend: 'Onbekend' };
+  var KOSTEN = { trustoo: 35 };
+  function bronVan(k) { return k.herkomst || (k.door === 'formulier' || (k.lead && /prijscheck|kennismaking/.test(k.lead.bron || '')) ? 'website' : 'onbekend'); }
+  function tekenBronnen(klanten) {
+    var grens = Date.now() - dagen * 864e5, per = {};
+    klanten.forEach(function (k) {
+      var op = Date.parse((k.lead && k.lead.op) || k.aangemaakt || k.klantOp || 0);
+      if (!(op >= grens)) return;
+      var b = bronVan(k), r = per[b] = per[b] || { leads: 0, klant: 0, verloren: 0, open: 0 };
+      r.leads++;
+      if (k.status === 'klant' || k.status === 'gestopt') r.klant++; else if (k.status === 'verloren') r.verloren++; else r.open++;
+    });
+    var rijen = Object.keys(BRON).filter(function (b) { return per[b]; }).sort(function (a, b) { return per[b].leads - per[a].leads; });
+    document.getElementById('bronnen').innerHTML = rijen.length ? rijen.map(function (b) {
+      var r = per[b], af = r.klant + r.verloren, conv = af ? Math.round(r.klant / af * 100) : null;
+      var kost = KOSTEN[b] ? (r.klant ? '€' + Math.round(KOSTEN[b] * r.leads / r.klant) : (r.leads ? '€' + KOSTEN[b] * r.leads + ', nog geen klant' : '–')) : '–';
+      return '<tr><td>' + esc(BRON[b]) + '</td><td class="r">' + r.leads + '</td><td class="r">' + r.klant + '</td><td class="r verberg">' + r.verloren + '</td><td class="r verberg">' + r.open + '</td><td class="r"><b>' + (conv == null ? '–' : conv + '%') + '</b></td><td class="r">' + kost + '</td></tr>';
+    }).join('') : '<tr><td colspan="7" class="leeg">Nog geen leads in deze periode.</td></tr>';
+  }
+  function laad() {
+    AE.api('/intern/api/inzichten?wie=' + (wie === 'ik' ? IK.wie : 'alle') + '&dagen=' + dagen).then(teken);
+    AE.api('/intern/api/klanten').then(function (r) { tekenBronnen(r.klanten || []); }).catch(function () {});
+  }
   function wissel(id, cb) { document.getElementById(id).addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; this.querySelectorAll('button').forEach(function (x) { x.classList.toggle('is-aan', x === b); }); cb(b.dataset.v); laad(); }); }
   wissel('f-wie', function (v) { wie = v; }); wissel('f-dagen', function (v) { dagen = +v; });
   document.addEventListener('ae:contact', laad);

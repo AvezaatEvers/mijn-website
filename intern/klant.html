@@ -133,6 +133,7 @@
             <label>Telefoon<input name="telefoon" type="tel" maxlength="30"></label>
             <label>Vaste boekhouder<select name="boekhouder"><option value="">Nog niet toegewezen</option><option value="koen">Koen</option><option value="daan">Daan</option></select></label>
             <label>Status<select name="status"><option value="klant">Klant</option><option value="prospect">Lead</option><option value="gestopt">Gestopt</option><option value="verloren">Verloren (lead)</option></select></label>
+            <label>Hoe kwam deze binnen?<select name="herkomst"><option value="">Onbekend</option><option value="moneymonk">MoneyMonk</option><option value="trustoo">Trustoo</option><option value="netwerk">Eigen netwerk</option><option value="google">Google</option><option value="website">Website (formulier)</option><option value="anders">Anders</option></select></label>
             <label>Startdatum<input name="start" type="date"></label>
             <label>Link naar voorstel<input name="voorstelLink" type="url" placeholder="https://"></label>
             <label class="breed">Interne notitie<textarea name="notitie" maxlength="2000" placeholder="Alleen intern zichtbaar"></textarea></label>
@@ -193,7 +194,7 @@
     var ini = String(k.bedrijf || k.naam || '?').replace(/[^A-Za-zÀ-ÿ ]/g, '').split(/\s+/).filter(Boolean);
     document.getElementById('avatar').textContent = ((ini[0] || '?')[0] + (ini[1] ? ini[1][0] : '')).toUpperCase();
     document.getElementById('sub').innerHTML = [k.bedrijf ? esc(k.naam) : '', esc(k.email), k.telefoon ? esc(k.telefoon) : ''].filter(Boolean).join(' <i>·</i> ') +
-      '<br>' + (k.boekhouder ? 'Boekhouder ' + naamVan(k.boekhouder) : '<span class="let-op">Nog geen boekhouder</span>') + (k.start && k.status === 'klant' ? ' <i>·</i> klant sinds ' + d(k.start) : '');
+      '<br>' + (k.boekhouder ? 'Boekhouder ' + naamVan(k.boekhouder) : '<span class="let-op">Nog geen boekhouder</span>') + (k.start && k.status === 'klant' ? ' <i>·</i> klant sinds ' + d(k.start) : '') + (k.herkomst ? ' <i>·</i> via ' + esc({ moneymonk: 'MoneyMonk', trustoo: 'Trustoo', netwerk: 'eigen netwerk', google: 'Google', website: 'de website', anders: 'anders' }[k.herkomst] || '') : '');
     document.getElementById('kop').hidden = false; document.getElementById('laad').hidden = true;
     document.getElementById('inhoud').hidden = false;
 
@@ -288,7 +289,7 @@
 
     // Formulier
     var f = document.getElementById('gegevens');
-    ['naam', 'bedrijf', 'email', 'telefoon', 'boekhouder', 'status', 'start', 'voorstelLink', 'notitie'].forEach(function (n) { f.elements[n].value = k[n] || ''; });
+    ['naam', 'bedrijf', 'email', 'telefoon', 'boekhouder', 'status', 'herkomst', 'start', 'voorstelLink', 'notitie'].forEach(function (n) { f.elements[n].value = k[n] || ''; });
   }
 
   var IC = {

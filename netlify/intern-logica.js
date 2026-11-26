@@ -227,7 +227,11 @@ function mailadres(e) { const v = String(e || "").trim().toLowerCase(); return /
 function link(l) { const v = String(l || "").trim(); return /^https:\/\/[^\s<>"]+$/.test(v) ? v.slice(0, 500) : ""; }
 function boekhouder(b) { return b === "daan" ? "daan" : b === "koen" ? "koen" : ""; }
 
+// Waar een lead of klant vandaan kwam, om de conversie per bron te meten
+export const HERKOMST = { moneymonk: "MoneyMonk", trustoo: "Trustoo", netwerk: "Eigen netwerk", google: "Google", website: "Website (formulier)", anders: "Anders" };
+
 function velden(body, k) {
+  if ("herkomst" in body && (body.herkomst === "" || Object.hasOwn(HERKOMST, body.herkomst))) k.herkomst = body.herkomst;
   if ("naam" in body) k.naam = schoon(body.naam);
   if ("bedrijf" in body) k.bedrijf = schoon(body.bedrijf);
   if ("email" in body) k.email = mailadres(body.email);

@@ -2,7 +2,14 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="/intern/app.webmanifest">
+<link rel="apple-touch-icon" href="/assets/img/app/intern-apple-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="A&amp;E">
+<meta name="theme-color" content="#F6F6F8">
 <title>Vandaag | Avezaat &amp; Evers intern</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -10,7 +17,6 @@
 <link rel="icon" href="/assets/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
-<meta name="theme-color" content="#26458F">
 <link rel="stylesheet" href="/assets/style.css?v=139">
 <style>
   body { background: var(--soft); }
@@ -164,7 +170,7 @@
   }
   .db-kaart form .db-knop { white-space: normal; text-align: left; }
 </style>
-<link rel="stylesheet" href="/intern/app.css?v=5">
+<link rel="stylesheet" href="/intern/app.css?v=6">
 <style>
   .hk { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
   .hk h1 { font-size: clamp(28px, 3.6vw, 42px); margin: 0; letter-spacing: -.03em; }
@@ -358,7 +364,7 @@
   </section>
 
   <section class="vd-plan db-kaart" aria-labelledby="plan-titel">
-    <div class="vp-kop"><h2 id="plan-titel">Je missies</h2><span class="vp-meta" id="plan-meta"></span></div>
+    <div class="vp-kop"><h2 id="plan-titel">Vandaag te doen</h2><span class="vp-meta" id="plan-meta"></span></div>
     <div class="vp-balk"><i id="plan-balk"></i></div>
     <ol class="plan" id="plan"></ol>
     <button class="tekst-knop vp-meer" type="button" id="plan-meer" hidden></button>
@@ -427,7 +433,7 @@
     </div>
   </div>
 </main>
-<script src="/intern/app.js?v=10"></script>
+<script src="/intern/app.js?v=11"></script>
 <script>
 (function () {
   var alles = false, laatste = null;
@@ -438,7 +444,7 @@
     var esc = window.AE.esc, n = p.missies.length, totaal = p.klaarVandaag + n, pct = totaal ? Math.round(p.klaarVandaag / totaal * 100) : 100;
     var eerste = p.missies[0];
     document.getElementById('samenvatting').innerHTML = n
-      ? esc(n + (n === 1 ? ' missie' : ' missies') + ', ongeveer ' + tijd(p.minuten) + '.') + (eerste ? ' Eerst: <b>' + esc(eerste.titel.charAt(0).toLowerCase() + eerste.titel.slice(1)) + (eerste.klant ? '</b> bij ' + esc(eerste.klant.naam) : '</b>') + '.' : '')
+      ? esc(n + (n === 1 ? ' taak' : ' taken') + ', ongeveer ' + tijd(p.minuten) + '.') + (eerste ? ' Eerst: <b>' + esc(eerste.titel.charAt(0).toLowerCase() + eerste.titel.slice(1)) + (eerste.klant ? '</b> bij ' + esc(eerste.klant.naam) : '</b>') + '.' : '')
       : 'Alles gedaan voor vandaag.';
     document.getElementById('plan-meta').textContent = totaal ? p.klaarVandaag + ' van ' + totaal + ' klaar' : '';
     document.getElementById('plan-balk').style.width = pct + '%';

@@ -472,3 +472,32 @@ body.app .orb::after { box-shadow: inset 0 0 calc(var(--m) * .12) rgba(138, 180,
 
 /* Donkere koppen (werkstroom-lade, modals) houden witte tekst */
 body.app .wd-kop h2, body.app .wd-kop strong, body.app .cm-kop h2, body.app .cm-kop strong { color: #fff; }
+
+/* ---------- Mobiel als app ---------- */
+.tabbalk { display: none; }
+@media (max-width: 960px) {
+  body.app main.db { padding-top: calc(72px + env(safe-area-inset-top)); padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+  body.app .mob-balk { height: calc(56px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); background: rgba(246, 246, 248, .88); -webkit-backdrop-filter: saturate(1.6) blur(18px); backdrop-filter: saturate(1.6) blur(18px); }
+  body.app .mob-balk button { background: rgba(0, 0, 0, .05); color: var(--ink); }
+  body.app .mob-balk strong span { color: #26458F; }
+  body.app .mob-balk #mob-menu { display: none; }
+  body.app .zij { box-shadow: none; }
+  body.app.zij-open .zij { box-shadow: 30px 0 60px -30px rgba(0, 0, 0, .35); background: #F6F6F8; z-index: 40; }
+  body.app.zij-open::after { background: rgba(0, 0, 0, .3); z-index: 35; }
+  .tabbalk { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center; position: fixed; z-index: 30; left: 0; right: 0; bottom: 0;
+    padding: 6px max(8px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    background: rgba(255, 255, 255, .9); -webkit-backdrop-filter: saturate(1.6) blur(18px); backdrop-filter: saturate(1.6) blur(18px); border-top: 1px solid rgba(0, 0, 0, .08); }
+  .tabbalk a, .tabbalk button { font: inherit; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 0; border: 0; background: none; color: #8E8E93; text-decoration: none; font-size: 11px; font-weight: 500; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  body.app .tabbalk a { color: #8E8E93; }
+  body.app .tabbalk a.is-aan { color: #26458F; }
+  .tabbalk svg { width: 24px; height: 24px; }
+  .tabbalk .tb-plus { justify-self: center; width: 48px; height: 48px; padding: 0; border-radius: 16px; background: #26458F; color: #fff; display: grid; place-items: center; box-shadow: 0 8px 20px -8px rgba(38, 69, 143, .7); }
+  .tabbalk .tb-plus svg { width: 22px; height: 22px; }
+  body.app .toast { bottom: calc(84px + env(safe-area-inset-bottom)) !important; }
+  /* iOS zoomt niet in op velden met 16px */
+  body.app input:not([type=checkbox]):not([type=radio]), body.app select, body.app textarea { font-size: 16px !important; }
+  /* Cijfers als veegbare rij */
+  body.app .kpis { display: flex !important; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; margin: 0 -16px 16px; padding: 2px 16px 6px; scrollbar-width: none; }
+  body.app .kpis::-webkit-scrollbar { display: none; }
+  body.app .kpis > .kpi { flex: 0 0 44%; scroll-snap-align: start; }
+}

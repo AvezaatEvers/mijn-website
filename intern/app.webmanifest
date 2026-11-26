@@ -1,0 +1,22 @@
+{
+  "name": "Avezaat & Evers intern",
+  "short_name": "A&E",
+  "description": "Het interne dashboard van Avezaat & Evers",
+  "id": "/intern/",
+  "start_url": "/intern/",
+  "scope": "/intern/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5F5F7",
+  "theme_color": "#F6F6F8",
+  "lang": "nl",
+  "icons": [
+    { "src": "/assets/img/app/intern-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/img/app/intern-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/img/app/intern-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Klanten", "url": "/intern/klanten.html", "icons": [{ "src": "/assets/img/app/intern-192.png", "sizes": "192x192" }] },
+    { "name": "Vraag de agent", "url": "/intern/agent.html", "icons": [{ "src": "/assets/img/app/intern-192.png", "sizes": "192x192" }] }
+  ]
+}

@@ -16,13 +16,14 @@
     flow: '<circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M9 6h5a4 4 0 0 1 4 4v5M6 9v9"/>',
     agent: '<path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"/>',
     act: '<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+    bel: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
     site: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'
   };
   function svg(n) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + I[n] + '</svg>'; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   var pad = location.pathname.replace(/index\.html$/, '');
   var NAV = [
-    ['Werk', [['/intern/', 'Vandaag', 'home'], ['/intern/klanten.html', 'Klanten en leads', 'klanten', 'tel-leads'], ['/intern/kwartaal.html', 'Kwartaalbord', 'kwartaal'], ['/intern/inzichten.html', 'Contact en NPS', 'inzicht'], ['/intern/werkstromen.html', 'Werkstromen', 'flow'], ['/intern/activiteit.html', 'Activiteit', 'act']]],
+    ['Werk', [['/intern/', 'Vandaag', 'home'], ['/intern/klanten.html', 'Klanten en leads', 'klanten', 'tel-leads'], ['/intern/kwartaal.html', 'Kwartaalbord', 'kwartaal'], ['/intern/inzichten.html', 'Contact en NPS', 'inzicht'], ['/intern/werkstromen.html', 'Werkstromen', 'flow'], ['/intern/activiteit.html', 'Activiteit', 'act'], ['/intern/meldingen.html', 'Meldingen', 'bel']]],
     ['Maken', [['/voorstel.html', 'Voorstel', 'voorstel'], ['/intern/mails/', 'Mailsjablonen', 'mail'], ['/intern/tools.html', 'Presenteren en tools', 'tools']]]
   ];
 
@@ -45,9 +46,23 @@
   mob.innerHTML = '<button type="button" id="mob-menu" aria-label="Menu">' + svg('menu').replace('<svg', '<svg width="20" height="20"') + '</button><strong>Avezaat <span>&amp;</span> Evers</strong><div class="rechts"><button type="button" data-ob aria-label="Zoeken">' + svg('zoek').replace('<svg', '<svg width="18" height="18"') + '</button></div>';
   document.body.insertBefore(mob, document.body.firstChild);
   document.getElementById('mob-menu').addEventListener('click', function () { document.body.classList.toggle('zij-open'); });
-  document.addEventListener('click', function (e) { if (document.body.classList.contains('zij-open') && !e.target.closest('.zij') && !e.target.closest('#mob-menu')) document.body.classList.remove('zij-open'); });
+  document.addEventListener('click', function (e) { if (document.body.classList.contains('zij-open') && !e.target.closest('.zij') && !e.target.closest('#mob-menu') && !e.target.closest('#tb-menu')) document.body.classList.remove('zij-open'); });
   var fab = document.createElement('button'); fab.className = 'fab'; fab.type = 'button'; fab.setAttribute('data-contact', ''); fab.setAttribute('aria-label', 'Contact vastleggen'); fab.innerHTML = svg('plus');
   document.body.appendChild(fab);
+
+  // Tabbalk onderin op mobiel (app-gevoel)
+  var pad0 = location.pathname, tab = document.createElement('nav'); tab.className = 'tabbalk'; tab.setAttribute('aria-label', 'Snel naar');
+  function tb(href, icoon, label, aan) { return '<a href="' + href + '"' + (aan ? ' class="is-aan" aria-current="page"' : '') + '>' + svg(icoon) + '<span>' + label + '</span></a>'; }
+  tab.innerHTML = tb('/intern/', 'home', 'Vandaag', pad0 === '/intern/' || pad0 === '/intern/index.html') +
+    tb('/intern/klanten.html', 'klanten', 'Klanten', /\/intern\/klant/.test(pad0)) +
+    '<button type="button" class="tb-plus" data-contact aria-label="Contact vastleggen">' + svg('plus') + '</button>' +
+    tb('/intern/agent.html', 'agent', 'Agent', pad0 === '/intern/agent.html') +
+    '<button type="button" id="tb-menu">' + svg('menu') + '<span>Menu</span></button>';
+  document.body.appendChild(tab);
+
+  // Webapp: service worker voor installeren en pushmeldingen
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/intern/sw.js', { scope: '/intern/' }).catch(function () {});
+  document.getElementById('tb-menu').addEventListener('click', function (e) { e.stopPropagation(); document.body.classList.toggle('zij-open'); });
 
   // ---------- API ----------
   function api(url, opt) {

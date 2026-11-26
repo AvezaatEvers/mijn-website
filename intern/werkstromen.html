@@ -2,14 +2,21 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="/intern/app.webmanifest">
+<link rel="apple-touch-icon" href="/assets/img/app/intern-apple-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="A&amp;E">
+<meta name="theme-color" content="#F6F6F8">
 <title>Werkstromen | Avezaat &amp; Evers intern</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/style.css?v=139">
 <link rel="stylesheet" href="/intern/klanten.css?v=7">
-<link rel="stylesheet" href="/intern/app.css?v=5">
+<link rel="stylesheet" href="/intern/app.css?v=6">
 <style>
   .wk-kop { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
   .wk-kop h1 { font-size: clamp(28px, 3.6vw, 42px); margin: 0; letter-spacing: -.03em; }
@@ -76,7 +83,7 @@
 <body>
 <main class="db">
   <div class="wk-kop">
-    <div><h1>Werkstromen</h1><p>Al onze vaste processen, van eerste lead tot offboarding. Ze starten en sluiten vanzelf zodra er iets speelt, en komen als missies in je dagplan. Hier zie je wat er loopt en hoe elk proces werkt.</p></div>
+    <div><h1>Werkstromen</h1><p>Al onze vaste processen, van eerste lead tot offboarding. Ze starten en sluiten vanzelf zodra er iets speelt, en komen als taken in je dagplan. Hier zie je wat er loopt en hoe elk proces werkt.</p></div>
   </div>
   <div id="lopend-sectie" hidden><div class="sectie">Loopt nu, vanzelf gestart</div><div class="lopend" id="lopend"></div></div>
   <div id="groepen"><div class="skelet" style="width:40%;margin-top:30px"></div></div>
@@ -85,7 +92,7 @@
 
 <div class="wd" id="wd" role="dialog" aria-modal="true" aria-labelledby="wd-titel"><div class="wd-doos" id="wd-doos"></div></div>
 
-<script src="/intern/app.js?v=10"></script>
+<script src="/intern/app.js?v=11"></script>
 <script>
 (function () {
   function start() {
@@ -130,7 +137,7 @@
         }).join('') + '</div>' +
         '<div class="wd-voet">' + (run
           ? (run.klant ? '<a class="ai-knop licht" href="/intern/klant.html?id=' + encodeURIComponent(run.klant) + '">Open klant</a>' : '') + '<button class="weg" type="button" id="wd-stop">Werkstroom verwijderen</button>'
-          : '<span class="db-noot" style="margin:0">Start vanzelf (' + esc(p.wanneer.charAt(0).toLowerCase() + p.wanneer.slice(1)) + ') en verschijnt dan als missies in je dagplan.</span><a class="ai-knop" href="/intern/" style="margin-left:auto">Naar mijn dagplan</a>') + '</div>';
+          : '<span class="db-noot" style="margin:0">Start vanzelf (' + esc(p.wanneer.charAt(0).toLowerCase() + p.wanneer.slice(1)) + ') en verschijnt dan als taken in je dagplan.</span><a class="ai-knop" href="/intern/" style="margin-left:auto">Naar mijn dagplan</a>') + '</div>';
       wd.classList.add('open');
       history.replaceState(null, '', run ? '?run=' + run.id : '?p=' + p.id);
       if (!run && p.perKlant) AE.herlaadKlanten().then(function (kl) {

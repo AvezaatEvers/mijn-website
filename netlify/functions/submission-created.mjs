@@ -3,6 +3,7 @@
 import { getStore } from "@netlify/blobs";
 import { mails } from "./lib/mails.js";
 import { verstuur, BASE } from "../klant-mails.js";
+import { stuur, MENSEN } from "../push.js";
 
 const SITUATIE_KENNISMAKING = { "Ik ben net gestart": "start", "Ik wil overstappen van boekhouder": "boekhouder", "Ik doe het nu zelf": "zelf" };
 const schoon = (s, n = 200) => String(s || "").replace(/[<>]/g, "").trim().slice(0, n);
@@ -57,6 +58,17 @@ export default async (req) => {
     k.tijdlijn = k.tijdlijn || [];
     k.tijdlijn.unshift({ id: nieuweId(), soort: "notitie", tekst: `Formulier ${formulier} ingevuld${lead.prijs ? ` (prijs ${lead.prijs})` : ""}${lead.bericht ? `: ${lead.bericht}` : ""}`.slice(0, 1000), op: nu, door: "formulier" });
     await store.setJSON("klanten", klanten);
+    // 4. Pushmelding naar Koen en Daan
+    try {
+      const wie = (k.bedrijf || k.naam || "Iemand");
+      await stuur(store, MENSEN, "lead", {
+        title: "Nieuwe lead: " + wie,
+        body: formulier === "prijscheck" ? "Prijscheck ingevuld" + (lead.prijs ? " (" + lead.prijs + ")" : "") + ". Reageer binnen 2 uur." : "Wil een kennismaking. Reageer binnen 2 uur.",
+        url: "/intern/klant.html?id=" + encodeURIComponent(k.id), tag: "lead-" + k.id,
+      });
+    } catch (e) {
+      console.error("Pushmelding niet verstuurd:", e.message);
+    }
   } catch (e) {
     console.error("Lead niet opgeslagen:", e.message);
   }

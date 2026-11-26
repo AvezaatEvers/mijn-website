@@ -1,9 +1,10 @@
 {
   "name": "avezaat-evers-website",
   "private": true,
-  "description": "Statische site; dit pakket is alleen nodig voor de interne takenlijst (Netlify Blobs).",
+  "description": "Statische site; dit pakket is alleen nodig voor de interne omgeving (Netlify Blobs en pushmeldingen).",
   "dependencies": {
-    "@netlify/blobs": "10.1.0"
+    "@netlify/blobs": "10.1.0",
+    "web-push": "3.6.7"
   },
   "type": "module"
 }

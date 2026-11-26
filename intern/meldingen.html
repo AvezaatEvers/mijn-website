@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="/intern/app.webmanifest">
+<link rel="apple-touch-icon" href="/assets/img/app/intern-apple-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="A&amp;E">
+<meta name="theme-color" content="#F6F6F8">
+<title>Meldingen | Avezaat &amp; Evers intern</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css?v=139">
+<link rel="stylesheet" href="/intern/klanten.css?v=7">
+<link rel="stylesheet" href="/intern/app.css?v=6">
+<style>
+  .db.smal { max-width: 720px; }
+  .smal h1 { font-size: clamp(28px, 3.6vw, 40px); margin: 0 0 6px; letter-spacing: -.03em; }
+  .smal > p.db-sub { margin-bottom: 22px; }
+  .status { display: flex; align-items: center; gap: 12px; }
+  .stip { width: 10px; height: 10px; border-radius: 50%; background: #9CA3AF; flex: none; }
+  .stip.aan { background: #22A355; }
+  .status p { margin: 0; font-size: 15px; color: var(--text); }
+  .status strong { display: block; }
+  .knoppen { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .soort { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .soort:last-child { border-bottom: 0; padding-bottom: 0; }
+  .soort:first-of-type { padding-top: 4px; }
+  .soort strong { display: block; font-size: 15.5px; }
+  .soort span { font-size: 13.5px; color: var(--muted); }
+  .schakel { position: relative; flex: none; width: 51px; height: 31px; }
+  .schakel input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; z-index: 1; }
+  .schakel i { position: absolute; inset: 0; border-radius: 999px; background: #E5E5EA; transition: background .2s; }
+  .schakel i::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 3px 8px rgba(0, 0, 0, .15); transition: transform .2s; }
+  .schakel input:checked + i { background: #34C759; }
+  .schakel input:checked + i::after { transform: translateX(20px); }
+  .schakel input:focus-visible + i { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .stappen { margin: 10px 0 0; padding-left: 20px; font-size: 15px; line-height: 1.7; color: var(--text); }
+  .apparaten { list-style: none; margin: 10px 0 0; padding: 0; font-size: 14px; color: var(--muted); }
+  .apparaten li { padding: 4px 0; }
+  .apparaten b { color: var(--ink); font-weight: 600; }
+  .db-kaart + .db-kaart { margin-top: 16px; }
+  .db-kaart h2 { font-size: 18px; margin: 0 0 8px; }
+  .noot { font-size: 13.5px; color: var(--muted); margin: 12px 0 0; }
+</style>
+</head>
+<body>
+<main class="db smal">
+  <h1>Meldingen</h1>
+  <p class="db-sub">Krijg een melding op je telefoon of laptop als er een lead binnenkomt of blijft liggen, en elke werkdag om 8:30 je overzicht.</p>
+
+  <div class="db-kaart" id="installeer" hidden>
+    <h2>Eerst de app op je beginscherm</h2>
+    <p style="margin:0;color:var(--text)">Op de iPhone werken meldingen alleen in de app op je beginscherm (iOS 16.4 of nieuwer).</p>
+    <ol class="stappen">
+      <li>Open deze pagina in <strong>Safari</strong>.</li>
+      <li>Tik onderin op <strong>Deel</strong> (vierkant met pijl omhoog).</li>
+      <li>Kies <strong>Zet op beginscherm</strong> en tik op <strong>Voeg toe</strong>.</li>
+      <li>Open <strong>A&amp;E</strong> vanaf je beginscherm, log in en kom terug op deze pagina.</li>
+    </ol>
+  </div>
+
+  <div class="db-kaart">
+    <div class="status" id="status"><span class="stip"></span><p>Laden…</p></div>
+    <div class="knoppen">
+      <button class="db-knop" type="button" id="aan" hidden>Meldingen aanzetten op dit apparaat</button>
+      <button class="db-knop is-rand" type="button" id="test" hidden>Stuur testmelding</button>
+      <button class="db-knop is-rand" type="button" id="uit" hidden>Uitzetten op dit apparaat</button>
+    </div>
+    <p class="noot" id="noot" hidden></p>
+    <ul class="apparaten" id="apparaten"></ul>
+  </div>
+
+  <div class="db-kaart">
+    <h2>Waarvoor wil je een melding?</h2>
+    <div id="soorten"><p class="kl-leeg">Laden…</p></div>
+    <p class="noot">Dit geldt voor al jouw apparaten. Daan en Koen stellen dit ieder voor zichzelf in.</p>
+  </div>
+</main>
+<script src="/intern/app.js?v=11"></script>
+<script>
+(function () {
+  var esc = AE.esc, sleutel = null, abonnement = null;
+  var ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var losse = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  var kan = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+
+  function apparaatNaam() {
+    var u = navigator.userAgent;
+    var os = /iPhone/.test(u) ? 'iPhone' : /iPad/.test(u) || (ios && !/iPhone/.test(u)) ? 'iPad' : /Android/.test(u) ? 'Android' : /Mac/.test(u) ? 'Mac' : /Windows/.test(u) ? 'Windows' : 'Computer';
+    var br = losse ? 'app' : /Edg\//.test(u) ? 'Edge' : /Chrome\//.test(u) ? 'Chrome' : /Firefox\//.test(u) ? 'Firefox' : /Safari\//.test(u) ? 'Safari' : 'browser';
+    return os + ', ' + br;
+  }
+  function b64(s) { var p = '='.repeat((4 - s.length % 4) % 4), r = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')), a = new Uint8Array(r.length); for (var i = 0; i < r.length; i++) a[i] = r.charCodeAt(i); return a; }
+  function datum(s) { return new Date(s).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' }); }
+
+  function zet(aan, tekst, sub) {
+    document.getElementById('status').innerHTML = '<span class="stip' + (aan ? ' aan' : '') + '"></span><p><strong>' + esc(tekst) + '</strong>' + (sub ? esc(sub) : '') + '</p>';
+  }
+  function noot(t) { var n = document.getElementById('noot'); n.hidden = !t; n.textContent = t || ''; }
+
+  function tekenSoorten(r) {
+    document.getElementById('soorten').innerHTML = Object.keys(r.soorten).map(function (s) {
+      return '<label class="soort"><div><strong>' + esc(r.soorten[s].naam) + '</strong><span>' + esc(r.soorten[s].uitleg) + '</span></div>' +
+        '<span class="schakel"><input type="checkbox" data-soort="' + s + '"' + (r.voorkeuren[s] ? ' checked' : '') + ' aria-label="' + esc(r.soorten[s].naam) + '"><i></i></span></label>';
+    }).join('');
+  }
+  function tekenApparaten(r) {
+    document.getElementById('apparaten').innerHTML = r.apparaten.length
+      ? r.apparaten.map(function (a) { return '<li><b>' + esc(a.apparaat) + '</b>' + (a.ditApparaat ? ' (dit apparaat)' : '') + ', sinds ' + datum(a.op) + '</li>'; }).join('')
+      : '';
+  }
+
+  function laad() {
+    var eind = abonnement ? '?eindpunt=' + encodeURIComponent(abonnement.endpoint) : '';
+    return AE.api('/intern/api/push' + eind).then(function (r) {
+      sleutel = r.publicKey; tekenSoorten(r); tekenApparaten(r);
+      var hier = r.apparaten.some(function (a) { return a.ditApparaat; });
+      var aan = document.getElementById('aan'), test = document.getElementById('test'), uit = document.getElementById('uit');
+      if (!kan) {
+        if (ios && !losse) { document.getElementById('installeer').hidden = false; zet(false, 'Nog niet beschikbaar in Safari', ''); }
+        else zet(false, 'Deze browser ondersteunt geen pushmeldingen', '');
+        aan.hidden = test.hidden = uit.hidden = true; return;
+      }
+      if (Notification.permission === 'denied') { zet(false, 'Meldingen staan geblokkeerd', ' Zet ze aan in de instellingen van je telefoon of browser.'); aan.hidden = test.hidden = uit.hidden = true; return; }
+      if (hier) { zet(true, 'Meldingen staan aan op dit apparaat', ''); aan.hidden = true; test.hidden = uit.hidden = false; }
+      else { zet(false, 'Meldingen staan uit op dit apparaat', ''); aan.hidden = false; test.hidden = uit.hidden = true; }
+    }).catch(function () { zet(false, 'Laden mislukt', ''); });
+  }
+
+  document.getElementById('aan').onclick = function () {
+    var b = this; b.disabled = true; noot('');
+    Notification.requestPermission().then(function (p) {
+      if (p !== 'granted') { b.disabled = false; return laad(); }
+      return navigator.serviceWorker.register('/intern/sw.js', { scope: '/intern/' }).then(function () { return navigator.serviceWorker.ready; })
+        .then(function (reg) { return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64(sleutel) }); })
+        .then(function (ab) { abonnement = ab; return AE.api('/intern/api/push', { method: 'POST', body: JSON.stringify({ abonnement: ab.toJSON(), apparaat: apparaatNaam() }) }); })
+        .then(function () { b.disabled = false; return laad(); })
+        .then(function () { return AE.api('/intern/api/push/test', { method: 'POST' }); });
+    }).catch(function (e) { b.disabled = false; noot('Aanzetten lukte niet: ' + (e && e.message || e)); });
+  };
+  document.getElementById('test').onclick = function () {
+    var b = this; b.disabled = true;
+    AE.api('/intern/api/push/test', { method: 'POST' }).then(function (r) {
+      b.disabled = false; noot(r.ok ? 'Verstuurd naar ' + r.ok + (r.ok === 1 ? ' apparaat' : ' apparaten') + '. Komt hij niet binnen? Kijk of meldingen voor de app aanstaan in je instellingen.' : 'Geen apparaat gevonden om naar te sturen.');
+    }).catch(function () { b.disabled = false; noot('Versturen mislukt.'); });
+  };
+  document.getElementById('uit').onclick = function () {
+    var b = this; b.disabled = true;
+    var weg = abonnement ? AE.api('/intern/api/push?eindpunt=' + encodeURIComponent(abonnement.endpoint), { method: 'DELETE' }).then(function () { return abonnement.unsubscribe(); }) : Promise.resolve();
+    weg.then(function () { abonnement = null; b.disabled = false; noot(''); laad(); });
+  };
+  document.getElementById('soorten').addEventListener('change', function (e) {
+    var i = e.target.closest('[data-soort]'); if (!i) return;
+    var v = {}; v[i.dataset.soort] = i.checked;
+    AE.api('/intern/api/push', { method: 'PATCH', body: JSON.stringify({ voorkeuren: v }) }).catch(function () { i.checked = !i.checked; });
+  });
+
+  (kan ? navigator.serviceWorker.register('/intern/sw.js', { scope: '/intern/' }).then(function (reg) { return reg.pushManager.getSubscription(); }).then(function (ab) { abonnement = ab; }).catch(function () {}) : Promise.resolve()).then(laad);
+})();
+</script>
+</body>
+</html>

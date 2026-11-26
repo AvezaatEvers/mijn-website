@@ -54,6 +54,7 @@ function json(data, status = 200) {
 export function inlogPagina(fout) {
   return `<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow"><meta name="theme-color" content="#EEF2F8"><title>Intern | Avezaat &amp; Evers</title><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/intern/app.webmanifest"><link rel="apple-touch-icon" href="/assets/img/app/intern-apple-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="A&amp;E">
 <style>
 @font-face{font-family:P;font-weight:400;src:url(/assets/fonts/poppins-400.woff2)}@font-face{font-family:P;font-weight:500;src:url(/assets/fonts/poppins-500.woff2)}@font-face{font-family:P;font-weight:600;src:url(/assets/fonts/poppins-600.woff2)}@font-face{font-family:P;font-weight:700;src:url(/assets/fonts/poppins-700.woff2)}
 *{box-sizing:border-box}html,body{height:100%}
@@ -153,6 +154,9 @@ export async function verwerk(request, cookies, next, maakStore, env = () => und
     return html(inlogPagina(true), 401);
   }
 
+  // Service worker en manifest van de webapp bevatten geen gegevens en moeten ook zonder inlog laden
+  if (pad === "/intern/sw.js" || pad === "/intern/app.webmanifest") return next();
+
   if (pad === "/intern/logout") {
     return new Response(null, { status: 303, headers: { Location: "/intern/", "Set-Cookie": `${COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax` } });
   }
@@ -164,6 +168,9 @@ export async function verwerk(request, cookies, next, maakStore, env = () => und
   }
 
   if (pad === "/intern/api/ik") return json({ wie, naam: GEBRUIKERS[wie].naam });
+
+  // Pushmeldingen draaien in een Node-functie (netlify/functions/push.mjs), die de inlog zelf ook controleert
+  if (pad === "/intern/api/push" || pad.startsWith("/intern/api/push/")) return next();
 
   if (pad === "/intern/api/taken") {
     const store = maakStore();

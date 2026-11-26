@@ -2,7 +2,14 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="/intern/app.webmanifest">
+<link rel="apple-touch-icon" href="/assets/img/app/intern-apple-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="A&amp;E">
+<meta name="theme-color" content="#F6F6F8">
 <title>Presenteren en tools | Avezaat &amp; Evers intern</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -10,7 +17,6 @@
 <link rel="icon" href="/assets/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
-<meta name="theme-color" content="#26458F">
 <link rel="stylesheet" href="/assets/style.css?v=139">
 <style>
   body { background: var(--soft); }
@@ -68,7 +74,7 @@
   /* Kennismaking presenteren */
   .db-pres { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; background: var(--accent); border-color: var(--accent); color: #fff; }
   .db-pres h2 { color: #fff; margin: 0 0 4px; }
-  .db-pres p { font-size: 14px; color: #CAD4E8; margin: 0; }
+  .db-pres p { font-size: 14px; color: var(--muted); margin: 0; }
   .db-pres > div:first-child { flex: 1 1 360px; min-width: 0; }
   .db-pres form { display: flex; gap: 8px; flex: 0 1 auto; max-width: 460px; min-width: 0; }
   .db-pres input { flex: 1; min-width: 0; font: inherit; font-size: 15px; padding: 10px 12px; border-radius: 10px; border: 0; }
@@ -165,7 +171,7 @@
   }
   .db-kaart form .db-knop { white-space: normal; text-align: left; }
 </style>
-<link rel="stylesheet" href="/intern/app.css?v=5">
+<link rel="stylesheet" href="/intern/app.css?v=6">
 </head>
 <body>
 <main class="db">
@@ -301,7 +307,7 @@
   
   </div>
 </main>
-<script src="/intern/app.js?v=10"></script>
+<script src="/intern/app.js?v=11"></script>
 <script>
 (function () {
   // Welkomstlink

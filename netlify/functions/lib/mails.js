@@ -590,7 +590,6 @@ function afspraakKaart(d, status) {
   return blok(tabel([
     ['Datum', esc(cap(d.datum))],
     ['Tijd', `${esc(d.tijd)}${d.eindtijd ? ' - ' + esc(d.eindtijd) : ''} (${esc(d.duur)} min)`],
-    ['Met', metWie(d.wie)],
     ['Gesprek', d.video ? 'Videogesprek' : d.telefoon ? `We bellen je op ${esc(d.telefoon)}` : 'Online'],
   ])) +
     (d.video ? knop(esc(d.video), 'Deelnemen aan het gesprek') : '') +

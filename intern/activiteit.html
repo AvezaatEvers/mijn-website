@@ -47,11 +47,11 @@
 <body>
 <main class="db">
   <div class="hk">
-    <div><h1>Activiteit</h1><p>Wie deed wat, in het dashboard of via Claude.</p></div>
+    <div><h1>Activiteit</h1><p>Elke wijziging: wie deed wat, in het dashboard, via de agent of Claude, of automatisch.</p></div>
     <a class="db-knop is-rand" href="/intern/claude.html">Claude koppelen</a>
   </div>
   <div class="bal">
-    <div class="seg" id="wie"><button type="button" data-w="alle" class="is-aan">Iedereen</button><button type="button" data-w="koen">Koen</button><button type="button" data-w="daan">Daan</button></div>
+    <div class="seg" id="wie"><button type="button" data-w="alle" class="is-aan">Iedereen</button><button type="button" data-w="koen">Koen</button><button type="button" data-w="daan">Daan</button><button type="button" data-w="systeem">Systeem</button></div>
     <div class="seg" id="dagen"><button type="button" data-d="1">Vandaag</button><button type="button" data-d="7" class="is-aan">Week</button><button type="button" data-d="30">Maand</button></div>
   </div>
   <div class="tellers" id="tellers"></div>
@@ -61,7 +61,7 @@
 <script>
 (function () {
   var wie = 'alle', dagen = 7, items = [];
-  var NAAM = { koen: 'Koen', daan: 'Daan', auto: 'Automatisch', formulier: 'Websiteformulier', klant: 'Klant', gepland: 'Automatisch' };
+  var NAAM = { koen: 'Koen', daan: 'Daan', systeem: 'Systeem' };
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function dagLabel(d) {
     var v = new Date(); v.setHours(0, 0, 0, 0); var x = new Date(d); x.setHours(0, 0, 0, 0);
@@ -74,7 +74,7 @@
     var tel = function (w) { return lijst.filter(function (a) { return a.wie === w; }).length; };
     document.getElementById('tellers').innerHTML =
       '<div><span>Acties</span><b>' + lijst.length + '</b></div>' +
-      (wie === 'alle' ? '<div><span>Koen</span><b>' + tel('koen') + '</b></div><div><span>Daan</span><b>' + tel('daan') + '</b></div>' : '') +
+      (wie === 'alle' ? '<div><span>Koen</span><b>' + tel('koen') + '</b></div><div><span>Daan</span><b>' + tel('daan') + '</b></div><div><span>Systeem</span><b>' + tel('systeem') + '</b></div>' : '') +
       '<div><span>Via Claude</span><b>' + lijst.filter(function (a) { return a.via === 'claude'; }).length + '</b></div>';
     if (!lijst.length) { document.getElementById('lijst').innerHTML = '<p class="kl-leeg">Nog niets in deze periode.</p>'; return; }
     var html = '', vorige = '';
@@ -84,7 +84,7 @@
       var foto = a.wie === 'koen' || a.wie === 'daan' ? '/assets/img/mail/' + a.wie + '.jpg' : '/assets/favicon.svg';
       html += '<div class="rij"><img src="' + foto + '" alt=""><div class="wat"><strong>' + esc(NAAM[a.wie] || a.wie) + '</strong>' +
         (a.via ? '<span class="via ' + a.via + '">via ' + (a.via === 'claude' ? 'Claude' : 'agent') + '</span>' : '') +
-        '<small style="color:var(--ink);font-size:14px;margin-top:3px">' + esc(a.tekst) + (a.klant ? ' · <a href="/intern/klant.html?id=' + encodeURIComponent(a.klant.id) + '">' + esc(a.klant.naam) + '</a>' : '') + '</small></div>' +
+        '<small style="color:var(--ink);font-size:14px;margin-top:3px">' + esc(a.tekst) + (a.klant ? ' · ' + (a.weg ? esc(a.klant.naam) + ' (verwijderd)' : '<a href="/intern/klant.html?id=' + encodeURIComponent(a.klant.id) + '">' + esc(a.klant.naam) + '</a>') : '') + '</small></div>' +
         '<time>' + new Date(a.op).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }) + '</time></div>';
     });
     document.getElementById('lijst').innerHTML = html + '</div>';

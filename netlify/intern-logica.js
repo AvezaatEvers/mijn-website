@@ -4,6 +4,7 @@ import { mails } from "./functions/lib/mails.js";
 import { overzicht, leadInfo, aandachtVoor } from "./overzicht.js";
 import { agentApi } from "./agent/agent.js";
 import { inzichten, KANALEN, ONDERWERPEN, SOORTEN, GEVOEL } from "./inzichten.js";
+import { log as logboekRegel, klantVerschil } from "./logboek.js";
 // Los van Netlify gehouden zodat het lokaal te testen is; intern.js koppelt de opslag.
 
 export const GEBRUIKERS = {
@@ -132,6 +133,8 @@ async function leesTaken(store) {
 function schoon(t) { return String(t || "").replace(/[<>]/g, "").trim().slice(0, 200); }
 function datum(d) { return /^\d{4}-\d{2}-\d{2}$/.test(d || "") ? d : ""; }
 function voor(v) { return ["koen", "daan", "samen"].includes(v) ? v : "samen"; }
+const VOOR = { koen: "Koen", daan: "Daan", samen: "samen" };
+const TL_SOORT = { notitie: "Notitie", gebeld: "Gebeld", geappt: "Geappt", gemaild: "Gemaild", gesprek: "Gesprek" };
 
 // request: Request, cookies: { get(naam) }, next: () => Response, store: Blobs-store
 export async function verwerk(request, cookies, next, maakStore, env = () => undefined) {
@@ -178,28 +181,44 @@ export async function verwerk(request, cookies, next, maakStore, env = () => und
     const body = request.method === "DELETE" ? Object.fromEntries(url.searchParams) : await request.json().catch(() => ({}));
     const taken = await leesTaken(store);
     const nu = new Date().toISOString();
+    const viaKop = request.headers.get("x-via");
+    const tvia = viaKop === "claude" || viaKop === "agent" ? viaKop : null;
+    const regels = [];
+    const regel = (tekst, t) => regels.push({ wie, via: tvia, soort: "taak", tekst, klant: t && t.klant ? { id: t.klant } : null });
 
     if (request.method === "POST") {
       const titel = schoon(body.titel);
       if (!titel) return json({ fout: "Titel ontbreekt" }, 400);
-      taken.push({ id: nieuweId(), titel, notitie: schoon(body.notitie), deadline: datum(body.deadline), voor: voor(body.voor),
-        klaar: false, klaarDoor: null, klaarOp: null, door: wie, aangemaakt: nu, klant: schoon(body.klant).slice(0, 60) || null });
+      const t = { id: nieuweId(), titel, notitie: schoon(body.notitie), deadline: datum(body.deadline), voor: voor(body.voor),
+        klaar: false, klaarDoor: null, klaarOp: null, door: wie, aangemaakt: nu, klant: schoon(body.klant).slice(0, 60) || null };
+      taken.push(t);
+      regel("Taak aangemaakt: " + titel + " (voor " + VOOR[t.voor] + (t.deadline ? ", deadline " + t.deadline : "") + ")", t);
     } else if (request.method === "PATCH") {
       const t = taken.find((x) => x.id === body.id);
       if (!t) return json({ fout: "Taak niet gevonden" }, 404);
+      const oud = { ...t };
       if (typeof body.klaar === "boolean") { t.klaar = body.klaar; t.klaarDoor = body.klaar ? wie : null; t.klaarOp = body.klaar ? nu : null; }
       if ("titel" in body && schoon(body.titel)) t.titel = schoon(body.titel);
       if ("notitie" in body) t.notitie = schoon(body.notitie);
       if ("deadline" in body) t.deadline = datum(body.deadline);
       if ("voor" in body) t.voor = voor(body.voor);
+      if (!!oud.klaar !== !!t.klaar) regel((t.klaar ? "Taak afgerond: " : "Taak weer opengezet: ") + t.titel, t);
+      const anders = [];
+      if (oud.titel !== t.titel) anders.push("titel was '" + oud.titel + "'");
+      if ((oud.deadline || "") !== (t.deadline || "")) anders.push("deadline " + (oud.deadline || "geen") + " → " + (t.deadline || "geen"));
+      if (oud.voor !== t.voor) anders.push("voor " + (VOOR[oud.voor] || oud.voor || "niemand") + " → " + VOOR[t.voor]);
+      if ((oud.notitie || "") !== (t.notitie || "")) anders.push("notitie");
+      if (anders.length) regel("Taak gewijzigd: " + t.titel + " (" + anders.join(", ") + ")", t);
     } else if (request.method === "DELETE") {
       const i = taken.findIndex((x) => x.id === body.id);
       if (i < 0) return json({ fout: "Taak niet gevonden" }, 404);
+      regel("Taak verwijderd: " + taken[i].titel, taken[i]);
       taken.splice(i, 1);
     } else {
       return json({ fout: "Methode niet toegestaan" }, 405);
     }
     await store.setJSON(SLEUTEL, taken);
+    await logboekRegel(store,regels);
     return json(taken);
   }
 
@@ -291,6 +310,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
   // Via welke weg de wijziging kwam (Claude-koppeling of de agent op de site). Alleen een label voor de activiteitenlijst.
   const viaKop = request.headers.get("x-via");
   const via = viaKop === "claude" || viaKop === "agent" ? viaKop : undefined;
+  const lg = (tekst, k, soort) => logboekRegel(store, { wie, via, soort, tekst, klant: k });
 
   if (pad === "/intern/api/klanten") {
     if (request.method === "GET") return json({ klanten: klanten.map((k) => metPlanning(k, env)), types: TYPES, handmatig: HANDMATIG, reviewLink: !!env("REVIEW_LINK") });
@@ -303,6 +323,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
       if (!k.email) return json({ fout: "Geen geldig e-mailadres" }, 400);
       klanten.push(k);
       await bewaar();
+      await lg(k.status === "prospect" ? "Lead toegevoegd" : "Klant toegevoegd", k, "klant");
       return json(metPlanning(k, env));
     }
     return json({ fout: "Methode niet toegestaan" }, 405);
@@ -313,15 +334,19 @@ async function klantenApi(request, url, pad, wie, store, env) {
     if (!k) return json({ fout: "Klant niet gevonden" }, 404);
     if (request.method === "GET") return json({ klant: metPlanning(k, env), types: TYPES, handmatig: HANDMATIG, reviewLink: !!env("REVIEW_LINK"), kwartalen: kwartalenRond().slice(0, 4).map(kwartaalInfo) });
     if (request.method === "PATCH") {
+      const voorheen = JSON.parse(JSON.stringify(k));
       velden(body, k);
       if (!k.naam || !k.email) return json({ fout: "Naam en e-mailadres zijn verplicht" }, 400);
-      k.gewijzigd = nu; k.gewijzigdDoor = wie; k.gewijzigdVia = via;
+      const anders = klantVerschil(voorheen, k);
+      if (anders.length) { k.gewijzigd = nu; k.gewijzigdDoor = wie; k.gewijzigdVia = via; }
       await bewaar();
+      if (anders.length) await lg("Gegevens bijgewerkt: " + anders.join(", "), k, "klant");
       return json({ klant: metPlanning(k, env), types: TYPES, handmatig: HANDMATIG, reviewLink: !!env("REVIEW_LINK"), kwartalen: kwartalenRond().slice(0, 4).map(kwartaalInfo) });
     }
     if (request.method === "DELETE") {
       klanten.splice(klanten.indexOf(k), 1);
       await bewaar();
+      await lg((k.status === "prospect" ? "Lead" : "Klant") + " verwijderd: " + (k.bedrijf || k.naam), null, "klant");
       return json({ ok: true });
     }
     return json({ fout: "Methode niet toegestaan" }, 405);
@@ -353,6 +378,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
     const sl = sleutelVoor(body.type, data, k);
     if (r.ok && !test && sl) k.verstuurd = { ...(k.verstuurd || {}), [sl]: nu };
     await bewaar();
+    await lg((test ? "Testmail (naar info@) " : "Mail ") + (r.ok ? "verstuurd: " : "mislukt: ") + m.subject, k, "mail");
     return json({ ...r, klant: metPlanning(k, env) }, r.ok ? 200 : 502);
   }
 
@@ -376,6 +402,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
       k.log = k.log.slice(0, 100);
       await bewaar();
     }
+    await lg((test ? "Testmail (naar info@) " : "Mail ") + (r.ok ? "verstuurd: " : "mislukt: ") + m.subject + (k ? "" : " (los adres, geen klant)"), k, "mail");
     return json({ ...r, id: k ? k.id : null }, r.ok ? 200 : 502);
   }
 
@@ -389,6 +416,8 @@ async function klantenApi(request, url, pad, wie, store, env) {
     kw[body.veld + "Door"] = body.aan ? wie : null;
     kw[body.veld + "Via"] = body.aan ? via || null : null;
     await bewaar();
+    const lbl = { binnen: "stukken binnen", ingediend: "aangifte ingediend", betaald: "btw betaald" }[body.veld];
+    await lg("Btw " + body.kw.replace("-", " ") + ": " + (body.aan ? lbl : "'" + lbl + "' weer uitgezet"), k, "btw");
     return json({ klant: metPlanning(k, env) });
   }
 
@@ -399,6 +428,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
     k.ibIngediend = k.ibIngediend || {};
     if (body.aan) { k.ibIngediend[body.jaar] = nu; k.ibDoor = { ...(k.ibDoor || {}), [body.jaar]: wie }; } else delete k.ibIngediend[body.jaar];
     await bewaar();
+    await lg("IB-aangifte " + body.jaar + (body.aan ? " ingediend" : ": 'ingediend' weer uitgezet"), k, "btw");
     return json({ klant: metPlanning(k, env) });
   }
 
@@ -407,16 +437,21 @@ async function klantenApi(request, url, pad, wie, store, env) {
     const k = vind(body.id);
     if (!k) return json({ fout: "Klant niet gevonden" }, 404);
     k.tijdlijn = k.tijdlijn || [];
+    let regel = null;
     if (request.method === "POST") {
       const tekst = String(body.tekst || "").replace(/[<>]/g, "").trim().slice(0, 1000);
       if (!tekst) return json({ fout: "Leeg" }, 400);
       const soort = ["notitie", "gebeld", "geappt", "gemaild", "gesprek"].includes(body.soort) ? body.soort : "notitie";
       k.tijdlijn.unshift({ id: nieuweId(), tekst, soort, op: nu, door: wie, via });
       k.tijdlijn = k.tijdlijn.slice(0, 300);
+      regel = TL_SOORT[soort] + ": " + tekst;
     } else if (request.method === "DELETE") {
+      const weg = k.tijdlijn.find((x) => x.id === body.nid);
       k.tijdlijn = k.tijdlijn.filter((x) => x.id !== body.nid);
+      if (weg) regel = (TL_SOORT[weg.soort] || "Notitie") + " verwijderd: " + weg.tekst;
     } else return json({ fout: "Methode niet toegestaan" }, 405);
     await bewaar();
+    if (regel) await lg(regel, k, "contact");
     return json({ klant: metPlanning(k, env) });
   }
 
@@ -440,20 +475,23 @@ async function klantenApi(request, url, pad, wie, store, env) {
       const aan = test ? String(env("MAIL_TO") || "info@avezaatenevers.nl").split(",")[0].trim() : email;
       const mail = test ? { ...m, subject: "[TEST] " + m.subject } : m;
       const r = await verstuur(env, { aan, mail });
-      if (!r.ok) return json(r, 502);
-      if (test) return json({ ok: true, test: true });
-      let k = klanten.find((x) => x.email === email);
+      if (!r.ok) { await lg((test ? "Testvoorstel (naar info@)" : "Voorstel") + " mislukt: " + (data.bedrijf || data.naam || "zonder naam"), null, "mail"); return json(r, 502); }
+      if (test) { await lg("Testvoorstel (naar info@) verstuurd: " + (data.bedrijf || data.naam || "zonder naam"), null, "mail"); return json({ ok: true, test: true }); }
+      let k = klanten.find((x) => x.email === email), nieuw = false;
       if (!k) {
-        k = { id: nieuweId(), naam: data.naam, bedrijf: data.bedrijf, email, telefoon: schoon(body.telefoon).slice(0, 30), boekhouder: data.wie, status: "prospect", start: "", voorstelLink: "", notitie: "", uit: [], verstuurd: {}, log: [], door: wie, aangemaakt: nu };
+        k = { id: nieuweId(), naam: data.naam, bedrijf: data.bedrijf, email, telefoon: schoon(body.telefoon).slice(0, 30), boekhouder: data.wie, status: "prospect", start: "", voorstelLink: "", notitie: "", uit: [], verstuurd: {}, log: [], door: wie, aangemaakt: nu, via };
         klanten.push(k);
+        nieuw = true;
       }
       if (!k.bedrijf && data.bedrijf) k.bedrijf = data.bedrijf;
       k.boekhouder = data.wie;
       k.voorstel = { op: nu, door: wie, data };
       k.log = k.log || [];
-      k.log.unshift({ type: "voorstel", onderwerp: m.subject, aan: email, op: nu, door: wie, test: false, ok: true, fout: null, handmatig: true });
+      k.log.unshift({ type: "voorstel", onderwerp: m.subject, aan: email, op: nu, door: wie, via, test: false, ok: true, fout: null, handmatig: true });
       k.log = k.log.slice(0, 100);
       await bewaar();
+      await logboekRegel(store,[nieuw && { wie, via, soort: "klant", tekst: "Lead toegevoegd (bij voorstel)", klant: k },
+        { wie, via, soort: "mail", tekst: "Voorstel verstuurd (€" + data.pakket + " p/m)", klant: k }]);
       return json({ ok: true, klantId: k.id, status: k.status });
     }
   }
@@ -463,6 +501,7 @@ async function klantenApi(request, url, pad, wie, store, env) {
     const k = vind(body.id);
     if (!k) return json({ fout: "Klant niet gevonden" }, 404);
     k.contacten = k.contacten || [];
+    let contactRegel = null;
     if (request.method === "POST") {
       const c = {
         id: nieuweId(), op: /^\d{4}-\d{2}-\d{2}$/.test(body.datum || "") && body.datum !== vandaag() ? body.datum + "T12:00:00.000Z" : nu,
@@ -473,10 +512,14 @@ async function klantenApi(request, url, pad, wie, store, env) {
       };
       k.contacten.unshift(c);
       k.contacten = k.contacten.slice(0, 1000);
+      contactRegel = "Contact vastgelegd (" + KANALEN[c.kanaal] + ", " + ONDERWERPEN[c.onderwerp] + ")" + (c.notitie ? ": " + c.notitie.slice(0, 120) : "");
     } else if (request.method === "DELETE") {
+      const weg = k.contacten.find((c) => c.id === body.cid);
       k.contacten = k.contacten.filter((c) => c.id !== body.cid);
+      if (weg) contactRegel = "Contactmoment verwijderd (" + (KANALEN[weg.kanaal] || weg.kanaal) + ", " + (ONDERWERPEN[weg.onderwerp] || weg.onderwerp) + ", " + String(weg.op).slice(0, 10) + ")";
     } else return json({ fout: "Methode niet toegestaan" }, 405);
     await bewaar();
+    if (contactRegel) await lg(contactRegel, k, "contact");
     return json({ klant: metPlanning(k, env) });
   }
 

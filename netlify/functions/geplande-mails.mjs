@@ -2,6 +2,7 @@
 // Draait alleen op de live site (Netlify voert geplande functies niet uit op branch deploys).
 import { getStore } from "@netlify/blobs";
 import { teVersturen, maakMail, verstuur, vandaag, TYPES } from "../klant-mails.js";
+import { log } from "../logboek.js";
 
 export default async () => {
   const store = getStore({ name: "intern", consistency: "strong" });
@@ -9,6 +10,7 @@ export default async () => {
   const env = (k) => process.env[k];
   const nu = vandaag();
   let verstuurd = 0, mislukt = 0;
+  const regels = [];
 
   for (const k of klanten) {
     if (!k.email) continue;
@@ -20,9 +22,11 @@ export default async () => {
       k.log = k.log.slice(0, 100);
       if (r.ok) { k.verstuurd = { ...(k.verstuurd || {}), [moment.sleutel]: new Date().toISOString() }; verstuurd++; }
       else mislukt++;
+      regels.push({ wie: "systeem", soort: "mail", tekst: "Automatische mail " + (r.ok ? "verstuurd: " : "mislukt: ") + mail.subject, klant: k });
     }
   }
   await store.setJSON("klanten", klanten);
+  await log(store, regels);
   console.log(`Geplande mails ${nu}: ${verstuurd} verstuurd, ${mislukt} mislukt (${Object.keys(TYPES).length} types)`);
   return new Response("ok");
 };

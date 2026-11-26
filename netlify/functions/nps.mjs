@@ -1,6 +1,7 @@
 // Openbare pagina /nps: de klant klikt in de mail op een cijfer, wij slaan het op en vragen kort waarom.
 import { getStore } from "@netlify/blobs";
 import { npsToken } from "../klant-mails.js";
+import { log } from "../logboek.js";
 
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
@@ -49,6 +50,7 @@ export default async (req) => {
   if (score >= 9) k.tevreden = true;
   if (score <= 6) k.tevreden = false;
   await store.setJSON("klanten", klanten);
+  await log(store, { wie: "systeem", soort: "nps", klant: k, tekst: req.method === "POST" ? "NPS-toelichting ontvangen bij cijfer " + score : "NPS-cijfer ontvangen: " + score });
 
   const voornaam = String(k.naam || "").split(" ")[0];
   const kleur = score <= 6 ? "#FDECEA;color:#B42318" : score <= 8 ? "#FEF3E2;color:#9A5B13" : "#E6F4EA;color:#15803D";

@@ -4,6 +4,7 @@ import { getStore } from "@netlify/blobs";
 import { mails } from "./lib/mails.js";
 import { verstuur, BASE } from "../klant-mails.js";
 import { stuur, MENSEN } from "../push.js";
+import { log } from "../logboek.js";
 
 const SITUATIE_KENNISMAKING = { "Ik ben net gestart": "start", "Ik wil overstappen van boekhouder": "boekhouder", "Ik doe het nu zelf": "zelf" };
 const schoon = (s, n = 200) => String(s || "").replace(/[<>]/g, "").trim().slice(0, n);
@@ -45,6 +46,7 @@ export default async (req) => {
     const klanten = (await store.get("klanten", { type: "json" })) || [];
     let k = email ? klanten.find((x) => x.email === email) : null;
     const nu = new Date().toISOString();
+    const bestond = !!k;
     if (!k) {
       k = { id: nieuweId(), naam: gegevens.naam, bedrijf: "", email, telefoon: gegevens.telefoon, boekhouder: "", status: "prospect", start: "", voorstelLink: "", notitie: "", uit: [], verstuurd: {}, log: [], tijdlijn: [], door: "formulier", aangemaakt: nu };
       klanten.push(k);
@@ -59,6 +61,8 @@ export default async (req) => {
     k.tijdlijn = k.tijdlijn || [];
     k.tijdlijn.unshift({ id: nieuweId(), soort: "notitie", tekst: `Formulier ${formulier} ingevuld${lead.prijs ? ` (prijs ${lead.prijs})` : ""}${lead.bericht ? `: ${lead.bericht}` : ""}`.slice(0, 1000), op: nu, door: "formulier" });
     await store.setJSON("klanten", klanten);
+    await log(store, { wie: "systeem", soort: "klant", klant: k,
+      tekst: "Websiteformulier " + formulier + " ingevuld" + (lead.prijs ? " (prijs " + lead.prijs + ")" : "") + (bestond ? "" : ", lead aangemaakt") });
     // 4. Pushmelding naar Koen en Daan
     try {
       const wie = (k.bedrijf || k.naam || "Iemand");

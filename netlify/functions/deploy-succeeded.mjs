@@ -3,6 +3,7 @@
 // Welke pagina's gewijzigd zijn, halen we uit <lastmod> in sitemap.xml: houd die dus bij.
 // De sleutel is niet geheim; hij staat ook openbaar in /<sleutel>.txt in de root van de site.
 import { getStore } from "@netlify/blobs";
+import { log } from "../logboek.js";
 
 const SITE = "https://avezaatenevers.nl";
 const SLEUTEL = "f42ea39f717d4a22b4a55ec378b1aa2e";
@@ -41,6 +42,7 @@ export default async (request) => {
 
   if (!urls.length) {
     console.log(`IndexNow: niets gewijzigd sinds ${vorige}`);
+    await log(store, { wie: "systeem", soort: "site", tekst: "Site live gezet; geen gewijzigde openbare pagina's om bij Bing te melden" });
     return new Response("niets te melden");
   }
 
@@ -53,6 +55,8 @@ export default async (request) => {
   console.log(`IndexNow: ${urls.length} URL's gemeld, antwoord ${melding.status} ${tekst.slice(0, 200)}\n${urls.join("\n")}`);
 
   // 200 = ontvangen, 202 = ontvangen, sleutel wordt nog gecontroleerd
-  if (melding.status === 200 || melding.status === 202) await store.set(BLOB, vandaag);
+  const gelukt = melding.status === 200 || melding.status === 202;
+  if (gelukt) await store.set(BLOB, vandaag);
+  await log(store, { wie: "systeem", soort: "site", tekst: gelukt ? `Site live gezet; ${urls.length} gewijzigde pagina's gemeld bij Bing (IndexNow)` : `Site live gezet; IndexNow-melding mislukt (${melding.status})` });
   return new Response(`IndexNow ${melding.status}`);
 };

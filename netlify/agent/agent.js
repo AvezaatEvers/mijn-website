@@ -6,6 +6,7 @@ import { PROCESSEN, GROEPEN, proces } from "./processen.js";
 import { synchroniseer, dagplan, verwerkMissie, GIDS } from "./dagplan.js";
 import { TYPES, HANDMATIG } from "../klant-mails.js";
 import { KANALEN, ONDERWERPEN, SOORTEN, GEVOEL } from "../inzichten.js";
+import { log as logboekRegel, leesLogboek } from "../logboek.js";
 
 const WERK = "werkstromen";
 const NAMEN = { koen: "Koen", daan: "Daan" };
@@ -39,10 +40,13 @@ async function werkstromenApi(request, url, pad, wie, store, h) {
       afgerond: runs.filter((r) => r.klaarOp).slice(-20).reverse().map(metNaam).filter(Boolean) });
   }
   const body = request.method === "DELETE" ? Object.fromEntries(url.searchParams) : await request.json().catch(() => ({}));
+  const klantVan = (kid) => { const k = kid && klanten.find((x) => x.id === kid); return k || null; };
   if (request.method === "POST") {
+    const aantal = runs.length;
     const r = startRun(runs, body.proces, body.klant, wie, klanten);
     if (r.fout) return json(r, 400);
     await store.setJSON(WERK, runs);
+    if (runs.length > aantal) await logboekRegel(store,{ wie, soort: "werkstroom", tekst: "Werkstroom gestart: " + proces(r.proces).titel, klant: klantVan(r.klant) });
     return json(metNaam(r));
   }
   const run = runs.find((r) => r.id === body.id);
@@ -50,18 +54,25 @@ async function werkstromenApi(request, url, pad, wie, store, h) {
   if (request.method === "PATCH") {
     const p = proces(run.proces);
     const i = Number(body.stap);
+    const regels = [];
     if (Number.isInteger(i) && i >= 0 && i < p.stappen.length) {
       run.stappen = run.stappen || {};
+      const was = !!run.stappen[i];
       if (body.klaar) run.stappen[i] = { door: wie, op: new Date().toISOString() }; else delete run.stappen[i];
+      if (was !== !!body.klaar) regels.push(p.titel + ": " + String(p.stappen[i].t || "stap " + (i + 1)).slice(0, 100) + (body.klaar ? "" : " (weer opengezet)"));
     }
     const alles = p.stappen.every((_, j) => run.stappen && run.stappen[j]);
+    const wasKlaar = !!run.klaarOp;
     run.klaarOp = alles ? (run.klaarOp || new Date().toISOString()) : null;
+    if (!wasKlaar && run.klaarOp) regels.push("Werkstroom afgerond: " + p.titel);
     await store.setJSON(WERK, runs);
+    await logboekRegel(store,regels.map((tekst) => ({ wie, soort: "werkstroom", tekst, klant: klantVan(run.klant) })));
     return json(metNaam(run));
   }
   if (request.method === "DELETE") {
     runs.splice(runs.indexOf(run), 1);
     await store.setJSON(WERK, runs);
+    await logboekRegel(store,{ wie, soort: "werkstroom", tekst: "Werkstroom verwijderd: " + ((proces(run.proces) || {}).titel || run.proces), klant: klantVan(run.klant) });
     return json({ ok: true });
   }
   return json({ fout: "Methode niet toegestaan" }, 405);
@@ -155,8 +166,8 @@ const TOOLS = [
     input_schema: { type: "object", properties: { zoek: { type: "string", description: "Zoekwoorden. Leeg = de meest recente gesprekken." } } } },
   { name: "gesprek_lezen", description: "Lees een eerder gesprek helemaal terug (id uit gesprekken_zoeken).",
     input_schema: { type: "object", properties: { id: { type: "string" } }, required: ["id"] } },
-  { name: "activiteit", description: "Wie heeft wat gedaan: een tijdlijn van recente acties van Koen en Daan (klanten toegevoegd of gewijzigd, contact, notities, mails, voorstellen, btw-kwartalen, taken, werkstroomstappen), inclusief of het via Claude of de agent ging. Gebruik voor vragen als 'wat heeft Daan vandaag gedaan?' of 'wie heeft Jansen gebeld?'.",
-    input_schema: { type: "object", properties: { wie: { type: "string", enum: ["koen", "daan", "alle"] }, dagen: { type: "number", description: "Hoeveel dagen terug, standaard 7" }, klant_id: { type: "string" } } } },
+  { name: "activiteit", description: "Wie heeft wat gedaan: een logboek van elke wijziging door Koen en Daan (klanten toegevoegd, gewijzigd of verwijderd met wat er veranderde, contact, notities, mails en testmails, voorstellen, btw- en IB-vinkjes, taken aangemaakt, gewijzigd, afgerond of verwijderd, werkstromen, agentgeheugen, Claude-koppeling), inclusief of het via Claude of de agent ging, plus automatische acties van het systeem (geplande mails, websiteformulieren, NPS, IndexNow). Gebruik voor vragen als 'wat heeft Daan vandaag gedaan?' of 'wie heeft Jansen gebeld?'.",
+    input_schema: { type: "object", properties: { wie: { type: "string", enum: ["koen", "daan", "systeem", "alle"] }, dagen: { type: "number", description: "Hoeveel dagen terug, standaard 7" }, klant_id: { type: "string" } } } },
   { name: "taak_afvinken", description: "Vink direct een open taak af. Geef (een deel van) de titel.",
     input_schema: { type: "object", properties: { titel: { type: "string" } }, required: ["titel"] } },
   { name: "mail_ontwerpen", description: "Ontwerp zelf een complete mail in onze huisstijl en zet hem klaar om te versturen via Resend (na Bevestigen). Gebruik dit voor nieuwsbrieven, uitleg, aanbiedingen, herinneringen op maat of elke mail die meer nodig heeft dan een paar alinea's. Bouw de mail op uit blokken. Ontvanger: een bestaande klant (klant_id) of een los e-mailadres (aan_email + aan_naam).",
@@ -215,10 +226,12 @@ async function voerUit(naam, input, c) {
     case "lopende_werkstromen":
       return runs.filter((r) => !r.klaarOp).map((r) => { const v = voortgang(r); const k = klanten.find((x) => x.id === r.klant); return v && { id: r.id, titel: v.titel, klant: k ? (k.bedrijf || k.naam) : null, klaar: v.klaar, totaal: v.totaal, gestart: r.gestart.slice(0, 10), door: NAMEN[r.wie] }; }).filter(Boolean);
     case "werkstroom_starten": {
+      const aantal = runs.length;
       const r = startRun(runs, input.proces, input.klant_id, wie, klanten, c.via || "agent");
       if (r.fout) return r;
       await store.setJSON(WERK, runs);
       const v = voortgang(r);
+      if (runs.length > aantal) await logboekRegel(store,{ wie, via: c.via || "agent", soort: "werkstroom", tekst: "Werkstroom gestart: " + v.titel, klant: klanten.find((k) => k.id === r.klant) });
       stuur({ t: "actie", soort: "werkstroom", tekst: "Werkstroom gestart: " + v.titel, link: "/intern/werkstromen.html?run=" + r.id });
       return { ok: true, id: r.id, titel: v.titel, link: "/intern/werkstromen.html?run=" + r.id };
     }
@@ -230,6 +243,7 @@ async function voerUit(naam, input, c) {
         klaar: false, klaarDoor: null, klaarOp: null, door: wie, aangemaakt: new Date().toISOString(), klant, viaAgent: true, via: c.via || "agent" };
       taken.push(t);
       await h.bewaarTaken(store, taken);
+      await logboekRegel(store,{ wie, via: t.via, soort: "taak", tekst: "Taak aangemaakt: " + titel + " (voor " + (NAMEN[t.voor] || "samen") + (t.deadline ? ", deadline " + t.deadline : "") + ")", klant: klanten.find((k) => k.id === klant) });
       stuur({ t: "actie", soort: "taak", tekst: "Taak toegevoegd: " + titel + (t.deadline ? " (" + t.deadline + ")" : ""), link: "/intern/" });
       return { ok: true, taak: t };
     }
@@ -325,6 +339,7 @@ async function voerUit(naam, input, c) {
       const g = await leesGeheugen(store);
       g.feiten.push({ id: id(), tekst, door: wie, op: new Date().toISOString() });
       await store.setJSON(GEHEUGEN, { feiten: g.feiten.slice(-60), antwoorden: g.antwoorden.slice(-300) });
+      await logboekRegel(store,{ wie, via: c.via || "agent", soort: "agent", tekst: "Agent onthoudt: " + tekst });
       stuur({ t: "actie", soort: "geheugen", tekst: "Onthouden: " + tekst, link: "/intern/agent.html?geheugen=1" });
       return { ok: true };
     }
@@ -353,11 +368,13 @@ async function voerUit(naam, input, c) {
       if (open.length > 1) return { fout: "Meerdere taken passen, wees specifieker", opties: open.map((t) => t.titel) };
       open[0].klaar = true; open[0].klaarDoor = wie; open[0].klaarOp = new Date().toISOString(); open[0].klaarVia = c.via || "agent";
       await h.bewaarTaken(store, taken);
+      await logboekRegel(store,{ wie, via: c.via || "agent", soort: "taak", tekst: "Taak afgerond: " + open[0].titel, klant: klanten.find((k) => k.id === open[0].klant) });
       stuur({ t: "actie", soort: "taak", tekst: "Taak afgevinkt: " + open[0].titel, link: "/intern/" });
       return { ok: true };
     }
     case "activiteit": {
-      const lijst = activiteit(klanten, taken, runs, { wie: input.wie, dagen: Number(input.dagen) || 7, klant: input.klant_id, max: 60 });
+      const dagen = Math.min(90, Number(input.dagen) || 7);
+      const lijst = activiteit(klanten, taken, runs, { wie: input.wie, dagen, klant: input.klant_id, max: 60, logboek: await leesLogboek(store, dagen) });
       return lijst.length ? lijst.map((a) => ({ op: a.op, wie: NAMEN[a.wie] || a.wie, via: a.via || "dashboard", wat: a.tekst, klant: a.klant ? a.klant.naam : undefined })) : { resultaat: "Niets gevonden in deze periode" };
     }
     case "contact_inzichten": {
@@ -854,13 +871,18 @@ async function geheugenApi(request, url, pad, wie, store) {
   if (request.method === "GET") return json(g);
   if (request.method === "DELETE") {
     const weg = url.searchParams.get("id");
+    const f = g.feiten.find((x) => x.id === weg), a = g.antwoorden.find((x) => x.id === weg);
     g.feiten = g.feiten.filter((f) => f.id !== weg); g.antwoorden = g.antwoorden.filter((a) => a.id !== weg);
-    await bewaar(); return json({ ok: true });
+    await bewaar();
+    if (f || a) await logboekRegel(store,{ wie, soort: "agent", tekst: f ? "Agentgeheugen: feit verwijderd: " + f.tekst : "Agentgeheugen: beoordeeld antwoord verwijderd: " + a.vraag });
+    return json({ ok: true });
   }
   const body = await request.json().catch(() => ({}));
   if (pad === "/intern/api/geheugen/feit") {
     const tekst = schoon(body.tekst, 400); if (!tekst) return json({ fout: "Leeg" }, 400);
-    const f = { id: id(), tekst, door: wie, op: new Date().toISOString() }; g.feiten.push(f); await bewaar(); return json(f);
+    const f = { id: id(), tekst, door: wie, op: new Date().toISOString() }; g.feiten.push(f); await bewaar();
+    await logboekRegel(store,{ wie, soort: "agent", tekst: "Agent onthoudt: " + tekst });
+    return json(f);
   }
   if (pad === "/intern/api/geheugen/oordeel") {
     const vraag = schoon(body.vraag, 600), antwoord = String(body.antwoord || "").replace(/[<>]/g, "").slice(0, 4000);
@@ -870,7 +892,9 @@ async function geheugenApi(request, url, pad, wie, store) {
     g.antwoorden = g.antwoorden.filter((a) => !(a.vraag === vraag && a.antwoord === antwoord));
     const a = { id: id(), vraag, antwoord, oordeel, correctie: schoon(body.correctie, 1500), web: !!body.web,
       bronnen: (Array.isArray(body.bronnen) ? body.bronnen : []).slice(0, 6).map((b) => ({ titel: schoon(b.titel, 120), bron: schoon(b.bron, 400) })), door: wie, op: new Date().toISOString() };
-    g.antwoorden.push(a); await bewaar(); return json(a);
+    g.antwoorden.push(a); await bewaar();
+    await logboekRegel(store,{ wie, soort: "agent", tekst: "Agentantwoord beoordeeld als " + (oordeel === "goed" ? "goed" : "kan beter") + (a.correctie ? " (met correctie)" : "") + ": " + vraag.slice(0, 120) });
+    return json(a);
   }
   return json({ fout: "Onbekende route" }, 404);
 }
@@ -882,7 +906,11 @@ async function gesprekkenApi(request, url, pad, wie, store) {
   const meta = (g) => ({ id: g.id, titel: g.titel, bijgewerkt: g.bijgewerkt, aantal: (g.berichten || []).length });
   if (pad === "/intern/api/gesprekken") return json(lijst.map(meta).sort((a, b) => b.bijgewerkt.localeCompare(a.bijgewerkt)));
   if (request.method === "GET") { const g = lijst.find((x) => x.id === url.searchParams.get("id")); return g ? json(g) : json({ fout: "Gesprek niet gevonden" }, 404); }
-  if (request.method === "DELETE") { const i = lijst.findIndex((x) => x.id === url.searchParams.get("id")); if (i >= 0) { lijst.splice(i, 1); await store.setJSON(sleutel, lijst); } return json({ ok: true }); }
+  if (request.method === "DELETE") {
+    const i = lijst.findIndex((x) => x.id === url.searchParams.get("id"));
+    if (i >= 0) { const titel = lijst[i].titel; lijst.splice(i, 1); await store.setJSON(sleutel, lijst); await logboekRegel(store,{ wie, soort: "agent", tekst: "Agentgesprek verwijderd: " + (titel || "zonder titel") }); }
+    return json({ ok: true });
+  }
   if (request.method === "POST") {
     const body = await request.json().catch(() => ({}));
     const berichten = (Array.isArray(body.berichten) ? body.berichten : []).slice(-60).map((b) => ({
@@ -901,14 +929,38 @@ async function gesprekkenApi(request, url, pad, wie, store) {
   return json({ fout: "Methode niet toegestaan" }, 405);
 }
 
+// Logregel voor een actie in het dagplan (missie afgerond, uitgesteld of teruggezet)
+function dagplanRegel(missie, actie, taken, runs, klanten, wie) {
+  const [soort, rid, stap] = missie.split(":");
+  const klant = (kid) => (kid && klanten.find((k) => k.id === kid)) || null;
+  if (soort === "t") {
+    const t = taken.find((x) => x.id === rid); if (!t) return null;
+    const tekst = actie === "later" ? "Taak uitgesteld naar " + t.deadline : actie === "terug" ? "Taak weer opengezet" : "Taak afgerond";
+    return { wie, soort: "taak", tekst: tekst + ": " + t.titel, klant: klant(t.klant) };
+  }
+  const r = runs.find((x) => x.id === rid), p = r && proces(r.proces); if (!p) return null;
+  const wat = stap === "*" ? "alle stappen" : String((p.stappen[Number(stap)] || {}).t || "stap").slice(0, 100);
+  const tekst = actie === "later" ? p.titel + ": uitgesteld naar morgen" : actie === "terug" ? p.titel + ": " + wat + " weer opengezet" : p.titel + ": " + wat + (r.klaarOp ? " (werkstroom afgerond)" : "");
+  return { wie, soort: "werkstroom", tekst, klant: klant(r.klant) };
+}
+
 // ---------- Ingang ----------
 // ---------- Activiteit: wie deed wat ----------
-// Opgebouwd uit wat er al wordt vastgelegd (door, op, via), dus het werkt voor het dashboard, de agent en Claude tegelijk.
+// Sinds het logboek bestaat (netlify/logboek.js) komt elke wijziging daaruit. Voor de periode daarvoor bouwen we
+// de lijst nog op uit wat in de dossiers is vastgelegd (door, op, via).
 const SOORT_TL = { notitie: "Notitie", gebeld: "Gebeld", geappt: "Geappt", gemaild: "Gemaild", gesprek: "Gesprek" };
 export function activiteit(klanten, taken, runs, opt = {}) {
   const uit = [], sinds = new Date(Date.now() - (opt.dagen || 14) * 864e5).toISOString();
+  const lb = opt.logboek || { sinds: null, items: [] };
   const naam = (k) => ({ id: k.id, naam: k.bedrijf || k.naam });
-  const zet = (op, wie, via, tekst, k, soort) => { if (op && op >= sinds && wie) uit.push({ op, wie, via: via || null, tekst, klant: k ? naam(k) : null, soort }); };
+  // Stappen die het systeem zelf afvinkt (door "auto") staan niet in het logboek, die blijven we uit de werkstromen halen
+  const zet = (op, wie, via, tekst, k, soort) => { if (op && op >= sinds && wie && (!lb.sinds || op < lb.sinds || wie === "auto")) uit.push({ op, wie, via: via || null, tekst, klant: k ? naam(k) : null, soort }); };
+  for (const it of lb.items) {
+    if (!it.op || it.op < sinds) continue;
+    if (opt.klant && (!it.klant || it.klant.id !== opt.klant)) continue;
+    const k = it.klant && klanten.find((x) => x.id === it.klant.id);
+    uit.push({ op: it.op, wie: it.wie, via: it.via || null, tekst: it.tekst, soort: it.soort, klant: it.klant ? { id: it.klant.id, naam: k ? k.bedrijf || k.naam : it.klant.naam || "klant" } : null, weg: !!it.klant && !k });
+  }
   for (const k of klanten) {
     if (opt.klant && k.id !== opt.klant) continue;
     zet(k.aangemaakt, k.door, k.via, (k.lead && k.status === "prospect" ? "Lead toegevoegd" : "Klant toegevoegd"), k, "klant");
@@ -934,6 +986,8 @@ export function activiteit(klanten, taken, runs, opt = {}) {
     zet(r.gestart, r.wie, r.via, "Werkstroom gestart: " + p.titel, kl(r.klant), "werkstroom");
     for (const [i, st] of Object.entries(r.stappen || {})) if (st && st.door) zet(st.op, st.door, st.via, p.titel + ": " + String((p.stappen[i] || {}).t || "stap " + (Number(i) + 1)).slice(0, 100), kl(r.klant), "werkstroom");
   }
+  // Alles wat niet door Koen of Daan zelf gebeurde (gepland, formulier, auto, klant) heet "systeem"
+  for (const a of uit) if (a.wie !== "koen" && a.wie !== "daan") a.wie = "systeem";
   return uit.filter((a) => !opt.wie || opt.wie === "alle" || a.wie === opt.wie).sort((a, b) => b.op.localeCompare(a.op)).slice(0, opt.max || 150);
 }
 
@@ -951,11 +1005,18 @@ async function claudeSleutelApi(request, url, wie, store) {
   if (request.method === "GET") return json({ heeft: !!alle[wie], sinds: alle[wie] ? alle[wie].op : null, laatst: alle[wie] ? alle[wie].laatst || null : null });
   if (request.method === "POST") {
     const ruw = crypto.getRandomValues(new Uint8Array(24)), sleutel = "ae_" + [...ruw].map((x) => x.toString(16).padStart(2, "0")).join("");
+    const vervangen = !!alle[wie];
     alle[wie] = { hash: await hashHex(sleutel), op: new Date().toISOString() };
     await store.setJSON(SLEUTELS, alle);
+    await logboekRegel(store,{ wie, soort: "instelling", tekst: vervangen ? "Claude-koppeling vernieuwd (oude link werkt niet meer)" : "Claude-koppeling aangemaakt" });
     return json({ sleutel, url: url.origin + "/mcp/" + sleutel });
   }
-  if (request.method === "DELETE") { delete alle[wie]; await store.setJSON(SLEUTELS, alle); return json({ ok: true }); }
+  if (request.method === "DELETE") {
+    const had = !!alle[wie];
+    delete alle[wie]; await store.setJSON(SLEUTELS, alle);
+    if (had) await logboekRegel(store,{ wie, soort: "instelling", tekst: "Claude-koppeling ingetrokken" });
+    return json({ ok: true });
+  }
   return json({ fout: "Methode niet toegestaan" }, 405);
 }
 export async function sleutelGebruikt(store, wie) {
@@ -996,7 +1057,8 @@ export async function agentApi(request, url, pad, wie, store, env, h) {
   if (pad === "/intern/api/activiteit") {
     const [klanten, taken, runs] = await Promise.all([h.leesKlanten(store), h.leesTaken(store), leesRuns(store)]);
     const p = url.searchParams;
-    return json({ items: activiteit(klanten, taken, runs, { wie: p.get("wie") || "alle", dagen: Math.min(90, Number(p.get("dagen")) || 14), klant: p.get("klant") || null, max: 200 }) });
+    const dagen = Math.min(90, Number(p.get("dagen")) || 14);
+    return json({ items: activiteit(klanten, taken, runs, { wie: p.get("wie") || "alle", dagen, klant: p.get("klant") || null, max: 300, logboek: await leesLogboek(store, dagen) }) });
   }
   if (pad === "/intern/api/claude-sleutel") return claudeSleutelApi(request, url, wie, store);
   if (pad === "/intern/api/werkstromen" || pad === "/intern/api/werkstroom") return werkstromenApi(request, url, pad, wie, store, h);
@@ -1007,14 +1069,18 @@ export async function agentApi(request, url, pad, wie, store, env, h) {
     const [klanten, taken, runs] = await Promise.all([h.leesKlanten(store), h.leesTaken(store), leesRuns(store)]);
     let runsVeranderd = synchroniseer(klanten, runs, nu), takenVeranderd = false;
     const voor = ["koen", "daan"].includes(url.searchParams.get("wie")) ? url.searchParams.get("wie") : wie;
+    let regel = null;
     if (request.method === "POST") {
       const body = await request.json().catch(() => ({}));
-      const r = verwerkMissie(runs, taken, body.missie, wie, nu, ["later", "terug"].includes(body.actie) ? body.actie : "klaar");
+      const actie = ["later", "terug"].includes(body.actie) ? body.actie : "klaar";
+      const r = verwerkMissie(runs, taken, body.missie, wie, nu, actie);
       if (r.fout) return json(r, 404);
       if (r.taken) takenVeranderd = true; else runsVeranderd = true;
+      regel = dagplanRegel(String(body.missie), actie, taken, runs, klanten, wie);
     }
     if (runsVeranderd) await store.setJSON(WERK, runs);
     if (takenVeranderd) await h.bewaarTaken(store, taken);
+    if (regel) await logboekRegel(store,regel);
     return json(dagplan(klanten, taken, runs, voor, nu));
   }
   if (pad === "/intern/api/agent/status") return json({ slim: !!geminiSleutel(env), web: !!String(env("TAVILY_API_KEY") || "").trim(), gratis: true, motor: geminiSleutel(env) ? "Gemini" : "lokaal" });

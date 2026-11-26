@@ -9,7 +9,7 @@
   var css = '' +
     '.pl{display:grid;grid-template-columns:280px minmax(0,1fr);min-height:540px;font:inherit;color:var(--ink,#111827);text-align:left}' +
     '.pl-info{padding:28px 26px;border-right:1px solid var(--line,#E5E7EB);display:flex;flex-direction:column;gap:14px}' +
-    '.pl-fotos{display:flex}.pl-fotos img{width:44px;height:44px;border-radius:50%;object-fit:cover;border:3px solid #fff}.pl-fotos img+img{margin-left:-12px}' +
+    '.pl-wissel{display:contents}.pl-fotos{display:flex}.pl-fotos img{width:44px;height:44px;border-radius:50%;object-fit:cover;border:3px solid #fff}.pl-fotos img+img{margin-left:-12px}' +
     '.pl-org{font-size:15px;color:var(--muted,#4B5563);font-weight:500;margin:0}' +
     '.pl-titel{font-size:24px;font-weight:700;letter-spacing:-.02em;margin:0;line-height:1.2}' +
     '.pl-feit{display:flex;gap:10px;align-items:flex-start;font-size:15px;font-weight:500;color:var(--muted,#4B5563);margin:0;line-height:1.45}' +
@@ -88,11 +88,10 @@
     var dagen = {}, lijstDagen = [], dag = null, gekozen = null, maand = null, stap = 'laden';
     zetCss();
 
+    // Het vaste deel (foto's, naam) wordt één keer getekend; alleen dit wisselende deel verandert bij een klik
+    function terugKnop() { return stap === 'form' ? '<div><button type="button" class="pl-terug" data-terug aria-label="Terug naar de kalender">' + IC.links + '</button></div>' : ''; }
     function info() {
-      var h = stap === 'form' ? '<div><button type="button" class="pl-terug" data-terug aria-label="Terug naar de kalender">' + IC.links + '</button></div>' : '';
-      h += '<div class="pl-fotos"><img src="/assets/img/koen-160.webp?v=4" alt="" width="44" height="44"><img src="/assets/img/daan-160.webp?v=4" alt="" width="44" height="44"></div>' +
-        '<p class="pl-org">Avezaat &amp; Evers</p>' +
-        '<h2 class="pl-titel">' + (verzet ? 'Verzet je kennismaking' : 'Gratis kennismaking') + '</h2>' +
+      var h = '<h2 class="pl-titel">' + (verzet ? 'Verzet je kennismaking' : 'Gratis kennismaking') + '</h2>' +
         '<p class="pl-feit">' + IC.klok + '<span>20 min</span></p>' +
         '<p class="pl-feit">' + IC.video + '<span>Google Meet</span></p>';
       if (gekozen && stap === 'form') h += '<p class="pl-feit is-keuze">' + IC.agenda + '<span>' + tijd(gekozen) + ' – ' + tijd(plus20(gekozen)) + ', ' + esc(datumLang(gekozen)) + '</span></p>';
@@ -153,7 +152,16 @@
         : stap === 'laden' ? '<p class="pl-leeg">Vrije momenten laden…</p>'
         : !lijstDagen.length ? '<div><h2 class="pl-h">Kies een dag en tijd</h2><p class="pl-leeg">Er zijn de komende twee weken geen vrije momenten online. <a href="https://wa.me/31850604363">App ons</a> of bel <a href="tel:+31850604363">085 060 4363</a>, dan plannen we samen een tijd.</p></div>'
         : kalender() + tijden();
-      el.innerHTML = '<div class="pl"><aside class="pl-info">' + info() + '</aside><div class="pl-main' + (stap === 'form' ? ' is-form' : '') + '">' + main + '</div></div>';
+      if (!el.querySelector('.pl')) {
+        el.innerHTML = '<div class="pl"><aside class="pl-info"><div class="pl-wissel pl-wissel-terug"></div>' +
+          '<div class="pl-fotos"><img src="/assets/img/koen-160.webp?v=4" alt="" width="44" height="44"><img src="/assets/img/daan-160.webp?v=4" alt="" width="44" height="44"></div>' +
+          '<p class="pl-org">Avezaat &amp; Evers</p><div class="pl-wissel pl-wissel-info"></div></aside><div class="pl-main"></div></div>';
+      }
+      el.querySelector('.pl-wissel-terug').innerHTML = terugKnop();
+      el.querySelector('.pl-wissel-info').innerHTML = info();
+      var hoofd = el.querySelector('.pl-main');
+      hoofd.className = 'pl-main' + (stap === 'form' ? ' is-form' : '');
+      hoofd.innerHTML = main;
       if (melding) {
         var mm = el.querySelector('.pl-melding');
         if (mm) mm.textContent = melding;

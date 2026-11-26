@@ -28,7 +28,7 @@ export async function agendaCheck(store, env, opties = {}) {
     if (dezeWeek) delen.push(`${dezeWeek} ${dezeWeek === 1 ? "kennismaking" : "kennismakingen"} deze week.`);
     if (appleFout) delen.push("Let op: je Apple Agenda kon niet worden gelezen.");
     delen.push("Kloppen je tijden en dichte dagen nog?");
-    uit[wie] = await stuur(store, [wie], "agenda", { title: "Check je agenda, " + NAAM[wie], body: delen.join(" "), url: "/intern/beschikbaarheid.html" });
+    uit[wie] = await stuur(store, [wie], "agenda", { title: "Check je agenda, " + NAAM[wie], body: delen.join(" "), url: "/intern/beschikbaarheid.html#tijden" });
   }
   return uit;
 }

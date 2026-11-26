@@ -44,7 +44,9 @@
   .nieuw select, .dicht input { font: inherit; font-size: 14px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
   .dicht { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
   .dicht h3 { font-size: 15px; margin: 0 0 8px; }
-  .dicht form { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .dicht form { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 10px; }
+  .dicht form label { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--muted); }
+  .mtabs { display: none; }
   .af { display: grid; grid-template-columns: 74px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 12px 2px; border-bottom: 1px solid var(--line); }
   .af:last-child { border-bottom: 0; }
   .af .dt { font-size: 13px; color: var(--muted); line-height: 1.3; }
@@ -73,40 +75,65 @@
   .vooruit select { font: inherit; font-size: 14px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font-weight: 600; }
   .opgeslagen { font-size: 13px; color: #15803D; margin-left: 8px; }
   details.eerder summary { cursor: pointer; color: var(--muted); font-size: 14px; margin-top: 10px; }
+  @media (max-width: 760px) {
+    .hk { margin-bottom: 12px; align-items: center; flex-wrap: nowrap; }
+    main.db .hk h1 { font-size: 26px; overflow-wrap: normal; word-break: normal; }
+    .hk .intro { display: none; }
+    .planner-knop { font-size: 13px; padding: 7px 11px; white-space: nowrap; flex: none; }
+    .hk > div { min-width: 0; }
+    .tellers { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+    .tellers div { padding: 10px 12px; border-radius: 12px; }
+    .tellers span { font-size: 12px; }
+    .tellers b { font-size: 20px; }
+    .mtabs { display: flex; gap: 2px; padding: 3px; border-radius: 12px; background: #E8E8ED; margin-bottom: 14px; }
+    .mtabs button { flex: 1; font: inherit; font-size: 14px; font-weight: 500; padding: 9px 6px; border: 0; border-radius: 9px; background: none; color: var(--ink); }
+    .mtabs button[aria-selected="true"] { background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .12); font-weight: 600; }
+    main.db[data-tab] [data-paneel] { display: none; }
+    main.db[data-tab="afspraken"] [data-paneel="afspraken"], main.db[data-tab="tijden"] [data-paneel="tijden"], main.db[data-tab="koppelingen"] [data-paneel="koppelingen"] { display: block; }
+    .db-kaart { padding: 18px 16px; }
+    .af { grid-template-columns: 70px minmax(0, 1fr); gap: 10px; }
+    .af .dt { white-space: nowrap; }
+    .af .acties { grid-column: 2; justify-content: flex-start; }
+    .wd { grid-template-columns: 92px minmax(0, 1fr); }
+    .dicht form { display: grid; grid-template-columns: 1fr 1fr; }
+    .dicht form input { width: 100%; min-width: 0; }
+    .dicht form button { grid-column: 1 / -1; }
+  }
 </style>
 </head>
 <body>
 <main class="db">
   <div class="hk">
-    <div><h1>Kennismakingen</h1><p>Zet hier wanneer je kunt. Klanten boeken zelf via de planner op <a href="/contact#plannen" target="_blank">de contactpagina</a>: 20 minuten via Google Meet, tot <span id="vooruit-tekst">2 weken</span> vooruit en minstens 24 uur van tevoren. Een afspraak gaat naar wie er vrij is.</p></div>
-    <a class="db-knop is-rand" href="/contact#plannen" target="_blank" rel="noopener">Planner bekijken</a>
+    <div><h1>Kennismakingen</h1><p class="intro">Zet hier wanneer je kunt. Klanten boeken zelf via de planner op <a href="/contact#plannen" target="_blank">de contactpagina</a>: 20 minuten via Google Meet, tot <span id="vooruit-tekst">2 weken</span> vooruit en minstens 24 uur van tevoren. Een afspraak gaat naar wie er vrij is.</p></div>
+    <a class="db-knop is-rand planner-knop" href="/contact#plannen" target="_blank" rel="noopener">Planner bekijken</a>
   </div>
   <div id="melding"></div>
   <div class="tellers" id="tellers"></div>
+  <div class="mtabs" id="mtabs" role="tablist" aria-label="Onderdelen"><button type="button" role="tab" data-naar="afspraken">Afspraken</button><button type="button" role="tab" data-naar="tijden">Tijden</button><button type="button" role="tab" data-naar="koppelingen">Koppelingen</button></div>
   <div class="kol">
     <div>
-      <div class="db-kaart" style="margin-bottom:18px">
+      <div class="db-kaart" data-paneel="afspraken" style="margin-bottom:18px">
         <h2>Afspraken</h2><p class="sub">De komende kennismakingen. Annuleren stuurt de klant een mail met de vraag een nieuw moment te kiezen.</p>
         <div id="afspraken"><p class="kl-leeg">Laden…</p></div>
       </div>
     </div>
     <div>
-      <div class="db-kaart" style="margin-bottom:18px">
+      <div class="db-kaart" data-paneel="tijden" style="margin-bottom:18px">
         <h2>Beschikbaarheid <span class="opgeslagen" id="opgeslagen" hidden>Opgeslagen</span></h2><p class="sub">Vaste tijden per week. Wijzigingen staan direct in de planner.</p>
         <label class="vooruit">Klanten kunnen boeken tot <select id="vooruit" aria-label="Hoeveel weken vooruit"><option value="1">1 week</option><option value="2">2 weken</option><option value="3">3 weken</option><option value="4">4 weken</option><option value="5">5 weken</option><option value="6">6 weken</option><option value="7">7 weken</option><option value="8">8 weken</option></select> vooruit</label>
         <div class="seg" id="persoon"><button type="button" data-p="koen">Koen</button><button type="button" data-p="daan">Daan</button></div>
         <div id="week"></div>
         <div class="dicht">
           <h3>Dichte dagen</h3>
-          <form id="dicht-form"><input type="date" name="van" required aria-label="Van"><span style="align-self:center;color:var(--muted)">t/m</span><input type="date" name="tot" aria-label="Tot en met (optioneel)"><button class="db-knop is-licht is-klein" type="submit">Dichtzetten</button></form>
+          <form id="dicht-form"><label>Van<input type="date" name="van" required></label><label>Tot en met (optioneel)<input type="date" name="tot"></label><button class="db-knop is-licht is-klein" type="submit">Dichtzetten</button></form>
           <div class="vensters" id="dicht"></div>
         </div>
       </div>
-      <div class="db-kaart" style="margin-bottom:18px">
+      <div class="db-kaart" data-paneel="koppelingen" style="margin-bottom:18px">
         <h2>Apple Agenda</h2><p class="sub">Staat er iets in je Apple Agenda, dan kan een klant op dat moment niet boeken. De planner ziet alleen dát je bezet bent, niet wat er staat.</p>
         <div id="apple"></div>
       </div>
-      <div class="db-kaart">
+      <div class="db-kaart" data-paneel="koppelingen">
         <h2>Google Agenda</h2><p class="sub">Per kennismaking maakt de site een afspraak met een Google Meet-link in de agenda van wie het gesprek doet.</p>
         <div id="google"></div>
       </div>
@@ -138,6 +165,15 @@
     history.replaceState(null, '', location.pathname);
   }
 
+  // Tabbladen op mobiel: één onderdeel tegelijk (via #afspraken, #tijden of #koppelingen ook direct te openen)
+  function kiesTab(t) {
+    if (['afspraken', 'tijden', 'koppelingen'].indexOf(t) < 0) t = 'afspraken';
+    document.querySelector('main.db').dataset.tab = t;
+    document.querySelectorAll('#mtabs [data-naar]').forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.naar === t)); });
+    history.replaceState(null, '', location.pathname + location.search + '#' + t);
+  }
+  kiesTab(gq ? 'koppelingen' : location.hash.slice(1));
+  $('mtabs').addEventListener('click', function (e) { var b = e.target.closest('[data-naar]'); if (b) { kiesTab(b.dataset.naar); window.scrollTo(0, 0); } });
   function laad() {
     api('GET', '').then(function (r) { data = r; ik = r.wie; if (!laad.gedaan) { persoon = r.wie; laad.gedaan = true; } teken(); })
       .catch(function (e) { $('afspraken').innerHTML = '<p class="kl-leeg">Laden mislukt: ' + esc(e.message) + '</p>'; });
@@ -200,7 +236,7 @@
           '<label>App-specifiek wachtwoord<input type="password" name="wachtwoord" autocomplete="off" placeholder="xxxx-xxxx-xxxx-xxxx" required></label>' +
           '<div><button class="db-knop is-klein" type="submit">Koppel Apple Agenda</button></div><p class="ap-uitleg ap-fout" id="ap-fout"></p></form></div>';
       }
-      var status = x.fout ? '<span class="ap-fout">Lezen lukt niet: ' + esc(x.fout) + '</span>' : x.gelezen ? 'Gelezen om ' + esc(f(x.gelezen, { hour: '2-digit', minute: '2-digit' })) + ' · ' + x.blokken + ' bezette momenten in de komende 2 weken' : 'Nog niet gelezen';
+      var status = x.fout ? '<span class="ap-fout">Lezen lukt niet: ' + esc(x.fout) + '</span>' : x.gelezen ? 'Gelezen om ' + esc(f(x.gelezen, { hour: '2-digit', minute: '2-digit' })) + ' · ' + x.blokken + ' bezette momenten in de komende ' + data.regels.vooruitWeken + (data.regels.vooruitWeken === 1 ? ' week' : ' weken') : 'Nog niet gelezen';
       return '<div class="gk" style="display:block"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><div><strong>' + NAAM[m] + '</strong><small>' + esc(x.appleId) + '<br>' + status + '</small></div>' +
         (mij ? '<span style="display:flex;gap:6px"><button class="db-knop is-licht is-klein" type="button" data-apple-lees>Opnieuw lezen</button><button class="db-knop is-rand is-klein" type="button" data-apple-uit>Ontkoppelen</button></span>' : '') + '</div>' +
         '<div class="ap-agendas">' + x.agendas.map(function (a) {

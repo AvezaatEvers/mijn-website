@@ -54,7 +54,7 @@ export default async (req) => {
       google: { ingesteld: googleIngesteld(env), redirect, ...Object.fromEntries(MENSEN.map((m) => [m, g[m] && g[m].refresh ? { email: g[m].email || "", sinds: g[m].op } : null])) },
       apple: Object.fromEntries(MENSEN.map((m) => [m, apple[m] && apple[m].appleId ? { appleId: apple[m].appleId, agendas: apple[m].agendas, sinds: apple[m].op,
         gelezen: (status[m] || {}).laatstGoed || null, fout: (status[m] || {}).fout || null, perAgenda: (status[m] || {}).agendas || [],
-        blokken: (bezet[m] || []).filter((x) => x[1] > Date.now() && x[0] < Date.now() + 14 * 864e5).length } : null])),
+        blokken: (bezet[m] || []).filter((x) => x[1] > Date.now() && x[0] < Date.now() + vooruitDagen(b) * 864e5).length } : null])),
     });
   }
 

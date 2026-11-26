@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="/intern/app.webmanifest">
+<link rel="apple-touch-icon" href="/assets/img/app/intern-apple-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="A&amp;E">
+<meta name="theme-color" content="#F6F6F8">
+<title>Kennismakingen | Avezaat &amp; Evers intern</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/style.css?v=140">
+<link rel="stylesheet" href="/intern/klanten.css?v=7">
+<link rel="stylesheet" href="/intern/app.css?v=8">
+<style>
+  .hk { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .hk h1 { font-size: clamp(28px, 3.6vw, 40px); margin: 0; letter-spacing: -.03em; }
+  .hk p { margin: 4px 0 0; color: var(--muted); max-width: 720px; }
+  .tellers { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .tellers div { background: var(--vlak, #fff); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
+  .tellers span { font-size: 12.5px; color: var(--muted); }
+  .tellers b { display: block; font-size: 24px; font-weight: 600; letter-spacing: -.02em; }
+  .kol { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+  @media (max-width: 960px) { .kol { grid-template-columns: 1fr; } }
+  .db-kaart h2 { font-size: 18px; margin: 0 0 4px; }
+  .db-kaart > p.sub { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
+  .seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 12px; background: #E8E8ED; margin-bottom: 14px; }
+  .seg button { font: inherit; font-size: 14px; font-weight: 500; padding: 7px 14px; border: 0; border-radius: 9px; background: none; color: var(--ink); cursor: pointer; }
+  .seg button.is-aan { background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .12); font-weight: 600; }
+  .wd { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line); }
+  .wd:last-of-type { border-bottom: 0; }
+  .wd > b { font-size: 14px; font-weight: 600; }
+  .vensters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; padding: 5px 6px 5px 10px; border-radius: 8px; background: var(--tint); color: var(--accent); font-variant-numeric: tabular-nums; }
+  .chip button { border: 0; background: none; color: inherit; font: inherit; font-size: 15px; line-height: 1; cursor: pointer; padding: 0 4px; opacity: .7; }
+  .chip button:hover { opacity: 1; }
+  .plus { font: inherit; font-size: 13px; border: 1px dashed var(--line); background: none; color: var(--muted); border-radius: 8px; padding: 5px 10px; cursor: pointer; }
+  .nieuw { display: inline-flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .nieuw select, .dicht input { font: inherit; font-size: 14px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+  .dicht { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .dicht h3 { font-size: 15px; margin: 0 0 8px; }
+  .dicht form { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .af { display: grid; grid-template-columns: 74px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 12px 2px; border-bottom: 1px solid var(--line); }
+  .af:last-child { border-bottom: 0; }
+  .af .dt { font-size: 13px; color: var(--muted); line-height: 1.3; }
+  .af .dt b { display: block; font-size: 15px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .af .wie { font-size: 14.5px; line-height: 1.45; overflow-wrap: anywhere; }
+  .af .wie a { color: var(--ink); font-weight: 600; text-decoration: none; }
+  .af .wie small { display: block; color: var(--muted); font-size: 13px; }
+  .af .acties { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .af.is-weg { opacity: .55; }
+  .lbl { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 6px; margin-left: 6px; vertical-align: 1px; background: var(--tint); color: var(--accent); }
+  .lbl.weg { background: #F3F4F6; color: var(--muted); }
+  .lbl.let { background: #FEF3E2; color: #9A5B13; }
+  .gk { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .gk:last-of-type { border-bottom: 0; }
+  .gk small { display: block; color: var(--muted); font-size: 13px; }
+  .melding { padding: 12px 14px; border-radius: 12px; margin-bottom: 16px; font-size: 14.5px; background: var(--tint); color: var(--accent); }
+  .melding.fout { background: #FEF2F2; color: #B91C1C; }
+  .opgeslagen { font-size: 13px; color: #15803D; margin-left: 8px; }
+  details.eerder summary { cursor: pointer; color: var(--muted); font-size: 14px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<main class="db">
+  <div class="hk">
+    <div><h1>Kennismakingen</h1><p>Zet hier wanneer je kunt. Klanten boeken zelf via de planner op <a href="/contact#plannen" target="_blank">de contactpagina</a>: 20 minuten via Google Meet, tot 2 weken vooruit en minstens 24 uur van tevoren. Een afspraak gaat naar wie er vrij is.</p></div>
+    <a class="db-knop is-rand" href="/contact#plannen" target="_blank" rel="noopener">Planner bekijken</a>
+  </div>
+  <div id="melding"></div>
+  <div class="tellers" id="tellers"></div>
+  <div class="kol">
+    <div>
+      <div class="db-kaart" style="margin-bottom:18px">
+        <h2>Afspraken</h2><p class="sub">De komende kennismakingen. Annuleren stuurt de klant een mail met de vraag een nieuw moment te kiezen.</p>
+        <div id="afspraken"><p class="kl-leeg">Laden…</p></div>
+      </div>
+    </div>
+    <div>
+      <div class="db-kaart" style="margin-bottom:18px">
+        <h2>Beschikbaarheid <span class="opgeslagen" id="opgeslagen" hidden>Opgeslagen</span></h2><p class="sub">Vaste tijden per week. Wijzigingen staan direct in de planner.</p>
+        <div class="seg" id="persoon"><button type="button" data-p="koen">Koen</button><button type="button" data-p="daan">Daan</button></div>
+        <div id="week"></div>
+        <div class="dicht">
+          <h3>Dichte dagen</h3>
+          <form id="dicht-form"><input type="date" name="van" required aria-label="Van"><span style="align-self:center;color:var(--muted)">t/m</span><input type="date" name="tot" aria-label="Tot en met (optioneel)"><button class="db-knop is-licht is-klein" type="submit">Dichtzetten</button></form>
+          <div class="vensters" id="dicht"></div>
+        </div>
+      </div>
+      <div class="db-kaart">
+        <h2>Google Agenda</h2><p class="sub">Per kennismaking maakt de site een afspraak met een Google Meet-link in de agenda van wie het gesprek doet.</p>
+        <div id="google"></div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="/intern/app.js?v=14"></script>
+<script>
+(function () {
+  var data = null, persoon = 'koen', ik = 'koen';
+  var DAGEN = [[1, 'Maandag'], [2, 'Dinsdag'], [3, 'Woensdag'], [4, 'Donderdag'], [5, 'Vrijdag'], [6, 'Zaterdag'], [0, 'Zondag']];
+  var NAAM = { koen: 'Koen', daan: 'Daan' };
+  var TZ = 'Europe/Amsterdam';
+  var TIJDEN = []; for (var h = 7; h <= 21; h++) { TIJDEN.push((h < 10 ? '0' : '') + h + ':00'); if (h < 21) TIJDEN.push((h < 10 ? '0' : '') + h + ':30'); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function $(id) { return document.getElementById(id); }
+  function f(iso, o) { o.timeZone = TZ; return new Date(iso).toLocaleString('nl-NL', o); }
+  function api(methode, pad, body) {
+    return fetch('/intern/api/planner' + pad, { method: methode, credentials: 'same-origin', headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined })
+      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.fout || 'Mislukt'); return j; }); });
+  }
+  function melding(t, fout) { $('melding').innerHTML = t ? '<div class="melding' + (fout ? ' fout' : '') + '">' + t + '</div>' : ''; }
+
+  // Terugkomst van Google
+  var q = new URLSearchParams(location.search), gq = q.get('google');
+  if (gq) {
+    var M = { ok: 'Google Agenda gekoppeld. Nieuwe kennismakingen krijgen nu een Meet-link.', geweigerd: 'Je hebt de toegang bij Google geweigerd. Er is niets gekoppeld.', ongeldig: 'Het koppelen is verlopen of klopte niet. Probeer het opnieuw.', 'niet-ingesteld': 'Google is nog niet ingesteld in Netlify (GOOGLE_CLIENT_ID en GOOGLE_CLIENT_SECRET).', mislukt: 'Koppelen mislukt: ' + esc(q.get('uitleg') || 'onbekende fout') };
+    melding(M[gq] || '', gq !== 'ok');
+    history.replaceState(null, '', location.pathname);
+  }
+
+  function laad() {
+    api('GET', '').then(function (r) { data = r; ik = r.wie; if (!laad.gedaan) { persoon = r.wie; laad.gedaan = true; } teken(); })
+      .catch(function (e) { $('afspraken').innerHTML = '<p class="kl-leeg">Laden mislukt: ' + esc(e.message) + '</p>'; });
+  }
+  function teken() {
+    var nu = new Date().toISOString();
+    var komend = data.afspraken.filter(function (a) { return a.eind >= nu; });
+    var actief = komend.filter(function (a) { return a.status !== 'geannuleerd'; });
+    $('tellers').innerHTML = '<div><span>Komende kennismakingen</span><b>' + actief.length + '</b></div>' +
+      '<div><span>Vrije momenten (2 weken)</span><b>' + data.vrij.totaal + '</b></div>' +
+      '<div><span>Koen vrij</span><b>' + data.vrij.koen + '</b></div><div><span>Daan vrij</span><b>' + data.vrij.daan + '</b></div>';
+    tekenAfspraken(komend, data.afspraken.filter(function (a) { return a.eind < nu; }).reverse());
+    tekenWeek(); tekenGoogle();
+  }
+  function rij(a) {
+    var weg = a.status === 'geannuleerd';
+    return '<div class="af' + (weg ? ' is-weg' : '') + '"><div class="dt">' + esc(f(a.start, { weekday: 'short', day: 'numeric', month: 'short' })) + '<b>' + esc(f(a.start, { hour: '2-digit', minute: '2-digit' })) + '</b></div>' +
+      '<div class="wie">' + (a.klantId ? '<a href="/intern/klant.html?id=' + encodeURIComponent(a.klantId) + '">' + esc(a.naam) + '</a>' : '<strong>' + esc(a.naam) + '</strong>') +
+      '<span class="lbl' + (weg ? ' weg' : '') + '">' + (weg ? 'Geannuleerd' : NAAM[a.wie]) + '</span>' + (!weg && a.status === 'verzet' ? '<span class="lbl weg">Verzet</span>' : '') + (!weg && !a.meet ? '<span class="lbl let">Geen Meet-link</span>' : '') +
+      '<small>' + esc(a.email) + (a.telefoon ? ' · ' + esc(a.telefoon) : '') + (weg && a.reden ? ' · Reden: ' + esc(a.reden) : '') + '</small>' + (a.bericht ? '<small>“' + esc(a.bericht) + '”</small>' : '') + '</div>' +
+      '<div class="acties">' + (!weg && a.meet ? '<a class="db-knop is-klein" href="' + esc(a.meet) + '" target="_blank" rel="noopener">Meet</a>' : '') +
+      (!weg && a.eind >= new Date().toISOString() ? '<button class="db-knop is-rand is-klein" type="button" data-annuleer="' + esc(a.id) + '">Annuleren</button>' : '') + '</div></div>';
+  }
+  function tekenAfspraken(komend, eerder) {
+    $('afspraken').innerHTML = (komend.length ? komend.map(rij).join('') : '<p class="kl-leeg">Nog geen kennismakingen gepland.</p>') +
+      (eerder.length ? '<details class="eerder"><summary>Eerder (' + eerder.length + ')</summary>' + eerder.map(rij).join('') + '</details>' : '');
+  }
+  function tekenWeek() {
+    document.querySelectorAll('#persoon button').forEach(function (b) { b.classList.toggle('is-aan', b.dataset.p === persoon); });
+    var p = data.beschikbaarheid[persoon];
+    $('week').innerHTML = DAGEN.map(function (d) {
+      var v = p.week[d[0]] || [];
+      return '<div class="wd"><b>' + d[1] + '</b><div class="vensters">' + v.map(function (x, i) { return '<span class="chip">' + x[0] + ' – ' + x[1] + '<button type="button" data-weg="' + d[0] + ':' + i + '" aria-label="Verwijder ' + x[0] + ' tot ' + x[1] + '">×</button></span>'; }).join('') +
+        '<button class="plus" type="button" data-plus="' + d[0] + '">+ Tijdblok</button></div></div>';
+    }).join('');
+    var vandaag = new Date().toISOString().slice(0, 10);
+    var dicht = p.dicht.filter(function (d) { return d >= vandaag; });
+    $('dicht').innerHTML = dicht.length ? dicht.map(function (d) { return '<span class="chip">' + esc(f(d + 'T12:00:00Z', { weekday: 'short', day: 'numeric', month: 'short' })) + '<button type="button" data-open="' + d + '" aria-label="Weer openzetten">×</button></span>'; }).join('') : '<span style="color:var(--muted);font-size:13.5px">Geen dichte dagen.</span>';
+  }
+  function tekenGoogle() {
+    var g = data.google;
+    if (!g.ingesteld) { $('google').innerHTML = '<p class="kl-leeg" style="padding:0">Nog niet ingesteld. Zet in Netlify GOOGLE_CLIENT_ID en GOOGLE_CLIENT_SECRET (zie de uitleg). Redirect-URI voor Google Cloud:<br><code style="font-size:12.5px;user-select:all">' + esc(g.redirect) + '</code></p>'; return; }
+    $('google').innerHTML = ['koen', 'daan'].map(function (m) {
+      var x = g[m];
+      return '<div class="gk"><div><strong>' + NAAM[m] + '</strong><small>' + (x ? 'Gekoppeld' + (x.email ? ' met ' + esc(x.email) : '') : 'Niet gekoppeld' + (m === ik ? '' : '. ' + NAAM[m] + ' koppelt dit zelf als hij is ingelogd.')) + '</small></div>' +
+        (m === ik ? (x ? '<button class="db-knop is-rand is-klein" type="button" data-ontkoppel>Ontkoppelen</button>' : '<a class="db-knop is-klein" href="/intern/api/planner/google/start">Koppel je Google Agenda</a>') : '') + '</div>';
+    }).join('') + (!g.koen && !g.daan ? '<p class="kl-leeg" style="padding:8px 0 0">Zolang niemand gekoppeld is, krijgen klanten geen Meet-link (de mail zegt dan dat de link volgt).</p>' : '');
+  }
+  var timer;
+  function bewaar() {
+    var b = {}; b[persoon] = data.beschikbaarheid[persoon];
+    api('POST', '/beschikbaarheid', b).then(function (r) {
+      data.beschikbaarheid = r.beschikbaarheid; tekenWeek();
+      $('opgeslagen').hidden = false; clearTimeout(timer); timer = setTimeout(function () { $('opgeslagen').hidden = true; laad(); }, 1500);
+    }).catch(function (e) { melding('Opslaan mislukt: ' + esc(e.message), true); });
+  }
+
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    var pb = t.closest('#persoon button'); if (pb) { persoon = pb.dataset.p; tekenWeek(); return; }
+    var w = t.closest('[data-weg]'); if (w) { var d = w.dataset.weg.split(':'); data.beschikbaarheid[persoon].week[d[0]].splice(+d[1], 1); bewaar(); return; }
+    var o = t.closest('[data-open]'); if (o) { var p = data.beschikbaarheid[persoon]; p.dicht = p.dicht.filter(function (x) { return x !== o.dataset.open; }); bewaar(); return; }
+    var pl = t.closest('[data-plus]');
+    if (pl) {
+      var opties = function (sel) { return TIJDEN.map(function (x) { return '<option' + (x === sel ? ' selected' : '') + '>' + x + '</option>'; }).join(''); };
+      var n = document.createElement('span'); n.className = 'nieuw';
+      n.innerHTML = '<select aria-label="Van">' + opties('09:00') + '</select><span>–</span><select aria-label="Tot">' + opties('12:00') + '</select><button class="db-knop is-klein" type="button" data-zet="' + pl.dataset.plus + '">Toevoegen</button>';
+      pl.replaceWith(n); return;
+    }
+    var z = t.closest('[data-zet]');
+    if (z) {
+      var s = z.parentNode.querySelectorAll('select'), van = s[0].value, tot = s[1].value;
+      if (van >= tot) { alertNiet(z, 'Eindtijd moet na de begintijd liggen'); return; }
+      var wk = data.beschikbaarheid[persoon].week; (wk[z.dataset.zet] = wk[z.dataset.zet] || []).push([van, tot]); bewaar(); return;
+    }
+    if (t.closest('[data-ontkoppel]')) { if (confirm('Google Agenda ontkoppelen? Nieuwe kennismakingen met jou krijgen dan geen Meet-link meer.')) api('POST', '/google/ontkoppel').then(laad); return; }
+    var an = t.closest('[data-annuleer]');
+    if (an) {
+      var a = data.afspraken.filter(function (x) { return x.id === an.dataset.annuleer; })[0];
+      var reden = prompt('Kennismaking met ' + a.naam + ' annuleren? De klant krijgt een mail met de vraag een nieuw moment te kiezen.\n\nReden (komt in de mail, mag leeg):', '');
+      if (reden === null) return;
+      an.disabled = true; an.textContent = 'Bezig…';
+      api('POST', '/annuleer', { id: a.id, reden: reden }).then(function () { melding('Geannuleerd. ' + esc(a.naam) + ' heeft een mail gekregen.'); laad(); })
+        .catch(function (e2) { an.disabled = false; an.textContent = 'Annuleren'; melding('Annuleren mislukt: ' + esc(e2.message), true); });
+    }
+  });
+  function alertNiet(el, t) { el.textContent = t; setTimeout(function () { el.textContent = 'Toevoegen'; }, 1800); }
+  $('dicht-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var van = e.target.van.value, tot = e.target.tot.value || van; if (!van) return;
+    if (tot < van) { var x = van; van = tot; tot = x; }
+    var p = data.beschikbaarheid[persoon], d = new Date(van + 'T12:00:00Z'), eind = new Date(tot + 'T12:00:00Z'), n = 0;
+    while (d <= eind && n < 92) { var s = d.toISOString().slice(0, 10); if (p.dicht.indexOf(s) < 0) p.dicht.push(s); d.setUTCDate(d.getUTCDate() + 1); n++; }
+    e.target.reset(); bewaar();
+  });
+  laad();
+})();
+</script>
+</body>
+</html>

@@ -21,11 +21,14 @@ Website van Avezaat & Evers (statische HTML, gehost op Netlify).
 - Na elke geslaagde productiedeploy meldt `netlify/functions/deploy-succeeded.mjs` de gewijzigde pagina's bij Bing via IndexNow. Sleutelbestand: `/f42ea39f717d4a22b4a55ec378b1aa2e.txt` (niet verwijderen).
 - Welke pagina's gewijzigd zijn, komt uit `<lastmod>` in `sitemap.xml`. **Werk bij elke wijziging aan een openbare pagina de `lastmod` van die pagina bij** (datum van vandaag), en voeg nieuwe pagina's toe aan de sitemap.
 
-## Afspraken (Cal.com)
+## Kennismakingen (eigen planner, vervangt Cal.com)
 
-- Boeken gaat via https://cal.com/avezaatenevers/kennismaking. De standaardmails van Cal.com staan uit; `netlify/functions/cal-webhook.mjs` (https://avezaatenevers.nl/api/cal-webhook) stuurt de bevestiging, verzet- en annuleringsmail in huisstijl (sjablonen `afspraak*` in `netlify/functions/lib/mails.js`), zet de afspraak bij de lead in het dashboard en stuurt een pushmelding.
-- Vereist in Netlify de omgevingsvariabele `CAL_WEBHOOK_SECRET`, gelijk aan de secret van de webhook in Cal.com.
-- `netlify/functions/afspraak-herinnering.mjs` draait elke 10 minuten (alleen live) en stuurt ongeveer 2 uur voor de kennismaking een herinnering, behalve als er minder dan 3 uur tussen boeken en de afspraak zit.
+- Klanten boeken op /contact#plannen (`assets/planner.js`); verzetten en annuleren via /afspraak met een beveiligde link uit de mail. Regels: 20 minuten, tot 2 weken vooruit, minstens 24 uur van tevoren, de afspraak gaat naar wie er vrij is (constanten in `netlify/functions/lib/planner.js`).
+- Koen en Daan zetten hun beschikbaarheid in het dashboard: /intern/beschikbaarheid.html (menu: Kennismakingen). Daar ook de lijst met afspraken en het koppelen van Google Agenda.
+- Server: `netlify/functions/planner.mjs` (openbaar, /api/planner/*) en `planner-intern.mjs` (dashboard, /intern/api/planner/*). Na boeken/verzetten/annuleren doet `lib/planner-acties.js` alles: Google-agenda-item met Meet-link (`lib/google.js`), lead en afspraak in het dashboard, mail met agenda-bijlage (sjablonen `afspraak*` in `lib/mails.js`), pushmelding en logboek.
+- Google: in Netlify `GOOGLE_CLIENT_ID` en `GOOGLE_CLIENT_SECRET` (OAuth-client in Google Cloud, redirect-URI https://avezaatenevers.nl/intern/api/planner/google/terug). Elk koppelt zijn eigen Google-account in het dashboard; de refresh tokens staan in Blobs (`planner-google`). Lukt Google niet, dan gaat de boeking door en meldt de mail dat de link volgt.
+- `netlify/functions/afspraak-herinnering.mjs` draait elke 10 minuten (alleen live) en stuurt ongeveer 2 uur voor de kennismaking een herinnering (alleen "ander moment kiezen", geen annuleerlink), behalve als er minder dan 3 uur tussen boeken en de afspraak zit.
+- `netlify/functions/cal-webhook.mjs` is alleen nog voor afspraken die nog via Cal.com zijn geboekt; kan weg zodra die voorbij zijn.
 
 ## Contactgegevens
 

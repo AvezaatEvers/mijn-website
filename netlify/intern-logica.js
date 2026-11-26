@@ -174,6 +174,8 @@ export async function verwerk(request, cookies, next, maakStore, env = () => und
 
   // Pushmeldingen draaien in een Node-functie (netlify/functions/push.mjs), die de inlog zelf ook controleert
   if (pad === "/intern/api/push" || pad.startsWith("/intern/api/push/")) return next();
+  // Eigen planner (beschikbaarheid, afspraken, Google-koppeling): Node-functie netlify/functions/planner-intern.mjs, die de inlog ook controleert
+  if (pad === "/intern/api/planner" || pad.startsWith("/intern/api/planner/")) return next();
 
   if (pad === "/intern/api/taken") {
     const store = maakStore();

@@ -1,0 +1,89 @@
+// Koppeling met Google Agenda: per kennismaking een agenda-item met een echte Google Meet-link.
+// Koen en Daan koppelen elk hun eigen Google-account in het dashboard (Beschikbaarheid). Het agenda-item komt
+// in de agenda van wie het gesprek doet; die is dan ook host van de Meet.
+// Nodig in Netlify: GOOGLE_CLIENT_ID en GOOGLE_CLIENT_SECRET (OAuth-client uit Google Cloud).
+// De refresh tokens staan in de Blobs-store onder "planner-google".
+import { TZ } from "./planner.js";
+
+const SLEUTEL = "planner-google";
+const TOKEN_URL = "https://oauth2.googleapis.com/token";
+const AGENDA = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
+export const SCOPE = "openid email https://www.googleapis.com/auth/calendar.events";
+
+export const googleIngesteld = (env) => !!(env("GOOGLE_CLIENT_ID") && env("GOOGLE_CLIENT_SECRET"));
+export async function leesGoogle(store) { return (await store.get(SLEUTEL, { type: "json" })) || {}; }
+export async function bewaarGoogle(store, g) { await store.setJSON(SLEUTEL, g); }
+
+export function googleAuthUrl(env, redirect, state) {
+  return "https://accounts.google.com/o/oauth2/v2/auth?" + new URLSearchParams({
+    client_id: env("GOOGLE_CLIENT_ID"), redirect_uri: redirect, response_type: "code", scope: SCOPE,
+    access_type: "offline", prompt: "consent", include_granted_scopes: "true", state,
+  });
+}
+
+// Code uit de terugkoppeling inwisselen voor een refresh token (en het e-mailadres van het account)
+export async function googleCode(env, code, redirect) {
+  const r = await fetch(TOKEN_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ code, client_id: env("GOOGLE_CLIENT_ID"), client_secret: env("GOOGLE_CLIENT_SECRET"), redirect_uri: redirect, grant_type: "authorization_code" }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.refresh_token) return { fout: j.error_description || j.error || (j.access_token ? "Google gaf geen refresh token; ontkoppel de app in je Google-account en probeer opnieuw" : "Koppelen mislukt (" + r.status + ")") };
+  let email = "";
+  try { email = JSON.parse(Buffer.from(String(j.id_token).split(".")[1], "base64url").toString()).email || ""; } catch { /* geen id_token */ }
+  return { refresh: j.refresh_token, email };
+}
+
+async function toegang(env, refresh) {
+  const r = await fetch(TOKEN_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ client_id: env("GOOGLE_CLIENT_ID"), client_secret: env("GOOGLE_CLIENT_SECRET"), refresh_token: refresh, grant_type: "refresh_token" }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.access_token) throw new Error("Google-toegang mislukt: " + (j.error_description || j.error || r.status) + (j.error === "invalid_grant" ? " (koppel Google opnieuw in het dashboard)" : ""));
+  return j.access_token;
+}
+
+// Welk account gebruiken we: dat van wie het gesprek doet, anders dat van de ander
+export function accountVoor(g, wie) {
+  if (g[wie] && g[wie].refresh) return wie;
+  return ["koen", "daan"].find((w) => g[w] && g[w].refresh) || "";
+}
+
+const meetVan = (ev) => ev.hangoutLink || ((((ev.conferenceData || {}).entryPoints) || []).find((e) => e.entryPointType === "video") || {}).uri || "";
+
+// Nieuw agenda-item met Meet-link. Geeft { eventId, meet, account } of gooit een fout.
+export async function maakAfspraak(env, g, a, { titel, beschrijving }) {
+  const account = accountVoor(g, a.wie);
+  if (!account) throw new Error("Geen Google-account gekoppeld");
+  const at = await toegang(env, g[account].refresh);
+  const r = await fetch(AGENDA + "?conferenceDataVersion=1&sendUpdates=none", {
+    method: "POST", headers: { Authorization: "Bearer " + at, "Content-Type": "application/json" },
+    // De klant als gast (Google mailt niet: sendUpdates=none), zodat hij de Meet direct in kan zonder aan te kloppen
+    body: JSON.stringify({ summary: titel, description: beschrijving, start: { dateTime: a.start, timeZone: TZ }, end: { dateTime: a.eind, timeZone: TZ },
+      attendees: a.email ? [{ email: a.email, displayName: a.naam || undefined }] : [], guestsCanInviteOthers: false, guestsCanSeeOtherGuests: false,
+      conferenceData: { createRequest: { requestId: "ae-" + a.id + "-" + Date.now(), conferenceSolutionKey: { type: "hangoutsMeet" } } } }),
+  });
+  let ev = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error("Google Agenda: " + ((ev.error && ev.error.message) || r.status));
+  // De Meet-link is soms nog niet direct klaar
+  for (let i = 0; i < 3 && !meetVan(ev); i++) {
+    await new Promise((res) => setTimeout(res, 1200));
+    const r2 = await fetch(AGENDA + "/" + encodeURIComponent(ev.id), { headers: { Authorization: "Bearer " + at } });
+    if (r2.ok) ev = await r2.json();
+  }
+  return { eventId: ev.id, meet: meetVan(ev), account };
+}
+
+export async function verzetAfspraak(env, g, account, eventId, a) {
+  if (!g[account] || !g[account].refresh) throw new Error("Google-account niet meer gekoppeld");
+  const at = await toegang(env, g[account].refresh);
+  const r = await fetch(AGENDA + "/" + encodeURIComponent(eventId) + "?sendUpdates=none", {
+    method: "PATCH", headers: { Authorization: "Bearer " + at, "Content-Type": "application/json" },
+    body: JSON.stringify({ start: { dateTime: a.start, timeZone: TZ }, end: { dateTime: a.eind, timeZone: TZ } }),
+  });
+  if (!r.ok) throw new Error("Google Agenda verzetten: " + r.status);
+}
+
+export async function verwijderAfspraak(env, g, account, eventId) {
+  if (!g[account] || !g[account].refresh) return;
+  const at = await toegang(env, g[account].refresh);
+  const r = await fetch(AGENDA + "/" + encodeURIComponent(eventId) + "?sendUpdates=none", { method: "DELETE", headers: { Authorization: "Bearer " + at } });
+  if (!r.ok && r.status !== 404 && r.status !== 410) throw new Error("Google Agenda verwijderen: " + r.status);
+}

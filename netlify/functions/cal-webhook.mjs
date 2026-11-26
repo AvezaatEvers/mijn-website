@@ -13,7 +13,7 @@ import { mails } from "./lib/mails.js";
 import { verstuur, BASE } from "../klant-mails.js";
 import { stuur, MENSEN } from "../push.js";
 import { log } from "../logboek.js";
-import { TZ, wanneer, mailData } from "./lib/afspraak.js";
+import { TZ, wanneer, mailData, ics } from "./lib/afspraak.js";
 
 const CAL = "https://cal.com";
 const SOORT = { BOOKING_CREATED: "gepland", BOOKING_RESCHEDULED: "verzet", BOOKING_CANCELLED: "geannuleerd" };
@@ -29,19 +29,6 @@ function handtekeningKlopt(ruw, kop, geheim) {
   return gekregen.length === verwacht.length && timingSafeEqual(gekregen, verwacht);
 }
 
-
-// Agenda-bijlage (.ics). Eén vaste UID per afspraak, zodat verzetten en annuleren het bestaande agenda-item bijwerken.
-function ics({ uid, seq, start, eind, titel, beschrijving, locatie, geannuleerd }) {
-  const t = (iso) => new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-  const tekst = (s) => String(s || "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
-  const vouw = (regel) => { const uit = []; let r = regel; while (Buffer.byteLength(r) > 74) { let n = 74; while (Buffer.byteLength(r.slice(0, n)) > 74) n--; uit.push(r.slice(0, n)); r = " " + r.slice(n); } uit.push(r); return uit.join("\r\n"); };
-  return [
-    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Avezaat & Evers//Kennismaking//NL", "CALSCALE:GREGORIAN", `METHOD:${geannuleerd ? "CANCEL" : "PUBLISH"}`,
-    "BEGIN:VEVENT", `UID:${uid}@avezaatenevers.nl`, `SEQUENCE:${seq}`, `DTSTAMP:${t(new Date().toISOString())}`, `DTSTART:${t(start)}`, `DTEND:${t(eind)}`,
-    `SUMMARY:${tekst(titel)}`, `DESCRIPTION:${tekst(beschrijving)}`, locatie ? `LOCATION:${tekst(locatie)}` : "", locatie && https(locatie) ? `URL:${locatie}` : "",
-    `STATUS:${geannuleerd ? "CANCELLED" : "CONFIRMED"}`, "END:VEVENT", "END:VCALENDAR",
-  ].filter(Boolean).map(vouw).join("\r\n") + "\r\n";
-}
 
 export default async (req) => {
   if (req.method !== "POST") return new Response("alleen POST", { status: 405 });

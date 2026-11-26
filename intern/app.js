@@ -16,6 +16,7 @@
     flow: '<circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M9 6h5a4 4 0 0 1 4 4v5M6 9v9"/>',
     agent: '<path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"/>',
     act: '<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+    agenda: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/><path d="M12 14v3l2 1"/>',
     bel: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
     site: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'
   };
@@ -23,7 +24,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   var pad = location.pathname.replace(/index\.html$/, '');
   var NAV = [
-    ['Werk', [['/intern/', 'Vandaag', 'home'], ['/intern/klanten.html', 'Klanten en leads', 'klanten', 'tel-leads'], ['/intern/kwartaal.html', 'Kwartaalbord', 'kwartaal'], ['/intern/inzichten.html', 'Contact en NPS', 'inzicht'], ['/intern/werkstromen.html', 'Werkstromen', 'flow'], ['/intern/activiteit.html', 'Activiteit', 'act'], ['/intern/meldingen.html', 'Meldingen', 'bel']]],
+    ['Werk', [['/intern/', 'Vandaag', 'home'], ['/intern/klanten.html', 'Klanten en leads', 'klanten', 'tel-leads'], ['/intern/kwartaal.html', 'Kwartaalbord', 'kwartaal'], ['/intern/beschikbaarheid.html', 'Kennismakingen', 'agenda'], ['/intern/inzichten.html', 'Contact en NPS', 'inzicht'], ['/intern/werkstromen.html', 'Werkstromen', 'flow'], ['/intern/activiteit.html', 'Activiteit', 'act'], ['/intern/meldingen.html', 'Meldingen', 'bel']]],
     ['Maken', [['/voorstel.html', 'Voorstel', 'voorstel'], ['/intern/mails/', 'Mailsjablonen', 'mail'], ['/intern/tools.html', 'Presenteren en tools', 'tools']]]
   ];
 
@@ -97,6 +98,7 @@
     { t: 'Vraag de agent', s: 'Agent', url: '/intern/agent.html' },
     { t: 'Vandaag', s: 'Pagina', url: '/intern/' },
     { t: 'Activiteit: wie deed wat', s: 'Pagina', url: '/intern/activiteit.html' },
+    { t: 'Kennismakingen: beschikbaarheid en afspraken', s: 'Pagina', url: '/intern/beschikbaarheid.html' },
     { t: 'Claude koppelen', s: 'Pagina', url: '/intern/claude.html' },
     { t: 'Contact vastleggen', s: 'Actie', doe: function () { openContact(); } },
     { t: 'Werkstromen', s: 'Pagina', url: '/intern/werkstromen.html' },

@@ -597,7 +597,7 @@ ${rij(0, 5)}${rij(6, 10)}
 // ---------- Bouwstenen voor de afspraakmails ----------
 const cap = (s) => { const t = String(s || ''); return t.charAt(0).toUpperCase() + t.slice(1); };
 const metWie = (wie) => (wie === 'daan' ? 'Daan Evers' : wie === 'koen' ? 'Koen Avezaat' : 'Koen of Daan');
-const hoeVan = (d) => (d.video ? 'Videogesprek' : d.telefoon ? 'Telefonisch' : 'Online');
+const hoeVan = (d) => (d.video || d.videoVolgt ? 'Videogesprek' : d.telefoon ? 'Telefonisch' : 'Online');
 
 // De afspraak in het vaste lichtblauwe blok met tabel (zoals in de prijscheckmail), met de standaardknop eronder
 function afspraakKaart(d, status) {
@@ -605,7 +605,7 @@ function afspraakKaart(d, status) {
   return blok(tabel([
     ['Datum', esc(cap(d.datum))],
     ['Tijd', `${esc(d.tijd)}${d.eindtijd ? ' - ' + esc(d.eindtijd) : ''} (${esc(d.duur)} min)`],
-    ['Gesprek', d.video ? 'Videogesprek' : d.telefoon ? `We bellen je op ${esc(d.telefoon)}` : 'Online'],
+    ['Gesprek', d.video ? 'Videogesprek (Google Meet)' : d.videoVolgt ? 'Videogesprek, de link volgt' : d.telefoon ? `We bellen je op ${esc(d.telefoon)}` : 'Online'],
   ])) +
     (d.video ? knop(esc(d.video), 'Deelnemen aan het gesprek') : '') +
     (status === 'herinnering' ? '' : p('Met de bijlage bij deze mail zet je de afspraak in je agenda.', `font-size:14px;color:${ZACHT}`));

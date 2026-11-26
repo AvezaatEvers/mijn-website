@@ -57,15 +57,5 @@ var UMAMI_WEBSITE_ID = "931b51e9-cfd4-41b0-9b54-bc51ab4c0d77";
     });
   }
 
-  // Afspraak echt ingepland via Cal.com
-  function koppelCal() {
-    if (window.Cal && window.Cal.ns && window.Cal.ns.kennismaking) {
-      window.Cal.ns.kennismaking("on", {
-        action: "bookingSuccessful",
-        callback: function () { meet("Afspraak ingepland", { pagina: location.pathname }); }
-      });
-    }
-  }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", koppelCal);
-  else koppelCal();
+  // "Afspraak ingepland" meet de eigen planner zelf (assets/planner.js), net voor de bedankpagina
 })();

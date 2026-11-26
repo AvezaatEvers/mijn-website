@@ -20,17 +20,20 @@ export default async () => {
 
   for (const k of klanten) {
     const a = k.afspraak;
-    if (!a || a.status === "geannuleerd" || a.herinnerd === a.uid || !k.email) continue;
+    // Per afspraak én tijdstip: na verzetten komt er opnieuw een herinnering voor het nieuwe tijdstip
+    if (!a) continue;
+    const merk = a.uid + "|" + a.start;
+    if (a.status === "geannuleerd" || a.herinnerd === merk || !k.email) continue;
     const start = new Date(a.start).getTime();
     if (!(start > nu && start - nu <= VOORAF)) continue;
-    if (start - new Date(a.op).getTime() < MIN_GEBOEKT) { a.herinnerd = a.uid; gewijzigd = true; continue; }
+    if (start - new Date(a.op).getTime() < MIN_GEBOEKT) { a.herinnerd = merk; gewijzigd = true; continue; }
 
     // Eerst vastleggen dat we deze afspraak oppakken, zodat een overlappende run hem niet nog eens stuurt
-    const eerste = await store.setJSON(`cal/${a.uid}/herinnering`, new Date().toISOString(), { onlyIfNew: true });
-    a.herinnerd = a.uid; gewijzigd = true;
+    const eerste = await store.setJSON(`cal/${a.uid}/herinnering/${a.start}`, new Date().toISOString(), { onlyIfNew: true });
+    a.herinnerd = merk; gewijzigd = true;
     if (eerste && eerste.modified === false) continue;
 
-    const m = mails.afspraakHerinnering(mailData({ naam: k.naam, wie: a.wie, start: a.start, eind: a.eind, tz: a.tz, video: a.video, telefoon: a.telefoon, verzet: a.verzet, annuleer: a.annuleer }), BASE);
+    const m = mails.afspraakHerinnering(mailData({ naam: k.naam, wie: a.bron === "planner" ? "" : a.wie, start: a.start, eind: a.eind, tz: a.tz, video: a.video, videoVolgt: a.bron === "planner" && !a.video, telefoon: a.telefoon, verzet: a.verzet, annuleer: a.annuleer }), BASE);
     const r = await verstuur(env, { aan: k.email, mail: m });
     if (!r.ok) console.error("Herinnering niet verstuurd:", r.fout);
     nieuweLog.set(k.id, { type: "afspraak", onderwerp: m.subject, aan: k.email, op: new Date().toISOString(), door: "gepland", test: false, ok: r.ok, fout: r.fout || null });

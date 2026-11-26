@@ -1618,3 +1618,11 @@ p, li, dd, dt, td, th, blockquote, figcaption, summary, label { overflow-wrap: b
   .wij-punten li { flex-direction: row; gap: 16px; }
 }
 @media (max-width: 700px) { .home .warm-wie { font-size: 14px; justify-content: center; margin: -4px 0 0; } }
+/* Homepage mobiel: minder tekst bovenaan */
+@media (max-width: 700px) {
+  .home-wij .wij-kop .lead + .lead { display: none; }
+  .voelt-b .warm-klant .kl-lijst { gap: 14px; }
+  .voelt-b .warm-klant .kl-lijst li { align-items: center; }
+  .voelt-b .warm-klant .kl-lijst p { display: none; }
+  .voelt-b .warm-klant .kl-lijst strong { margin: 0; }
+}

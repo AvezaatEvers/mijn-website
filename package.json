@@ -1,9 +1,10 @@
 {
   "name": "avezaat-evers-website",
   "private": true,
-  "description": "Statische site; dit pakket is alleen nodig voor de interne omgeving (Netlify Blobs en pushmeldingen).",
+  "description": "Statische site; dit pakket is alleen nodig voor de interne omgeving (Netlify Blobs, pushmeldingen en Apple Agenda).",
   "dependencies": {
     "@netlify/blobs": "10.1.0",
+    "ical.js": "2.2.1",
     "web-push": "3.6.7"
   },
   "type": "module"

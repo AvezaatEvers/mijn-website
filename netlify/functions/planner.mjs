@@ -8,6 +8,7 @@ import { getStore } from "@netlify/blobs";
 import { leesBeschikbaarheid, leesAfspraken, vrijeTijden, tijdenPerDag, boek, verzet, annuleer, tokenKlopt, TZ } from "./lib/planner.js";
 import { naAfspraak } from "./lib/planner-acties.js";
 import { wanneer } from "./lib/afspraak.js";
+import { bezetVoor } from "./lib/apple.js";
 
 const json = (data, status = 200) => new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
 const schoon = (s, n = 200) => String(s || "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, n);
@@ -23,9 +24,9 @@ export default async (req) => {
   const store = getStore({ name: "intern", consistency: "strong" });
 
   if (pad === "/api/planner/tijden" && req.method === "GET") {
-    const [b, lijst] = await Promise.all([leesBeschikbaarheid(store), leesAfspraken(store)]);
+    const [b, lijst, bezet] = await Promise.all([leesBeschikbaarheid(store), leesAfspraken(store), bezetVoor(store, env)]);
     const negeer = url.searchParams.get("id") && tokenKlopt(env, url.searchParams.get("id"), url.searchParams.get("t")) ? url.searchParams.get("id") : undefined;
-    return json({ dagen: tijdenPerDag(vrijeTijden(b, lijst, new Date(), { negeer })) });
+    return json({ dagen: tijdenPerDag(vrijeTijden(b, lijst, new Date(), { negeer, bezet })) });
   }
 
   if (pad === "/api/planner/boek" && req.method === "POST") {
@@ -35,7 +36,8 @@ export default async (req) => {
       situatie: SITUATIES.includes(body.situatie) ? body.situatie : "", bericht: String(body.bericht || "").replace(/[<>]/g, "").trim().slice(0, 1000) };
     if (!g.naam || !g.email) return json({ fout: "Vul je naam en een geldig e-mailadres in." }, 400);
     if (!body.privacy) return json({ fout: "Ga akkoord met de privacyverklaring." }, 400);
-    const r = await boek(store, await leesBeschikbaarheid(store), g);
+    // Bij boeken de agenda opnieuw bekijken als die meer dan een minuut oud is
+    const r = await boek(store, await leesBeschikbaarheid(store), g, new Date(), await bezetVoor(store, env, 60e3));
     if (r.fout === "bezet") return json({ fout: BEZET, bezet: true }, 409);
     if (r.fout === "dubbel") return json({ fout: `Je hebt al een kennismaking op ${wanneer(r.afspraak.start)}. Wil je een ander moment? Gebruik de link in je bevestigingsmail.` }, 409);
     if (r.fout) return json({ fout: r.fout }, 503);
@@ -56,7 +58,7 @@ export default async (req) => {
     return json({ status: a.status, start: a.start, eind: a.eind, wanneer: wanneer(a.start), voornaam: String(a.naam || "").split(" ")[0], voorbij: new Date(a.start) <= new Date(), meet: a.status !== "geannuleerd" ? a.meet || "" : "" });
   }
   if (pad === "/api/planner/verzet" && req.method === "POST") {
-    const r = await verzet(store, await leesBeschikbaarheid(store), a.id, String(body.start || ""));
+    const r = await verzet(store, await leesBeschikbaarheid(store), a.id, String(body.start || ""), new Date(), await bezetVoor(store, env, 60e3));
     if (r.fout === "bezet") return json({ fout: BEZET, bezet: true }, 409);
     if (r.fout === "voorbij") return json({ fout: "Deze afspraak is al geweest." }, 409);
     if (r.fout) return json({ fout: r.fout === "niet gevonden" ? "Deze afspraak is geannuleerd." : r.fout }, 409);

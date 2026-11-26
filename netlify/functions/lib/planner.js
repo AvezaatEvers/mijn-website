@@ -71,12 +71,13 @@ export async function wijzigAfspraken(store, fn) {
 
 // ---------- Vrije tijden ----------
 const actief = (a) => a.status !== "geannuleerd";
-function bezet(lijst, wie, s, e, negeer) {
+function bezetDoorAfspraak(lijst, wie, s, e, negeer) {
   return lijst.some((a) => actief(a) && a.wie === wie && a.id !== negeer && new Date(a.start).getTime() < e + BUFFER * 60e3 && new Date(a.eind).getTime() + BUFFER * 60e3 > s);
 }
 
 // Alle tijden waarop minstens één van beiden vrij is: [{ start, eind, wie: ["koen", "daan"] }]
-export function vrijeTijden(beschikbaar, afspraken, nu = new Date(), { negeer } = {}) {
+// bezet: { koen: [[startMs, eindMs]], daan: [...] } uit de eigen agenda (Apple Agenda), zie lib/apple.js
+export function vrijeTijden(beschikbaar, afspraken, nu = new Date(), { negeer, bezet = {} } = {}) {
   const vanaf = nu.getTime() + MIN_UREN * 3600e3, vandaag = lokaleDatum(nu), uit = new Map();
   for (let i = 0; i <= VOORUIT_DAGEN; i++) {
     const datum = plusDagen(vandaag, i), wd = weekdag(datum);
@@ -87,7 +88,7 @@ export function vrijeTijden(beschikbaar, afspraken, nu = new Date(), { negeer } 
         const einde = lokaalNaarUtc(datum, tot).getTime();
         for (let s = lokaalNaarUtc(datum, van).getTime(); s + DUUR * 60e3 <= einde; s += STAP * 60e3) {
           const e = s + DUUR * 60e3;
-          if (s < vanaf || bezet(afspraken, wie, s, e, negeer)) continue;
+          if (s < vanaf || bezetDoorAfspraak(afspraken, wie, s, e, negeer) || (bezet[wie] || []).some((b) => b[0] < e && b[1] > s)) continue;
           const k = new Date(s).toISOString();
           if (!uit.has(k)) uit.set(k, { start: k, eind: new Date(e).toISOString(), wie: [] });
           if (!uit.get(k).wie.includes(wie)) uit.get(k).wie.push(wie);
@@ -122,12 +123,12 @@ function kiesWie(kandidaten, lijst, start) {
 // ---------- Boeken, verzetten, annuleren ----------
 const nieuweId = () => crypto.randomUUID().replace(/-/g, "").slice(0, 20);
 
-export async function boek(store, beschikbaar, gegevens, nu = new Date()) {
+export async function boek(store, beschikbaar, gegevens, nu = new Date(), bezet = {}) {
   let gemaakt = null;
   const r = await wijzigAfspraken(store, (lijst) => {
     const al = lijst.find((a) => actief(a) && a.email === gegevens.email && new Date(a.start) > nu);
     if (al) return { fout: "dubbel", afspraak: al };
-    const slot = vrijeTijden(beschikbaar, lijst, nu).find((t) => t.start === gegevens.start);
+    const slot = vrijeTijden(beschikbaar, lijst, nu, { bezet }).find((t) => t.start === gegevens.start);
     if (!slot) return { fout: "bezet" };
     gemaakt = { id: nieuweId(), start: slot.start, eind: slot.eind, wie: kiesWie(slot.wie, lijst, slot.start), naam: gegevens.naam, email: gegevens.email,
       telefoon: gegevens.telefoon || "", situatie: gegevens.situatie || "", bericht: gegevens.bericht || "", status: "gepland", op: nu.toISOString(), seq: 0, meet: "", googleEventId: "", googleWie: "" };
@@ -137,13 +138,13 @@ export async function boek(store, beschikbaar, gegevens, nu = new Date()) {
   return r.fout ? r : { ok: true, afspraak: gemaakt };
 }
 
-export async function verzet(store, beschikbaar, id, start, nu = new Date()) {
+export async function verzet(store, beschikbaar, id, start, nu = new Date(), bezet = {}) {
   let uit = null;
   const r = await wijzigAfspraken(store, (lijst) => {
     const a = lijst.find((x) => x.id === id);
     if (!a || !actief(a)) return { fout: "niet gevonden" };
     if (new Date(a.start) <= nu) return { fout: "voorbij" };
-    const slot = vrijeTijden(beschikbaar, lijst, nu, { negeer: id }).find((t) => t.start === start);
+    const slot = vrijeTijden(beschikbaar, lijst, nu, { negeer: id, bezet }).find((t) => t.start === start);
     if (!slot) return { fout: "bezet" };
     const vorige = { start: a.start, wie: a.wie };
     a.wie = slot.wie.includes(a.wie) ? a.wie : kiesWie(slot.wie, lijst.filter((x) => x.id !== id), slot.start);

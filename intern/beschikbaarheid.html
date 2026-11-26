@@ -60,6 +60,13 @@
   .gk { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
   .gk:last-of-type { border-bottom: 0; }
   .gk small { display: block; color: var(--muted); font-size: 13px; }
+  .ap-form { display: grid; gap: 10px; margin-top: 4px; }
+  .ap-form label { display: flex; flex-direction: column; gap: 5px; font-size: 13.5px; font-weight: 600; }
+  .ap-form input { font: inherit; font-size: 15px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 9px; background: #fff; }
+  .ap-uitleg { font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0; }
+  .ap-agendas { display: grid; gap: 6px; margin: 10px 0 4px; }
+  .ap-agendas label { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+  .ap-fout { color: #B91C1C; }
   .melding { padding: 12px 14px; border-radius: 12px; margin-bottom: 16px; font-size: 14.5px; background: var(--tint); color: var(--accent); }
   .melding.fout { background: #FEF2F2; color: #B91C1C; }
   .opgeslagen { font-size: 13px; color: #15803D; margin-left: 8px; }
@@ -91,6 +98,10 @@
           <form id="dicht-form"><input type="date" name="van" required aria-label="Van"><span style="align-self:center;color:var(--muted)">t/m</span><input type="date" name="tot" aria-label="Tot en met (optioneel)"><button class="db-knop is-licht is-klein" type="submit">Dichtzetten</button></form>
           <div class="vensters" id="dicht"></div>
         </div>
+      </div>
+      <div class="db-kaart" style="margin-bottom:18px">
+        <h2>Apple Agenda</h2><p class="sub">Staat er iets in je Apple Agenda, dan kan een klant op dat moment niet boeken. De planner ziet alleen dát je bezet bent, niet wat er staat.</p>
+        <div id="apple"></div>
       </div>
       <div class="db-kaart">
         <h2>Google Agenda</h2><p class="sub">Per kennismaking maakt de site een afspraak met een Google Meet-link in de agenda van wie het gesprek doet.</p>
@@ -136,7 +147,7 @@
       '<div><span>Vrije momenten (2 weken)</span><b>' + data.vrij.totaal + '</b></div>' +
       '<div><span>Koen vrij</span><b>' + data.vrij.koen + '</b></div><div><span>Daan vrij</span><b>' + data.vrij.daan + '</b></div>';
     tekenAfspraken(komend, data.afspraken.filter(function (a) { return a.eind < nu; }).reverse());
-    tekenWeek(); tekenGoogle();
+    tekenWeek(); tekenGoogle(); tekenApple();
   }
   function rij(a) {
     var weg = a.status === 'geannuleerd';
@@ -172,6 +183,40 @@
         (m === ik ? (x ? '<button class="db-knop is-rand is-klein" type="button" data-ontkoppel>Ontkoppelen</button>' : '<a class="db-knop is-klein" href="/intern/api/planner/google/start">Koppel je Google Agenda</a>') : '') + '</div>';
     }).join('') + (!g.koen && !g.daan ? '<p class="kl-leeg" style="padding:8px 0 0">Zolang niemand gekoppeld is, krijgen klanten geen Meet-link (de mail zegt dan dat de link volgt).</p>' : '');
   }
+  function tekenApple() {
+    var ap = data.apple || {};
+    $('apple').innerHTML = ['koen', 'daan'].map(function (m) {
+      var x = ap[m], mij = m === ik;
+      if (!x) {
+        if (!mij) return '<div class="gk"><div><strong>' + NAAM[m] + '</strong><small>Niet gekoppeld. ' + NAAM[m] + ' koppelt dit zelf als hij is ingelogd.</small></div></div>';
+        return '<div class="gk" style="display:block"><strong>' + NAAM[m] + '</strong><small>Niet gekoppeld</small>' +
+          '<form class="ap-form" id="ap-koppel"><p class="ap-uitleg">Maak op <a href="https://account.apple.com" target="_blank" rel="noopener">account.apple.com</a> onder Inloggen en beveiliging een <strong>app-specifiek wachtwoord</strong> aan (niet je gewone wachtwoord). Het wordt versleuteld bewaard.</p>' +
+          '<label>Apple ID (e-mailadres)<input type="email" name="appleId" autocomplete="off" required></label>' +
+          '<label>App-specifiek wachtwoord<input type="password" name="wachtwoord" autocomplete="off" placeholder="xxxx-xxxx-xxxx-xxxx" required></label>' +
+          '<div><button class="db-knop is-klein" type="submit">Koppel Apple Agenda</button></div><p class="ap-uitleg ap-fout" id="ap-fout"></p></form></div>';
+      }
+      var status = x.fout ? '<span class="ap-fout">Lezen lukt niet: ' + esc(x.fout) + '</span>' : x.gelezen ? 'Gelezen om ' + esc(f(x.gelezen, { hour: '2-digit', minute: '2-digit' })) + ' · ' + x.blokken + ' bezette momenten in de komende 2 weken' : 'Nog niet gelezen';
+      return '<div class="gk" style="display:block"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><div><strong>' + NAAM[m] + '</strong><small>' + esc(x.appleId) + '<br>' + status + '</small></div>' +
+        (mij ? '<button class="db-knop is-rand is-klein" type="button" data-apple-uit>Ontkoppelen</button>' : '') + '</div>' +
+        '<div class="ap-agendas">' + x.agendas.map(function (a) {
+          return '<label><input type="checkbox" data-agenda="' + esc(a.href) + '"' + (a.aan ? ' checked' : '') + (mij ? '' : ' disabled') + '> ' + esc(a.naam) + '</label>';
+        }).join('') + '</div></div>';
+    }).join('');
+  }
+  document.addEventListener('submit', function (e) {
+    if (e.target.id !== 'ap-koppel') return;
+    e.preventDefault();
+    var fm = e.target, knop = fm.querySelector('button'); knop.disabled = true; knop.textContent = 'Agenda\'s zoeken…'; $('ap-fout').textContent = '';
+    api('POST', '/apple/koppel', { appleId: fm.appleId.value, wachtwoord: fm.wachtwoord.value })
+      .then(function (r) { melding('Apple Agenda gekoppeld. Vink hieronder aan welke agenda\'s meetellen.'); laad(); })
+      .catch(function (e2) { knop.disabled = false; knop.textContent = 'Koppel Apple Agenda'; $('ap-fout').textContent = e2.message; });
+  });
+  document.addEventListener('change', function (e) {
+    if (!e.target.matches('[data-agenda]')) return;
+    var aan = []; document.querySelectorAll('[data-agenda]:not([disabled])').forEach(function (c) { if (c.checked) aan.push(c.dataset.agenda); });
+    api('POST', '/apple/agendas', { aan: aan }).then(function () { $('opgeslagen').hidden = false; setTimeout(function () { $('opgeslagen').hidden = true; }, 1500); laad(); })
+      .catch(function (e2) { melding('Opslaan mislukt: ' + esc(e2.message), true); });
+  });
   var timer;
   function bewaar() {
     var b = {}; b[persoon] = data.beschikbaarheid[persoon];
@@ -199,6 +244,7 @@
       if (van >= tot) { alertNiet(z, 'Eindtijd moet na de begintijd liggen'); return; }
       var wk = data.beschikbaarheid[persoon].week; (wk[z.dataset.zet] = wk[z.dataset.zet] || []).push([van, tot]); bewaar(); return;
     }
+    if (t.closest('[data-apple-uit]')) { if (confirm('Apple Agenda ontkoppelen? De planner kijkt dan niet meer naar je afspraken.')) api('POST', '/apple/ontkoppel').then(laad); return; }
     if (t.closest('[data-ontkoppel]')) { if (confirm('Google Agenda ontkoppelen? Nieuwe kennismakingen met jou krijgen dan geen Meet-link meer.')) api('POST', '/google/ontkoppel').then(laad); return; }
     var an = t.closest('[data-annuleer]');
     if (an) {

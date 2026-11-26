@@ -5,6 +5,9 @@
 //   GET  /intern/api/planner/google/start       naar Google om de eigen agenda te koppelen
 //   GET  /intern/api/planner/google/terug       terugkomst van Google
 //   POST /intern/api/planner/google/ontkoppel
+//   POST /intern/api/planner/apple/koppel        { appleId, wachtwoord }  Apple Agenda (iCloud) koppelen
+//   POST /intern/api/planner/apple/agendas       { aan: [href] }          welke agenda's meetellen
+//   POST /intern/api/planner/apple/ontkoppel
 import { getStore } from "@netlify/blobs";
 import { createHmac } from "node:crypto";
 import { ingelogd, COOKIE } from "../intern-logica.js";
@@ -12,6 +15,7 @@ import { log } from "../logboek.js";
 import { leesBeschikbaarheid, bewaarBeschikbaarheid, schoneBeschikbaarheid, leesAfspraken, vrijeTijden, annuleer, NAMEN, MENSEN, DUUR, VOORUIT_DAGEN, MIN_UREN } from "./lib/planner.js";
 import { naAfspraak, beheerLink } from "./lib/planner-acties.js";
 import { googleIngesteld, leesGoogle, bewaarGoogle, googleAuthUrl, googleCode } from "./lib/google.js";
+import { ontdek, versleutel, leesApple, bewaarApple, bezetVoor, bezetStatus, wisBezet } from "./lib/apple.js";
 
 const json = (data, status = 200) => new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
 const terug = (pad) => new Response(null, { status: 303, headers: { Location: pad } });
@@ -33,9 +37,11 @@ export default async (req) => {
   const redirect = url.origin + "/intern/api/planner/google/terug";
 
   if (pad === "/intern/api/planner" && req.method === "GET") {
-    const [b, lijst, g, klanten] = await Promise.all([leesBeschikbaarheid(store), leesAfspraken(store), leesGoogle(store), store.get("klanten", { type: "json" })]);
+    const [b, lijst, g, klanten, apple] = await Promise.all([leesBeschikbaarheid(store), leesAfspraken(store), leesGoogle(store), store.get("klanten", { type: "json" }), leesApple(store)]);
+    const bezet = await bezetVoor(store, env);
+    const status = await bezetStatus(store);
     const grens = new Date(Date.now() - 30 * 864e5).toISOString();
-    const vrij = vrijeTijden(b, lijst);
+    const vrij = vrijeTijden(b, lijst, new Date(), { bezet });
     return json({
       wie, beschikbaarheid: b,
       regels: { duur: DUUR, vooruit: VOORUIT_DAGEN, minUren: MIN_UREN },
@@ -46,6 +52,9 @@ export default async (req) => {
           reden: a.reden || "", meet: a.meet || "", klantId: k ? k.id : null, beheer: beheerLink(env, a) };
       }),
       google: { ingesteld: googleIngesteld(env), redirect, ...Object.fromEntries(MENSEN.map((m) => [m, g[m] && g[m].refresh ? { email: g[m].email || "", sinds: g[m].op } : null])) },
+      apple: Object.fromEntries(MENSEN.map((m) => [m, apple[m] && apple[m].appleId ? { appleId: apple[m].appleId, agendas: apple[m].agendas, sinds: apple[m].op,
+        gelezen: (status[m] || {}).laatstGoed || null, fout: (status[m] || {}).fout || null,
+        blokken: (bezet[m] || []).filter((x) => x[1] > Date.now() && x[0] < Date.now() + 14 * 864e5).length } : null])),
     });
   }
 
@@ -84,6 +93,36 @@ export default async (req) => {
     await bewaarGoogle(store, g);
     await log(store, { wie, soort: "instelling", tekst: "Google Agenda gekoppeld voor kennismakingen" + (r.email ? " (" + r.email + ")" : "") });
     return terug("/intern/beschikbaarheid.html?google=ok");
+  }
+
+  if (pad === "/intern/api/planner/apple/koppel" && req.method === "POST") {
+    const body = await req.json().catch(() => ({}));
+    const appleId = String(body.appleId || "").trim().toLowerCase(), ww = String(body.wachtwoord || "").replace(/\s+/g, "");
+    if (!appleId || !ww) return json({ fout: "Vul je Apple ID en het app-specifieke wachtwoord in." }, 400);
+    let r;
+    try { r = await ontdek(appleId, ww); } catch (e) { return json({ fout: e.message }, 400); }
+    const apple = await leesApple(store);
+    apple[wie] = { appleId, wachtwoord: versleutel(env, ww), home: r.home, agendas: r.agendas, op: new Date().toISOString() };
+    await bewaarApple(store, apple); await wisBezet(store, wie);
+    await log(store, { wie, soort: "instelling", tekst: "Apple Agenda gekoppeld voor kennismakingen (" + r.agendas.filter((a) => a.aan).map((a) => a.naam).join(", ") + ")" });
+    return json({ ok: true, agendas: r.agendas });
+  }
+
+  if (pad === "/intern/api/planner/apple/agendas" && req.method === "POST") {
+    const body = await req.json().catch(() => ({}));
+    const apple = await leesApple(store);
+    if (!apple[wie]) return json({ fout: "Nog geen Apple Agenda gekoppeld" }, 400);
+    const aan = new Set(Array.isArray(body.aan) ? body.aan : []);
+    apple[wie].agendas = apple[wie].agendas.map((a) => ({ ...a, aan: aan.has(a.href) }));
+    await bewaarApple(store, apple); await wisBezet(store, wie);
+    await log(store, { wie, soort: "instelling", tekst: "Agenda's voor kennismakingen aangepast: " + (apple[wie].agendas.filter((a) => a.aan).map((a) => a.naam).join(", ") || "geen") });
+    return json({ ok: true });
+  }
+
+  if (pad === "/intern/api/planner/apple/ontkoppel" && req.method === "POST") {
+    const apple = await leesApple(store);
+    if (apple[wie]) { delete apple[wie]; await bewaarApple(store, apple); await wisBezet(store, wie); await log(store, { wie, soort: "instelling", tekst: "Apple Agenda ontkoppeld" }); }
+    return json({ ok: true });
   }
 
   if (pad === "/intern/api/planner/google/ontkoppel" && req.method === "POST") {

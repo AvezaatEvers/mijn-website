@@ -37,7 +37,7 @@
 <main id="main">
 
 <section class="page-head">
-  <div class="container stack" style="max-width:760px">
+  <div class="container stack" style="max-width:1000px">
     <p class="crumbs"><a href="/">Home</a> / Je kennismaking</p>
     <h1 id="af-kop">Je kennismaking</h1>
     <p class="lead" id="af-lead">Even laden…</p>
@@ -45,14 +45,14 @@
 </section>
 
 <section class="section" style="padding-top:32px">
-  <div class="container" style="max-width:760px">
+  <div class="container" style="max-width:1000px">
     <div class="cal-box" id="af-box" style="padding:22px" hidden>
       <div id="af-acties" style="display:flex;gap:12px;flex-wrap:wrap">
         <a class="btn btn-primary" id="af-meet" href="#" hidden>Deelnemen aan het gesprek</a>
         <button class="btn" type="button" id="af-verzet" style="border-color:var(--tint-border);color:var(--accent);background:#fff">Ander moment kiezen</button>
         <button class="btn" type="button" id="af-annuleer" style="border-color:var(--line);color:var(--muted);background:#fff">Annuleren</button>
       </div>
-      <div id="af-planner" hidden style="margin:8px -22px -22px"></div>
+      <div id="af-planner" hidden style="margin:22px -22px -22px;border-top:1px solid var(--line)"></div>
       <form id="af-annuleer-form" hidden style="margin-top:20px;display:grid;gap:12px">
         <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:500;color:var(--text)">Wil je laten weten waarom? <span style="font-weight:400;color:var(--muted)">(optioneel)</span>
           <textarea name="reden" rows="3" maxlength="300" style="font:inherit;font-size:16px;padding:12px 14px;border-radius:8px;border:1px solid var(--tint-border)"></textarea></label>
@@ -124,10 +124,10 @@
 
 <script src="/assets/main.js?v=126" defer></script>
 <script src="/assets/analytics.js?v=127" defer></script>
-<script src="/assets/planner.js?v=1"></script>
+<script src="/assets/planner.js?v=2"></script>
 <script>
 (function () {
-  var q = new URLSearchParams(location.search), id = q.get('id'), t = q.get('t');
+  var q = new URLSearchParams(location.search), id = q.get('id'), t = q.get('t'), huidig = null;
   var $ = function (x) { return document.getElementById(x); };
   var TZ = 'Europe/Amsterdam';
   function wanneer(iso) { var d = new Date(iso); var s = d.toLocaleDateString('nl-NL', { timeZone: TZ, weekday: 'long', day: 'numeric', month: 'long' }); return s.charAt(0).toUpperCase() + s.slice(1) + ' om ' + d.toLocaleTimeString('nl-NL', { timeZone: TZ, hour: '2-digit', minute: '2-digit' }); }
@@ -139,6 +139,7 @@
       if (a.fout) return klaar('Link werkt niet', a.fout);
       if (a.status === 'geannuleerd') return klaar('Deze kennismaking is geannuleerd', 'Wil je toch kennismaken? <a href="/contact#plannen">Kies een nieuw moment</a>.');
       if (a.voorbij) return klaar('Deze kennismaking is al geweest', 'Nog vragen? <a href="https://wa.me/31850604363">App ons</a> gerust.');
+      huidig = a.start;
       $('af-kop').textContent = 'Je kennismaking';
       $('af-lead').innerHTML = '<strong>' + wanneer(a.start) + '</strong>, 20 minuten via Google Meet.';
       if (a.meet) { $('af-meet').href = a.meet; $('af-meet').hidden = false; }
@@ -149,7 +150,7 @@
 
   $('af-verzet').addEventListener('click', function () {
     $('af-annuleer-form').hidden = true; $('af-planner').hidden = false;
-    window.AEPlanner.start($('af-planner'), { modus: 'verzet', id: id, t: t, klaar: function (j) {
+    window.AEPlanner.start($('af-planner'), { modus: 'verzet', id: id, t: t, huidig: huidig, klaar: function (j) {
       klaar('Je kennismaking is verzet', 'Je nieuwe moment is <strong>' + wanneer(j.start) + '</strong>. De bevestiging staat in je mail.');
     } });
   });

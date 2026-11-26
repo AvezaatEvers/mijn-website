@@ -45,7 +45,8 @@ function ics({ uid, seq, start, eind, titel, beschrijving, locatie, geannuleerd 
 
 export default async (req) => {
   if (req.method !== "POST") return new Response("alleen POST", { status: 405 });
-  const geheim = process.env.CAL_WEBHOOK_SECRET;
+  // Spaties, regeleinden en aanhalingstekens eromheen negeren: die gaan makkelijk mee bij kopiëren en plakken
+  const geheim = String(process.env.CAL_WEBHOOK_SECRET || "").trim().replace(/^["']|["']$/g, "").trim();
   if (!geheim) { console.error("Cal.com-webhook: CAL_WEBHOOK_SECRET ontbreekt in Netlify"); return new Response("niet ingesteld", { status: 500 }); }
   const ruw = await req.text();
   let body;
@@ -53,7 +54,13 @@ export default async (req) => {
   const getekend = handtekeningKlopt(ruw, req.headers.get("x-cal-signature-256"), geheim);
   // De ping-test van Cal.com doet niets, dus die mag ook zonder (geldige) handtekening; we melden wel of de handtekening klopt
   if (body.triggerEvent === "PING") { console.log("Cal.com-webhook: ping ontvangen, handtekening " + (getekend ? "klopt" : "ontbreekt of klopt niet")); return new Response("pong"); }
-  if (!getekend) { console.error("Cal.com-webhook: ongeldige handtekening bij " + body.triggerEvent + ". Klopt CAL_WEBHOOK_SECRET met de secret in Cal.com?"); return new Response("ongeldige handtekening", { status: 401 }); }
+  if (!getekend) {
+    // Uitleg zonder de secret zelf te tonen: is er een handtekening, hoe lang is de secret, en de eerste tekens van de vingerafdruk
+    const kop = String(req.headers.get("x-cal-signature-256") || "");
+    const afdruk = createHmac("sha256", "vingerafdruk").update(geheim).digest("hex").slice(0, 6);
+    console.error(`Cal.com-webhook: ongeldige handtekening bij ${body.triggerEvent}. Handtekening ${kop ? "aanwezig (" + kop.length + " tekens)" : "ONTBREEKT: staat er een secret in Cal.com?"}; secret in Netlify ${geheim.length} tekens, vingerafdruk ${afdruk}. Klopt CAL_WEBHOOK_SECRET met de secret in Cal.com?`);
+    return new Response("ongeldige handtekening", { status: 401 });
+  }
   const soort = SOORT[body.triggerEvent];
   if (!soort) return new Response("overgeslagen");
 

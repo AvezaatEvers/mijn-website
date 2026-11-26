@@ -581,7 +581,7 @@ ${rij(0, 5)}${rij(6, 10)}
   afspraakIntern(d, base = '') {
     const kopTekst = { gepland: 'Nieuwe kennismaking gepland', verzet: 'Kennismaking verzet', geannuleerd: 'Kennismaking geannuleerd' }[d.soort] || 'Kennismaking';
     const tel = d.telefoon ? `<a href="tel:${esc(String(d.telefoon).replace(/[^\d+]/g, ''))}" style="color:${ACCENT}">${esc(d.telefoon)}</a>` : '-';
-    const rijen = [['Wanneer', esc(d.wanneer)], ['Met', wieNaam(d.wie)], ['Naam', esc(d.naam) || '-'],
+    const rijen = [['Wanneer', esc(d.wanneer)], ['Met', wieNaam(d.wie)], ['Naam', esc(d.naam) || '-'], ...(d.bedrijf ? [['Bedrijf', esc(d.bedrijf)]] : []),
       ['E-mail', d.email ? `<a href="mailto:${esc(d.email)}" style="color:${ACCENT}">${esc(d.email)}</a>` : '-'], ['Telefoon', tel]];
     if (d.situatie) rijen.push(['Situatie', esc(d.situatie)]);
     if (d.soort !== 'geannuleerd') rijen.push(['Meet', d.video ? `<a href="${esc(d.video)}" style="color:${ACCENT}">Link</a>` : 'Nog geen link']);
@@ -594,9 +594,9 @@ ${rij(0, 5)}${rij(6, 10)}
       (d.soort !== 'geannuleerd' && d.video ? knop(esc(d.video), 'Open de Meet') : '') +
       p(`${d.klantLink ? link(esc(d.klantLink), 'Bekijk in het dashboard') + '. ' : ''}${d.soort === 'geannuleerd' ? '' : 'Met de bijlage zet je de afspraak in je eigen agenda.'}`, `font-size:14px;color:${ZACHT}`);
     return {
-      subject: `${kopTekst}: ${d.naam || 'onbekend'}, ${d.wanneer}${d.soort === 'gepland' ? ` (${wieNaam(d.wie)})` : ''}`,
+      subject: `${kopTekst}: ${d.naam || 'onbekend'}${d.bedrijf ? ' (' + d.bedrijf + ')' : ''}, ${d.wanneer}${d.soort === 'gepland' ? ` (${wieNaam(d.wie)})` : ''}`,
       html: omhulsel(base, { preheader: `${d.wanneer}, ${wieNaam(d.wie)}. ${d.email || ''}`, inhoud, appBlok: false }),
-      text: `${kopTekst}\n\nWanneer: ${d.wanneer}\nMet: ${wieNaam(d.wie)}\nNaam: ${d.naam || '-'}\nE-mail: ${d.email || '-'}\nTelefoon: ${d.telefoon || '-'}${d.situatie ? `\nSituatie: ${d.situatie}` : ''}${d.video && d.soort !== 'geannuleerd' ? `\nMeet: ${d.video}` : ''}${d.reden ? `\nReden: ${d.reden}` : ''}${d.bericht ? `\n\n${d.bericht}` : ''}${d.klantLink ? `\n\n${d.klantLink}` : ''}`,
+      text: `${kopTekst}\n\nWanneer: ${d.wanneer}\nMet: ${wieNaam(d.wie)}\nNaam: ${d.naam || '-'}${d.bedrijf ? `\nBedrijf: ${d.bedrijf}` : ''}\nE-mail: ${d.email || '-'}\nTelefoon: ${d.telefoon || '-'}${d.situatie ? `\nSituatie: ${d.situatie}` : ''}${d.video && d.soort !== 'geannuleerd' ? `\nMeet: ${d.video}` : ''}${d.reden ? `\nReden: ${d.reden}` : ''}${d.bericht ? `\n\n${d.bericht}` : ''}${d.klantLink ? `\n\n${d.klantLink}` : ''}`,
     };
   },
 

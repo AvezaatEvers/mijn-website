@@ -154,7 +154,7 @@
     return '<div class="af' + (weg ? ' is-weg' : '') + '"><div class="dt">' + esc(f(a.start, { weekday: 'short', day: 'numeric', month: 'short' })) + '<b>' + esc(f(a.start, { hour: '2-digit', minute: '2-digit' })) + '</b></div>' +
       '<div class="wie">' + (a.klantId ? '<a href="/intern/klant.html?id=' + encodeURIComponent(a.klantId) + '">' + esc(a.naam) + '</a>' : '<strong>' + esc(a.naam) + '</strong>') +
       '<span class="lbl' + (weg ? ' weg' : '') + '">' + (weg ? 'Geannuleerd' : NAAM[a.wie]) + '</span>' + (!weg && a.status === 'verzet' ? '<span class="lbl weg">Verzet</span>' : '') + (!weg && !a.meet ? '<span class="lbl let">Geen Meet-link</span>' : '') +
-      '<small>' + esc(a.email) + (a.telefoon ? ' · ' + esc(a.telefoon) : '') + (weg && a.reden ? ' · Reden: ' + esc(a.reden) : '') + '</small>' + (a.bericht ? '<small>“' + esc(a.bericht) + '”</small>' : '') + '</div>' +
+      '<small>' + (a.bedrijf ? esc(a.bedrijf) + ' · ' : '') + esc(a.email) + (a.telefoon ? ' · ' + esc(a.telefoon) : '') + (weg && a.reden ? ' · Reden: ' + esc(a.reden) : '') + '</small>' + (a.bericht ? '<small>“' + esc(a.bericht) + '”</small>' : '') + '</div>' +
       '<div class="acties">' + (!weg && a.meet ? '<a class="db-knop is-klein" href="' + esc(a.meet) + '" target="_blank" rel="noopener">Meet</a>' : '') +
       (!weg && a.eind >= new Date().toISOString() ? '<button class="db-knop is-rand is-klein" type="button" data-annuleer="' + esc(a.id) + '">Annuleren</button>' : '') + '</div></div>';
   }

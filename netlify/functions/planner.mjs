@@ -32,7 +32,7 @@ export default async (req) => {
   if (pad === "/api/planner/boek" && req.method === "POST") {
     const body = await req.json().catch(() => ({}));
     if (body.website) return json({ ok: true, start: body.start }); // honeypot: bots krijgen een nep-succes
-    const g = { start: String(body.start || ""), naam: schoon(body.naam, 120), email: mailadres(body.email), telefoon: schoon(body.telefoon, 30),
+    const g = { start: String(body.start || ""), naam: schoon(body.naam, 120), bedrijf: schoon(body.bedrijf, 120), email: mailadres(body.email), telefoon: schoon(body.telefoon, 30),
       situatie: SITUATIES.includes(body.situatie) ? body.situatie : "", bericht: String(body.bericht || "").replace(/[<>]/g, "").trim().slice(0, 1000) };
     if (!g.naam || !g.email) return json({ fout: "Vul je naam en een geldig e-mailadres in." }, 400);
     if (!body.privacy) return json({ fout: "Ga akkoord met de privacyverklaring." }, 400);

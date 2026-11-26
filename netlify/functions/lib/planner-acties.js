@@ -22,8 +22,8 @@ export async function naAfspraak(store, env, a, soort, { door = "systeem", reden
   if (googleIngesteld(env)) {
     try {
       const g = await leesGoogle(store);
-      const titel = `Kennismaking: ${a.naam} (${NAMEN[a.wie]})`;
-      const beschrijving = [`Kennismaking van 20 minuten via avezaatenevers.nl.`, `Naam: ${a.naam}`, `E-mail: ${a.email}`, a.telefoon ? `Telefoon: ${a.telefoon}` : "",
+      const titel = `Kennismaking: ${a.naam}${a.bedrijf ? ", " + a.bedrijf : ""} (${NAMEN[a.wie]})`;
+      const beschrijving = [`Kennismaking van 20 minuten via avezaatenevers.nl.`, `Naam: ${a.naam}`, a.bedrijf ? `Bedrijf: ${a.bedrijf}` : "", `E-mail: ${a.email}`, a.telefoon ? `Telefoon: ${a.telefoon}` : "",
         a.situatie ? `Situatie: ${SITUATIE[a.situatie] || a.situatie}` : "", a.bericht ? `Bericht: ${a.bericht}` : ""].filter(Boolean).join("\n");
       if (soort === "geannuleerd") {
         if (eventId && account) await verwijderAfspraak(env, g, account, eventId);
@@ -50,7 +50,7 @@ export async function naAfspraak(store, env, a, soort, { door = "systeem", reden
   const nu = new Date().toISOString();
   let k = klanten.find((x) => x.email === a.email), nieuw = false;
   if (!k && soort !== "geannuleerd") {
-    k = { id: nieuweId(), naam: a.naam, bedrijf: "", email: a.email, telefoon: a.telefoon, boekhouder: a.wie, status: "prospect", start: "", voorstelLink: "", notitie: "", uit: [], verstuurd: {}, log: [], tijdlijn: [],
+    k = { id: nieuweId(), naam: a.naam, bedrijf: a.bedrijf || "", email: a.email, telefoon: a.telefoon, boekhouder: a.wie, status: "prospect", start: "", voorstelLink: "", notitie: "", uit: [], verstuurd: {}, log: [], tijdlijn: [],
       door: "formulier", aangemaakt: nu, herkomst: "website", lead: { bron: "afspraak", op: nu, situatie: a.situatie, situatieTekst: SITUATIE[a.situatie] || "", bericht: a.bericht } };
     klanten.push(k); nieuw = true;
   }
@@ -58,6 +58,7 @@ export async function naAfspraak(store, env, a, soort, { door = "systeem", reden
   if (k) {
     if (soort !== "geannuleerd" && k.status !== "klant") { if (k.status !== "prospect") k.status = "prospect"; if (!k.lead) k.lead = { bron: "afspraak", op: nu }; }
     if (!k.telefoon && a.telefoon) k.telefoon = a.telefoon;
+    if (!k.bedrijf && a.bedrijf) k.bedrijf = a.bedrijf;
     if (!k.boekhouder) k.boekhouder = a.wie;
     k.afspraak = { uid: a.id, icsUid: a.id, seq: a.seq || 0, start: a.start, eind: a.eind, status: soort, video: meet, telefoon: "", tz: TZ, verzet: verzetLink, annuleer: annuleerLink, wie: a.wie, op: nu, herinnerd: null, bron: "planner" };
     const w = wanneer(a.start);
@@ -86,10 +87,10 @@ export async function naAfspraak(store, env, a, soort, { door = "systeem", reden
 
   // 4. Mail aan Koen en Daan (zelfde adres als de formuliermeldingen), met agenda-bijlage voor de eigen agenda
   try {
-    const mi = mails.afspraakIntern({ soort, naam: a.naam, email: a.email, telefoon: a.telefoon, situatie: SITUATIE[a.situatie] || "", bericht: a.bericht, wanneer: wanneer(a.start),
+    const mi = mails.afspraakIntern({ soort, naam: a.naam, bedrijf: a.bedrijf, email: a.email, telefoon: a.telefoon, situatie: SITUATIE[a.situatie] || "", bericht: a.bericht, wanneer: wanneer(a.start),
       wie: a.wie, video: meet, reden, klantLink: k ? `${BASE}/intern/klant.html?id=${encodeURIComponent(k.id)}` : "" }, BASE);
     const eigen = ics({ uid: a.id + "-intern", seq: a.seq || 0, start: a.start, eind: a.eind, geannuleerd: soort === "geannuleerd", locatie: meet,
-      titel: `Kennismaking: ${a.naam} (${NAMEN[a.wie]})`,
+      titel: `Kennismaking: ${a.naam}${a.bedrijf ? ", " + a.bedrijf : ""} (${NAMEN[a.wie]})`,
       beschrijving: `${meet ? "Meet: " + meet + "\n" : ""}${a.email}${a.telefoon ? "\n" + a.telefoon : ""}${a.bericht ? "\n\n" + a.bericht : ""}${k ? "\n\n" + BASE + "/intern/klant.html?id=" + k.id : ""}` });
     const aan = String(env("MAIL_TO") || "info@avezaatenevers.nl").split(",").map((x) => x.trim()).filter(Boolean);
     for (const adres of aan) {

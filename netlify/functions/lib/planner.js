@@ -130,7 +130,7 @@ export async function boek(store, beschikbaar, gegevens, nu = new Date(), bezet 
     if (al) return { fout: "dubbel", afspraak: al };
     const slot = vrijeTijden(beschikbaar, lijst, nu, { bezet }).find((t) => t.start === gegevens.start);
     if (!slot) return { fout: "bezet" };
-    gemaakt = { id: nieuweId(), start: slot.start, eind: slot.eind, wie: kiesWie(slot.wie, lijst, slot.start), naam: gegevens.naam, email: gegevens.email,
+    gemaakt = { id: nieuweId(), start: slot.start, eind: slot.eind, wie: kiesWie(slot.wie, lijst, slot.start), naam: gegevens.naam, bedrijf: gegevens.bedrijf || "", email: gegevens.email,
       telefoon: gegevens.telefoon || "", situatie: gegevens.situatie || "", bericht: gegevens.bericht || "", status: "gepland", op: nu.toISOString(), seq: 0, meet: "", googleEventId: "", googleWie: "" };
     lijst.push(gemaakt);
     return { ok: true };

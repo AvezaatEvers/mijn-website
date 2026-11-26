@@ -48,7 +48,7 @@ export default async (req) => {
       vrij: { totaal: vrij.length, koen: vrij.filter((t) => t.wie.includes("koen")).length, daan: vrij.filter((t) => t.wie.includes("daan")).length },
       afspraken: lijst.filter((a) => a.start >= grens).sort((x, y) => x.start.localeCompare(y.start)).map((a) => {
         const k = (klanten || []).find((x) => x.email === a.email);
-        return { id: a.id, start: a.start, eind: a.eind, wie: a.wie, naam: a.naam, email: a.email, telefoon: a.telefoon, situatie: a.situatie, bericht: a.bericht, status: a.status,
+        return { id: a.id, start: a.start, eind: a.eind, wie: a.wie, naam: a.naam, bedrijf: a.bedrijf || "", email: a.email, telefoon: a.telefoon, situatie: a.situatie, bericht: a.bericht, status: a.status,
           reden: a.reden || "", meet: a.meet || "", klantId: k ? k.id : null, beheer: beheerLink(env, a) };
       }),
       google: { ingesteld: googleIngesteld(env), redirect, ...Object.fromEntries(MENSEN.map((m) => [m, g[m] && g[m].refresh ? { email: g[m].email || "", sinds: g[m].op } : null])) },

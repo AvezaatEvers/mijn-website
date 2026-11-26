@@ -137,6 +137,7 @@
         '<button class="btn btn-primary pl-knop" type="button" id="pl-verzet">Verzet naar dit moment</button><p class="pl-melding" role="alert"></p>';
       return '<h2 class="pl-h">Je gegevens</h2><form class="pl-form" novalidate>' +
         '<label>Naam<input name="naam" autocomplete="name" required></label>' +
+        '<label><span>Bedrijfsnaam <span class="opt">(optioneel)</span></span><input name="bedrijf" autocomplete="organization"></label>' +
         '<label>E-mail<input type="email" name="email" autocomplete="email" required></label>' +
         '<label><span>Telefoon <span class="opt">(optioneel)</span></span><input type="tel" name="telefoon" autocomplete="tel"></label>' +
         '<label>Wat is je situatie?<select name="situatie"><option value="start">Ik ben net gestart</option><option value="boekhouder">Ik wil overstappen van boekhouder</option><option value="zelf">Ik doe het nu zelf</option><option value="anders">Anders</option></select></label>' +

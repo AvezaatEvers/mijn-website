@@ -1602,7 +1602,7 @@ p, li, dd, dt, td, th, blockquote, figcaption, summary, label { overflow-wrap: b
 }
 
 /* Homepage: wie wij zijn direct na de hero */
-.home-wij .wij-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "links kop" "rest rest"; gap: 56px; align-items: center; }
+.home-wij .wij-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "links kop"; gap: 56px; align-items: center; }
 .home-wij .wij-links { grid-area: links; } .home-wij .wij-kop { grid-area: kop; } .home-wij .wij-rest { grid-area: rest; }
 .wij-plek { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin: 4px 0 0; font-size: 14px; color: var(--muted); }
 .wij-plek img { width: 150px; height: auto; display: block; }
@@ -1610,7 +1610,7 @@ p, li, dd, dt, td, th, blockquote, figcaption, summary, label { overflow-wrap: b
 .wij-punten li { flex-direction: column; gap: 12px; }
 @media (max-width: 1100px) { .wij-punten { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 900px) {
-  .home-wij .wij-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "kop" "links" "rest"; gap: 28px; }
+  .home-wij .wij-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "kop" "links"; gap: 28px; }
   .home-wij .wij-duo { gap: 12px; }
   .home-wij .wij-duo figcaption { font-size: 13px; padding-top: 8px; }
   .home-wij .wij-duo figcaption strong { font-size: 15px; }

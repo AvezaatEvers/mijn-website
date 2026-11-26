@@ -501,3 +501,7 @@ body.app .wd-kop h2, body.app .wd-kop strong, body.app .cm-kop h2, body.app .cm-
   body.app .kpis::-webkit-scrollbar { display: none; }
   body.app .kpis > .kpi { flex: 0 0 44%; scroll-snap-align: start; }
 }
+
+/* Geen verend scrollen (iOS): anders veren de vaste balken mee */
+html.app, html.app body { overscroll-behavior-y: none; }
+@media (max-width: 960px) { html.app { background: #F5F5F7; } }

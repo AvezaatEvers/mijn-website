@@ -28,6 +28,7 @@
   ];
 
   document.body.classList.add('app');
+  document.documentElement.classList.add('app');
   var zij = document.createElement('aside'); zij.className = 'zij'; zij.setAttribute('aria-label', 'Navigatie');
   zij.innerHTML = '<a class="zij-logo" href="/intern/"><b>A&amp;E</b><span>Avezaat <span>&amp;</span> Evers</span></a>' +
     '<button class="zij-zoek" type="button" data-ob>' + svg('zoek') + '<span>Zoek of doe iets…</span><kbd>' + (/Mac|iPhone|iPad/.test(navigator.platform) ? '⌘K' : 'Ctrl K') + '</kbd></button>' +

@@ -161,6 +161,28 @@ export async function verzet(store, beschikbaar, id, start, nu = new Date(), bez
 
 // Verzetten vanuit het dashboard: Koen of Daan kiest zelf datum, tijd en wie het gesprek doet, ook buiten de vaste tijden.
 // Alleen een andere kennismaking van dezelfde persoon blokkeert; iets in de Apple Agenda geeft een waarschuwing (toch = doorzetten).
+// Zelf inplannen vanuit het dashboard (bijvoorbeeld na een telefoontje): zelfde regels als verzetten door ons.
+// E-mail mag leeg zijn; mailKlant = false stuurt de klant niets (ook geen herinnering).
+export async function planDoorOns(store, g, datum, tijd, wie, door, { nu = new Date(), bezet = {}, toch = false } = {}) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(datum)) || !/^\d{2}:\d{2}$/.test(String(tijd))) return { fout: "Kies een datum en tijd." };
+  if (!MENSEN.includes(wie)) return { fout: "Kies wie het gesprek doet." };
+  if (!g.naam) return { fout: "Vul een naam in." };
+  const s = lokaalNaarUtc(datum, tijd).getTime(), e = s + DUUR * 60e3;
+  if (!Number.isFinite(s)) return { fout: "Kies een datum en tijd." };
+  if (s <= nu.getTime()) return { fout: "Dat moment is al voorbij." };
+  if (!toch && (bezet[wie] || []).some((b) => b[0] < e && b[1] > s)) return { fout: "agenda", waarschuwing: `${NAMEN[wie]} heeft op dat moment iets in de agenda staan.` };
+  let gemaakt = null;
+  const r = await wijzigAfspraken(store, (lijst) => {
+    if (bezetDoorAfspraak(lijst, wie, s, e)) return { fout: `${NAMEN[wie]} heeft dan al een kennismaking.` };
+    gemaakt = { id: nieuweId(), start: new Date(s).toISOString(), eind: new Date(e).toISOString(), wie, naam: g.naam, bedrijf: g.bedrijf || "", email: g.email || "",
+      telefoon: g.telefoon || "", situatie: "", bericht: g.bericht || "", status: "gepland", op: nu.toISOString(), seq: 0, meet: "", googleEventId: "", googleWie: "",
+      ingeplandDoor: door, stil: !g.mailKlant || !g.email };
+    lijst.push(gemaakt);
+    return { ok: true };
+  });
+  return r.fout ? r : { ok: true, afspraak: gemaakt };
+}
+
 export async function verzetDoorOns(store, id, datum, tijd, wie, door, { nu = new Date(), bezet = {}, toch = false } = {}) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(datum)) || !/^\d{2}:\d{2}$/.test(String(tijd))) return { fout: "Kies een datum en tijd." };
   if (!MENSEN.includes(wie)) return { fout: "Kies wie het gesprek doet." };

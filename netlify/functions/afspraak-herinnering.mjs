@@ -23,7 +23,7 @@ export default async () => {
     // Per afspraak én tijdstip: na verzetten komt er opnieuw een herinnering voor het nieuwe tijdstip
     if (!a) continue;
     const merk = a.uid + "|" + a.start;
-    if (a.status === "geannuleerd" || a.herinnerd === merk || !k.email || (k.uit || []).includes("afspraakHerinnering")) continue;
+    if (a.status === "geannuleerd" || a.stil || a.herinnerd === merk || !k.email || (k.uit || []).includes("afspraakHerinnering")) continue;
     const start = new Date(a.start).getTime();
     if (!(start > nu && start - nu <= VOORAF)) continue;
     if (start - new Date(a.op).getTime() < MIN_GEBOEKT) { a.herinnerd = merk; gewijzigd = true; continue; }

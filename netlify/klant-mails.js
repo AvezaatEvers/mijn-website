@@ -66,7 +66,7 @@ export function kwartalenRond(nu = vandaag(), aantal = 6) {
 // niet door de dagelijkse mails; hier alleen zodat hij in het klantdossier onder Gepland staat (met Bekijk en Aan/uit).
 function afspraakMoment(k) {
   const a = k.afspraak;
-  if (!a || a.status === "geannuleerd" || !a.start) return null;
+  if (!a || a.status === "geannuleerd" || a.stil || !k.email || !a.start) return null;
   const start = new Date(a.start).getTime(), eind = a.eind ? new Date(a.eind).getTime() : start + 20 * 60e3;
   if (start <= Date.now() || a.herinnerd === a.uid + "|" + a.start) return null;
   if (a.op && start - new Date(a.op).getTime() < 3 * 3600e3) return null; // te kort van tevoren geboekt: geen herinnering

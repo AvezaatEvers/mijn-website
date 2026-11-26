@@ -56,6 +56,17 @@
   .af .wie small { display: block; color: var(--muted); font-size: 13px; }
   .af .acties { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
   .af.is-weg { opacity: .55; }
+  .kaartkop { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .kaartkop h2 { margin: 0; }
+  .plusje { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--accent, #1F3F8F); color: #fff; font-size: 22px; line-height: 1; cursor: pointer; display: grid; place-items: center; padding: 0 0 2px; }
+  .plusje[aria-expanded="true"] { transform: rotate(45deg); }
+  #nieuw { margin: 4px 0 14px; }
+  #nieuw h3 { margin: 0 0 10px; font-size: 15px; }
+  .vz-velden label.breed { flex: 1 1 100%; }
+  .vz-velden label.half { flex: 1 1 200px; }
+  .vz-velden textarea { font: inherit; font-size: 15px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); width: 100%; box-sizing: border-box; min-height: 60px; resize: vertical; }
+  .vz-vink { display: flex; gap: 8px; align-items: center; font-size: 14px; margin-top: 10px; }
+  .vz-vink input:disabled + span { color: var(--muted); }
   .vz { grid-column: 1 / -1; min-width: 0; background: var(--vlak2, #F5F5F7); border-radius: 12px; padding: 14px; }
   .vz-velden { display: flex; gap: 10px; flex-wrap: wrap; }
   .vz-velden label { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--muted); }
@@ -115,7 +126,7 @@
     .vz { padding: 12px; }
     .vz-velden { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     .vz-velden label { min-width: 0; }
-    .vz-velden label:last-child { grid-column: 1 / -1; }
+    .vz-velden label:last-child, .vz-velden label.breed { grid-column: 1 / -1; }
     .vz .vz-velden input, .vz .vz-velden select { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
   }
 </style>
@@ -131,8 +142,10 @@
   <div class="mtabs" id="mtabs" role="tablist" aria-label="Onderdelen"><button type="button" role="tab" data-naar="afspraken">Afspraken</button><button type="button" role="tab" data-naar="tijden">Tijden</button><button type="button" role="tab" data-naar="koppelingen">Koppelingen</button></div>
   <div class="kol">
     <div>
-      <div class="db-kaart" data-paneel="afspraken" style="margin-bottom:18px">
-        <h2>Afspraken</h2><p class="sub">De komende kennismakingen. Annuleren stuurt de klant een mail met de vraag een nieuw moment te kiezen.</p>
+      <div class="db-kaart" data-paneel="afspraken" id="afspraken-kaart" style="margin-bottom:18px">
+        <div class="kaartkop"><h2>Afspraken</h2><button class="plusje" type="button" data-nieuw aria-label="Zelf een kennismaking inplannen" title="Zelf inplannen">+</button></div>
+        <p class="sub">De komende kennismakingen. Annuleren stuurt de klant een mail met de vraag een nieuw moment te kiezen. Met + plan je er zelf een in, bijvoorbeeld na een telefoontje.</p>
+        <div class="vz" id="nieuw" hidden></div>
         <div id="afspraken"><p class="kl-leeg">Laden…</p></div>
       </div>
     </div>
@@ -311,10 +324,11 @@
     if (lees) { lees.disabled = true; lees.textContent = 'Bezig…'; api('POST', '/apple/vernieuw').then(laad).catch(function (e2) { melding('Lezen mislukt: ' + esc(e2.message), true); laad(); }); return; }
     if (t.closest('[data-apple-uit]')) { if (confirm('Apple Agenda ontkoppelen? De planner kijkt dan niet meer naar je afspraken.')) api('POST', '/apple/ontkoppel').then(laad); return; }
     if (t.closest('[data-ontkoppel]')) { if (confirm('Google Agenda ontkoppelen? Nieuwe kennismakingen met jou krijgen dan geen Meet-link meer.')) api('POST', '/google/ontkoppel').then(laad); return; }
+    if (t.closest('[data-nieuw]')) { openNieuw(); return; }
     var vzk = t.closest('[data-verzet]');
     if (vzk) { openVerzet(vzk.dataset.verzet); return; }
     var vzs = t.closest('[data-vz-sluit]');
-    if (vzs) { vzs.closest('.vz').hidden = true; return; }
+    if (vzs) { vzs.closest('.vz').hidden = true; document.querySelector('[data-nieuw]').setAttribute('aria-expanded', 'false'); return; }
     var sug = t.closest('[data-vz-tijd]');
     if (sug) { var pv = sug.closest('.vz'); pv.querySelector('[name=tijd]').value = sug.dataset.vzTijd; pv.querySelector('[name=met]').value = sug.dataset.vzMet; pv.querySelector('[name=toch]').value = ''; tekenSuggesties(pv); return; }
     var an = t.closest('[data-annuleer]');
@@ -352,13 +366,58 @@
       return '<button type="button" class="vz-chip' + (t === tijd && m === met ? ' is-aan' : '') + '" data-vz-tijd="' + t + '" data-vz-met="' + m + '">' + t + (x.wie.length === 1 ? ' <small>' + NAAM[x.wie[0]] + '</small>' : '') + '</button>';
     }).join('') : '<em>Geen vrije momenten volgens de beschikbaarheid. Je kunt wel zelf een tijd kiezen.</em>');
   }
-  $('afspraken').addEventListener('input', function (e) {
+  // Zelf inplannen (na een telefoontje of afspraak buiten de planner om)
+  function openNieuw() {
+    var pv = $('nieuw'), knop = document.querySelector('[data-nieuw]');
+    if (!pv.hidden) { pv.hidden = true; knop.setAttribute('aria-expanded', 'false'); return; }
+    var morgen = lokaal(new Date(Date.now() + 864e5).toISOString()).datum;
+    var eerst = (data.suggesties || []).filter(function (x) { return x.start > new Date().toISOString(); })[0];
+    var l = eerst ? lokaal(eerst.start) : { datum: morgen, tijd: '10:00' };
+    pv.innerHTML = '<form data-plan-form><h3>Kennismaking inplannen</h3><div class="vz-velden">' +
+      '<label class="breed">Naam<input name="naam" required autocomplete="off"></label>' +
+      '<label class="half">Bedrijfsnaam (optioneel)<input name="bedrijf" autocomplete="off"></label>' +
+      '<label class="half">Telefoon<input name="telefoon" type="tel" autocomplete="off"></label>' +
+      '<label class="breed">E-mail<input name="email" type="email" autocomplete="off" placeholder="Nodig voor de bevestiging en de Meet-link"></label>' +
+      '<label class="breed">Notitie (optioneel)<textarea name="bericht" rows="2"></textarea></label>' +
+      '<label>Datum<input type="date" name="datum" required value="' + l.datum + '" min="' + lokaal(new Date().toISOString()).datum + '"></label>' +
+      '<label>Tijd<input type="time" name="tijd" required step="300" value="' + l.tijd + '"></label>' +
+      '<label>Met<select name="met"><option value="koen">Koen</option><option value="daan">Daan</option></select></label></div>' +
+      '<div class="vz-sug"></div><label class="vz-vink"><input type="checkbox" name="mailKlant" disabled><span>Bevestiging met Meet-link mailen naar de klant</span></label>' +
+      '<input type="hidden" name="toch" value=""><div class="vz-fout" role="alert"></div>' +
+      '<div class="vz-knoppen"><button class="db-knop is-klein" type="submit">Inplannen</button><button class="db-knop is-rand is-klein" type="button" data-vz-sluit>Sluiten</button></div></form>';
+    pv.querySelector('[name=met]').value = eerst ? (eerst.wie.indexOf(ik) >= 0 ? ik : eerst.wie[0]) : ik;
+    pv.hidden = false; knop.setAttribute('aria-expanded', 'true');
+    tekenSuggesties(pv);
+    pv.querySelector('[name=naam]').focus();
+  }
+  $('afspraken-kaart').addEventListener('input', function (e) {
     var pv = e.target.closest('.vz'); if (!pv) return;
+    var mk = pv.querySelector('[name=mailKlant]');
+    if (mk) { var heeft = /\S+@\S+\.\S+/.test(pv.querySelector('[name=email]').value); if (mk.disabled === heeft) { mk.disabled = !heeft; mk.checked = heeft; } }
+    if (!/^(datum|tijd|met)$/.test(e.target.name)) return;
     pv.querySelector('[name=toch]').value = ''; pv.querySelector('.vz-fout').textContent = '';
-    pv.querySelector('[type=submit]').textContent = 'Verzetten en klant mailen';
+    pv.querySelector('[type=submit]').textContent = mk ? 'Inplannen' : 'Verzetten en klant mailen';
     tekenSuggesties(pv);
   });
-  $('afspraken').addEventListener('submit', function (e) {
+  $('afspraken-kaart').addEventListener('submit', function (e) {
+    var pf = e.target.closest('[data-plan-form]'); if (!pf) return;
+    e.preventDefault();
+    var knop = pf.querySelector('[type=submit]'), fout = pf.querySelector('.vz-fout');
+    knop.disabled = true; knop.textContent = 'Bezig…'; fout.textContent = '';
+    api('POST', '/plan', { naam: pf.naam.value, bedrijf: pf.bedrijf.value, telefoon: pf.telefoon.value, email: pf.email.value, bericht: pf.bericht.value,
+      mailKlant: pf.mailKlant.checked, datum: pf.datum.value, tijd: pf.tijd.value, met: pf.met.value, toch: pf.toch.value === '1' }).then(function (r) {
+      $('nieuw').hidden = true; document.querySelector('[data-nieuw]').setAttribute('aria-expanded', 'false');
+      melding('Ingepland: ' + esc(pf.naam.value) + '.' + (pf.mailKlant.checked ? ' De klant heeft een bevestiging gekregen.' : ' De klant is niet gemaild.') +
+        (r.klantId ? ' <a href="/intern/klant.html?id=' + encodeURIComponent(r.klantId) + '">Open de klantkaart</a>.' : '') +
+        (r.problemen && r.problemen.length ? ' Let op: ' + esc(r.problemen.join('; ')) : ''), !!(r.problemen && r.problemen.length));
+      window.scrollTo(0, 0); laad();
+    }).catch(function (e2) {
+      knop.disabled = false;
+      if (e2.agenda) { pf.toch.value = '1'; knop.textContent = 'Toch inplannen'; fout.textContent = e2.message + ' Toch inplannen?'; }
+      else { knop.textContent = 'Inplannen'; fout.textContent = e2.message; }
+    });
+  });
+  $('afspraken-kaart').addEventListener('submit', function (e) {
     var fm = e.target.closest('[data-vz-form]'); if (!fm) return;
     e.preventDefault();
     var a = data.afspraken.filter(function (x) { return x.id === fm.dataset.vzForm; })[0], knop = fm.querySelector('[type=submit]'), fout = fm.querySelector('.vz-fout'), oud = knop.textContent;

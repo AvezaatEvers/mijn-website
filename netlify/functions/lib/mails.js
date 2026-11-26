@@ -529,7 +529,7 @@ ${rij(0, 5)}${rij(6, 10)}
   afspraak(d, base = '') {
     const inhoud = kop('Je kennismaking staat gepland') +
       p(hoi(d.naam)) +
-      p('Fijn dat je een moment hebt gekozen. Hieronder staat alles op een rij.') +
+      p(d.doorOns ? 'Leuk dat we elkaar gaan spreken! Zoals afgesproken staat je kennismaking gepland. Hieronder staat alles op een rij.' : 'Fijn dat je een moment hebt gekozen. Hieronder staat alles op een rij.') +
       afspraakKaart(d, 'gepland') +
       tussenkop('Wat je kunt verwachten') +
       vinkjes([
@@ -543,7 +543,7 @@ ${rij(0, 5)}${rij(6, 10)}
     return {
       subject: `Je kennismaking staat gepland: ${d.wanneer}`,
       html: omhulsel(base, { preheader: `${cap(d.datum)} om ${d.tijd}, met ${metWie(d.wie)}.${d.video ? ' De link om deel te nemen staat in deze mail.' : ''}`, inhoud, wie: d.wie, appTitel: 'Vragen voor het gesprek?' }),
-      text: `${hoiTekst(d.naam)}\n\nFijn dat je een moment hebt gekozen. Je kennismaking staat gepland:\n\n${afspraakTekst(d)}\n\nKomt het toch niet uit?\nAnder moment kiezen: ${d.verzet}\nAnnuleren: ${d.annuleer}\n\nTot snel!${voet(d.wie)}`,
+      text: `${hoiTekst(d.naam)}\n\n${d.doorOns ? 'Leuk dat we elkaar gaan spreken! Zoals afgesproken staat je kennismaking gepland:' : 'Fijn dat je een moment hebt gekozen. Je kennismaking staat gepland:'}\n\n${afspraakTekst(d)}\n\nKomt het toch niet uit?\nAnder moment kiezen: ${d.verzet}\nAnnuleren: ${d.annuleer}\n\nTot snel!${voet(d.wie)}`,
     };
   },
 
@@ -586,7 +586,7 @@ ${rij(0, 5)}${rij(6, 10)}
     if (d.situatie) rijen.push(['Situatie', esc(d.situatie)]);
     if (d.soort !== 'geannuleerd') rijen.push(['Meet', d.video ? `<a href="${esc(d.video)}" style="color:${ACCENT}">Link</a>` : 'Nog geen link']);
     const inhoud = kop(`${kopTekst}: ${esc(voornaam(d.naam) || 'onbekend')}`) +
-      p(d.soort === 'gepland' ? `Ingepland via de planner op de site. ${sterk(wieNaam(d.wie))} doet het gesprek.`
+      p(d.soort === 'gepland' ? (d.door && d.door !== 'systeem' ? `${sterk(wieNaam(d.door))} heeft deze kennismaking zelf ingepland. ${sterk(wieNaam(d.wie))} doet het gesprek.` : `Ingepland via de planner op de site. ${sterk(wieNaam(d.wie))} doet het gesprek.`)
         : d.soort === 'verzet' ? `${d.door && d.door !== 'systeem' ? sterk(wieNaam(d.door)) + ' heeft' : 'De klant heeft'} de kennismaking verzet. Het nieuwe moment staat hieronder.`
         : `Deze kennismaking gaat niet door.${d.reden ? ` Reden: ${esc(d.reden)}` : ''}`) +
       blok(tabel(rijen)) +

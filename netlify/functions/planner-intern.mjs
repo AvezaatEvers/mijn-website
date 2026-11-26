@@ -2,6 +2,7 @@
 //   GET  /intern/api/planner                    beschikbaarheid, afspraken, Google-status, aantal vrije momenten
 //   POST /intern/api/planner/beschikbaarheid    { koen: { week, dicht }, daan: { week, dicht } }
 //   POST /intern/api/planner/annuleer           { id, reden }  annuleren namens Koen of Daan (klant krijgt een mail)
+//   POST /intern/api/planner/plan               { naam, bedrijf, email, telefoon, bericht, mailKlant, datum, tijd, met, toch }  zelf inplannen
 //   POST /intern/api/planner/verzet             { id, datum, tijd, met, toch }  verzetten namens Koen of Daan (klant krijgt een mail)
 //   GET  /intern/api/planner/google/start       naar Google om de eigen agenda te koppelen
 //   GET  /intern/api/planner/google/terug       terugkomst van Google
@@ -13,7 +14,7 @@ import { getStore } from "@netlify/blobs";
 import { createHmac } from "node:crypto";
 import { ingelogd, COOKIE } from "../intern-logica.js";
 import { log } from "../logboek.js";
-import { leesBeschikbaarheid, bewaarBeschikbaarheid, schoneBeschikbaarheid, leesAfspraken, vrijeTijden, annuleer, verzetDoorOns, NAMEN, MENSEN, DUUR, MIN_UREN, vooruitDagen } from "./lib/planner.js";
+import { leesBeschikbaarheid, bewaarBeschikbaarheid, schoneBeschikbaarheid, leesAfspraken, vrijeTijden, annuleer, verzetDoorOns, planDoorOns, NAMEN, MENSEN, DUUR, MIN_UREN, vooruitDagen } from "./lib/planner.js";
 import { naAfspraak, beheerLink } from "./lib/planner-acties.js";
 import { googleIngesteld, leesGoogle, bewaarGoogle, googleAuthUrl, googleCode } from "./lib/google.js";
 import { ontdek, herontdek, versleutel, leesApple, bewaarApple, bezetVoor, bezetStatus, wisBezet } from "./lib/apple.js";
@@ -70,6 +71,19 @@ export default async (req) => {
     if (anders.length) await log(store, { wie, soort: "instelling", tekst: "Beschikbaarheid voor kennismakingen aangepast (" + anders.map((m) => NAMEN[m]).join(" en ") + ")" });
     if (oud.instellingen.vooruitWeken !== nieuw.instellingen.vooruitWeken) await log(store, { wie, soort: "instelling", tekst: `Klanten kunnen nu ${nieuw.instellingen.vooruitWeken} ${nieuw.instellingen.vooruitWeken === 1 ? "week" : "weken"} vooruit een kennismaking boeken` });
     return json({ ok: true, beschikbaarheid: nieuw });
+  }
+
+  if (pad === "/intern/api/planner/plan" && req.method === "POST") {
+    const body = await req.json().catch(() => ({}));
+    const schoon = (v, n) => String(v || "").replace(/[<>]/g, "").trim().slice(0, n);
+    const email = schoon(body.email, 200).toLowerCase();
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ fout: "Dat e-mailadres klopt niet." }, 400);
+    const g = { naam: schoon(body.naam, 120), bedrijf: schoon(body.bedrijf, 120), email, telefoon: schoon(body.telefoon, 40), bericht: schoon(body.bericht, 1000), mailKlant: body.mailKlant !== false };
+    const r = await planDoorOns(store, g, String(body.datum || ""), String(body.tijd || ""), String(body.met || ""), wie,
+      { bezet: await bezetVoor(store, env, 60e3), toch: body.toch === true });
+    if (r.fout) return json({ fout: r.fout === "agenda" ? r.waarschuwing : r.fout, agenda: r.fout === "agenda" }, 409);
+    const na = await naAfspraak(store, env, r.afspraak, "gepland", { door: wie });
+    return json({ ok: true, problemen: na.problemen, klantId: na.klantId });
   }
 
   if (pad === "/intern/api/planner/verzet" && req.method === "POST") {

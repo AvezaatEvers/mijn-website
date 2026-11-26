@@ -200,7 +200,7 @@
         (mij ? '<span style="display:flex;gap:6px"><button class="db-knop is-licht is-klein" type="button" data-apple-lees>Opnieuw lezen</button><button class="db-knop is-rand is-klein" type="button" data-apple-uit>Ontkoppelen</button></span>' : '') + '</div>' +
         '<div class="ap-agendas">' + x.agendas.map(function (a) {
           var st = (x.perAgenda || []).filter(function (p) { return p.naam === a.naam; })[0];
-          var extra = !a.aan ? '' : !st ? '' : st.fout ? ' <span class="ap-fout" style="font-size:12.5px">(niet gelezen: ' + esc(st.fout) + ')</span>' : ' <span style="font-size:12.5px;color:var(--muted)">(' + st.items + ' afspraken gevonden)</span>';
+          var extra = !a.aan ? '' : !st ? '' : st.fout ? ' <span class="ap-fout" style="font-size:12.5px">(niet gelezen: ' + esc(st.fout) + ')</span>' : ' <span style="font-size:12.5px;color:var(--muted)">(' + (st.abonnement ? 'abonnement, ' : '') + st.items + ' afspraken gevonden)</span>';
           return '<label><input type="checkbox" data-agenda="' + esc(a.href) + '"' + (a.aan ? ' checked' : '') + (mij ? '' : ' disabled') + '> ' + esc(a.naam) + extra + '</label>';
         }).join('') + '</div></div>';
     }).join('');

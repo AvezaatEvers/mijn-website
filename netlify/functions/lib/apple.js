@@ -49,15 +49,18 @@ export async function ontdek(appleId, wachtwoord) {
   if (!principal) throw new Error("Geen iCloud-agenda gevonden voor dit account");
   const h = await dav("PROPFIND", new URL(principal, p.url).href, '<?xml version="1.0" encoding="utf-8"?><d:propfind xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:prop><c:calendar-home-set/></d:prop></d:propfind>', auth, 0);
   const home = new URL(ontsnap(eerste(eerste(h.xml, "calendar-home-set"), "href")).trim(), h.url).href;
-  const l = await dav("PROPFIND", home, '<?xml version="1.0" encoding="utf-8"?><d:propfind xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:prop><d:resourcetype/><d:displayname/><c:supported-calendar-component-set/></d:prop></d:propfind>', auth, 1);
+  const l = await dav("PROPFIND", home, '<?xml version="1.0" encoding="utf-8"?><d:propfind xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav" xmlns:cs="http://calendarserver.org/ns/"><d:prop><d:resourcetype/><d:displayname/><c:supported-calendar-component-set/><cs:source/></d:prop></d:propfind>', auth, 1);
   const agendas = [];
   for (const r of tags(l.xml, "response")) {
     const type = eerste(r, "resourcetype");
-    if (!/<(?:[\w-]+:)?calendar\b/i.test(type) || /schedule-(inbox|outbox)/i.test(type)) continue;
+    // Agenda-abonnementen (toegevoegd via een link) hebben geen afspraken in iCloud zelf, wel een bron-link
+    const bron = ontsnap(eerste(eerste(r, "source"), "href")).trim();
+    const abonnement = /subscribed/i.test(type) || !!bron;
+    if ((!/<(?:[\w-]+:)?calendar\b/i.test(type) && !abonnement) || /schedule-(inbox|outbox)/i.test(type)) continue;
     const comps = eerste(r, "supported-calendar-component-set");
     if (comps && !/VEVENT/i.test(comps)) continue;
     const href = new URL(ontsnap(eerste(r, "href")).trim(), home).href, naam = ontsnap(eerste(r, "displayname")).trim() || "Agenda";
-    agendas.push({ href, naam, aan: !NIET_STANDAARD.test(naam) });
+    agendas.push({ href, naam, aan: !NIET_STANDAARD.test(naam), ...(bron ? { bron: bron.replace(/^webcals?:\/\//i, "https://") } : {}) });
   }
   if (!agendas.length) throw new Error("Geen agenda's gevonden in dit iCloud-account");
   return { home, agendas };
@@ -104,18 +107,34 @@ export function bezetUitIcs(teksten, van, tot) {
   return blokken.sort((a, b) => a[0] - b[0]);
 }
 
+// Agenda-abonnement: het .ics-bestand direct van de link halen (zoals de Apple-app ook doet)
+async function abonnement(url) {
+  const r = await fetch(url, { redirect: "follow", signal: AbortSignal.timeout(10000), headers: { Accept: "text/calendar, */*" } });
+  if (!r.ok) throw new Error("abonnement gaf fout " + r.status);
+  const t = await r.text();
+  if (!t.includes("BEGIN:VCALENDAR")) throw new Error("abonnement is geen agenda");
+  return [t];
+}
+
+// Agenda's opnieuw opzoeken met de bewaarde inlog, en de aan/uit-keuzes behouden
+export async function herontdek(env, cfg) {
+  const r = await ontdek(cfg.appleId, ontsleutel(env, cfg.wachtwoord));
+  const was = new Map((cfg.agendas || []).map((a) => [a.href, a.aan]));
+  return { ...cfg, home: r.home, agendas: r.agendas.map((a) => ({ ...a, aan: was.has(a.href) ? was.get(a.href) : a.aan })) };
+}
+
 async function haalBezet(env, cfg, van, tot) {
   const auth = { appleId: cfg.appleId, wachtwoord: ontsleutel(env, cfg.wachtwoord) };
   const body = `<?xml version="1.0" encoding="utf-8"?><c:calendar-query xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:prop><c:calendar-data/></d:prop><c:filter><c:comp-filter name="VCALENDAR"><c:comp-filter name="VEVENT"><c:time-range start="${ics(new Date(van))}" end="${ics(new Date(tot))}"/></c:comp-filter></c:comp-filter></c:filter></c:calendar-query>`;
   // Per agenda: weigert er één (bijvoorbeeld een gedeelde agenda), dan tellen de andere gewoon mee
   const aan = cfg.agendas.filter((a) => a.aan);
-  const delen = await Promise.allSettled(aan.map((a) => dav("REPORT", a.href, body, auth, 1)));
+  const delen = await Promise.allSettled(aan.map((a) => a.bron ? abonnement(a.bron) : dav("REPORT", a.href, body, auth, 1).then((d) => tags(d.xml, "calendar-data").map(ontsnap))));
   const teksten = [], agendas = [];
   delen.forEach((d, i) => {
     if (d.status === "rejected") { agendas.push({ naam: aan[i].naam, fout: d.reason.message }); return; }
-    const t = tags(d.value.xml, "calendar-data").map(ontsnap).filter((x) => x.includes("BEGIN:VCALENDAR"));
+    const t = d.value.filter((x) => x.includes("BEGIN:VCALENDAR"));
     teksten.push(...t);
-    agendas.push({ naam: aan[i].naam, items: t.length });
+    agendas.push({ naam: aan[i].naam, items: t.reduce((n, x) => n + (x.match(/BEGIN:VEVENT/g) || []).length, 0), ...(aan[i].bron ? { abonnement: true } : {}) });
   });
   if (aan.length && agendas.every((a) => a.fout)) throw new Error(agendas[0].fout);
   return { blokken: bezetUitIcs(teksten, van, tot), agendas };

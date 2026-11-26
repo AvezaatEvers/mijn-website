@@ -15,7 +15,7 @@ import { log } from "../logboek.js";
 import { leesBeschikbaarheid, bewaarBeschikbaarheid, schoneBeschikbaarheid, leesAfspraken, vrijeTijden, annuleer, NAMEN, MENSEN, DUUR, VOORUIT_DAGEN, MIN_UREN } from "./lib/planner.js";
 import { naAfspraak, beheerLink } from "./lib/planner-acties.js";
 import { googleIngesteld, leesGoogle, bewaarGoogle, googleAuthUrl, googleCode } from "./lib/google.js";
-import { ontdek, versleutel, leesApple, bewaarApple, bezetVoor, bezetStatus, wisBezet } from "./lib/apple.js";
+import { ontdek, herontdek, versleutel, leesApple, bewaarApple, bezetVoor, bezetStatus, wisBezet } from "./lib/apple.js";
 
 const json = (data, status = 200) => new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
 const terug = (pad) => new Response(null, { status: 303, headers: { Location: pad } });
@@ -120,6 +120,9 @@ export default async (req) => {
   }
 
   if (pad === "/intern/api/planner/apple/vernieuw" && req.method === "POST") {
+    // Agenda's opnieuw opzoeken (nieuwe agenda's en abonnementen), dan direct uitlezen
+    const apple = await leesApple(store);
+    if (apple[wie]) { try { apple[wie] = await herontdek(env, apple[wie]); await bewaarApple(store, apple); } catch (e) { return json({ fout: e.message }, 400); } }
     await wisBezet(store, wie);
     await bezetVoor(store, env, 0);
     return json({ ok: true });

@@ -81,8 +81,8 @@ function bezetDoorAfspraak(lijst, wie, s, e, negeer) {
 
 // Alle tijden waarop minstens één van beiden vrij is: [{ start, eind, wie: ["koen", "daan"] }]
 // bezet: { koen: [[startMs, eindMs]], daan: [...] } uit de eigen agenda (Apple Agenda), zie lib/apple.js
-export function vrijeTijden(beschikbaar, afspraken, nu = new Date(), { negeer, bezet = {} } = {}) {
-  const vanaf = nu.getTime() + MIN_UREN * 3600e3, vandaag = lokaleDatum(nu), uit = new Map();
+export function vrijeTijden(beschikbaar, afspraken, nu = new Date(), { negeer, bezet = {}, minUren = MIN_UREN } = {}) {
+  const vanaf = nu.getTime() + minUren * 3600e3, vandaag = lokaleDatum(nu), uit = new Map();
   for (let i = 0, n = vooruitDagen(beschikbaar); i <= n; i++) {
     const datum = plusDagen(vandaag, i), wd = weekdag(datum);
     for (const wie of MENSEN) {
@@ -153,6 +153,30 @@ export async function verzet(store, beschikbaar, id, start, nu = new Date(), bez
     const vorige = { start: a.start, wie: a.wie };
     a.wie = slot.wie.includes(a.wie) ? a.wie : kiesWie(slot.wie, lijst.filter((x) => x.id !== id), slot.start);
     a.start = slot.start; a.eind = slot.eind; a.status = "verzet"; a.op = nu.toISOString(); a.seq = (a.seq || 0) + 1;
+    uit = { ...a, vorige };
+    return { ok: true };
+  });
+  return r.fout ? r : { ok: true, afspraak: uit };
+}
+
+// Verzetten vanuit het dashboard: Koen of Daan kiest zelf datum, tijd en wie het gesprek doet, ook buiten de vaste tijden.
+// Alleen een andere kennismaking van dezelfde persoon blokkeert; iets in de Apple Agenda geeft een waarschuwing (toch = doorzetten).
+export async function verzetDoorOns(store, id, datum, tijd, wie, door, { nu = new Date(), bezet = {}, toch = false } = {}) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(datum)) || !/^\d{2}:\d{2}$/.test(String(tijd))) return { fout: "Kies een datum en tijd." };
+  if (!MENSEN.includes(wie)) return { fout: "Kies wie het gesprek doet." };
+  const s = lokaalNaarUtc(datum, tijd).getTime(), e = s + DUUR * 60e3;
+  if (!Number.isFinite(s)) return { fout: "Kies een datum en tijd." };
+  if (s <= nu.getTime()) return { fout: "Dat moment is al voorbij." };
+  if (!toch && (bezet[wie] || []).some((b) => b[0] < e && b[1] > s)) return { fout: "agenda", waarschuwing: `${NAMEN[wie]} heeft op dat moment iets in de agenda staan.` };
+  let uit = null;
+  const r = await wijzigAfspraken(store, (lijst) => {
+    const a = lijst.find((x) => x.id === id);
+    if (!a || !actief(a)) return { fout: "Deze kennismaking bestaat niet meer of is geannuleerd." };
+    if (bezetDoorAfspraak(lijst, wie, s, e, id)) return { fout: `${NAMEN[wie]} heeft dan al een kennismaking.` };
+    const start = new Date(s).toISOString();
+    if (start === a.start && wie === a.wie) return { fout: "Dat is hetzelfde moment als nu." };
+    const vorige = { start: a.start, wie: a.wie };
+    a.wie = wie; a.start = start; a.eind = new Date(e).toISOString(); a.status = "verzet"; a.verzetDoor = door; a.op = nu.toISOString(); a.seq = (a.seq || 0) + 1;
     uit = { ...a, vorige };
     return { ok: true };
   });

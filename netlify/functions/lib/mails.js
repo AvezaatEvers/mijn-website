@@ -550,7 +550,7 @@ ${rij(0, 5)}${rij(6, 10)}
   afspraakVerzet(d, base = '') {
     const inhoud = kop('Je kennismaking is verzet') +
       p(hoi(d.naam)) +
-      p('Gelukt. Hieronder staat je nieuwe moment.') +
+      p(d.doorOns ? 'We hebben je kennismaking naar een ander moment verplaatst. Hieronder staat je nieuwe moment. Komt het je niet uit? Kies dan gerust zelf een ander moment.' : 'Gelukt. Hieronder staat je nieuwe moment.') +
       afspraakKaart(d, 'verzet') +
       afspraakWijzigen(d) +
       p('Tot snel!', 'margin-bottom:22px') +
@@ -558,7 +558,7 @@ ${rij(0, 5)}${rij(6, 10)}
     return {
       subject: `Je kennismaking is verzet naar ${d.wanneer}`,
       html: omhulsel(base, { preheader: `Je nieuwe moment: ${cap(d.datum)} om ${d.tijd}.`, inhoud, wie: d.wie, appTitel: 'Vragen voor het gesprek?' }),
-      text: `${hoiTekst(d.naam)}\n\nJe kennismaking is verzet. Je nieuwe moment:\n\n${afspraakTekst(d)}\n\nAnder moment kiezen: ${d.verzet}\nAnnuleren: ${d.annuleer}\n\nTot snel!${voet(d.wie)}`,
+      text: `${hoiTekst(d.naam)}\n\n${d.doorOns ? 'We hebben je kennismaking naar een ander moment verplaatst.' : 'Je kennismaking is verzet.'} Je nieuwe moment:\n\n${afspraakTekst(d)}\n\nAnder moment kiezen: ${d.verzet}\nAnnuleren: ${d.annuleer}\n\nTot snel!${voet(d.wie)}`,
     };
   },
 
@@ -587,7 +587,7 @@ ${rij(0, 5)}${rij(6, 10)}
     if (d.soort !== 'geannuleerd') rijen.push(['Meet', d.video ? `<a href="${esc(d.video)}" style="color:${ACCENT}">Link</a>` : 'Nog geen link']);
     const inhoud = kop(`${kopTekst}: ${esc(voornaam(d.naam) || 'onbekend')}`) +
       p(d.soort === 'gepland' ? `Ingepland via de planner op de site. ${sterk(wieNaam(d.wie))} doet het gesprek.`
-        : d.soort === 'verzet' ? `De klant heeft de kennismaking verzet. Het nieuwe moment staat hieronder.`
+        : d.soort === 'verzet' ? `${d.door && d.door !== 'systeem' ? sterk(wieNaam(d.door)) + ' heeft' : 'De klant heeft'} de kennismaking verzet. Het nieuwe moment staat hieronder.`
         : `Deze kennismaking gaat niet door.${d.reden ? ` Reden: ${esc(d.reden)}` : ''}`) +
       blok(tabel(rijen)) +
       (d.bericht ? p(`${sterk('Bericht')}<br>${esc(d.bericht).replace(/\n/g, '<br>')}`) : '') +

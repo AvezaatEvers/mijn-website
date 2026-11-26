@@ -56,6 +56,20 @@
   .af .wie small { display: block; color: var(--muted); font-size: 13px; }
   .af .acties { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
   .af.is-weg { opacity: .55; }
+  .vz { grid-column: 1 / -1; min-width: 0; background: var(--vlak2, #F5F5F7); border-radius: 12px; padding: 14px; }
+  .vz-velden { display: flex; gap: 10px; flex-wrap: wrap; }
+  .vz-velden label { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--muted); }
+  .vz-velden input, .vz-velden select { font: inherit; font-size: 15px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); min-width: 0; box-sizing: border-box; }
+  .vz-sug { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 12px 0 4px; }
+  .vz-sug > span { font-size: 12.5px; color: var(--muted); width: 100%; }
+  .vz-sug em { font-size: 13px; color: var(--muted); font-style: normal; }
+  .vz-chip { font: inherit; font-size: 13.5px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 9px; background: #fff; color: var(--ink); cursor: pointer; font-variant-numeric: tabular-nums; }
+  .vz-chip small { color: var(--muted); font-size: 11.5px; }
+  .vz-chip.is-aan { background: var(--accent, #1F3F8F); border-color: transparent; color: #fff; }
+  .vz-chip.is-aan small { color: rgba(255, 255, 255, .8); }
+  .vz-fout { font-size: 13.5px; color: #B42318; margin: 6px 0 0; }
+  .vz-fout:empty { display: none; }
+  .vz-knoppen { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
   .lbl { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 6px; margin-left: 6px; vertical-align: 1px; background: var(--tint); color: var(--accent); }
   .lbl.weg { background: #F3F4F6; color: var(--muted); }
   .lbl.let { background: #FEF3E2; color: #9A5B13; }
@@ -98,6 +112,11 @@
     .dicht form { display: grid; grid-template-columns: 1fr 1fr; }
     .dicht form input { width: 100%; min-width: 0; }
     .dicht form button { grid-column: 1 / -1; }
+    .vz { padding: 12px; }
+    .vz-velden { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .vz-velden label { min-width: 0; }
+    .vz-velden label:last-child { grid-column: 1 / -1; }
+    .vz .vz-velden input, .vz .vz-velden select { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
   }
 </style>
 </head>
@@ -153,7 +172,7 @@
   function f(iso, o) { o.timeZone = TZ; return new Date(iso).toLocaleString('nl-NL', o); }
   function api(methode, pad, body) {
     return fetch('/intern/api/planner' + pad, { method: methode, credentials: 'same-origin', headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined })
-      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.fout || 'Mislukt'); return j; }); });
+      .then(function (r) { return r.json().then(function (j) { if (!r.ok) { var e = new Error(j.fout || 'Mislukt'); e.agenda = !!j.agenda; throw e; } return j; }); });
   }
   function melding(t, fout) { $('melding').innerHTML = t ? '<div class="melding' + (fout ? ' fout' : '') + '">' + t + '</div>' : ''; }
 
@@ -197,7 +216,8 @@
       '<span class="lbl' + (weg ? ' weg' : '') + '">' + (weg ? 'Geannuleerd' : NAAM[a.wie]) + '</span>' + (!weg && a.status === 'verzet' ? '<span class="lbl weg">Verzet</span>' : '') + (!weg && !a.meet ? '<span class="lbl let">Geen Meet-link</span>' : '') +
       '<small>' + (a.bedrijf ? esc(a.bedrijf) + ' · ' : '') + esc(a.email) + (a.telefoon ? ' · ' + esc(a.telefoon) : '') + (weg && a.reden ? ' · Reden: ' + esc(a.reden) : '') + '</small>' + (a.bericht ? '<small>“' + esc(a.bericht) + '”</small>' : '') + '</div>' +
       '<div class="acties">' + (!weg && a.meet ? '<a class="db-knop is-klein" href="' + esc(a.meet) + '" target="_blank" rel="noopener">Meet</a>' : '') +
-      (!weg && a.eind >= new Date().toISOString() ? '<button class="db-knop is-rand is-klein" type="button" data-annuleer="' + esc(a.id) + '">Annuleren</button>' : '') + '</div></div>';
+      (!weg && a.eind >= new Date().toISOString() ? '<button class="db-knop is-rand is-klein" type="button" data-verzet="' + esc(a.id) + '">Verzetten</button><button class="db-knop is-rand is-klein" type="button" data-annuleer="' + esc(a.id) + '">Annuleren</button>' : '') + '</div>' +
+      '<div class="vz" id="vz-' + esc(a.id) + '" hidden></div></div>';
   }
   function tekenAfspraken(komend, eerder) {
     $('afspraken').innerHTML = (komend.length ? komend.map(rij).join('') : '<p class="kl-leeg">Nog geen kennismakingen gepland.</p>') +
@@ -291,6 +311,12 @@
     if (lees) { lees.disabled = true; lees.textContent = 'Bezig…'; api('POST', '/apple/vernieuw').then(laad).catch(function (e2) { melding('Lezen mislukt: ' + esc(e2.message), true); laad(); }); return; }
     if (t.closest('[data-apple-uit]')) { if (confirm('Apple Agenda ontkoppelen? De planner kijkt dan niet meer naar je afspraken.')) api('POST', '/apple/ontkoppel').then(laad); return; }
     if (t.closest('[data-ontkoppel]')) { if (confirm('Google Agenda ontkoppelen? Nieuwe kennismakingen met jou krijgen dan geen Meet-link meer.')) api('POST', '/google/ontkoppel').then(laad); return; }
+    var vzk = t.closest('[data-verzet]');
+    if (vzk) { openVerzet(vzk.dataset.verzet); return; }
+    var vzs = t.closest('[data-vz-sluit]');
+    if (vzs) { vzs.closest('.vz').hidden = true; return; }
+    var sug = t.closest('[data-vz-tijd]');
+    if (sug) { var pv = sug.closest('.vz'); pv.querySelector('[name=tijd]').value = sug.dataset.vzTijd; pv.querySelector('[name=met]').value = sug.dataset.vzMet; pv.querySelector('[name=toch]').value = ''; tekenSuggesties(pv); return; }
     var an = t.closest('[data-annuleer]');
     if (an) {
       var a = data.afspraken.filter(function (x) { return x.id === an.dataset.annuleer; })[0];
@@ -300,6 +326,51 @@
       api('POST', '/annuleer', { id: a.id, reden: reden }).then(function () { melding('Geannuleerd. ' + esc(a.naam) + ' heeft een mail gekregen.'); laad(); })
         .catch(function (e2) { an.disabled = false; an.textContent = 'Annuleren'; melding('Annuleren mislukt: ' + esc(e2.message), true); });
     }
+  });
+  // Verzetten door Koen of Daan: vrije datum, tijd en persoon, met de vrije momenten van die dag als suggestie
+  function lokaal(iso) { var d = new Date(iso); return { datum: d.toLocaleDateString('sv-SE', { timeZone: TZ }), tijd: d.toLocaleTimeString('nl-NL', { timeZone: TZ, hour: '2-digit', minute: '2-digit' }) }; }
+  function openVerzet(id) {
+    var a = data.afspraken.filter(function (x) { return x.id === id; })[0], pv = $('vz-' + id);
+    if (!a || !pv) return;
+    if (!pv.hidden) { pv.hidden = true; return; }
+    var l = lokaal(a.start);
+    pv.innerHTML = '<form data-vz-form="' + esc(id) + '"><div class="vz-velden">' +
+      '<label>Datum<input type="date" name="datum" required value="' + l.datum + '" min="' + lokaal(new Date().toISOString()).datum + '"></label>' +
+      '<label>Tijd<input type="time" name="tijd" required step="300" value="' + l.tijd + '"></label>' +
+      '<label>Met<select name="met"><option value="koen">Koen</option><option value="daan">Daan</option></select></label></div>' +
+      '<div class="vz-sug"></div><input type="hidden" name="toch" value=""><div class="vz-fout" role="alert"></div>' +
+      '<div class="vz-knoppen"><button class="db-knop is-klein" type="submit">Verzetten en klant mailen</button><button class="db-knop is-rand is-klein" type="button" data-vz-sluit>Sluiten</button></div></form>';
+    pv.querySelector('[name=met]').value = a.wie;
+    pv.hidden = false;
+    tekenSuggesties(pv);
+  }
+  function tekenSuggesties(pv) {
+    var datum = pv.querySelector('[name=datum]').value, tijd = pv.querySelector('[name=tijd]').value, met = pv.querySelector('[name=met]').value;
+    var dag = (data.suggesties || []).filter(function (x) { return lokaal(x.start).datum === datum; });
+    pv.querySelector('.vz-sug').innerHTML = '<span>Vrij op die dag</span>' + (dag.length ? dag.map(function (x) {
+      var t = lokaal(x.start).tijd, m = x.wie.indexOf(met) >= 0 ? met : x.wie[0];
+      return '<button type="button" class="vz-chip' + (t === tijd && m === met ? ' is-aan' : '') + '" data-vz-tijd="' + t + '" data-vz-met="' + m + '">' + t + (x.wie.length === 1 ? ' <small>' + NAAM[x.wie[0]] + '</small>' : '') + '</button>';
+    }).join('') : '<em>Geen vrije momenten volgens de beschikbaarheid. Je kunt wel zelf een tijd kiezen.</em>');
+  }
+  $('afspraken').addEventListener('input', function (e) {
+    var pv = e.target.closest('.vz'); if (!pv) return;
+    pv.querySelector('[name=toch]').value = ''; pv.querySelector('.vz-fout').textContent = '';
+    pv.querySelector('[type=submit]').textContent = 'Verzetten en klant mailen';
+    tekenSuggesties(pv);
+  });
+  $('afspraken').addEventListener('submit', function (e) {
+    var fm = e.target.closest('[data-vz-form]'); if (!fm) return;
+    e.preventDefault();
+    var a = data.afspraken.filter(function (x) { return x.id === fm.dataset.vzForm; })[0], knop = fm.querySelector('[type=submit]'), fout = fm.querySelector('.vz-fout'), oud = knop.textContent;
+    knop.disabled = true; knop.textContent = 'Bezig…'; fout.textContent = '';
+    api('POST', '/verzet', { id: a.id, datum: fm.datum.value, tijd: fm.tijd.value, met: fm.met.value, toch: fm.toch.value === '1' }).then(function (r) {
+      melding('Verzet. ' + esc(a.naam) + ' heeft een mail met het nieuwe moment gekregen.' + (r.problemen && r.problemen.length ? ' Let op: ' + esc(r.problemen.join('; ')) : ''), !!(r.problemen && r.problemen.length));
+      window.scrollTo(0, 0); laad();
+    }).catch(function (e2) {
+      knop.disabled = false;
+      if (e2.agenda) { fm.toch.value = '1'; knop.textContent = 'Toch verzetten'; fout.textContent = e2.message + ' Toch verzetten?'; }
+      else { knop.textContent = oud; fout.textContent = e2.message; }
+    });
   });
   function alertNiet(el, t) { el.textContent = t; setTimeout(function () { el.textContent = 'Toevoegen'; }, 1800); }
   $('vooruit').addEventListener('change', function () {

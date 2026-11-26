@@ -65,12 +65,12 @@ export async function naAfspraak(store, env, a, soort, { door = "systeem", reden
     k.tijdlijn = k.tijdlijn || [];
     k.tijdlijn.unshift({ id: nieuweId(), soort: "notitie", door: door === "systeem" ? "formulier" : door, op: nu,
       tekst: soort === "gepland" ? `Kennismaking gepland met ${NAMEN[a.wie]}: ${w}${a.bericht ? ". Bericht: " + a.bericht : ""}`
-        : soort === "verzet" ? `Kennismaking verzet naar ${w} (met ${NAMEN[a.wie]})`
+        : soort === "verzet" ? `Kennismaking verzet naar ${w} (met ${NAMEN[a.wie]})${door !== "systeem" ? " door " + NAMEN[door] : ""}`
         : `Kennismaking van ${w} geannuleerd${door !== "systeem" ? " door " + NAMEN[door] : ""}${reden ? ". Reden: " + reden : ""}` });
   }
 
   // 3. Mail naar de klant
-  const d = mailData({ naam: a.naam, wie: "", start: a.start, eind: a.eind, tz: TZ, video: meet, videoVolgt: !meet, verzet: verzetLink, annuleer: annuleerLink, reden });
+  const d = { ...mailData({ naam: a.naam, wie: "", start: a.start, eind: a.eind, tz: TZ, video: meet, videoVolgt: !meet, verzet: verzetLink, annuleer: annuleerLink, reden }), doorOns: door !== "systeem" };
   const m = soort === "gepland" ? mails.afspraak(d, BASE) : soort === "verzet" ? mails.afspraakVerzet(d, BASE) : mails.afspraakGeannuleerd(d, BASE);
   const agenda = ics({ uid: a.id, seq: a.seq || 0, start: a.start, eind: a.eind, geannuleerd: soort === "geannuleerd", locatie: meet,
     titel: "Kennismaking Avezaat & Evers",
@@ -88,7 +88,7 @@ export async function naAfspraak(store, env, a, soort, { door = "systeem", reden
   // 4. Mail aan Koen en Daan (zelfde adres als de formuliermeldingen), met agenda-bijlage voor de eigen agenda
   try {
     const mi = mails.afspraakIntern({ soort, naam: a.naam, bedrijf: a.bedrijf, email: a.email, telefoon: a.telefoon, situatie: SITUATIE[a.situatie] || "", bericht: a.bericht, wanneer: wanneer(a.start),
-      wie: a.wie, video: meet, reden, klantLink: k ? `${BASE}/intern/klant.html?id=${encodeURIComponent(k.id)}` : "" }, BASE);
+      wie: a.wie, door, video: meet, reden, klantLink: k ? `${BASE}/intern/klant.html?id=${encodeURIComponent(k.id)}` : "" }, BASE);
     const eigen = ics({ uid: a.id + "-intern", seq: a.seq || 0, start: a.start, eind: a.eind, geannuleerd: soort === "geannuleerd", locatie: meet,
       titel: `Kennismaking: ${a.naam}${a.bedrijf ? ", " + a.bedrijf : ""} (${NAMEN[a.wie]})`,
       beschrijving: `${meet ? "Meet: " + meet + "\n" : ""}${a.email}${a.telefoon ? "\n" + a.telefoon : ""}${a.bericht ? "\n\n" + a.bericht : ""}${k ? "\n\n" + BASE + "/intern/klant.html?id=" + k.id : ""}` });

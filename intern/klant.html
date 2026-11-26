@@ -135,6 +135,7 @@
             <label>Status<select name="status"><option value="klant">Klant</option><option value="prospect">Lead</option><option value="gestopt">Gestopt</option><option value="verloren">Verloren (lead)</option></select></label>
             <label>Hoe kwam deze binnen?<select name="herkomst"><option value="">Onbekend</option><option value="moneymonk">MoneyMonk</option><option value="trustoo">Trustoo</option><option value="netwerk">Eigen netwerk</option><option value="google">Google</option><option value="website">Website (formulier)</option><option value="anders">Anders</option></select></label>
             <label>Startdatum<input name="start" type="date"></label>
+            <label class="schakel-rij"><input type="checkbox" name="pastNiet"> Lead past niet bij ons (bv, alleen IB-aangifte, nep)</label>
             <label>Link naar voorstel<input name="voorstelLink" type="url" placeholder="https://"></label>
             <label class="breed">Interne notitie<textarea name="notitie" maxlength="2000" placeholder="Alleen intern zichtbaar"></textarea></label>
             <div class="breed" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -289,7 +290,7 @@
 
     // Formulier
     var f = document.getElementById('gegevens');
-    ['naam', 'bedrijf', 'email', 'telefoon', 'boekhouder', 'status', 'herkomst', 'start', 'voorstelLink', 'notitie'].forEach(function (n) { f.elements[n].value = k[n] || ''; });
+    ['naam', 'bedrijf', 'email', 'telefoon', 'boekhouder', 'status', 'herkomst', 'start', 'voorstelLink', 'notitie'].forEach(function (n) { f.elements[n].value = k[n] || ''; }); f.elements.pastNiet.checked = !!k.pastNiet;
   }
 
   var IC = {
@@ -400,7 +401,7 @@
   var f = document.getElementById('gegevens'), gm = document.getElementById('g-melding');
   f.addEventListener('submit', function (e) {
     e.preventDefault();
-    var data = Object.fromEntries(new FormData(f).entries()); data.id = id;
+    var data = Object.fromEntries(new FormData(f).entries()); data.id = id; data.pastNiet = f.elements.pastNiet.checked;
     gm.className = 'db-melding'; gm.textContent = 'Opslaan…';
     api('/intern/api/klant', { method: 'PATCH', body: JSON.stringify(data) }).then(function (r) {
       zet(r); gm.className = 'db-melding is-ok'; gm.textContent = 'Opgeslagen.';

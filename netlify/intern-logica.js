@@ -232,6 +232,7 @@ export const HERKOMST = { moneymonk: "MoneyMonk", trustoo: "Trustoo", netwerk: "
 
 function velden(body, k) {
   if ("herkomst" in body && (body.herkomst === "" || Object.hasOwn(HERKOMST, body.herkomst))) k.herkomst = body.herkomst;
+  if ("pastNiet" in body) k.pastNiet = body.pastNiet === true || body.pastNiet === "on";
   if ("naam" in body) k.naam = schoon(body.naam);
   if ("bedrijf" in body) k.bedrijf = schoon(body.bedrijf);
   if ("email" in body) k.email = mailadres(body.email);

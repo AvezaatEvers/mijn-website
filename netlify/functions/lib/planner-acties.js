@@ -84,7 +84,24 @@ export async function naAfspraak(store, env, a, soort, { door = "systeem", reden
   }
   await store.setJSON("klanten", klanten);
 
-  // 4. Logboek en pushmelding
+  // 4. Mail aan Koen en Daan (zelfde adres als de formuliermeldingen), met agenda-bijlage voor de eigen agenda
+  try {
+    const mi = mails.afspraakIntern({ soort, naam: a.naam, email: a.email, telefoon: a.telefoon, situatie: SITUATIE[a.situatie] || "", bericht: a.bericht, wanneer: wanneer(a.start),
+      wie: a.wie, video: meet, reden, klantLink: k ? `${BASE}/intern/klant.html?id=${encodeURIComponent(k.id)}` : "" }, BASE);
+    const eigen = ics({ uid: a.id + "-intern", seq: a.seq || 0, start: a.start, eind: a.eind, geannuleerd: soort === "geannuleerd", locatie: meet,
+      titel: `Kennismaking: ${a.naam} (${NAMEN[a.wie]})`,
+      beschrijving: `${meet ? "Meet: " + meet + "\n" : ""}${a.email}${a.telefoon ? "\n" + a.telefoon : ""}${a.bericht ? "\n\n" + a.bericht : ""}${k ? "\n\n" + BASE + "/intern/klant.html?id=" + k.id : ""}` });
+    const aan = String(env("MAIL_TO") || "info@avezaatenevers.nl").split(",").map((x) => x.trim()).filter(Boolean);
+    for (const adres of aan) {
+      const ri = await verstuur(env, { aan: adres, mail: mi,
+        bijlagen: [{ filename: soort === "geannuleerd" ? "kennismaking-geannuleerd.ics" : "kennismaking.ics", content: Buffer.from(eigen).toString("base64"), content_type: `text/calendar; method=${soort === "geannuleerd" ? "CANCEL" : "PUBLISH"}; charset=UTF-8` }] });
+      if (!ri.ok) { console.error("Planner: interne mail mislukt:", ri.fout); problemen.push("Interne mail: " + ri.fout); }
+    }
+  } catch (e) {
+    console.error("Planner: interne mail mislukt:", e.message);
+  }
+
+  // 5. Logboek en pushmelding
   const w = wanneer(a.start);
   await log(store, { wie: door, soort: "klant", klant: k,
     tekst: `Kennismaking ${soort} (${w}, ${NAMEN[a.wie]})${nieuw ? ", lead aangemaakt" : ""}${r.ok ? ", klant gemaild" : ", mail mislukt"}${problemen.some((p) => p.startsWith("Google Agenda")) ? ", zonder Meet-link" : problemen.some((p) => p.startsWith("Google Meet")) ? ", Meet niet open" : ""}` });

@@ -1,6 +1,6 @@
 // Eigen planner voor kennismakingen: beschikbaarheid per persoon, vrije tijden en boeken zonder dubbele boekingen.
 // Opslag (Blobs-store "intern"):
-//   planner-beschikbaarheid  { koen: { week: { "1": [["09:00","12:00"]], ... }, dicht: ["2026-12-24"] }, daan: { ... } }
+//   planner-beschikbaarheid  { koen: { week: { "1": [["09:00","12:00"]], ... }, dicht: ["2026-12-24"] }, daan: { ... }, instellingen: { vooruitWeken: 2 } }
 //                            week-sleutels: 0 = zondag, 1 = maandag ... 6 = zaterdag (tijden in Nederlandse tijd)
 //   planner-afspraken        [ { id, start, eind, wie, naam, email, telefoon, situatie, bericht, status, op, seq, meet, googleEventId, googleWie } ]
 import { createHmac, timingSafeEqual } from "node:crypto";
@@ -11,7 +11,9 @@ export const NAMEN = { koen: "Koen", daan: "Daan" };
 export const DUUR = 20;          // minuten per kennismaking
 export const STAP = 30;          // om de hoeveel minuten een tijd begint (20 min gesprek + 10 min ruimte)
 export const BUFFER = 10;        // minuten ruimte tussen twee afspraken van dezelfde persoon
-export const VOORUIT_DAGEN = 14; // zo ver vooruit kan een klant boeken
+export const VOORUIT_WEKEN = 2;  // standaard: zo ver vooruit kan een klant boeken (instelbaar in het dashboard, 1 tot 8 weken)
+export const MAX_WEKEN = 8;
+export const vooruitDagen = (b) => 7 * ((b && b.instellingen && b.instellingen.vooruitWeken) || VOORUIT_WEKEN);
 export const MIN_UREN = 24;      // zo kort van tevoren kan een klant nog boeken
 const BESCHIKBAAR = "planner-beschikbaarheid";
 const AFSPRAKEN = "planner-afspraken";
@@ -48,6 +50,8 @@ export function schoneBeschikbaarheid(ruw) {
     const dicht = [...new Set((Array.isArray(p.dicht) ? p.dicht : []).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)))].sort().slice(-200);
     uit[wie] = { week, dicht };
   }
+  const w = Number(ruw && ruw.instellingen && ruw.instellingen.vooruitWeken);
+  uit.instellingen = { vooruitWeken: Number.isInteger(w) && w >= 1 && w <= MAX_WEKEN ? w : VOORUIT_WEKEN };
   return uit;
 }
 export async function leesBeschikbaarheid(store) { return schoneBeschikbaarheid(await store.get(BESCHIKBAAR, { type: "json" })); }
@@ -79,7 +83,7 @@ function bezetDoorAfspraak(lijst, wie, s, e, negeer) {
 // bezet: { koen: [[startMs, eindMs]], daan: [...] } uit de eigen agenda (Apple Agenda), zie lib/apple.js
 export function vrijeTijden(beschikbaar, afspraken, nu = new Date(), { negeer, bezet = {} } = {}) {
   const vanaf = nu.getTime() + MIN_UREN * 3600e3, vandaag = lokaleDatum(nu), uit = new Map();
-  for (let i = 0; i <= VOORUIT_DAGEN; i++) {
+  for (let i = 0, n = vooruitDagen(beschikbaar); i <= n; i++) {
     const datum = plusDagen(vandaag, i), wd = weekdag(datum);
     for (const wie of MENSEN) {
       const p = beschikbaar[wie] || { week: {}, dicht: [] };

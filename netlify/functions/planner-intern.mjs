@@ -12,7 +12,7 @@ import { getStore } from "@netlify/blobs";
 import { createHmac } from "node:crypto";
 import { ingelogd, COOKIE } from "../intern-logica.js";
 import { log } from "../logboek.js";
-import { leesBeschikbaarheid, bewaarBeschikbaarheid, schoneBeschikbaarheid, leesAfspraken, vrijeTijden, annuleer, NAMEN, MENSEN, DUUR, VOORUIT_DAGEN, MIN_UREN } from "./lib/planner.js";
+import { leesBeschikbaarheid, bewaarBeschikbaarheid, schoneBeschikbaarheid, leesAfspraken, vrijeTijden, annuleer, NAMEN, MENSEN, DUUR, MIN_UREN, vooruitDagen } from "./lib/planner.js";
 import { naAfspraak, beheerLink } from "./lib/planner-acties.js";
 import { googleIngesteld, leesGoogle, bewaarGoogle, googleAuthUrl, googleCode } from "./lib/google.js";
 import { ontdek, herontdek, versleutel, leesApple, bewaarApple, bezetVoor, bezetStatus, wisBezet } from "./lib/apple.js";
@@ -44,7 +44,7 @@ export default async (req) => {
     const vrij = vrijeTijden(b, lijst, new Date(), { bezet });
     return json({
       wie, beschikbaarheid: b,
-      regels: { duur: DUUR, vooruit: VOORUIT_DAGEN, minUren: MIN_UREN },
+      regels: { duur: DUUR, vooruitWeken: vooruitDagen(b) / 7, minUren: MIN_UREN },
       vrij: { totaal: vrij.length, koen: vrij.filter((t) => t.wie.includes("koen")).length, daan: vrij.filter((t) => t.wie.includes("daan")).length },
       afspraken: lijst.filter((a) => a.start >= grens).sort((x, y) => x.start.localeCompare(y.start)).map((a) => {
         const k = (klanten || []).find((x) => x.email === a.email);
@@ -65,6 +65,7 @@ export default async (req) => {
     await bewaarBeschikbaarheid(store, nieuw);
     const anders = MENSEN.filter((m) => JSON.stringify(oud[m]) !== JSON.stringify(nieuw[m]));
     if (anders.length) await log(store, { wie, soort: "instelling", tekst: "Beschikbaarheid voor kennismakingen aangepast (" + anders.map((m) => NAMEN[m]).join(" en ") + ")" });
+    if (oud.instellingen.vooruitWeken !== nieuw.instellingen.vooruitWeken) await log(store, { wie, soort: "instelling", tekst: `Klanten kunnen nu ${nieuw.instellingen.vooruitWeken} ${nieuw.instellingen.vooruitWeken === 1 ? "week" : "weken"} vooruit een kennismaking boeken` });
     return json({ ok: true, beschikbaarheid: nieuw });
   }
 

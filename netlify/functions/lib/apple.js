@@ -10,7 +10,7 @@ import { MENSEN, lokaalNaarUtc } from "./planner.js";
 
 const ICLOUD = "https://caldav.icloud.com/";
 const APPLE = "planner-apple", BEZET = "planner-bezet";
-const VOORUIT_MS = 16 * 864e5;
+const VOORUIT_MS = (8 * 7 + 2) * 864e5; // ruim genoeg voor de verste instelling (8 weken)
 const NIET_STANDAARD = /verjaardag|birthday|feestdag|holiday|herinnering|reminder/i;
 
 // ---------- Versleuteling van het app-specifieke wachtwoord ----------

@@ -151,7 +151,7 @@
     function teken(melding) {
       var main = stap === 'form' ? formulier()
         : stap === 'laden' ? '<p class="pl-leeg">Vrije momenten laden…</p>'
-        : !lijstDagen.length ? '<div><h2 class="pl-h">Kies een dag en tijd</h2><p class="pl-leeg">Er zijn de komende twee weken geen vrije momenten online. <a href="https://wa.me/31850604363">App ons</a> of bel <a href="tel:+31850604363">085 060 4363</a>, dan plannen we samen een tijd.</p></div>'
+        : !lijstDagen.length ? '<div><h2 class="pl-h">Kies een dag en tijd</h2><p class="pl-leeg">Er zijn op dit moment geen vrije momenten online. <a href="https://wa.me/31850604363">App ons</a> of bel <a href="tel:+31850604363">085 060 4363</a>, dan plannen we samen een tijd.</p></div>'
         : kalender() + tijden();
       if (!el.querySelector('.pl')) {
         el.innerHTML = '<div class="pl"><aside class="pl-info"><div class="pl-wissel pl-wissel-terug"></div>' +

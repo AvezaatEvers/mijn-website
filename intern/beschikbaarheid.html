@@ -69,6 +69,8 @@
   .ap-fout { color: #B91C1C; }
   .melding { padding: 12px 14px; border-radius: 12px; margin-bottom: 16px; font-size: 14.5px; background: var(--tint); color: var(--accent); }
   .melding.fout { background: #FEF2F2; color: #B91C1C; }
+  .vooruit { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; margin: 0 0 14px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+  .vooruit select { font: inherit; font-size: 14px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font-weight: 600; }
   .opgeslagen { font-size: 13px; color: #15803D; margin-left: 8px; }
   details.eerder summary { cursor: pointer; color: var(--muted); font-size: 14px; margin-top: 10px; }
 </style>
@@ -76,7 +78,7 @@
 <body>
 <main class="db">
   <div class="hk">
-    <div><h1>Kennismakingen</h1><p>Zet hier wanneer je kunt. Klanten boeken zelf via de planner op <a href="/contact#plannen" target="_blank">de contactpagina</a>: 20 minuten via Google Meet, tot 2 weken vooruit en minstens 24 uur van tevoren. Een afspraak gaat naar wie er vrij is.</p></div>
+    <div><h1>Kennismakingen</h1><p>Zet hier wanneer je kunt. Klanten boeken zelf via de planner op <a href="/contact#plannen" target="_blank">de contactpagina</a>: 20 minuten via Google Meet, tot <span id="vooruit-tekst">2 weken</span> vooruit en minstens 24 uur van tevoren. Een afspraak gaat naar wie er vrij is.</p></div>
     <a class="db-knop is-rand" href="/contact#plannen" target="_blank" rel="noopener">Planner bekijken</a>
   </div>
   <div id="melding"></div>
@@ -91,6 +93,7 @@
     <div>
       <div class="db-kaart" style="margin-bottom:18px">
         <h2>Beschikbaarheid <span class="opgeslagen" id="opgeslagen" hidden>Opgeslagen</span></h2><p class="sub">Vaste tijden per week. Wijzigingen staan direct in de planner.</p>
+        <label class="vooruit">Klanten kunnen boeken tot <select id="vooruit" aria-label="Hoeveel weken vooruit"><option value="1">1 week</option><option value="2">2 weken</option><option value="3">3 weken</option><option value="4">4 weken</option><option value="5">5 weken</option><option value="6">6 weken</option><option value="7">7 weken</option><option value="8">8 weken</option></select> vooruit</label>
         <div class="seg" id="persoon"><button type="button" data-p="koen">Koen</button><button type="button" data-p="daan">Daan</button></div>
         <div id="week"></div>
         <div class="dicht">
@@ -144,8 +147,10 @@
     var komend = data.afspraken.filter(function (a) { return a.eind >= nu; });
     var actief = komend.filter(function (a) { return a.status !== 'geannuleerd'; });
     $('tellers').innerHTML = '<div><span>Komende kennismakingen</span><b>' + actief.length + '</b></div>' +
-      '<div><span>Vrije momenten (2 weken)</span><b>' + data.vrij.totaal + '</b></div>' +
+      '<div><span>Vrije momenten (' + data.regels.vooruitWeken + (data.regels.vooruitWeken === 1 ? ' week' : ' weken') + ')</span><b>' + data.vrij.totaal + '</b></div>' +
       '<div><span>Koen vrij</span><b>' + data.vrij.koen + '</b></div><div><span>Daan vrij</span><b>' + data.vrij.daan + '</b></div>';
+    $('vooruit').value = String(data.regels.vooruitWeken);
+    $('vooruit-tekst').textContent = data.regels.vooruitWeken + (data.regels.vooruitWeken === 1 ? ' week' : ' weken');
     tekenAfspraken(komend, data.afspraken.filter(function (a) { return a.eind < nu; }).reverse());
     tekenWeek(); tekenGoogle(); tekenApple();
   }
@@ -261,6 +266,11 @@
     }
   });
   function alertNiet(el, t) { el.textContent = t; setTimeout(function () { el.textContent = 'Toevoegen'; }, 1800); }
+  $('vooruit').addEventListener('change', function () {
+    api('POST', '/beschikbaarheid', { instellingen: { vooruitWeken: +this.value } }).then(function () {
+      $('opgeslagen').hidden = false; setTimeout(function () { $('opgeslagen').hidden = true; }, 1500); laad();
+    }).catch(function (e) { melding('Opslaan mislukt: ' + esc(e.message), true); });
+  });
   $('dicht-form').addEventListener('submit', function (e) {
     e.preventDefault();
     var van = e.target.van.value, tot = e.target.tot.value || van; if (!van) return;

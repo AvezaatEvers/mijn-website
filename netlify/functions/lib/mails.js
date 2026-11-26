@@ -524,6 +524,76 @@ ${rij(0, 5)}${rij(6, 10)}
     };
   },
 
+  // Afspraak via Cal.com: bevestiging, verzet en geannuleerd (naar de bezoeker, vanuit netlify/functions/cal-webhook.mjs)
+  // d: { naam, wie, wanneer, duur, video, telefoon, verzet, annuleer, reden }
+  afspraak(d, base = '') {
+    const inhoud = kop('Je kennismaking staat gepland') +
+      p(hoi(d.naam)) +
+      p(`Fijn dat je een moment hebt gekozen. We spreken elkaar ${sterk(esc(d.wanneer))}.`) +
+      afspraakBlok(d) +
+      (d.video ? knop(esc(d.video), 'Deelnemen aan het gesprek') +
+        p('Bewaar deze mail, dan heb je de link straks bij de hand. De afspraak staat ook in de bijlage, voor in je agenda.', `font-size:14px;color:${ZACHT}`) :
+        p('De afspraak staat in de bijlage, voor in je agenda.', `font-size:14px;color:${ZACHT}`)) +
+      tussenkop('Zo gaat de kennismaking') +
+      vinkjes([
+        'We vragen naar je bedrijf en hoe je administratie nu loopt.',
+        'Je hoort precies wat het kost. Vrijblijvend, geen verkooppraatje.',
+        'Handig om bij de hand te hebben: een idee van hoeveel bonnetjes en facturen je per maand hebt.',
+      ]) +
+      afspraakWijzigen(d) +
+      p('Tot dan!', 'margin-bottom:22px') +
+      groet(base, d.wie);
+    return {
+      subject: `Je kennismaking staat gepland: ${d.wanneer}`,
+      html: omhulsel(base, { preheader: `We spreken elkaar ${d.wanneer}.${d.video ? ' De link om deel te nemen staat in deze mail.' : ''}`, inhoud, wie: d.wie }),
+      text: `${hoiTekst(d.naam)}\n\nFijn dat je een moment hebt gekozen. We spreken elkaar ${d.wanneer} (${d.duur} minuten) met ${wieVol(d.wie)}.\n\n${d.video ? `Deelnemen aan het gesprek: ${d.video}\n\n` : d.telefoon ? `We bellen je op ${d.telefoon}.\n\n` : ''}Komt het toch niet uit?\nAnder moment kiezen: ${d.verzet}\nAnnuleren: ${d.annuleer}\n\nTot dan!${voet(d.wie)}`,
+    };
+  },
+
+  afspraakVerzet(d, base = '') {
+    const inhoud = kop('Je kennismaking is verzet') +
+      p(hoi(d.naam)) +
+      p(`Gelukt. Je nieuwe moment is ${sterk(esc(d.wanneer))}.`) +
+      afspraakBlok(d) +
+      (d.video ? knop(esc(d.video), 'Deelnemen aan het gesprek') : '') +
+      p('In de bijlage staat de nieuwe tijd voor in je agenda. Stond de oude afspraak er al in, dan wordt die meestal vanzelf bijgewerkt.', `font-size:14px;color:${ZACHT}`) +
+      afspraakWijzigen(d) +
+      p('Tot dan!', 'margin-bottom:22px') +
+      groet(base, d.wie);
+    return {
+      subject: `Je kennismaking is verzet naar ${d.wanneer}`,
+      html: omhulsel(base, { preheader: `Je nieuwe moment: ${d.wanneer}.`, inhoud, wie: d.wie }),
+      text: `${hoiTekst(d.naam)}\n\nJe kennismaking is verzet. Je nieuwe moment is ${d.wanneer} (${d.duur} minuten) met ${wieVol(d.wie)}.\n\n${d.video ? `Deelnemen aan het gesprek: ${d.video}\n\n` : ''}Ander moment kiezen: ${d.verzet}\nAnnuleren: ${d.annuleer}\n\nTot dan!${voet(d.wie)}`,
+    };
+  },
+
+  afspraakGeannuleerd(d, base = '') {
+    const inhoud = kop('Je kennismaking is geannuleerd') +
+      p(hoi(d.naam)) +
+      p(`Je afspraak van ${sterk(esc(d.wanneer))} gaat niet door. Je hoeft verder niets te doen.`) +
+      (d.reden ? blok(blokTekst(`${sterk('Reden')}<br>${esc(d.reden)}`)) : '') +
+      p('Wil je toch kennismaken? Kies gerust een nieuw moment. Of app of bel ons, dan prikken we samen een tijd.') +
+      knop(`${base}/contact#plannen`, 'Kies een nieuw moment') +
+      groet(base, d.wie);
+    return {
+      subject: 'Je kennismaking is geannuleerd',
+      html: omhulsel(base, { preheader: `Je afspraak van ${d.wanneer} gaat niet door. Een nieuw moment kiezen kan altijd.`, inhoud, wie: d.wie }),
+      text: `${hoiTekst(d.naam)}\n\nJe afspraak van ${d.wanneer} gaat niet door.${d.reden ? `\nReden: ${d.reden}` : ''}\n\nWil je toch kennismaken? Kies een nieuw moment: ${base}/contact#plannen${voet(d.wie)}`,
+    };
+  },
+
 };
+
+function afspraakBlok(d) {
+  return blok(tabel([
+    ['Wanneer', esc(d.wanneer)],
+    ['Duur', `${esc(d.duur)} minuten`],
+    ['Met', wieVol(d.wie)],
+    ['Hoe', d.video ? 'Videogesprek' : d.telefoon ? `We bellen je op ${esc(d.telefoon)}` : 'Online'],
+  ]));
+}
+function afspraakWijzigen(d) {
+  return p(`Komt het toch niet uit? ${link(esc(d.verzet), 'Kies een ander moment')} of ${link(esc(d.annuleer), 'annuleer de afspraak')}.`);
+}
 
 export { mails, voornaam };

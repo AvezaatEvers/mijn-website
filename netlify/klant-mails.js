@@ -19,6 +19,7 @@ export const TYPES = {
   jubileum: { label: "Een jaar klant", wanneer: "Automatisch, 1 jaar na de startdatum" },
   ontwerp: { label: "Ontworpen mail", wanneer: "Opgesteld door de agent" },
   bericht: { label: "Eigen bericht", wanneer: "Handmatig, bijvoorbeeld opgesteld door de agent" },
+  afspraak: { label: "Afspraak (Cal.com)", wanneer: "Automatisch na boeken, verzetten of annuleren via Cal.com" },
 };
 export const AUTOMATISCH = ["voorstelHerinnering", "checkIn", "kwartaal", "kwartaalTweede", "jaareinde", "inkomstenbelasting", "nps", "aanbevelen", "jubileum"];
 export const HANDMATIG = ["welkom", "voorstelHerinnering", "checkIn", "nps", "kwartaal", "kwartaalTweede", "jaareinde", "inkomstenbelasting", "review", "aanbevelen", "jubileum"];
@@ -164,14 +165,15 @@ export function maakMail(k, type, data = {}, env = () => undefined) {
 }
 
 // Versturen via Resend. env: (naam) => waarde
-export async function verstuur(env, { aan, mail }) {
+// bijlagen (optioneel): [{ filename, content (base64), content_type }]
+export async function verstuur(env, { aan, mail, bijlagen }) {
   const sleutel = env("RESEND_API_KEY");
   if (!sleutel) return { ok: false, fout: "RESEND_API_KEY ontbreekt in Netlify" };
   const van = env("MAIL_FROM") || "Avezaat & Evers <info@avezaatenevers.nl>";
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${sleutel}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: van, to: [aan], reply_to: "info@avezaatenevers.nl", subject: mail.subject, html: mail.html, text: mail.text }),
+    body: JSON.stringify({ from: van, to: [aan], reply_to: "info@avezaatenevers.nl", subject: mail.subject, html: mail.html, text: mail.text, ...(bijlagen && bijlagen.length ? { attachments: bijlagen } : {}) }),
   });
   const body = await res.json().catch(() => ({}));
   if (!res.ok) return { ok: false, fout: body.message || `Resend gaf fout ${res.status}` };

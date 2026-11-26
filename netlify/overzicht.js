@@ -48,6 +48,9 @@ export function leadInfo(k, nu = vandaag()) {
   if (sit === "achter") { score += 8; redenen.push("Administratie loopt achter"); }
   if (sit === "start") { score += 5; redenen.push("Net gestart"); }
   if (/€\s?(9\d|1\d\d)/.test(lead.prijs || "")) score += 5;
+  // Zelf een kennismaking ingepland via Cal.com (netlify/functions/cal-webhook.mjs)
+  const afspraak = k.afspraak && k.afspraak.status !== "geannuleerd" && k.afspraak.start ? k.afspraak : null;
+  if (afspraak && (fase === "nieuw" || fase === "contact")) { score += 15; redenen.push("Plande zelf een kennismaking"); }
 
   if (leeftijd < 1) { score += 15; redenen.push("Vandaag binnen"); }
   else if (leeftijd < 3) score += 8;
@@ -71,7 +74,10 @@ export function leadInfo(k, nu = vandaag()) {
 
   // Volgende stap
   let actie = "", urgent = false;
-  if (fase === "nieuw") {
+  if (afspraak && (fase === "nieuw" || fase === "contact")) {
+    const wanneer = new Date(afspraak.start).toLocaleString("nl-NL", { timeZone: "Europe/Amsterdam", weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+    actie = afspraak.start > new Date().toISOString() ? "Kennismaking gepland: " + wanneer : "Kennismaking geweest? Leg het gesprek vast";
+  } else if (fase === "nieuw") {
     if (leeftijd > 7) actie = "Nog één poging, of op verloren zetten";
     else if (uren > 2) { actie = "Reactie te laat: bel of app nu"; urgent = true; }
     else { actie = "Bel of app binnen 2 uur"; urgent = true; }

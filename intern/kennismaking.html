@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#26458F">
-<link rel="stylesheet" href="/assets/style.css?v=139">
+<link rel="stylesheet" href="/assets/style.css?v=140">
 <style>
   html, body { height: 100%; }
   body { margin: 0; overflow: hidden; background: #E6EBF5; }
@@ -295,6 +295,11 @@
     .slide .a { opacity: 1; transform: none; }
     .voet, .bed, .hulp, .melding { display: none !important; }
   }
+  /* Echte portretten van Koen en Daan, boven elkaar */
+  div.rechts { background: var(--tint, #EEF2F8); }
+  div.rechts .duo-vul { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 4%; padding: 0 8%; }
+  div.rechts .duo-vul img { position: static; width: 44%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 22px; box-shadow: 0 24px 50px -28px rgba(17, 24, 39, .45); }
+
 </style>
 </head>
 <body>
@@ -318,7 +323,7 @@
       </div>
     </div>
     <div class="rechts">
-      <img src="/assets/img/koen-daan.webp" alt="Koen Avezaat en Daan Evers" width="1200" height="975">
+      <div class="duo-vul"><img src="/assets/img/koen.webp?v=4" alt="Koen Avezaat" width="800" height="800"><img src="/assets/img/daan.webp?v=3" alt="Daan Evers" width="800" height="800"></div>
       <div class="label a a6"><strong>Koen &amp; Daan</strong><span>Jouw vaste boekhouders</span></div>
     </div>
     <aside class="notes">
@@ -762,7 +767,7 @@
         </div>
       </div>
     </div>
-    <div class="rechts"><img src="/assets/img/koen-daan.webp" alt="" width="1200" height="975"></div>
+    <div class="rechts"><div class="duo-vul"><img src="/assets/img/koen.webp?v=4" alt="Koen Avezaat" width="800" height="800"><img src="/assets/img/daan.webp?v=3" alt="Daan Evers" width="800" height="800"></div></div>
     <aside class="notes">
       <ul>
         <li>Terugkomen op wat ze bij de agenda in ieder geval besproken wilden hebben.</li>

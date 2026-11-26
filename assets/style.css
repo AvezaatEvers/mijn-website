@@ -1626,3 +1626,7 @@ p, li, dd, dt, td, th, blockquote, figcaption, summary, label { overflow-wrap: b
   .voelt-b .warm-klant .kl-lijst p { display: none; }
   .voelt-b .warm-klant .kl-lijst p.kort { display: block; font-size: 15px; line-height: 1.45; }
 }
+
+/* Bedankpagina: echte portretten van Koen en Daan */
+.bd-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.bd-duo img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 30%; border-radius: var(--radius); display: block; }

@@ -8,7 +8,7 @@ import { getStore } from "@netlify/blobs";
 import { leesBeschikbaarheid, leesAfspraken, vrijeTijden, tijdenPerDag, boek, verzet, annuleer, tokenKlopt, TZ } from "./lib/planner.js";
 import { naAfspraak } from "./lib/planner-acties.js";
 import { wanneer } from "./lib/afspraak.js";
-import { bezetVoor } from "./lib/bezet.js";
+import { bezetVoor, bezetSnel } from "./lib/bezet.js";
 
 const json = (data, status = 200) => new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
 const schoon = (s, n = 200) => String(s || "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, n);
@@ -17,14 +17,16 @@ const SITUATIES = ["start", "boekhouder", "zelf", "anders"];
 
 const BEZET = "Dit moment is net door iemand anders gekozen. Kies een ander moment.";
 
-export default async (req) => {
+export default async (req, context) => {
   const url = new URL(req.url);
   const pad = url.pathname.replace(/\/+$/, "");
   const env = (k) => process.env[k];
   const store = getStore({ name: "intern", consistency: "strong" });
 
   if (pad === "/api/planner/tijden" && req.method === "GET") {
-    const [b, lijst, bezet] = await Promise.all([leesBeschikbaarheid(store), leesAfspraken(store), bezetVoor(store, env)]);
+    // Niet wachten op iCloud/Google: laatst bekende bezette tijden tonen en op de achtergrond verversen
+    const achtergrond = context && typeof context.waitUntil === "function" ? (p) => context.waitUntil(p) : null;
+    const [b, lijst, bezet] = await Promise.all([leesBeschikbaarheid(store), leesAfspraken(store), bezetSnel(store, env, achtergrond)]);
     const negeer = url.searchParams.get("id") && tokenKlopt(env, url.searchParams.get("id"), url.searchParams.get("t")) ? url.searchParams.get("id") : undefined;
     return json({ dagen: tijdenPerDag(vrijeTijden(b, lijst, new Date(), { negeer, bezet })) });
   }

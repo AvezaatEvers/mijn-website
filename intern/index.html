@@ -357,18 +357,11 @@
     <div class="vd-tekst">
       <p class="vd-datum" id="datum"></p>
       <h1 id="groet">&nbsp;</h1>
-      <p class="vd-samen" id="samenvatting">&nbsp;</p>
     </div>
     <div id="briefing" hidden></div><div id="acties" hidden></div>
     <div class="wissel" id="wissel" hidden><button type="button" data-v="ik" class="is-aan">Mijn werk</button><button type="button" data-v="alle">Alles</button></div>
   </section>
 
-  <section class="vd-plan db-kaart" aria-labelledby="plan-titel">
-    <div class="vp-kop"><h2 id="plan-titel">Vandaag te doen</h2><span class="vp-meta" id="plan-meta"></span></div>
-    <div class="vp-balk"><i id="plan-balk"></i></div>
-    <ol class="plan" id="plan"></ol>
-    <button class="tekst-knop vp-meer" type="button" id="plan-meer" hidden></button>
-  </section>
 
   <div class="kpis" id="kpis">
     <div class="db-kaart kpi"><div class="skelet" style="width:60%"></div></div><div class="db-kaart kpi"><div class="skelet" style="width:60%"></div></div><div class="db-kaart kpi"><div class="skelet" style="width:60%"></div></div><div class="db-kaart kpi"><div class="skelet" style="width:60%"></div></div><div class="db-kaart kpi"><div class="skelet" style="width:60%"></div></div>
@@ -434,42 +427,6 @@
   </div>
 </main>
 <script src="/intern/app.js?v=14"></script>
-<script>
-(function () {
-  var alles = false, laatste = null;
-  function plan() { var AE = window.AE; if (!AE) return; AE.api('/intern/api/dagplan').then(teken).catch(function () {}); }
-  function tijd(min) { return min >= 60 ? Math.floor(min / 60) + ' uur' + (min % 60 >= 10 ? ' en ' + (min % 60) + ' min' : '') : min + ' minuten'; }
-  function teken(p) {
-    laatste = p;
-    var esc = window.AE.esc, n = p.missies.length, totaal = p.klaarVandaag + n, pct = totaal ? Math.round(p.klaarVandaag / totaal * 100) : 100;
-    var eerste = p.missies[0];
-    document.getElementById('samenvatting').innerHTML = n
-      ? esc(n + (n === 1 ? ' taak' : ' taken') + ', ongeveer ' + tijd(p.minuten) + '.') + (eerste ? ' Eerst: <b>' + esc(eerste.titel.charAt(0).toLowerCase() + eerste.titel.slice(1)) + (eerste.klant ? '</b> bij ' + esc(eerste.klant.naam) : '</b>') + '.' : '')
-      : 'Alles gedaan voor vandaag.';
-    document.getElementById('plan-meta').textContent = totaal ? p.klaarVandaag + ' van ' + totaal + ' klaar' : '';
-    document.getElementById('plan-balk').style.width = pct + '%';
-    var lijst = alles ? p.missies : p.missies.slice(0, 5);
-    document.getElementById('plan').innerHTML = n ? lijst.map(function (m, i) {
-      var tekst = '<b>' + esc(m.titel) + '</b><small>' + (m.klant ? esc(m.klant.naam) + ' · ' : '') + esc(m.proces.titel) + '</small>';
-      return '<li class="pm" style="animation-delay:' + (i * .03) + 's"><button class="pm-vink" type="button" data-klaar="' + esc(m.id) + '" aria-label="Klaar: ' + esc(m.titel) + '" title="Klaar"></button>' +
-        (m.url ? '<a class="pm-tekst" href="' + esc(m.url) + '"' + (m.extern ? ' target="_blank" rel="noopener"' : '') + '>' + tekst + '</a>' : '<span class="pm-tekst">' + tekst + '</span>') +
-        '<span class="pm-min">' + m.minuten + ' min</span><button class="pm-later" type="button" data-later="' + esc(m.id) + '" title="Zet op morgen">Morgen</button></li>';
-    }).join('') : '<li class="plan-leeg">Niets meer te doen. Mooi werk.</li>';
-    var meer = document.getElementById('plan-meer');
-    meer.hidden = n <= 5; meer.textContent = alles ? 'Toon minder' : 'Toon alle ' + n;
-  }
-  document.getElementById('plan-meer').addEventListener('click', function () { alles = !alles; if (laatste) teken(laatste); });
-  // Afvinken of naar morgen schuiven, direct vanuit de lijst
-  document.getElementById('plan').addEventListener('click', function (e) {
-    var b = e.target.closest('[data-klaar],[data-later]'); if (!b) return;
-    var li = b.closest('.pm'); li.classList.add('weg');
-    window.AE.api('/intern/api/dagplan', { method: 'POST', body: JSON.stringify({ missie: b.dataset.klaar || b.dataset.later, actie: b.dataset.klaar ? 'klaar' : 'later' }) })
-      .then(function (p) { setTimeout(function () { teken(p); }, 260); }).catch(function () { li.classList.remove('weg'); });
-  });
-  document.addEventListener('ae:dagplan', function (e) { teken(e.detail); });
-  plan();
-})();
-</script>
 <script>
 (function () {
   function werk() {

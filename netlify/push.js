@@ -7,7 +7,7 @@ const SLEUTEL = "push";
 export const SOORTEN = {
   lead: { naam: "Nieuwe lead", uitleg: "Iemand vult de prijscheck of het kennismakingsformulier op de site in." },
   wacht: { naam: "Lead wacht te lang", uitleg: "Een nieuwe lead is na 2 uur nog niet opgepakt (geen contact vastgelegd)." },
-  ochtend: { naam: "Ochtendoverzicht", uitleg: "Elke werkdag om 8:30: wat er vandaag te doen is." },
+  ochtend: { naam: "Dagstart", uitleg: "Elke werkdag om 8:30: even afstemmen wat jullie vandaag gaan doen." },
   agenda: { naam: "Agenda controleren", uitleg: "Elke maandag om 9:00: kloppen je vaste tijden en dichte dagen voor kennismakingen nog?" },
 };
 export const MENSEN = ["koen", "daan"];
